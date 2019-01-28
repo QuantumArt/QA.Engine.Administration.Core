@@ -1,0 +1,74 @@
+﻿@using QA.Engine.Administration.Services.Core.Models
+<p>start</p>
+@{
+    var model = (IEnumerable<SiteTreeModel>)ViewData["model"];
+    var userId = ViewData["userId"];
+}
+
+<h5>UserId: @(userId)</h5>
+
+<ul>
+    @foreach (var item in model)
+    {
+        <li>
+            @item.Alias (@item.Title)
+            <p>@Html.Raw(RenderItems(item.Children))</p>
+        </li>
+    }
+</ul>
+
+<p>
+    <a id="publish" href="#">publish</a>
+</p>
+
+@functions {
+public string RenderItems(List<SiteTreeModel> models)
+{
+    if (!models.Any())
+        return "";
+    var li = "";
+    foreach (var item in models)
+    {
+        li += item.Children.Any()
+            ? $"<li>{item.Alias} ({item.Title})<p>{RenderItems(item.Children)}</p></li>"
+            : $"<li>{item.Alias} ({item.Title})</li>";
+    }
+    var result = string.Format("<ul>{0}</ul>", li);
+    return result;
+}
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        jQuery('#publish').click(function (e) {
+            e.preventDefault();
+            var path = '/api/sitemap/publish?itemids=741180';
+            var data = {
+                BackendSid: getQueryVariable('backend_sid'),
+                CustomerCode: getQueryVariable('customerCode'),
+                HostId: getQueryVariable('hostUID'),
+                SiteId: getQueryVariable('site_id')
+            };
+            //data['itemids'] = [741180];
+            $.post(path, JSON.stringify(data), function (data) {
+                console.log(data)
+            });
+        });
+    });
+    //(function () {
+    //    var path = '/api/sitemap/publish' + location.search + '&itemids=741180';
+    //    el = document.getElementById('publish');
+    //    el.href = path;
+    //})();
+
+    function getQueryVariable(variable) {
+        var query = window.location.search.substring(1);
+        var vars = query.split('&');
+        for (var i = 0; i < vars.length; i++) {
+            var pair = vars[i].split('=');
+            if (decodeURIComponent(pair[0]) == variable) {
+                return decodeURIComponent(pair[1]);
+            }
+        }
+    }
+</script>

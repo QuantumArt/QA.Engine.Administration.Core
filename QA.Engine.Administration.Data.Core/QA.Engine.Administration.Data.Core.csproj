@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="QA.DotNetCore.Engine.Persistent.Dapper" Version="0.3.3" />
+    <PackageReference Include="QA.DotNetCore.Engine.Persistent.Interfaces" Version="0.3.3" />
+    <PackageReference Include="QA.DotNetCore.Engine.QpData" Version="0.3.3" />
+    <PackageReference Include="Quantumart.AspNetCore" Version="3.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\QA.Engine.Administration.Data.Interfaces.Core\QA.Engine.Administration.Data.Interfaces.Core.csproj" />
+  </ItemGroup>
+
+</Project>
