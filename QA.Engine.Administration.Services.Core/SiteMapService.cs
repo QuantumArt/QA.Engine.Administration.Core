@@ -104,7 +104,7 @@ namespace QA.Engine.Administration.Services.Core
             var status = _statusTypeProvider.GetStatus(siteId, isStage, QpContentItemStatus.Published);
             var contentId = _siteMapProvider.GetContentId(siteId);
 
-            _qpDataProvider.Publish(siteId, contentId, items, status.Id, userId);
+            _qpDataProvider.Publish(siteId, contentId, userId, items, status.Id);
         }
 
         public void ReorderSiteMapItems(int siteId, bool isStage, int userId, int itemId, int relatedItemId, bool isInsertBefore, int step)
@@ -137,7 +137,24 @@ namespace QA.Engine.Administration.Services.Core
 
             var contentId = _siteMapProvider.GetContentId(siteId);
 
-            _qpDataProvider.Reorder(siteId, contentId, list, userId);
+            _qpDataProvider.Reorder(siteId, contentId, userId, list);
+        }
+
+        public void MoveSiteMapItem(int siteId, bool isStage, int userId, int itemId, int newParentId)
+        {
+            if (itemId <= 0)
+                throw new ArgumentException("itemId <= 0");
+            if (newParentId <= 0)
+                throw new ArgumentException("newParentId <= 0");
+
+            var items = _siteMapProvider.GetByIds(siteId, isStage, new[] { itemId, newParentId });
+
+            if (!items.Any(x => x.Id == itemId) || !items.Any(x => x.Id == newParentId))
+                throw new InvalidOperationException("itemId or newParentId doesn't exist");
+
+            var contentId = _siteMapProvider.GetContentId(siteId);
+
+            _qpDataProvider.Move(siteId, contentId, userId, itemId, newParentId);
         }
 
         private List<SiteTreeModel> GetPageStructure(List<SiteTreeModel> pages, List<WidgetModel> widgets, List<DiscriminatorModel> discriminators)

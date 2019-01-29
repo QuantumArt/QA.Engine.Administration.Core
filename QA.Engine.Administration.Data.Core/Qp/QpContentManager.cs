@@ -514,7 +514,7 @@ namespace QA.Engine.Administration.Data.Core.Qp
         /// <summary>
         /// Изменяет статус элементов
         /// </summary>
-        public void ChangeStatus(int statusId, int userId)
+        public void ChangeStatus(int userId, int statusId)
         {
             ValidateQuery();
 
@@ -526,32 +526,6 @@ namespace QA.Engine.Administration.Data.Core.Qp
                 {
                     { ContentItemIdFieldName, row[ContentItemIdFieldName].ToString() },
                     { StatusTypeIdFieldName, statusId.ToString(CultureInfo.InvariantCulture) }
-                });
-            }
-
-            _query.DbConnector.MassUpdate(_query.ContentId, values, userId);
-        }
-
-        /// <summary>
-        /// Изменяет порядок элементов
-        /// </summary>
-        public void Reorder(IEnumerable<AbstractItemData> items, string colunmName, int userId)
-        {
-            ValidateQuery();
-
-            var values = new List<Dictionary<string, string>>();
-            var dataTable = _dbConnection.GetContentData(_query, out var totalRecords);
-            foreach(DataRow row in dataTable.Rows)
-            {
-                var id = int.Parse(row[ContentItemIdFieldName].ToString());
-                var indexOrder = items.SingleOrDefault(x => x.Id == id)?.IndexOrder;
-                if (indexOrder == null)
-                    continue;
-
-                values.Add(new Dictionary<string, string>
-                {
-                    { ContentItemIdFieldName, id.ToString(CultureInfo.InvariantCulture) },
-                    { colunmName, indexOrder.Value.ToString(CultureInfo.InvariantCulture) }
                 });
             }
 

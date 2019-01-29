@@ -155,11 +155,6 @@ namespace QA.Engine.Administration.Data.Core.Qp
         /// <summary>
         /// Изменяет статус элементов
         /// </summary>
-        void ChangeStatus(int statusId, int userId);
-
-        /// <summary>
-        /// Изменяет порядок элементов
-        /// </summary>
-        void Reorder(IEnumerable<AbstractItemData> items, string colunmName, int userId);
+        void ChangeStatus(int userId, int statusId);
     }
 }

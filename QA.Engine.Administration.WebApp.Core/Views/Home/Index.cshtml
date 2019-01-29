@@ -12,7 +12,7 @@
     @foreach (var item in model)
     {
         <li>
-            @item.Alias (@item.Title)
+            [@item.Id] @item.Alias (@item.Title) order->@item.IndexOrder
             <p>@Html.Raw(RenderItems(item.Children))</p>
         </li>
     }
@@ -24,6 +24,9 @@
 <p>
     <a id="reorder" href="#">reorder</a>
 </p>
+<p>
+    <a id="move" href="#">move</a>
+</p>
 
 @functions {
 public string RenderItems(List<SiteTreeModel> models)
@@ -34,8 +37,8 @@ public string RenderItems(List<SiteTreeModel> models)
     foreach (var item in models)
     {
         li += item.Children.Any()
-            ? $"<li>{item.Alias} ({item.Title})<p>{RenderItems(item.Children)}</p></li>"
-            : $"<li>{item.Alias} ({item.Title})</li>";
+            ? $"<li>[{item.Id}] {item.Alias} ({item.Title}) order->{item.IndexOrder}<p>{RenderItems(item.Children)}</p></li>"
+            : $"<li>[{item.Id}] {item.Alias} ({item.Title}) order->{item.IndexOrder}</li>";
     }
     var result = string.Format("<ul>{0}</ul>", li);
     return result;
@@ -44,17 +47,25 @@ public string RenderItems(List<SiteTreeModel> models)
 
 <script type="text/javascript">
     $(document).ready(function () {
-        jQuery('#publish').click(function (e) {
+        $('#publish').click(function (e) {
             e.preventDefault();
-            ajaxRequest('/api/sitemap/publish', ['741180']);
+            ajaxRequest('/api/sitemap/publish', [741184, 741186, 741188]);
         });
 
-        jQuery('#reorder').click(function (e) {
+        $('#reorder').click(function (e) {
             e.preventDefault();
             ajaxRequest('/api/sitemap/reorder', {
-                itemId: 741180,
-                relatedItemId: 741121,
-                isInsertBefore: false
+                itemId: 741188,
+                relatedItemId: 741184,
+                isInsertBefore: true
+            });
+        });
+
+        $('#move').click(function (e) {
+            e.preventDefault();
+            ajaxRequest('/api/sitemap/move', {
+                itemId: 741182,
+                newParentId: 741114
             });
         });
     });

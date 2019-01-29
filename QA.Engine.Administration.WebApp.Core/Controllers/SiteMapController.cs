@@ -97,6 +97,21 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
             }
         }
 
+        [HttpPost("move")]
+        public ApiResult Move([FromBody]MoveModel model)
+        {
+            try
+            {
+                _siteMapService.MoveSiteMapItem(_siteId, _isStage, _userId, model.ItemId, model.NewParentId);
+                return ApiResult.Success();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Move error");
+                return ApiResult.Fail(e);
+            }
+        }
+
     }
 
     

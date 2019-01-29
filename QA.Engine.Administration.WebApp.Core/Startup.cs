@@ -118,7 +118,7 @@ namespace QA.Engine.Administration.WebApp.Core
         private string GetConnectionString(IServiceProvider sp)
         {
             var config = Configuration.Get<EnvironmentConfiguration>();
-            var connectionString = config.IgnoreAuth
+            var connectionString = config.UseFake
                 ? Configuration.GetConnectionString("QpConnection")
                 : sp.GetService<IWebAppQpHelper>()?.ConnectionString;
             return connectionString;

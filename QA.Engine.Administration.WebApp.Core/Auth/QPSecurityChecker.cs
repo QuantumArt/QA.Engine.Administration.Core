@@ -47,6 +47,14 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
                     return true;
             }
 
+            if (_configuration.UseFake)
+            {
+                _httpContext.Session.Set(AuthenticationKey, BitConverter.GetBytes(true));
+                _httpContext.Session.SetInt32(DBConnector.LastModifiedByKey, _configuration.FakeData.UserId);
+                _httpContext.Session.SetString(UserLanguageKey, _configuration.FakeData.LangName);
+                return true;
+            }
+
             var connectionString = _webAppQpHelper.ConnectionString;
             if (string.IsNullOrEmpty(connectionString))
                 return false;
@@ -78,7 +86,6 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
 
                 _httpContext.Session.Set(AuthenticationKey, BitConverter.GetBytes(result));
                 _httpContext.Session.SetInt32(DBConnector.LastModifiedByKey, userId);
-                //_httpContext.Items[DBConnector.LastModifiedByKey] = userId;
             }
 
             return result;

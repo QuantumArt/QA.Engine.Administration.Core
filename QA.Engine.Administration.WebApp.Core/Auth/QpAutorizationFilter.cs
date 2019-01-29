@@ -25,9 +25,6 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
         {
             var httpContext = context.HttpContext;
 
-            if (_configuration.IgnoreAuth)
-                return;
-
             if (string.IsNullOrWhiteSpace(_webAppQpHelper.CustomerCode))
                 throw new Exception("Customer code should not be empty");
 

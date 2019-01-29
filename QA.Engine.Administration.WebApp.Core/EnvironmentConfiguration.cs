@@ -9,6 +9,13 @@
         public int IndexOrderStep { get; set; } = 1;
         public bool IsStage { get; set; } = true;
         public bool IgnoreQPSecurityChecker { get; set; } = false;
-        public bool IgnoreAuth { get; set; } = false;
+        public bool UseFake { get; set; } = false;
+        public FakeData FakeData { get; set; }
+    }
+
+    public class FakeData
+    {
+        public int UserId { get; set; }
+        public string LangName { get; set; }
     }
 }

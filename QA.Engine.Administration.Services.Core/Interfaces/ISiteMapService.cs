@@ -10,5 +10,6 @@ namespace QA.Engine.Administration.Services.Core.Interfaces
         List<SiteTreeModel> GetSiteMapStructure(int siteId, bool isStage);
         void PublishSiteMapItems(int siteId, bool isStage, int userId, List<int> itemIds);
         void ReorderSiteMapItems(int siteId, bool isStage, int userId, int itemId, int relatedItemId, bool isInsertBefore, int step);
+        void MoveSiteMapItem(int siteId, bool isStage, int userId, int itemId, int newParentId);
     }
 }
