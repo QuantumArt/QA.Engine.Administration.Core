@@ -1,0 +1,221 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>QA.Engine.Administration.WebApp.Core</name>
+    </assembly>
+    <members>
+        <member name="T:QA.Engine.Administration.WebApp.Core.Auth.QpHelper">
+            <summary>
+            Методы для взаимойствия c Qp
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Auth.QpHelper.CustomerCode">
+            <summary>
+            Код поставщика
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Auth.QpHelper.SiteId">
+            <summary>
+            Идентификатор сайта
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Auth.QpHelper.BackendSid">
+            <summary>
+            Id бэкенда
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Auth.QpHelper.HostId">
+            <summary>
+            Id хоста
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Auth.QpHelper.QpKey">
+            <summary>
+            Ключ
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Auth.QpHelper.IsQpMode">
+            <summary>
+            Признак запуска через Custom Action Qp
+            </summary>
+        </member>
+        <member name="M:QA.Engine.Administration.WebApp.Core.Auth.QPSecurityChecker.CheckAuthorization">
+            <summary>
+            Проверяет, авторизован ли пользователь
+            </summary>
+        </member>
+        <member name="T:QA.Engine.Administration.WebApp.Core.Auth.SerializableQpViewModelBase">
+            <summary>
+            Базовый класс модели представления при использовании Qp
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Auth.SerializableQpViewModelBase.HostId">
+            <summary>
+            Идентификатор хоста
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Auth.SerializableQpViewModelBase.BackendSid">
+            <summary>
+            Идентификатор бэкенда
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Auth.SerializableQpViewModelBase.CustomerCode">
+            <summary>
+            Код заказчика
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Auth.SerializableQpViewModelBase.QpKey">
+            <summary>
+            Ключ
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Auth.SerializableQpViewModelBase.SiteId">
+            <summary>
+            Идентификатор сайта
+            </summary>
+        </member>
+        <member name="M:QA.Engine.Administration.WebApp.Core.Auth.SerializableQpViewModelBase.FromJsonString(System.String)">
+            <summary>
+            Сериализация JSON в объект
+            </summary>
+            <param name="json">Строка для десериализации</param>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Auth.IWebAppQpHelper.BackendSid">
+            <summary>
+            Id бэкенда
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Auth.IWebAppQpHelper.CustomerCode">
+            <summary>
+            Код поставщика
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Auth.IWebAppQpHelper.HostId">
+            <summary>
+            Id хоста
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Auth.IWebAppQpHelper.IsQpMode">
+            <summary>
+            Признак запуска через Custom Action Qp
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Auth.IWebAppQpHelper.QpKey">
+            <summary>
+            Ключ
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Auth.IWebAppQpHelper.SiteId">
+            <summary>
+            Идентификатор сайта
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Auth.IWebAppQpHelper.ConnectionString">
+            <summary>
+            Строка подключения к БД
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Auth.IWebAppQpHelper.UserId">
+            <summary>
+            Id пользователя
+            </summary>
+        </member>
+        <member name="T:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController">
+            <summary>
+            Api карты сайта
+            </summary>
+        </member>
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.#ctor(QA.Engine.Administration.Services.Core.Interfaces.ISiteMapService,QA.Engine.Administration.Services.Core.Interfaces.IItemDifinitionService,Microsoft.Extensions.Options.IOptions{QA.Engine.Administration.WebApp.Core.EnvironmentConfiguration},QA.Engine.Administration.WebApp.Core.Auth.IWebAppQpHelper,Microsoft.Extensions.Logging.ILogger{QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController})">
+            <summary>
+            Конструктор
+            </summary>
+            <param name="siteMapService"></param>
+            <param name="itemDifinitionService"></param>
+            <param name="options"></param>
+            <param name="webAppQpHelper"></param>
+            <param name="logger"></param>
+        </member>
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.GetSiteMap">
+            <summary>
+            Возвращает полное дерево карты сайта
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.GetSiteTree(System.Nullable{System.Int32})">
+            <summary>
+            Возвращает дочерние страницы родительского элемента (страницы)
+            </summary>
+            <param name="parentId">Id родительской страницы</param>
+            <returns></returns>
+        </member>
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.GetWidgets(System.Int32)">
+            <summary>
+            Возвращает дочерние виджеты у родительского элемента (страницы или виджета)
+            </summary>
+            <param name="parentId">Id родительского элемента</param>
+            <returns></returns>
+        </member>
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.GetDescriminators">
+            <summary>
+            Возвращает типы контента
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.Publish(System.Collections.Generic.List{System.Int32})">
+            <summary>
+            Опубликовать страницу
+            </summary>
+            <param name="itemIds">Id страниц</param>
+            <returns></returns>
+        </member>
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.Reorder(QA.Engine.Administration.WebApp.Core.Models.ReorderModel)">
+            <summary>
+            Изменить порядок отображения страниц
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.Move(QA.Engine.Administration.WebApp.Core.Models.MoveModel)">
+            <summary>
+            Переместить страницу к новому родительскому элементу
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="T:QA.Engine.Administration.WebApp.Core.Models.MoveModel">
+            <summary>
+            Модель для изменения родительского элемента
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.MoveModel.ItemId">
+            <summary>
+            Id страницы, родительский элемент у которой хотим изменить
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.MoveModel.NewParentId">
+            <summary>
+            Id нового родительского элемента
+            </summary>
+        </member>
+        <member name="T:QA.Engine.Administration.WebApp.Core.Models.ReorderModel">
+            <summary>
+            Модель для изменения отображаемой сортировки страниц
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.ReorderModel.ItemId">
+            <summary>
+            Id страницы, позицию которой хотим изменить
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.ReorderModel.RelatedItemId">
+            <summary>
+            Id страницы, рядом с которой хотим поместить страницу
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.ReorderModel.IsInsertBefore">
+            <summary>
+            Признак - переместить страницу ItemId перед страницей RelatedItemId
+            </summary>
+        </member>
+    </members>
+</doc>

@@ -14,11 +14,15 @@ using QA.DotNetCore.Engine.Persistent.Interfaces;
 using QA.DotNetCore.Engine.QpData.Persistent.Dapper;
 using QA.Engine.Administration.Data.Core;
 using QA.Engine.Administration.Data.Core.Qp;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace QA.Engine.Administration.WebApp.Core
 {
     public class Startup
     {
+        const string SWAGGER_VERSION = "v1";
+        const string SWAGGER_TITLE = "Administration Web App";
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -37,6 +41,18 @@ namespace QA.Engine.Administration.WebApp.Core
                     opt.Filters.Add(typeof(QpAutorizationFilter));
                 })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+            services.AddSwaggerGen(o =>
+            {
+                o.SwaggerDoc(SWAGGER_VERSION, new Info
+                {
+                    Title = SWAGGER_TITLE,
+                    Version = SWAGGER_VERSION
+                });
+                var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = System.IO.Path.Combine(AppContext.BaseDirectory, xmlFile);
+                o.IncludeXmlComments(xmlPath);
+            });
 
             //services.AddSpaStaticFiles(configuration =>
             //{
@@ -105,6 +121,11 @@ namespace QA.Engine.Administration.WebApp.Core
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
+            });
+            app.UseSwagger();
+            app.UseSwaggerUI(o =>
+            {
+                o.SwaggerEndpoint("/swagger/v1/swagger.json", $"{SWAGGER_TITLE} {SWAGGER_VERSION}");
             });
 
             //app.UseSpa(spa =>
