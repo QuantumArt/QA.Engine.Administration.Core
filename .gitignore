@@ -248,3 +248,6 @@ _Pvt_Extensions
 *.sublime-workspace
 **/*.generated.cs
 npm-debug.log.*
+
+# Client
+*/wwwroot/*
