@@ -28,8 +28,6 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
 
         public bool UseHierarchyRegionsFilter { get; set; }
 
-        public bool IsStage { get; set; }
-
         //public int RootPageId
         //{
         //    get
@@ -57,7 +55,7 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
             return (SiteConfiguration)httpContext.Items[StorageKey];
         }
 
-        public static SiteConfiguration Set(HttpContext httpContext, string customerCode, int siteId, bool isStage)
+        public static SiteConfiguration Set(HttpContext httpContext, string customerCode, int siteId)
         {
             var connectionString = GetConnectionString(customerCode);
             //var useHierarchyRegionsFilter = _qpSettingsService.GetSetting(connectionString, "USE_HIERARCHY_REGIONS_FILTER");
@@ -66,7 +64,6 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
                 // UseHierarchyRegionsFilter = useHierarchyRegionsFilter != null && useHierarchyRegionsFilter.ToLower() == "true",
                 ConnectionString = connectionString,
                 SiteId = siteId,
-                IsStage = isStage,
                 PublishStatusImageUrl = "/Content/icons/pub.png",
                 CreatedStatusImageUrl = "/Content/icons/new.jpg",
             };

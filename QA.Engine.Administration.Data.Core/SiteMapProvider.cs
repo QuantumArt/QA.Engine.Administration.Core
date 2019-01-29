@@ -24,7 +24,7 @@ namespace QA.Engine.Administration.Data.Core
         }
 
         //запрос с использованием NetName таблиц и столбцов
-        private const string CmdGetAbstractItem = @"
+        private const string CmdGetAbstractItems = @"
 SELECT
     ai.content_item_id AS Id,
     ai.[|QPAbstractItem.Name|] as Alias,
@@ -42,9 +42,10 @@ SELECT
     CASE WHEN ai.[STATUS_TYPE_ID] = (SELECT TOP 1 st.STATUS_TYPE_ID FROM [STATUS_TYPE] st WHERE st.[STATUS_TYPE_NAME]=N'Published') THEN 1 ELSE 0 END AS Published
 FROM [|QPAbstractItem|] ai
 INNER JOIN [|QPDiscriminator|] def on ai.[|QPAbstractItem.Discriminator|] = def.content_item_id
+ORDER BY ai.[|QPAbstractItem.Parent|], ai.[|QPAbstractItem.IndexOrder|], ai.content_item_id
 ";
 
-        private const string CmdGetAbstractPageItem = @"
+        private const string CmdGetAbstractPageItems = @"
 SELECT
     ai.content_item_id AS Id,
     ai.[|QPAbstractItem.Name|] as Alias,
@@ -68,8 +69,9 @@ WHERE def.[|QPDiscriminator.IsPage|]=1 AND ai.[|QPAbstractItem.VersionOf|] is nu
         OR EXISTS (SELECT 1 FROM [|QPAbstractItem|] ai1 
             WHERE ai.[|QPAbstractItem.Parent|] {0} AND ai1.content_item_id=ai.[|QPAbstractItem.VersionOf|])
     )
+ORDER BY ai.[|QPAbstractItem.Parent|], ai.[|QPAbstractItem.IndexOrder|], ai.content_item_id
 ";
-        private const string CmdGetAbstractItemById = @"
+        private const string CmdGetAbstractItemByIds = @"
 SELECT
     ai.content_item_id AS Id,
     ai.[|QPAbstractItem.Name|] as Alias,
@@ -94,7 +96,7 @@ WHERE ai.content_item_id IN @ItemIds
 
         public IEnumerable<AbstractItemData> GetAllItems(int siteId, bool isStage)
         {
-            var query = _netNameQueryAnalyzer.PrepareQuery(CmdGetAbstractItem, siteId, isStage);
+            var query = _netNameQueryAnalyzer.PrepareQuery(CmdGetAbstractItems, siteId, isStage);
             return _connection.Query<AbstractItemData>(query).ToList();
         }
 
@@ -102,7 +104,7 @@ WHERE ai.content_item_id IN @ItemIds
         {
             const int maxParentIdsPerRequest = 500;
 
-            var query = _netNameQueryAnalyzer.PrepareQuery(CmdGetAbstractPageItem, siteId, isStage);
+            var query = _netNameQueryAnalyzer.PrepareQuery(CmdGetAbstractPageItems, siteId, isStage);
 
             if (parentIds == null || !parentIds.Any())
             {
@@ -136,7 +138,7 @@ WHERE ai.content_item_id IN @ItemIds
             if (itemIds.Any(x => x <= 0))
                 throw new ArgumentException("itemId <= 0");
 
-            var query = _netNameQueryAnalyzer.PrepareQuery(CmdGetAbstractItemById, siteId, isStage);
+            var query = _netNameQueryAnalyzer.PrepareQuery(CmdGetAbstractItemByIds, siteId, isStage);
             return _connection.Query<AbstractItemData>(query, new { ItemIds = itemIds });
         }
 

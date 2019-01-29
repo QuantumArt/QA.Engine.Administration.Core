@@ -1,10 +1,31 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace QA.Engine.Administration.WebApp.Core.Models
 {
+    public class ApiResult
+    {
+        public bool IsSuccess { get; set; }
+        public string Error { get; set; }
+
+        public static ApiResult Fail(Exception e)
+        {
+            return new ApiResult
+            {
+                IsSuccess = false,
+                Error = e.ToString()
+            };
+        }
+
+        public static ApiResult Success()
+        {
+            return new ApiResult
+            {
+                IsSuccess = true,
+                Error = null
+            };
+        }
+    }
+
     public class ApiResult<T>
     {
         public T Data { get; set; }
@@ -27,6 +48,16 @@ namespace QA.Engine.Administration.WebApp.Core.Models
             {
                 IsSuccess = true,
                 Data = data,
+                Error = null
+            };
+        }
+
+        public static ApiResult<T> Success()
+        {
+            return new ApiResult<T>
+            {
+                IsSuccess = true,
+                Data = default(T),
                 Error = null
             };
         }

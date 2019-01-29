@@ -43,10 +43,8 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
             if (_httpContext.Session.Get(AuthenticationKey) != null)
             {
                 var uid = _httpContext.Session.GetInt32(DBConnector.LastModifiedByKey);
-                if (uid == null || uid <= 0)
-                    return false;
-                _httpContext.Items[DBConnector.LastModifiedByKey] = uid;
-                return true;
+                if (uid > 0)
+                    return true;
             }
 
             var connectionString = _webAppQpHelper.ConnectionString;
@@ -80,7 +78,7 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
 
                 _httpContext.Session.Set(AuthenticationKey, BitConverter.GetBytes(result));
                 _httpContext.Session.SetInt32(DBConnector.LastModifiedByKey, userId);
-                _httpContext.Items[DBConnector.LastModifiedByKey] = userId;
+                //_httpContext.Items[DBConnector.LastModifiedByKey] = userId;
             }
 
             return result;

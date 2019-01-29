@@ -65,7 +65,6 @@ namespace QA.Engine.Administration.WebApp.Core
             services.AddScoped<IQpDbConnector, QpDbConnector>(sp => new QpDbConnector(GetConnectionString(sp)));
             services.AddScoped<IQpMetadataManager, QpMetadataManager>();
             services.AddScoped<IQpContentManager, QpContentManager>();
-            services.AddScoped<IQpContentItem, QpContentItem>();
 
             services.AddScoped<ISiteMapService, SiteMapService>();
             services.AddScoped<IItemDifinitionService, ItemDifinitionService>();

@@ -8,6 +8,7 @@ namespace QA.Engine.Administration.Services.Core.Interfaces
         List<SiteTreeModel> GetSiteMapItems(int siteId, bool isStage, int? parentId);
         List<WidgetModel> GetWidgetItems(int siteId, bool isStage, int parentId);
         List<SiteTreeModel> GetSiteMapStructure(int siteId, bool isStage);
-        object PublishSiteMapItems(int siteId, bool isStage, List<int> itemIds);
+        void PublishSiteMapItems(int siteId, bool isStage, int userId, List<int> itemIds);
+        void ReorderSiteMapItems(int siteId, bool isStage, int userId, int itemId, int relatedItemId, bool isInsertBefore, int step);
     }
 }

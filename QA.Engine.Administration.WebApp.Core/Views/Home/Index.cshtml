@@ -1,12 +1,13 @@
 ﻿@using QA.Engine.Administration.Services.Core.Models
-<p>start</p>
+
 @{
-    var model = (IEnumerable<SiteTreeModel>)ViewData["model"];
+    var model = (List<SiteTreeModel>)ViewData["model"];
     var userId = ViewData["userId"];
 }
 
 <h5>UserId: @(userId)</h5>
 
+<h5>Site structure:</h5>
 <ul>
     @foreach (var item in model)
     {
@@ -19,6 +20,9 @@
 
 <p>
     <a id="publish" href="#">publish</a>
+</p>
+<p>
+    <a id="reorder" href="#">reorder</a>
 </p>
 
 @functions {
@@ -42,16 +46,15 @@ public string RenderItems(List<SiteTreeModel> models)
     $(document).ready(function () {
         jQuery('#publish').click(function (e) {
             e.preventDefault();
-            var path = '/api/sitemap/publish?itemids=741180';
-            var data = {
-                BackendSid: getQueryVariable('backend_sid'),
-                CustomerCode: getQueryVariable('customerCode'),
-                HostId: getQueryVariable('hostUID'),
-                SiteId: getQueryVariable('site_id')
-            };
-            //data['itemids'] = [741180];
-            $.post(path, JSON.stringify(data), function (data) {
-                console.log(data)
+            ajaxRequest('/api/sitemap/publish', ['741180']);
+        });
+
+        jQuery('#reorder').click(function (e) {
+            e.preventDefault();
+            ajaxRequest('/api/sitemap/reorder', {
+                itemId: 741180,
+                relatedItemId: 741121,
+                isInsertBefore: false
             });
         });
     });
@@ -61,14 +64,37 @@ public string RenderItems(List<SiteTreeModel> models)
     //    el.href = path;
     //})();
 
-    function getQueryVariable(variable) {
-        var query = window.location.search.substring(1);
-        var vars = query.split('&');
-        for (var i = 0; i < vars.length; i++) {
-            var pair = vars[i].split('=');
-            if (decodeURIComponent(pair[0]) == variable) {
-                return decodeURIComponent(pair[1]);
+    function getHeaderData() {
+        getQueryVariable = function (variable) {
+            var query = window.location.search.substring(1);
+            var vars = query.split('&');
+            for (var i = 0; i < vars.length; i++) {
+                var pair = vars[i].split('=');
+                if (decodeURIComponent(pair[0]) == variable) {
+                    return decodeURIComponent(pair[1]);
+                }
             }
-        }
+        };
+
+        return {
+            BackendSid: getQueryVariable('backend_sid'),
+            CustomerCode: getQueryVariable('customerCode'),
+            HostId: getQueryVariable('hostUID'),
+            SiteId: getQueryVariable('site_id')
+        };
+    }
+
+    function ajaxRequest(path, model) {
+        $.ajax(path, {
+            method: 'POST',
+            data: JSON.stringify(model),
+            contentType: 'application/json',
+            beforeSend: function (request) {
+                request.setRequestHeader('Qp-Site-Params', JSON.stringify(getHeaderData()));
+            },
+            success: function (result) {
+                console.log(path, result)
+            }
+        });
     }
 </script>

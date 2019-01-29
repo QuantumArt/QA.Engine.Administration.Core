@@ -13,11 +13,6 @@ namespace QA.Engine.Administration.Data.Core.Qp
     {
         private readonly DBConnector _dbConnection;
 
-        /// <summary>
-        /// Строка подключения
-        /// </summary>
-        public string ConnectionString { get { return _dbConnection == null ? string.Empty : _dbConnection.InstanceConnectionString; } }
-
         #region Constructors
 
         /// <summary>

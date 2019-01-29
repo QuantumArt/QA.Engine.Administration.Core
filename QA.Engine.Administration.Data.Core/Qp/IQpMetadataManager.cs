@@ -18,8 +18,6 @@ namespace QA.Engine.Administration.Data.Core.Qp
 
         int GetSiteId(string siteName);
 
-        string ConnectionString { get; }
-
         string GetSiteName(int siteId);
     }
 }

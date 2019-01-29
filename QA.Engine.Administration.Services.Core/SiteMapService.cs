@@ -90,7 +90,7 @@ namespace QA.Engine.Administration.Services.Core
             return pageStructure;
         }
 
-        public object PublishSiteMapItems(int siteId, bool isStage, List<int> itemIds)
+        public void PublishSiteMapItems(int siteId, bool isStage, int userId, List<int> itemIds)
         {
             if (itemIds == null || !itemIds.Any())
                 throw new ArgumentNullException("itemIds");
@@ -104,9 +104,40 @@ namespace QA.Engine.Administration.Services.Core
             var status = _statusTypeProvider.GetStatus(siteId, isStage, QpContentItemStatus.Published);
             var contentId = _siteMapProvider.GetContentId(siteId);
 
-            _qpDataProvider.Publish(siteId, contentId, items, status.Id);
+            _qpDataProvider.Publish(siteId, contentId, items, status.Id, userId);
+        }
 
-            return new { Success = true };
+        public void ReorderSiteMapItems(int siteId, bool isStage, int userId, int itemId, int relatedItemId, bool isInsertBefore, int step)
+        {
+            if (itemId <= 0)
+                throw new ArgumentException("itemId <= 0");
+            if (relatedItemId <= 0)
+                throw new ArgumentException("relatedItemId <= 0");
+
+            var items = _siteMapProvider.GetByIds(siteId, isStage, new[] { itemId, relatedItemId });
+
+            if (!items.Any(x => x.Id == itemId) || !items.Any(x => x.Id == relatedItemId))
+                throw new InvalidOperationException("itemId or relatedItemId doesn't exist");
+
+            var item = items.First(x => x.Id == itemId);
+
+            var list = _siteMapProvider.GetItems(siteId, isStage, item.ParentId.HasValue ? new[] { item.ParentId.Value } : new int[] { });
+
+            var result = list.Select(x => _mapper.Map<SiteTreeModel>(x)).ToList();
+            result.Remove(result.SingleOrDefault(x => x.Id == itemId));
+            var relatedIndex = result.IndexOf(result.SingleOrDefault(x => x.Id == relatedItemId));
+            result.Insert(isInsertBefore ? relatedIndex : (relatedIndex + 1 >= result.Count ? result.Count : relatedIndex + 1), _mapper.Map<SiteTreeModel>(item));
+
+            for (var i = 0; i < result.Count; i++)
+            {
+                var i1 = i;
+                var listItem = list.SingleOrDefault(x => x.Id == result[i1].Id);
+                listItem.IndexOrder = i * step;
+            }
+
+            var contentId = _siteMapProvider.GetContentId(siteId);
+
+            _qpDataProvider.Reorder(siteId, contentId, list, userId);
         }
 
         private List<SiteTreeModel> GetPageStructure(List<SiteTreeModel> pages, List<WidgetModel> widgets, List<DiscriminatorModel> discriminators)

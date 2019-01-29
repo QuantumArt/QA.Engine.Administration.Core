@@ -5,6 +5,7 @@ namespace QA.Engine.Administration.Data.Interfaces.Core
 {
     public interface IQpDataProvider
     {
-        void Publish(int siteId, int contentId, IEnumerable<AbstractItemData> items, int statusId);
+        void Publish(int siteId, int contentId, IEnumerable<AbstractItemData> items, int statusId, int userId);
+        void Reorder(int siteId, int contentId, IEnumerable<AbstractItemData> items, int userId);
     }
 }

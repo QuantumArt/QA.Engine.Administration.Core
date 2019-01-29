@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
+using Quantumart.QPublishing.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,12 +33,17 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
         /// <summary>
         /// Идентификатор сайта
         /// </summary>
-        string SiteId { get; }
+        int SiteId { get; }
 
         /// <summary>
-        /// ConnectionString
+        /// Строка подключения к БД
         /// </summary>
         string ConnectionString { get; }
+
+        /// <summary>
+        /// Id пользователя
+        /// </summary>
+        int UserId { get; }
     }
 
     public class WebAppQpHelper : IWebAppQpHelper
@@ -58,8 +64,15 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
                 if (httpContext.Request.Headers.TryGetValue("X-Requested-With", out StringValues xRequestedWith))
                     isAjaxRequest = xRequestedWith.Contains("XMLHttpRequest");
 
-                if (isAjaxRequest && httpContext.Request.Method.ToLower() == "post")
+                var data = string.Empty;
+                if (httpContext.Request.Headers.TryGetValue("Qp-Site-Params", out StringValues qpSiteParams))
+                    data = string.Join("", qpSiteParams.ToArray());
+
+                if (isAjaxRequest && httpContext.Request.Method.ToLower() == "post" && string.IsNullOrEmpty(data))
                     return SerializableQpViewModelBase.FromJsonString(httpContext.Request.Body);
+
+                if (!string.IsNullOrEmpty(data))
+                    return SerializableQpViewModelBase.FromJsonString(data);
 
                 return null;
             });
@@ -103,15 +116,25 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
             }
         }
 
-        public string SiteId
+        public int SiteId
         {
             get
             {
+                var siteConfiguration = SiteConfiguration.Get(_httpContext);
+                if (siteConfiguration != null)
+                    return siteConfiguration.SiteId;
+
                 var obj = _serializableQpViewModelBaseLazy.Value;
-                return obj != null ? obj.SiteId : _qpHelper.SiteId;
+                var siteId = obj != null ? obj.SiteId : _qpHelper.SiteId;
+                if (!int.TryParse(siteId, out int result))
+                    throw new Exception("Site Id should not be empty");
+
+                return result;
             }
         }
 
         public string ConnectionString => SiteConfiguration.Get(_httpContext).ConnectionString;
+
+        public int UserId => _httpContext.Session.GetInt32(DBConnector.LastModifiedByKey) ?? 0;
     }
 }

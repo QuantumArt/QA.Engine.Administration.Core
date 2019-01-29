@@ -14,19 +14,20 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
     {
         private readonly ISiteMapService _siteMapService;
         private readonly HttpContext _httpContext;
+        private readonly IWebAppQpHelper _webAppQpHelper;
 
-        public HomeController(ISiteMapService siteMapService, IHttpContextAccessor httpContextAccessor)
+        public HomeController(ISiteMapService siteMapService, IHttpContextAccessor httpContextAccessor, IWebAppQpHelper webAppQpHelper)
         {
             _siteMapService = siteMapService;
             _httpContext = httpContextAccessor.HttpContext;
+            _webAppQpHelper = webAppQpHelper;
         }
 
         public ActionResult Index()
         {
             var model = _siteMapService.GetSiteMapStructure(52, true);
-            var userId = (int)_httpContext.Items[DBConnector.LastModifiedByKey];
             ViewData["model"] = model;
-            ViewData["userId"] = userId;
+            ViewData["userId"] = _webAppQpHelper.UserId;
             return View();
         }
     }

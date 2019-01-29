@@ -56,15 +56,16 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
         /// <param name="json">Строка для десериализации</param>
         public static SerializableQpViewModelBase FromJsonString(string json)
         {
-            var serializer = new DataContractJsonSerializer(typeof(SerializableQpViewModelBase));
-
-            using (var stream = new MemoryStream())
+            using (var strm = new MemoryStream())
             {
-                using (var sw = new StreamWriter(stream))
+                using (var sw = new StreamWriter(strm))
                 {
+                    var serializer = new DataContractJsonSerializer(typeof(SerializableQpViewModelBase));
                     sw.Write(json);
                     sw.Flush();
-                    return (SerializableQpViewModelBase)serializer.ReadObject(stream);
+                    strm.Position = 0;
+                    var obj = serializer.ReadObject(strm);
+                    return (SerializableQpViewModelBase)obj;
                 }
             }
         }

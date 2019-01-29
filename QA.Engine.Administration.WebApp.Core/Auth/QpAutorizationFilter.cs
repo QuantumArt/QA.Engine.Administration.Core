@@ -31,7 +31,7 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
             if (string.IsNullOrWhiteSpace(_webAppQpHelper.CustomerCode))
                 throw new Exception("Customer code should not be empty");
 
-            SiteConfiguration.Set(httpContext, _webAppQpHelper.CustomerCode, int.Parse(_webAppQpHelper.SiteId), _configuration.IsStage);
+            SiteConfiguration.Set(httpContext, _webAppQpHelper.CustomerCode, _webAppQpHelper.SiteId);
 
             var isAuthorize = _securityChecker.CheckAuthorization();
 

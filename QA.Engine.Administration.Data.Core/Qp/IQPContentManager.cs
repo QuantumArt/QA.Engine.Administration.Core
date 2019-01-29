@@ -9,27 +9,6 @@ namespace QA.Engine.Administration.Data.Core.Qp
     /// </summary>
     public interface IQpContentManager
     {
-        #region Properties
-
-        /// <summary>
-        /// Подключение к QP
-        /// </summary>
-        IQpDbConnector DbConnection { get; }
-
-        /// <summary>
-        /// Запрос
-        /// </summary>
-        List<string> Includes { get; }
-
-        /// <summary>
-        /// Список связанных контентов
-        /// </summary>
-        ContentDataQueryObject Query { get; }
-
-        #endregion
-
-        #region Methods
-
         #region Prepare properties
 
         /// <summary>
@@ -167,14 +146,20 @@ namespace QA.Engine.Administration.Data.Core.Qp
 
         #endregion
 
-        #endregion
-
         /// <summary>
         /// Возвращает результат запроса
         /// </summary>
         /// <returns></returns>
         QpContentResult Get();
 
-        void ChangeStatus(int statusId);
+        /// <summary>
+        /// Изменяет статус элементов
+        /// </summary>
+        void ChangeStatus(int statusId, int userId);
+
+        /// <summary>
+        /// Изменяет порядок элементов
+        /// </summary>
+        void Reorder(IEnumerable<AbstractItemData> items, string colunmName, int userId);
     }
 }
