@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "sourceMap": true,
+    "noImplicitAny": true,
+    "module": "commonjs",
+    "target": "es6",
+    "jsx": "react",
+    "experimentalDecorators": true,
+    "paths": {
+      "components/*": ["src/components/*"],
+      "services/*": ["src/services/*"],
+      "stores/*": ["src/stores/*"],
+      "assets/*": ["src/assets/*"]
+    }
+  },
+  "include": [
+    "./ClientApp/**/*"
+  ],
+  "exclude": [
+    "wwwroot",
+    "node_modules"
+  ]
+}

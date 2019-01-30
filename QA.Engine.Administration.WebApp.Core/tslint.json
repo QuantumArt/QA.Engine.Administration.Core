@@ -1,0 +1,10 @@
+{
+    "defaultSeverity": "error",
+    "extends": ["tslint-config-airbnb"],
+    "jsRules": {},
+    "rules": {
+      "max-line-length": [true, {"limit": 120, "ignore-pattern": "^\\s*(.+)$"}],
+      "ter-indent": [true, 4]
+    },
+    "rulesDirectory": []
+}
