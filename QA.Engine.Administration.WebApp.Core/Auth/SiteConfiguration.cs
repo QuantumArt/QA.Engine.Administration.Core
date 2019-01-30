@@ -55,9 +55,9 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
             return (SiteConfiguration)httpContext.Items[StorageKey];
         }
 
-        public static SiteConfiguration Set(HttpContext httpContext, string customerCode, int siteId)
+        public static SiteConfiguration Set(HttpContext httpContext, string customerCode, int siteId, bool useFake)
         {
-            var connectionString = GetConnectionString(customerCode);
+            var connectionString = GetConnectionString(customerCode, useFake);
             //var useHierarchyRegionsFilter = _qpSettingsService.GetSetting(connectionString, "USE_HIERARCHY_REGIONS_FILTER");
             var config = new SiteConfiguration
             {
@@ -73,8 +73,10 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
             return config;
         }
 
-        private static string GetConnectionString(string customerCode)
+        private static string GetConnectionString(string customerCode, bool useFake)
         {
+            if (useFake)
+                return string.Empty;
             return DBConnector.GetConnectionString(customerCode);
         }
     }
