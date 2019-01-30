@@ -27,6 +27,9 @@
 <p>
     <a id="move" href="#">move</a>
 </p>
+<p>
+    <a id="remove" href="#">remove</a>
+</p>
 
 @functions {
 public string RenderItems(List<SiteTreeModel> models)
@@ -66,6 +69,16 @@ public string RenderItems(List<SiteTreeModel> models)
             ajaxRequest('/api/sitemap/move', {
                 itemId: 741182,
                 newParentId: 741114
+            });
+        });
+
+        $('#remove').click(function (e) {
+            e.preventDefault();
+            ajaxRequest('/api/sitemap/remove', {
+                itemId: 741182,
+                isDeleteAllVersions: true,
+                isDeleteContentVersions: true,
+                contentVersionId: null
             });
         });
     });

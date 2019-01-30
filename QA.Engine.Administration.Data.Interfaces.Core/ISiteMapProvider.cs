@@ -9,5 +9,6 @@ namespace QA.Engine.Administration.Data.Interfaces.Core
         IEnumerable<AbstractItemData> GetItems(int siteId, bool isStage, IEnumerable<int> parentId);
         IEnumerable<AbstractItemData> GetByIds(int siteId, bool isStage, IEnumerable<int> itemIds);
         int GetContentId(int siteId);
+        AbstractItemData GetRootPage(int siteId, bool isStage);
     }
 }

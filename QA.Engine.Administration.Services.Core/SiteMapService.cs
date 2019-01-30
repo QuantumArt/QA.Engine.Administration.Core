@@ -157,10 +157,97 @@ namespace QA.Engine.Administration.Services.Core
             _qpDataProvider.Move(siteId, contentId, userId, itemId, newParentId);
         }
 
-        private List<SiteTreeModel> GetPageStructure(List<SiteTreeModel> pages, List<WidgetModel> widgets, List<DiscriminatorModel> discriminators)
+        public void RemoveSiteMapItems(int siteId, bool isStage, int userId, int id, bool isDeleteAllVersions, bool isDeleteContentVersion, int? contentVersionId)
+        {
+            if (id <= 0)
+                throw new ArgumentException("itemId <= 0");
+            if (!isDeleteContentVersion && contentVersionId == null)
+                throw new InvalidOperationException("Не указана версия для замены.");
+
+            var item = _siteMapProvider.GetByIds(siteId, isStage, new[] { id })?.FirstOrDefault();
+            if (item == null || item.Id == 0)
+                throw new InvalidOperationException("Элемент не найден.");
+
+            if (contentVersionId.HasValue)
+            {
+                var contentVersion = _siteMapProvider.GetByIds(siteId, isStage, new[] { contentVersionId.Value })?.FirstOrDefault();
+                if (contentVersion == null || contentVersion.Id == 0)
+                    throw new InvalidOperationException("Контентная версия не найдена.");
+            }
+
+            var rootPageId = _siteMapProvider.GetRootPage(siteId, isStage)?.Id;
+            if (id == rootPageId)
+                throw new InvalidOperationException("Нельзя удалить главную  страницу.");
+
+            var itemsToArchive = new List<AbstractItemData>();
+            AbstractItemData moveContentVersion = null;
+
+            var allItems = _siteMapProvider.GetAllItems(siteId, isStage);
+            var pages = allItems.Where(x => x.IsPage).Select(x => _mapper.Map<SiteTreeModel>(x)).OrderBy(x => x.IndexOrder).ToList();
+            var widgets = allItems.Where(x => !x.IsPage).Select(x => _mapper.Map<WidgetModel>(x)).OrderBy(x => x.IndexOrder).ToList();
+            var pageStructure = GetPageStructure(pages, widgets, new List<DiscriminatorModel>(), id);
+
+            void funcWidgets(List<WidgetModel> items)
+            {
+                foreach (var i in items)
+                {
+                    itemsToArchive.AddRange(allItems.Where(x => x.Id == i.Id));
+
+                    if (i.HasChildren)
+                        funcWidgets(i.Children);
+                }
+            }
+
+            void func(List<SiteTreeModel> items)
+            {
+                foreach (var i in items)
+                {
+                    itemsToArchive.AddRange(allItems.Where(x => x.Id == i.Id));
+
+                    if (!isDeleteAllVersions & !isDeleteContentVersion)
+                    {
+                        moveContentVersion = allItems.FirstOrDefault(x => x.Id == contentVersionId);
+                        if(moveContentVersion != null && moveContentVersion.VersionOfId != null)
+                        {
+                            moveContentVersion.Alias = item.Alias;
+                            moveContentVersion.ParentId = item.ParentId;
+                        }
+                    }
+                    else
+                    {
+                        if (i.HasContentVersion)
+                            itemsToArchive.AddRange(allItems.Where(x => i.ContentVersions.Any(y => x.Id == y.Id)));
+                    }
+
+                    if (i.HasWidgets)
+                        funcWidgets(i.Widgets);
+
+                    if (i.HasChildren)
+                        func(i.Children);
+                }
+            }
+
+            if (isDeleteAllVersions)
+            { 
+                var structuralVersions = allItems.Where(x => x.ParentId == item.ParentId && x.Alias == item.Alias && x.Id != item.Id).ToList();
+                if (structuralVersions.Any())
+                    itemsToArchive.AddRange(structuralVersions);
+            }
+
+            func(pageStructure);
+
+            var contentId = _siteMapProvider.GetContentId(siteId);
+
+            if (itemsToArchive.Any())
+                _qpDataProvider.Remove(siteId, contentId, userId, itemsToArchive);
+            if (moveContentVersion != null)
+                _qpDataProvider.MoveUpContentVersion(siteId, contentId, userId, moveContentVersion);
+        }
+
+        private List<SiteTreeModel> GetPageStructure(List<SiteTreeModel> pages, List<WidgetModel> widgets, List<DiscriminatorModel> discriminators, int? topLevelId = null)
         {
             var pageStructure = pages
-                .Where(x => x.ParentId == null && x.IsPage && x.VersionOfId == null)
+                .Where(x => (topLevelId != null && x.Id == topLevelId || topLevelId == null && x.ParentId == null) && x.IsPage && x.VersionOfId == null)
                 .Select(x => _mapper.Map<SiteTreeModel>(x))
                 .ToList();
             pageStructure.ForEach(x => x.Discriminator = discriminators.FirstOrDefault(y => y.Id == x.DiscriminatorId));
@@ -174,8 +261,8 @@ namespace QA.Engine.Administration.Services.Core
                 var tmp = new List<SiteTreeModel>();
                 foreach (var el in elements)
                 {
-                    el.Children = pages.Where(x => x.ParentId != null && x.ParentId == el.Id).Cast<SiteTreeModel>().ToList();
-                    el.ContentVersion = pages.Where(x => x.ParentId == null && x.VersionOfId == el.Id).Cast<SiteTreeModel>().ToList();
+                    el.Children = pages.Where(x => x.ParentId != null && x.ParentId == el.Id).ToList();
+                    el.ContentVersions = pages.Where(x => x.ParentId == null && x.VersionOfId == el.Id).ToList();
 
                     if (el.HasChildren)
                     {
@@ -187,9 +274,9 @@ namespace QA.Engine.Administration.Services.Core
                     else if (el.HasContentVersion)
                     {
                         makeTree = true;
-                        tmp.AddRange(el.ContentVersion);
-                        el.ContentVersion.ForEach(x => x.Discriminator = discriminators.FirstOrDefault(y => y.Id == x.DiscriminatorId));
-                        el.ContentVersion.ForEach(x => pages.Remove(x));
+                        tmp.AddRange(el.ContentVersions);
+                        el.ContentVersions.ForEach(x => x.Discriminator = discriminators.FirstOrDefault(y => y.Id == x.DiscriminatorId));
+                        el.ContentVersions.ForEach(x => pages.Remove(x));
                     }
                     else
                         tmp.Add(el);

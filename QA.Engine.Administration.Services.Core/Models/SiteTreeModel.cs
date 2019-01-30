@@ -21,11 +21,11 @@ namespace QA.Engine.Administration.Services.Core.Models
 
         public List<WidgetModel> Widgets { get; set; }
         public List<SiteTreeModel> Children { get; set; }
-        public List<SiteTreeModel> ContentVersion { get; set; }
+        public List<SiteTreeModel> ContentVersions { get; set; }
         public DiscriminatorModel Discriminator { get; set; }
 
         public bool HasWidgets { get { return Widgets?.Any() ?? false; } }
         public bool HasChildren { get { return Children?.Any() ?? false; } }
-        public bool HasContentVersion { get { return ContentVersion?.Any() ?? false; } }
+        public bool HasContentVersion { get { return ContentVersions?.Any() ?? false; } }
     }
 }

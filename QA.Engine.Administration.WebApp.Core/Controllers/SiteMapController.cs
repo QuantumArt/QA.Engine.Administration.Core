@@ -157,6 +157,26 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
             }
         }
 
+        /// <summary>
+        /// Удаление элементов
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost("remove")]
+        public ApiResult Remove([FromBody]RemoveModel model)
+        {
+            try
+            {
+                _siteMapService.RemoveSiteMapItems(_siteId, _isStage, _userId, model.ItemId, model.IsDeleteAllVersions ?? false, model.IsDeleteContentVersions ?? false, null);
+                return ApiResult.Success();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Move error");
+                return ApiResult.Fail(e);
+            }
+        }
+
     }
 
     

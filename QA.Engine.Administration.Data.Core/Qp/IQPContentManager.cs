@@ -153,6 +153,12 @@ namespace QA.Engine.Administration.Data.Core.Qp
         QpContentResult Get();
 
         /// <summary>
+        /// Отправляет элементы в архив
+        /// </summary>
+        /// <param name="userId"></param>
+        void Archive(int userId);
+
+        /// <summary>
         /// Изменяет статус элементов
         /// </summary>
         void ChangeStatus(int userId, int statusId);

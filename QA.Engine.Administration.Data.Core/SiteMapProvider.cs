@@ -91,6 +91,26 @@ FROM [|QPAbstractItem|] ai
 INNER JOIN [|QPDiscriminator|] def on ai.[|QPAbstractItem.Discriminator|] = def.content_item_id
 WHERE ai.content_item_id IN @ItemIds
 ";
+        private const string CmdGetRootPage = @"
+SELECT
+    ai.content_item_id AS Id,
+    ai.[|QPAbstractItem.Name|] as Alias,
+    ai.[|QPAbstractItem.Title|] as Title,
+    ai.[|QPAbstractItem.Parent|] AS ParentId,
+    ai.[|QPAbstractItem.IsVisible|] AS IsVisible,
+    ai.[|QPAbstractItem.ZoneName|] AS ZoneName,
+    ai.[|QPAbstractItem.IndexOrder|] AS IndexOrder,
+    ai.[|QPAbstractItem.ExtensionId|] AS ExtensionId,
+    ai.[|QPAbstractItem.VersionOf|] AS VersionOfId,
+    ai.[|QPAbstractItem.IsInSiteMap|] AS IsInSiteMap,
+    def.content_item_id AS DiscriminatorId,
+    def.[|QPDiscriminator.Name|] as Discriminator,
+    def.[|QPDiscriminator.IsPage|] as IsPage,
+    CASE WHEN ai.[STATUS_TYPE_ID] = (SELECT TOP 1 st.STATUS_TYPE_ID FROM [STATUS_TYPE] st WHERE st.[STATUS_TYPE_NAME]=N'Published') THEN 1 ELSE 0 END AS Published
+FROM [|QPAbstractItem|] ai
+INNER JOIN [|QPDiscriminator|] def on ai.[|QPAbstractItem.Discriminator|] = def.content_item_id
+WHERE ai.[|QPAbstractItem.Parent|] IS NULL AND ai.[|QPAbstractItem.VersionOf|] IS NULL AND def.[|QPDiscriminator.IsPage|]=1
+ORDER BY ai.content_item_id";
 
         public string AbstractItemNetName => "QPAbstractItem";
 
@@ -146,6 +166,12 @@ WHERE ai.content_item_id IN @ItemIds
         {
             var content = _metaInfoRepository.GetContent(AbstractItemNetName, siteId);
             return content.ContentId;
+        }
+
+        public AbstractItemData GetRootPage(int siteId, bool isStage)
+        {
+            var query = _netNameQueryAnalyzer.PrepareQuery(CmdGetRootPage, siteId, isStage);
+            return _connection.Query<AbstractItemData>(query).FirstOrDefault();
         }
 
     }
