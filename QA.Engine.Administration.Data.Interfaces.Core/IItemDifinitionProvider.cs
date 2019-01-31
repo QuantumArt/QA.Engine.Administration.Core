@@ -5,6 +5,6 @@ namespace QA.Engine.Administration.Data.Interfaces.Core
 {
     public interface IItemDifinitionProvider
     {
-        IEnumerable<ItemDefinitionData> GetAllItemDefinitions(int siteId, bool isStage);
+        IEnumerable<ItemDefinitionData> GetAllItemDefinitions(int siteId);
     }
 }

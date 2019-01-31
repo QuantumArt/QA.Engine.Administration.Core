@@ -31,15 +31,15 @@ namespace QA.Engine.Administration.Services.Core
             _mapper = mapper;
         }
 
-        public List<SiteTreeModel> GetSiteMapItems(int siteId, bool isStage, int? parentId)
+        public List<SiteTreeModel> GetSiteMapItems(int siteId, bool isArchive, int? parentId)
         {
-            var items = _siteMapProvider.GetItems(siteId, isStage, parentId.HasValue ? new[] { parentId.Value } : null)
+            var items = _siteMapProvider.GetItems(siteId, isArchive, parentId.HasValue ? new[] { parentId.Value } : null)
                 .Select(x => _mapper.Map<SiteTreeModel>(x))
                 .ToList();
-            var children = _siteMapProvider.GetItems(siteId, isStage, items.Select(x => x.Id))
+            var children = _siteMapProvider.GetItems(siteId, isArchive, items.Select(x => x.Id))
                 .Select(x => _mapper.Map<SiteTreeModel>(x))
                 .ToList();
-            var discriminators = _itemDifinitionProvider.GetAllItemDefinitions(siteId, isStage)
+            var discriminators = _itemDifinitionProvider.GetAllItemDefinitions(siteId)
                 .Select(x => _mapper.Map<DiscriminatorModel>(x))
                 .ToList();
 
@@ -53,15 +53,15 @@ namespace QA.Engine.Administration.Services.Core
             return items;
         }
 
-        public List<WidgetModel> GetWidgetItems(int siteId, bool isStage, int parentId)
+        public List<WidgetModel> GetWidgetItems(int siteId, bool isArchive, int parentId)
         {
-            var items = _widgetProvider.GetItems(siteId, isStage, new[] { parentId })
+            var items = _widgetProvider.GetItems(siteId, isArchive, new[] { parentId })
                 .Select(x => _mapper.Map<WidgetModel>(x))
                 .ToList();
-            var children = _widgetProvider.GetItems(siteId, isStage, items.Select(x => x.Id))
+            var children = _widgetProvider.GetItems(siteId, isArchive, items.Select(x => x.Id))
                 .Select(x => _mapper.Map<WidgetModel>(x))
                 .ToList();
-            var discriminators = _itemDifinitionProvider.GetAllItemDefinitions(siteId, isStage)
+            var discriminators = _itemDifinitionProvider.GetAllItemDefinitions(siteId)
                 .Select(x => _mapper.Map<DiscriminatorModel>(x))
                 .ToList();
 
@@ -75,13 +75,13 @@ namespace QA.Engine.Administration.Services.Core
             return items;
         }
 
-        public List<SiteTreeModel> GetSiteMapStructure(int siteId, bool isStage)
+        public List<SiteTreeModel> GetSiteMapStructure(int siteId, bool isArchive)
         {
-            var abstractItems = _siteMapProvider.GetAllItems(siteId, isStage);
+            var abstractItems = _siteMapProvider.GetAllItems(siteId, isArchive);
 
             var pages = abstractItems.Where(x => x.IsPage).Select(x => _mapper.Map<SiteTreeModel>(x)).OrderBy(x => x.IndexOrder).ToList();
             var widgets = abstractItems.Where(x => !x.IsPage).Select(x => _mapper.Map<WidgetModel>(x)).OrderBy(x => x.IndexOrder).ToList();
-            var discriminators = _itemDifinitionProvider.GetAllItemDefinitions(siteId, isStage)
+            var discriminators = _itemDifinitionProvider.GetAllItemDefinitions(siteId)
                 .Select(x => _mapper.Map<DiscriminatorModel>(x))
                 .ToList();
 
@@ -90,38 +90,38 @@ namespace QA.Engine.Administration.Services.Core
             return pageStructure;
         }
 
-        public void PublishSiteMapItems(int siteId, bool isStage, int userId, List<int> itemIds)
+        public void PublishSiteMapItems(int siteId, int userId, List<int> itemIds)
         {
             if (itemIds == null || !itemIds.Any())
                 throw new ArgumentNullException("itemIds");
             if (itemIds.Any(x => x <= 0))
                 throw new ArgumentException("itemId <= 0");
 
-            var items = _siteMapProvider.GetByIds(siteId, isStage, itemIds);
+            var items = _siteMapProvider.GetByIds(siteId, false, itemIds);
             if (!items.Any())
                 throw new InvalidOperationException("Элемент не найден.");
 
-            var status = _statusTypeProvider.GetStatus(siteId, isStage, QpContentItemStatus.Published);
+            var status = _statusTypeProvider.GetStatus(siteId, QpContentItemStatus.Published);
             var contentId = _siteMapProvider.GetContentId(siteId);
 
             _qpDataProvider.Publish(siteId, contentId, userId, items, status.Id);
         }
 
-        public void ReorderSiteMapItems(int siteId, bool isStage, int userId, int itemId, int relatedItemId, bool isInsertBefore, int step)
+        public void ReorderSiteMapItems(int siteId, int userId, int itemId, int relatedItemId, bool isInsertBefore, int step)
         {
             if (itemId <= 0)
                 throw new ArgumentException("itemId <= 0");
             if (relatedItemId <= 0)
                 throw new ArgumentException("relatedItemId <= 0");
 
-            var items = _siteMapProvider.GetByIds(siteId, isStage, new[] { itemId, relatedItemId });
+            var items = _siteMapProvider.GetByIds(siteId, false, new[] { itemId, relatedItemId });
 
             if (!items.Any(x => x.Id == itemId) || !items.Any(x => x.Id == relatedItemId))
                 throw new InvalidOperationException("itemId or relatedItemId doesn't exist");
 
             var item = items.First(x => x.Id == itemId);
 
-            var list = _siteMapProvider.GetItems(siteId, isStage, item.ParentId.HasValue ? new[] { item.ParentId.Value } : new int[] { });
+            var list = _siteMapProvider.GetItems(siteId, false, item.ParentId.HasValue ? new[] { item.ParentId.Value } : new int[] { });
 
             var result = list.Select(x => _mapper.Map<SiteTreeModel>(x)).ToList();
             result.Remove(result.SingleOrDefault(x => x.Id == itemId));
@@ -140,14 +140,14 @@ namespace QA.Engine.Administration.Services.Core
             _qpDataProvider.Reorder(siteId, contentId, userId, list);
         }
 
-        public void MoveSiteMapItem(int siteId, bool isStage, int userId, int itemId, int newParentId)
+        public void MoveSiteMapItem(int siteId, int userId, int itemId, int newParentId)
         {
             if (itemId <= 0)
                 throw new ArgumentException("itemId <= 0");
             if (newParentId <= 0)
                 throw new ArgumentException("newParentId <= 0");
 
-            var items = _siteMapProvider.GetByIds(siteId, isStage, new[] { itemId, newParentId });
+            var items = _siteMapProvider.GetByIds(siteId, false, new[] { itemId, newParentId });
 
             if (!items.Any(x => x.Id == itemId) || !items.Any(x => x.Id == newParentId))
                 throw new InvalidOperationException("itemId or newParentId doesn't exist");
@@ -157,35 +157,35 @@ namespace QA.Engine.Administration.Services.Core
             _qpDataProvider.Move(siteId, contentId, userId, itemId, newParentId);
         }
 
-        public void RemoveSiteMapItems(int siteId, bool isStage, int userId, int id, bool isDeleteAllVersions, bool isDeleteContentVersion, int? contentVersionId)
+        public void RemoveSiteMapItems(int siteId, int userId, int itemId, bool isDeleteAllVersions, bool isDeleteContentVersion, int? contentVersionId)
         {
-            if (id <= 0)
+            if (itemId <= 0)
                 throw new ArgumentException("itemId <= 0");
             if (!isDeleteContentVersion && contentVersionId == null)
                 throw new InvalidOperationException("Не указана версия для замены.");
 
-            var item = _siteMapProvider.GetByIds(siteId, isStage, new[] { id })?.FirstOrDefault();
+            var item = _siteMapProvider.GetByIds(siteId, false, new[] { itemId })?.FirstOrDefault();
             if (item == null || item.Id == 0)
                 throw new InvalidOperationException("Элемент не найден.");
 
             if (contentVersionId.HasValue)
             {
-                var contentVersion = _siteMapProvider.GetByIds(siteId, isStage, new[] { contentVersionId.Value })?.FirstOrDefault();
+                var contentVersion = _siteMapProvider.GetByIds(siteId, false, new[] { contentVersionId.Value })?.FirstOrDefault();
                 if (contentVersion == null || contentVersion.Id == 0)
                     throw new InvalidOperationException("Контентная версия не найдена.");
             }
 
-            var rootPageId = _siteMapProvider.GetRootPage(siteId, isStage)?.Id;
-            if (id == rootPageId)
+            var rootPageId = _siteMapProvider.GetRootPage(siteId)?.Id;
+            if (itemId == rootPageId)
                 throw new InvalidOperationException("Нельзя удалить главную  страницу.");
 
             var itemsToArchive = new List<AbstractItemData>();
             AbstractItemData moveContentVersion = null;
 
-            var allItems = _siteMapProvider.GetAllItems(siteId, isStage);
+            var allItems = _siteMapProvider.GetAllItems(siteId, false);
             var pages = allItems.Where(x => x.IsPage).Select(x => _mapper.Map<SiteTreeModel>(x)).OrderBy(x => x.IndexOrder).ToList();
             var widgets = allItems.Where(x => !x.IsPage).Select(x => _mapper.Map<WidgetModel>(x)).OrderBy(x => x.IndexOrder).ToList();
-            var pageStructure = GetPageStructure(pages, widgets, new List<DiscriminatorModel>(), id);
+            var pageStructure = GetPageStructure(pages, widgets, new List<DiscriminatorModel>(), itemId);
 
             void funcWidgets(List<WidgetModel> items)
             {
@@ -244,12 +244,84 @@ namespace QA.Engine.Administration.Services.Core
                 _qpDataProvider.MoveUpContentVersion(siteId, contentId, userId, moveContentVersion);
         }
 
+        public void RestoreSiteMapItems(
+            int siteId, int userId, int itemId, 
+            bool isRestoreAllVersions, bool isRestoreChildren, bool isRestoreContentVersions, bool isRestoreWidgets)
+        {
+            if (itemId <= 0)
+                throw new ArgumentException("itemId <= 0");
+
+            var item = _siteMapProvider.GetByIds(siteId, true, new[] { itemId })?.FirstOrDefault();
+            if (item == null || item.Id == 0)
+                throw new InvalidOperationException("Элемент не найден.");
+
+            if (item.VersionOfId != null || item.ParentId != null)
+            {
+                var parent = _siteMapProvider.GetByIds(siteId, true, new int[] { item.VersionOfId ?? item.ParentId.Value }).FirstOrDefault();
+                if (parent == null || parent.Id == 0)
+                    throw new InvalidOperationException("Нельзя восстановить элемент без элемента-предка.");
+            }
+
+            var itemsToRestore = new List<AbstractItemData>();
+
+            var allItems = _siteMapProvider.GetAllItems(siteId, true);
+            var pages = allItems.Where(x => x.IsPage).Select(x => _mapper.Map<SiteTreeModel>(x)).OrderBy(x => x.IndexOrder).ToList();
+            var widgets = allItems.Where(x => !x.IsPage).Select(x => _mapper.Map<WidgetModel>(x)).OrderBy(x => x.IndexOrder).ToList();
+            var pageStructure = GetPageStructure(pages, widgets, new List<DiscriminatorModel>(), itemId);
+
+            void funcWidgets(List<WidgetModel> items)
+            {
+                foreach (var i in items)
+                {
+                    itemsToRestore.AddRange(allItems.Where(x => x.Id == i.Id));
+
+                    if (i.HasChildren)
+                        funcWidgets(i.Children);
+                }
+            }
+
+            void func(List<SiteTreeModel> items)
+            {
+                foreach (var i in items)
+                {
+                    itemsToRestore.AddRange(allItems.Where(x => x.Id == i.Id));
+
+                    if (isRestoreContentVersions && i.HasContentVersion)
+                        itemsToRestore.AddRange(allItems.Where(x => i.ContentVersions.Any(y => x.Id == y.Id)));
+
+                    if (isRestoreWidgets && i.HasWidgets)
+                        funcWidgets(i.Widgets);
+
+                    if (isRestoreChildren && i.HasChildren)
+                        func(i.Children);
+                }
+            }
+
+            if (isRestoreAllVersions && item.IsPage && item.VersionOfId == null)
+            {
+                var structuralVersions = allItems.Where(x => x.ParentId == item.ParentId && x.Alias == item.Alias && x.Id != item.Id).ToList();
+                if (structuralVersions.Any())
+                    itemsToRestore.AddRange(structuralVersions);
+            }
+
+            func(pageStructure);
+
+            var contentId = _siteMapProvider.GetContentId(siteId);
+
+            if (itemsToRestore.Any())
+                _qpDataProvider.Restore(siteId, contentId, userId, itemsToRestore);
+        }
+
         private List<SiteTreeModel> GetPageStructure(List<SiteTreeModel> pages, List<WidgetModel> widgets, List<DiscriminatorModel> discriminators, int? topLevelId = null)
         {
             var pageStructure = pages
                 .Where(x => (topLevelId != null && x.Id == topLevelId || topLevelId == null && x.ParentId == null) && x.IsPage && x.VersionOfId == null)
                 .Select(x => _mapper.Map<SiteTreeModel>(x))
                 .ToList();
+            if (!pageStructure.Any())
+            {
+                pageStructure = pages.Where(x => !pages.Any(y => y.Id == (x.ParentId ?? x.VersionOfId))).ToList();
+            }
             pageStructure.ForEach(x => x.Discriminator = discriminators.FirstOrDefault(y => y.Id == x.DiscriminatorId));
             pageStructure.ForEach(x => pages.Remove(x));
 

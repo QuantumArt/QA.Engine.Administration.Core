@@ -12,16 +12,19 @@ namespace QA.Engine.Administration.Data.Core
     {
         private readonly IDbConnection _connection;
         private readonly INetNameQueryAnalyzer _netNameQueryAnalyzer;
+        private readonly IMetaInfoRepository _metaInfoRepository;
 
-        public ItemDifinitionProvider(IUnitOfWork uow, INetNameQueryAnalyzer netNameQueryAnalyzer)
+        public ItemDifinitionProvider(IUnitOfWork uow, INetNameQueryAnalyzer netNameQueryAnalyzer, IMetaInfoRepository metaInfoRepository)
         {
             _connection = uow.Connection;
             _netNameQueryAnalyzer = netNameQueryAnalyzer;
+            _metaInfoRepository = metaInfoRepository;
         }
 
         private const string CmdGetAll = @"
 SELECT
     CONTENT_ITEM_ID as Id,
+    ARCHIVE AS IsArchive,
     [|QPDiscriminator.Name|] as Discriminator,
     [|QPDiscriminator.TypeName|] as TypeName,
     [|QPDiscriminator.IsPage|] as IsPage,
@@ -34,9 +37,9 @@ FROM [|QPDiscriminator|]
 
         public string ItemDefinitionNetName => "QPDiscriminator";
 
-        public IEnumerable<ItemDefinitionData> GetAllItemDefinitions(int siteId, bool isStage)
+        public IEnumerable<ItemDefinitionData> GetAllItemDefinitions(int siteId)
         {
-            var query = _netNameQueryAnalyzer.PrepareQuery(CmdGetAll, siteId, isStage);
+            var query = _netNameQueryAnalyzer.PrepareQueryExtabtion(_metaInfoRepository, CmdGetAll, siteId);
             return _connection.Query<ItemDefinitionData>(query).ToList();
         }
     }

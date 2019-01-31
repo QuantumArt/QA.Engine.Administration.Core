@@ -5,7 +5,7 @@ namespace QA.Engine.Administration.Data.Interfaces.Core
 {
     public interface IStatusTypeProvider
     {
-        IEnumerable<StatusTypeData> GetAll(int siteId, bool isStage);
-        StatusTypeData GetStatus(int siteId, bool isStage, QpContentItemStatus status);
+        IEnumerable<StatusTypeData> GetAll(int siteId);
+        StatusTypeData GetStatus(int siteId, QpContentItemStatus status);
     }
 }

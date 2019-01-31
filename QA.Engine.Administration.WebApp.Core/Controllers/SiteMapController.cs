@@ -25,7 +25,6 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         // public const int SITE_ID = 35; // beeline ge
         // public const int SITE_ID = 52; // demosite
         private readonly int _siteId;
-        private readonly bool _isStage;
         private readonly int _step;
         private readonly int _userId;
 
@@ -47,7 +46,6 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
 
             _siteId = webAppQpHelper.SiteId;
             _userId = webAppQpHelper.UserId;
-            _isStage = options.Value.IsStage;
             _step = options.Value.IndexOrderStep;
         }
 
@@ -56,9 +54,9 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("getAllItems")]
-        public ApiResult<SiteTreeModel[]> GetSiteMap()
+        public ApiResult<SiteTreeModel[]> GetSiteMap(bool? isArchive)
         {
-            var result = _siteMapService.GetSiteMapStructure(_siteId, _isStage).ToArray();
+            var result = _siteMapService.GetSiteMapStructure(_siteId, isArchive ?? false).ToArray();
             return ApiResult<SiteTreeModel[]>.Success(result);
         }
 
@@ -66,11 +64,12 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// Возвращает дочерние страницы родительского элемента (страницы)
         /// </summary>
         /// <param name="parentId">Id родительской страницы</param>
+        /// <param name="isArchive">Признак возврата архивных элементов</param>
         /// <returns></returns>
         [HttpGet("getTree")]
-        public ApiResult<SiteTreeModel[]> GetSiteTree(int? parentId)
+        public ApiResult<SiteTreeModel[]> GetSiteTree(int? parentId, bool? isArchive)
         {
-            var result = _siteMapService.GetSiteMapItems(_siteId, _isStage, parentId).ToArray();
+            var result = _siteMapService.GetSiteMapItems(_siteId, isArchive ?? false, parentId).ToArray();
             return ApiResult<SiteTreeModel[]>.Success(result);
         }
 
@@ -78,11 +77,12 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// Возвращает дочерние виджеты у родительского элемента (страницы или виджета)
         /// </summary>
         /// <param name="parentId">Id родительского элемента</param>
+        /// <param name="isArchive">Признак возврата архивных элементов</param>
         /// <returns></returns>
         [HttpGet("getWidgets")]
-        public ApiResult<WidgetModel[]> GetWidgets(int parentId)
+        public ApiResult<WidgetModel[]> GetWidgets(int parentId, bool? isArchive)
         {
-            var result = _siteMapService.GetWidgetItems(_siteId, _isStage, parentId).ToArray();
+            var result = _siteMapService.GetWidgetItems(_siteId, isArchive ?? false, parentId).ToArray();
             return ApiResult<WidgetModel[]>.Success(result);
         }
 
@@ -93,7 +93,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpGet("getDefinitions")]
         public ApiResult<DiscriminatorModel[]> GetDescriminators()
         {
-            var result = _itemDifinitionService.GetAllItemDefinitions(_siteId, _isStage).ToArray();
+            var result = _itemDifinitionService.GetAllItemDefinitions(_siteId).ToArray();
             return ApiResult<DiscriminatorModel[]>.Success(result);
         }
 
@@ -107,7 +107,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         {
             try
             {
-                _siteMapService.PublishSiteMapItems(_siteId, _isStage, _userId, itemIds);
+                _siteMapService.PublishSiteMapItems(_siteId, _userId, itemIds);
                 return ApiResult.Success();
             }
             catch(Exception e)
@@ -127,7 +127,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         {
             try
             {
-                _siteMapService.ReorderSiteMapItems(_siteId, _isStage, _userId, model.ItemId, model.RelatedItemId, model.IsInsertBefore, _step);
+                _siteMapService.ReorderSiteMapItems(_siteId, _userId, model.ItemId, model.RelatedItemId, model.IsInsertBefore, _step);
                 return ApiResult.Success();
             }
             catch (Exception e)
@@ -147,7 +147,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         {
             try
             {
-                _siteMapService.MoveSiteMapItem(_siteId, _isStage, _userId, model.ItemId, model.NewParentId);
+                _siteMapService.MoveSiteMapItem(_siteId, _userId, model.ItemId, model.NewParentId);
                 return ApiResult.Success();
             }
             catch (Exception e)
@@ -167,12 +167,37 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         {
             try
             {
-                _siteMapService.RemoveSiteMapItems(_siteId, _isStage, _userId, model.ItemId, model.IsDeleteAllVersions ?? false, model.IsDeleteContentVersions ?? false, null);
+                _siteMapService.RemoveSiteMapItems(_siteId, _userId, model.ItemId, model.IsDeleteAllVersions ?? false, model.IsDeleteContentVersions ?? false, model.ContentVersionId);
                 return ApiResult.Success();
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Move error");
+                _logger.LogError(e, "Remove error");
+                return ApiResult.Fail(e);
+            }
+        }
+
+        /// <summary>
+        /// Восстановление элементов
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost("restore")]
+        public ApiResult Restore([FromBody]RestoreModel model)
+        {
+            try
+            {
+                _siteMapService.RestoreSiteMapItems(
+                    _siteId, _userId, model.ItemId, 
+                    model.IsRestoreAllVersions ?? false, 
+                    model.IsRestoreChildren?? false, 
+                    model.IsRestoreContentVersions ?? false, 
+                    model.IsRestoreWidgets ?? false);
+                return ApiResult.Success();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Restore error");
                 return ApiResult.Fail(e);
             }
         }

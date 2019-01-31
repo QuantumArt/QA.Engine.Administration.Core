@@ -135,24 +135,26 @@
             <param name="webAppQpHelper"></param>
             <param name="logger"></param>
         </member>
-        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.GetSiteMap">
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.GetSiteMap(System.Nullable{System.Boolean})">
             <summary>
             Возвращает полное дерево карты сайта
             </summary>
             <returns></returns>
         </member>
-        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.GetSiteTree(System.Nullable{System.Int32})">
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.GetSiteTree(System.Nullable{System.Int32},System.Nullable{System.Boolean})">
             <summary>
             Возвращает дочерние страницы родительского элемента (страницы)
             </summary>
             <param name="parentId">Id родительской страницы</param>
+            <param name="isArchive">Признак возврата архивных элементов</param>
             <returns></returns>
         </member>
-        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.GetWidgets(System.Int32)">
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.GetWidgets(System.Int32,System.Nullable{System.Boolean})">
             <summary>
             Возвращает дочерние виджеты у родительского элемента (страницы или виджета)
             </summary>
             <param name="parentId">Id родительского элемента</param>
+            <param name="isArchive">Признак возврата архивных элементов</param>
             <returns></returns>
         </member>
         <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.GetDescriminators">
@@ -185,6 +187,13 @@
         <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.Remove(QA.Engine.Administration.WebApp.Core.Models.RemoveModel)">
             <summary>
             Удаление элементов
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.Restore(QA.Engine.Administration.WebApp.Core.Models.RestoreModel)">
+            <summary>
+            Восстановление элементов
             </summary>
             <param name="model"></param>
             <returns></returns>

@@ -161,6 +161,39 @@ namespace QA.Engine.Administration.Data.Core
             _qpDbConnector.DbConnector.MassUpdate(contentId, values, userId);
         }
 
+        public void Restore(int siteId, int contentId, int userId, IEnumerable<AbstractItemData> items)
+        {
+            var siteName = _qpMetadataManager.GetSiteName(siteId);
+
+            //_qpDbConnector.DbConnector.
+            // update content
+            var values = items.Select(x => new Dictionary<string, string>
+            {
+                { ContentItemIdFieldName, x.Id.ToString(CultureInfo.InvariantCulture) },
+                { ArchiveFieldName, "0" }
+            });
+            _qpDbConnector.DbConnector.MassUpdate(contentId, values, userId);
+
+            //update extantion
+            var extantionValues = items
+                .Where(x => x.ExtensionId.HasValue)
+                .GroupBy(x => x.ExtensionId.Value, x => x.Id);
+            foreach (var item in extantionValues)
+            {
+                var contentName = _qpMetadataManager.GetContentName(item.Key);
+                _qpContentManager
+                    .Connection(_qpDbConnector.InstanceConnectionString)
+                    .SiteName(siteName)
+                    .IsIncludeArchive(true)
+                    .IsShowSplittedArticle(true)
+                    .StatusName(_statusNames)
+                    .ContentId(item.Key)
+                    .ContentName(contentName)
+                    .Where($"ItemId in ({string.Join(",", item.Select(x => x))}) AND Archive = 1")
+                    .Restore(userId);
+            }
+        }
+
         private string GetColumnNameByNetName(int siteId, string columnNetName)
         {
             var contentMetaInfo = _metaInfoRepository.GetContent("QPAbstractItem", siteId);

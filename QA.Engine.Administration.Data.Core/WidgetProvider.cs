@@ -12,20 +12,21 @@ namespace QA.Engine.Administration.Data.Core
     public class WidgetProvider: IWidgetProvider
     {
         private readonly IDbConnection _connection;
-        private readonly IAbstractItemRepository _abstractItemRepository;
         private readonly INetNameQueryAnalyzer _netNameQueryAnalyzer;
+        private readonly IMetaInfoRepository _metaInfoRepository;
 
-        public WidgetProvider(IUnitOfWork uow, IAbstractItemRepository abstractItemRepository, INetNameQueryAnalyzer netNameQueryAnalyzer)
+        public WidgetProvider(IUnitOfWork uow, INetNameQueryAnalyzer netNameQueryAnalyzer, IMetaInfoRepository metaInfoRepository)
         {
             _connection = uow.Connection;
-            _abstractItemRepository = abstractItemRepository;
             _netNameQueryAnalyzer = netNameQueryAnalyzer;
+            _metaInfoRepository = metaInfoRepository;
         }
 
         //запрос с использованием NetName таблиц и столбцов
         private const string CmdGetAbstractWidgetItem = @"
 SELECT
     ai.content_item_id AS Id,
+    ai.archive AS IsArchive,
     ai.[|QPAbstractItem.Name|] as Alias,
     ai.[|QPAbstractItem.Title|] as Title,
     ai.[|QPAbstractItem.Parent|] AS ParentId,
@@ -40,14 +41,14 @@ SELECT
     CASE WHEN ai.[STATUS_TYPE_ID] = (SELECT TOP 1 st.STATUS_TYPE_ID FROM [STATUS_TYPE] st WHERE st.[STATUS_TYPE_NAME]=N'Published') THEN 1 ELSE 0 END AS Published
 FROM [|QPAbstractItem|] ai
 INNER JOIN [|QPDiscriminator|] def on ai.[|QPAbstractItem.Discriminator|] = def.content_item_id
-WHERE def.[|QPDiscriminator.IsPage|]=0 AND ai.[|QPAbstractItem.Parent|] IN @ParentIds
+WHERE ai.archive=0 AND def.[|QPDiscriminator.IsPage|]=0 AND ai.[|QPAbstractItem.Parent|] IN @ParentIds
 ";
 
-        public IEnumerable<AbstractItemData> GetItems(int siteId, bool isStage, IEnumerable<int> parentIds)
+        public IEnumerable<AbstractItemData> GetItems(int siteId, bool isArchive, IEnumerable<int> parentIds)
         {
             const int maxParentIdsPerRequest = 500;
 
-            var query = _netNameQueryAnalyzer.PrepareQuery(CmdGetAbstractWidgetItem, siteId, isStage);
+            var query = _netNameQueryAnalyzer.PrepareQueryExtabtion(_metaInfoRepository, CmdGetAbstractWidgetItem, siteId);
 
             if (parentIds == null)
                 throw new ArgumentNullException("parentIds", "need not null and not empty parent ids");
@@ -60,14 +61,13 @@ WHERE def.[|QPDiscriminator.IsPage|]=0 AND ai.[|QPAbstractItem.Parent|] IN @Pare
                 for (var i = 0; i < (float)parentIds.Count() / maxParentIdsPerRequest; i++)
                 {
                     int[] r = parentIds.Skip(i * maxParentIdsPerRequest).Take(maxParentIdsPerRequest).ToArray();
-                    result.AddRange(GetItems(siteId, isStage, r));
+                    result.AddRange(GetItems(siteId, isArchive, r));
                 }
                 return result;
             }
             else
             {
-                query = string.Format(query, "IN @ParentIds");
-                return _connection.Query<AbstractItemData>(query, new { ParentIds = parentIds });
+                return _connection.Query<AbstractItemData>(query, new { Archive = isArchive, ParentIds = parentIds });
             }
         }
 

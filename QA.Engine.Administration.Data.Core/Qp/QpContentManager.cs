@@ -46,8 +46,19 @@ namespace QA.Engine.Administration.Data.Core.Qp
         }
 
         #endregion
- 
+
         #region Prepare properties
+
+        /// <summary>
+        /// Устанавливает подключение к QP
+        /// </summary>
+        /// <param name="connectionString">Строка подключения</param>
+        /// <returns></returns>
+        public virtual IQpContentManager Connect()
+        {
+            _query.DbConnector = _dbConnection.DbConnector;
+            return this;
+        }
 
         /// <summary>
         /// Устанавливает подключение к QP

@@ -25,5 +25,9 @@ namespace QA.Engine.Administration.Data.Interfaces.Core
         /// Переместить контентную версию в структуру сайте, т.е. сделать не контентной версией, а полноценной страницей
         /// </summary>
         void MoveUpContentVersion(int siteId, int contentId, int userId, AbstractItemData item);
+        /// <summary>
+        /// Восстановить элементы из архива
+        /// </summary>
+        void Restore(int siteId, int contentId, int userId, IEnumerable<AbstractItemData> items);
     }
 }

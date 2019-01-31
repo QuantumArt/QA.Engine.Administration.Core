@@ -18,9 +18,9 @@ namespace QA.Engine.Administration.Services.Core
             _mapper = mapper;
         }
 
-        public IEnumerable<DiscriminatorModel> GetAllItemDefinitions(int siteId, bool isStage)
+        public IEnumerable<DiscriminatorModel> GetAllItemDefinitions(int siteId)
         {
-            return _itemDifinitionProvider.GetAllItemDefinitions(siteId, isStage)
+            return _itemDifinitionProvider.GetAllItemDefinitions(siteId)
                 .Select(x => _mapper.Map<DiscriminatorModel>(x));
         }
     }

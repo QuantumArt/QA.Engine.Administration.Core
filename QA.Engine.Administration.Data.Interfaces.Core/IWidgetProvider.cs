@@ -5,6 +5,6 @@ namespace QA.Engine.Administration.Data.Interfaces.Core
 {
     public interface IWidgetProvider
     {
-        IEnumerable<AbstractItemData> GetItems(int siteId, bool isStage, IEnumerable<int> parentId);
+        IEnumerable<AbstractItemData> GetItems(int siteId, bool isArchive, IEnumerable<int> parentId);
     }
 }

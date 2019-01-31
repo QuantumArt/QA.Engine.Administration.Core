@@ -13,10 +13,24 @@
     {
         <li>
             [@item.Id] @item.Alias (@item.Title) order->@item.IndexOrder
+            <ul>
+                @foreach (var contentVersion in item.ContentVersions)
+                {
+                <li>(cv) [@contentVersion.Id] @contentVersion.Alias (@contentVersion.Title) order->@contentVersion.IndexOrder</li>
+                }
+            </ul>
+            <p>@Html.Raw(RenderWidgets(item.Widgets))</p>
             <p>@Html.Raw(RenderItems(item.Children))</p>
         </li>
     }
 </ul>
+
+<p><a id="getAllItems" href="#">getAllItems</a></p>
+<p><a id="getAllArchiveItems" href="#">getAllArchiveItems</a></p>
+<p><a id="getTree" href="#">getTree</a></p>
+<p><a id="getArchiveTree" href="#">getArchiveTree</a></p>
+<p><a id="getWidgets" href="#">getWidgets</a></p>
+<p><a id="getArchiveWidgets" href="#">getArchiveWidgets</a></p>
 
 <p>
     <a id="publish" href="#">publish</a>
@@ -32,32 +46,86 @@
 </p>
 
 @functions {
-public string RenderItems(List<SiteTreeModel> models)
-{
-    if (!models.Any())
-        return "";
-    var li = "";
-    foreach (var item in models)
+    public string RenderItems(List<SiteTreeModel> models)
     {
-        li += item.Children.Any()
-            ? $"<li>[{item.Id}] {item.Alias} ({item.Title}) order->{item.IndexOrder}<p>{RenderItems(item.Children)}</p></li>"
-            : $"<li>[{item.Id}] {item.Alias} ({item.Title}) order->{item.IndexOrder}</li>";
+        if (!models.Any())
+            return "";
+        var li = "";
+        foreach (var item in models)
+        {
+            li += item.Children.Any()
+                ? $"<li>[{item.Id}] {item.Alias} ({item.Title}) order->{item.IndexOrder}<p>{RenderItems(item.Children)}</p></li>"
+                : $"<li>[{item.Id}] {item.Alias} ({item.Title}) order->{item.IndexOrder}</li>";
+            foreach (var contentVersion in item.ContentVersions)
+            {
+                li += $"<li>(cv) {contentVersion.Id}] {contentVersion.Alias} ({contentVersion.Title}) order->{contentVersion.IndexOrder}</li>";
+            }
+        }
+        var result = string.Format("<ul>{0}</ul>", li);
+        return result;
     }
-    var result = string.Format("<ul>{0}</ul>", li);
-    return result;
-}
+    public string RenderWidgets(List<WidgetModel> models)
+    {
+        if (!models.Any())
+            return "";
+        var li = "";
+        foreach (var item in models)
+        {
+            li += item.Children.Any()
+                ? $"<li>(w) [{item.Id}] {item.Alias} ({item.Title}) order->{item.IndexOrder}<p>{RenderWidgets(item.Children)}</p></li>"
+                : $"<li>(w) [{item.Id}] {item.Alias} ({item.Title}) order->{item.IndexOrder}</li>";
+        }
+        var result = string.Format("<ul>{0}</ul>", li);
+        return result;
+    }
 }
 
 <script type="text/javascript">
     $(document).ready(function () {
+        $('#getAllItems').click(function (e) {
+            e.preventDefault();
+            var path = '/api/sitemap/getAllItems?isArchive=false';
+            ajaxGetRequest(path, convertSiteMap);
+        });
+
+        $('#getAllArchiveItems').click(function (e) {
+            e.preventDefault();
+            var path = '/api/sitemap/getAllItems?isArchive=true';
+            ajaxGetRequest(path, convertSiteMap);
+        });
+
+        $('#getTree').click(function (e) {
+            e.preventDefault();
+            var path = '/api/sitemap/getTree?isArchive=false&parentId=741114';
+            ajaxGetRequest(path, convertSiteMap);
+        });
+
+        $('#getArchiveTree').click(function (e) {
+            e.preventDefault();
+            var path = '/api/sitemap/getTree?isArchive=true&parentId=741182';
+            ajaxGetRequest(path, convertSiteMap);
+        });
+
+        $('#getWidgets').click(function (e) {
+            e.preventDefault();
+            var path = '/api/sitemap/getWidgets?isArchive=false&parentId=741164';
+            ajaxGetRequest(path, convertSiteMap);
+        });
+
+        $('#getArchiveWidgets').click(function (e) {
+            e.preventDefault();
+            var path = '/api/sitemap/getWidgets?isArchive=true&parentId=741182';
+            ajaxGetRequest(path, convertSiteMap);
+        });
+
         $('#publish').click(function (e) {
             e.preventDefault();
-            ajaxRequest('/api/sitemap/publish', [741184, 741186, 741188]);
+            ajaxPostRequest('/api/sitemap/publish', [741184, 741186, 741188]);
         });
 
         $('#reorder').click(function (e) {
             e.preventDefault();
-            ajaxRequest('/api/sitemap/reorder', {
+            ajaxPostRequest('/api/sitemap/reorder', {
                 itemId: 741188,
                 relatedItemId: 741184,
                 isInsertBefore: true
@@ -66,7 +134,7 @@ public string RenderItems(List<SiteTreeModel> models)
 
         $('#move').click(function (e) {
             e.preventDefault();
-            ajaxRequest('/api/sitemap/move', {
+            ajaxPostRequest('/api/sitemap/move', {
                 itemId: 741182,
                 newParentId: 741114
             });
@@ -74,7 +142,7 @@ public string RenderItems(List<SiteTreeModel> models)
 
         $('#remove').click(function (e) {
             e.preventDefault();
-            ajaxRequest('/api/sitemap/remove', {
+            ajaxPostRequest('/api/sitemap/remove', {
                 itemId: 741182,
                 isDeleteAllVersions: true,
                 isDeleteContentVersions: true,
@@ -108,7 +176,7 @@ public string RenderItems(List<SiteTreeModel> models)
         };
     }
 
-    function ajaxRequest(path, model) {
+    function ajaxPostRequest(path, model) {
         $.ajax(path, {
             method: 'POST',
             data: JSON.stringify(model),
@@ -120,5 +188,53 @@ public string RenderItems(List<SiteTreeModel> models)
                 console.log(path, result)
             }
         });
+    }
+
+    function ajaxGetRequest(path, success) {
+        $.ajax(path, {
+            method: 'GET',
+            beforeSend: function (request) {
+                request.setRequestHeader('Qp-Site-Params', JSON.stringify(getHeaderData()));
+            },
+            success: function (result) {
+                if (success == null) {
+                    console.log(path, result)
+                } else {
+                    var successResult = success(result);
+                    console.log(successResult);
+                }
+            }
+        });
+    }
+
+    function convertSiteMap(result) {
+        if (!result.isSuccess) {
+            console.error(path, result.error);
+            return;
+        }
+        var convertWidget = function (items, sitemap) {
+            for (var i = 0; i < items.length; i++) {
+                var item = items[i];
+                sitemap.push({
+                    text: '[' + item.id + '] ' + item.alias + ' (' + item.title + ') order->' + item.indexOrder,
+                    children: convertWidget(item.children, [])
+                })
+            }
+            return sitemap;
+        };
+        var convert = function (items, sitemap) {
+            for (var i = 0; i < items.length; i++) {
+                var item = items[i];
+                sitemap.push({
+                    text: '[' + item.id + '] ' + item.alias + ' (' + item.title + ') order->' + item.indexOrder,
+                    contentVersions: convert(item.contentVersions, []),
+                    widgets: convertWidget(item.widgets, []),
+                    children: convert(item.children, [])
+                })
+            }
+            return sitemap;
+        };
+        var sitemap = convert(result.data, []);
+        return sitemap;
     }
 </script>

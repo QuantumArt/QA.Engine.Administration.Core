@@ -3,6 +3,7 @@
     public class DiscriminatorModel
     {
         public int Id { get; set; }
+        public bool IsArchive { get; set; }
 
         public string Discriminator { get; set; }
 

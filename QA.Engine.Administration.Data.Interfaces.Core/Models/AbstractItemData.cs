@@ -3,6 +3,7 @@
     public class AbstractItemData
     {
         public int Id { get; set; }
+        public bool IsArchive { get; set; }
         public int? ParentId { get; set; }
         public string Alias { get; set; }
         public string Title { get; set; }

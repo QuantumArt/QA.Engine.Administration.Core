@@ -5,6 +5,6 @@ namespace QA.Engine.Administration.Services.Core.Interfaces
 {
     public interface IItemDifinitionService
     {
-        IEnumerable<DiscriminatorModel> GetAllItemDefinitions(int siteId, bool isStage);
+        IEnumerable<DiscriminatorModel> GetAllItemDefinitions(int siteId);
     }
 }

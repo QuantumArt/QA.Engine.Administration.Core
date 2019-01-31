@@ -23,6 +23,13 @@ namespace QA.Engine.Administration.Data.Core.Qp
         /// </summary>
         /// <param name="connectionString">Строка подключения</param>
         /// <returns></returns>
+        IQpContentManager Connect();
+
+        /// <summary>
+        /// Устанавливает подключение к QP
+        /// </summary>
+        /// <param name="connectionString">Строка подключения</param>
+        /// <returns></returns>
         IQpContentManager Connection(string connectionString);
 
         /// <summary>
@@ -157,6 +164,11 @@ namespace QA.Engine.Administration.Data.Core.Qp
         /// </summary>
         /// <param name="userId"></param>
         void Archive(int userId);
+
+        /// <summary>
+        /// Восстанавливает элементы из архива
+        /// </summary>
+        void Restore(int userId);
 
         /// <summary>
         /// Изменяет статус элементов

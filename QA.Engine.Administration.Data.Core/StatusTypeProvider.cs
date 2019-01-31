@@ -39,12 +39,12 @@ FROM [STATUS_TYPE]
 WHERE [SITE_ID]=@SiteId AND [STATUS_TYPE_NAME]=@Status
 ";
 
-        public IEnumerable<StatusTypeData> GetAll(int siteId, bool isStage)
+        public IEnumerable<StatusTypeData> GetAll(int siteId)
         {
             return _connection.Query<StatusTypeData>(CmdGetAll, new { SiteId = siteId });
         }
 
-        public StatusTypeData GetStatus(int siteId, bool isStage, QpContentItemStatus status)
+        public StatusTypeData GetStatus(int siteId, QpContentItemStatus status)
         {
             return _connection.QueryFirst<StatusTypeData>(CmdGetById, new { SiteId = siteId, Status = status.GetDescription() });
         }
