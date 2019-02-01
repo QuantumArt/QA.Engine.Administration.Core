@@ -16,11 +16,6 @@ namespace QA.Engine.Administration.Data.Core.Qp
         DBConnector DbConnector { get; }
 
         /// <summary>
-        /// Реальный коннектор
-        /// </summary>
-        object Connector { get; }
-
-        /// <summary>
         /// Возвращает данные контента
         /// </summary>
         /// <param name="query">Запрос</param>
@@ -68,5 +63,9 @@ namespace QA.Engine.Administration.Data.Core.Qp
         /// <param name="values">Ид'ы записей, для которой необходимо получить данные</param>
         /// <returns></returns>
         string GetContentItemLinkIDs(string fieldName, string values);
+
+        void BeginTransaction(IsolationLevel isolationLevel);
+        void CommitTransaction();
+        void RollbackTransaction();
     }
 }

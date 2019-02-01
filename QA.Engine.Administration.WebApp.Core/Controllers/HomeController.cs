@@ -25,8 +25,10 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
 
         public ActionResult Index()
         {
-            var model = _siteMapService.GetSiteMapStructure(52, true);
+            var model = _siteMapService.GetSiteMapStructure(52, false);
+            var archive = _siteMapService.GetSiteMapStructure(52, true);
             ViewData["model"] = model;
+            ViewData["archive"] = archive;
             ViewData["userId"] = _webAppQpHelper.UserId;
             return View();
         }

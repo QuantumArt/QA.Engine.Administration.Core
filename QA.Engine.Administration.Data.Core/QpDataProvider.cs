@@ -104,31 +104,42 @@ namespace QA.Engine.Administration.Data.Core
         {
             var siteName = _qpMetadataManager.GetSiteName(siteId);
 
-            // update content
-            var values = items.Select(x => new Dictionary<string, string>
-            {
-                { ContentItemIdFieldName, x.Id.ToString(CultureInfo.InvariantCulture) },
-                { ArchiveFieldName, "1" }
-            });
-            _qpDbConnector.DbConnector.MassUpdate(contentId, values, userId);
+            _qpDbConnector.BeginTransaction(IsolationLevel.Serializable);
 
-            //update extantion
-            var extantionValues = items
-                .Where(x => x.ExtensionId.HasValue)
-                .GroupBy(x => x.ExtensionId.Value, x => x.Id);
-            foreach (var item in extantionValues)
+            try
             {
-                var contentName = _qpMetadataManager.GetContentName(item.Key);
-                _qpContentManager
-                    .Connection(_qpDbConnector.InstanceConnectionString)
-                    .SiteName(siteName)
-                    .IsIncludeArchive(true)
-                    .IsShowSplittedArticle(true)
-                    .StatusName(_statusNames)
-                    .ContentId(item.Key)
-                    .ContentName(contentName)
-                    .Where($"ItemId in ({string.Join(",", item.Select(x => x))})")
-                    .Archive(userId);
+                // update content
+                var values = items.Select(x => new Dictionary<string, string>
+                {
+                    { ContentItemIdFieldName, x.Id.ToString(CultureInfo.InvariantCulture) },
+                    { ArchiveFieldName, "1" }
+                });
+                _qpDbConnector.DbConnector.MassUpdate(contentId, values, userId);
+
+                //update extantion
+                var extantionValues = items
+                    .Where(x => x.ExtensionId.HasValue)
+                    .GroupBy(x => x.ExtensionId.Value, x => x.Id);
+                foreach (var item in extantionValues)
+                {
+                    var contentName = _qpMetadataManager.GetContentName(item.Key);
+                    _qpContentManager
+                        .Connect()
+                        .SiteName(siteName)
+                        .IsIncludeArchive(true)
+                        .IsShowSplittedArticle(true)
+                        .StatusName(_statusNames)
+                        .ContentId(item.Key)
+                        .ContentName(contentName)
+                        .Where($"ItemId in ({string.Join(",", item.Select(x => x))})")
+                        .Archive(userId);
+                }
+                _qpDbConnector.CommitTransaction();
+            }
+            catch (Exception e)
+            {
+                _qpDbConnector.RollbackTransaction();
+                throw e;
             }
         }
 
@@ -165,32 +176,42 @@ namespace QA.Engine.Administration.Data.Core
         {
             var siteName = _qpMetadataManager.GetSiteName(siteId);
 
-            //_qpDbConnector.DbConnector.
-            // update content
-            var values = items.Select(x => new Dictionary<string, string>
-            {
-                { ContentItemIdFieldName, x.Id.ToString(CultureInfo.InvariantCulture) },
-                { ArchiveFieldName, "0" }
-            });
-            _qpDbConnector.DbConnector.MassUpdate(contentId, values, userId);
+            _qpDbConnector.BeginTransaction(IsolationLevel.Serializable);
 
-            //update extantion
-            var extantionValues = items
-                .Where(x => x.ExtensionId.HasValue)
-                .GroupBy(x => x.ExtensionId.Value, x => x.Id);
-            foreach (var item in extantionValues)
+            try
             {
-                var contentName = _qpMetadataManager.GetContentName(item.Key);
-                _qpContentManager
-                    .Connection(_qpDbConnector.InstanceConnectionString)
-                    .SiteName(siteName)
-                    .IsIncludeArchive(true)
-                    .IsShowSplittedArticle(true)
-                    .StatusName(_statusNames)
-                    .ContentId(item.Key)
-                    .ContentName(contentName)
-                    .Where($"ItemId in ({string.Join(",", item.Select(x => x))}) AND Archive = 1")
-                    .Restore(userId);
+                // update content
+                var values = items.Select(x => new Dictionary<string, string>
+                {
+                    { ContentItemIdFieldName, x.Id.ToString(CultureInfo.InvariantCulture) },
+                    { ArchiveFieldName, "0" }
+                });
+                _qpDbConnector.DbConnector.MassUpdate(contentId, values, userId);
+
+                //update extantion
+                var extantionValues = items
+                    .Where(x => x.ExtensionId.HasValue)
+                    .GroupBy(x => x.ExtensionId.Value, x => x.Id);
+                foreach (var item in extantionValues)
+                {
+                    var contentName = _qpMetadataManager.GetContentName(item.Key);
+                    _qpContentManager
+                        .Connect()
+                        .SiteName(siteName)
+                        .IsIncludeArchive(true)
+                        .IsShowSplittedArticle(true)
+                        .StatusName(_statusNames)
+                        .ContentId(item.Key)
+                        .ContentName(contentName)
+                        .Where($"ItemId in ({string.Join(",", item.Select(x => x))}) AND Archive = 1")
+                        .Restore(userId);
+                }
+                _qpDbConnector.CommitTransaction();
+            }
+            catch (Exception e)
+            {
+                _qpDbConnector.RollbackTransaction();
+                throw e;
             }
         }
 

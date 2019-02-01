@@ -2,28 +2,55 @@
 
 @{
     var model = (List<SiteTreeModel>)ViewData["model"];
+    var archive = (List<SiteTreeModel>)ViewData["archive"];
     var userId = ViewData["userId"];
 }
 
 <h5>UserId: @(userId)</h5>
 
-<h5>Site structure:</h5>
-<ul>
-    @foreach (var item in model)
-    {
-        <li>
-            [@item.Id] @item.Alias (@item.Title) order->@item.IndexOrder
+<h4>Site structure:</h4>
+<div style="display:table">
+    <div style="display:table-row">
+        <div style="display:table-cell">
+            <h5>site map</h5>
             <ul>
-                @foreach (var contentVersion in item.ContentVersions)
+                @foreach (var item in model)
                 {
-                <li>(cv) [@contentVersion.Id] @contentVersion.Alias (@contentVersion.Title) order->@contentVersion.IndexOrder</li>
+                    <li>
+                        [@item.Id] @item.Alias (@item.Title) order->@item.IndexOrder
+                        <ul>
+                            @foreach (var contentVersion in item.ContentVersions)
+                            {
+                                <li>(cv) [@contentVersion.Id] @contentVersion.Alias (@contentVersion.Title) order->@contentVersion.IndexOrder</li>
+                            }
+                        </ul>
+                        <p>@Html.Raw(RenderWidgets(item.Widgets))</p>
+                        <p>@Html.Raw(RenderItems(item.Children))</p>
+                    </li>
                 }
             </ul>
-            <p>@Html.Raw(RenderWidgets(item.Widgets))</p>
-            <p>@Html.Raw(RenderItems(item.Children))</p>
-        </li>
-    }
-</ul>
+        </div>
+        <div style="display:table-cell">
+            <h5>archive</h5>
+            <ul>
+                @foreach (var item in archive)
+                {
+                    <li>
+                        [@item.Id] @item.Alias (@item.Title) order->@item.IndexOrder
+                        <ul>
+                            @foreach (var contentVersion in item.ContentVersions)
+                            {
+                                <li>(cv) [@contentVersion.Id] @contentVersion.Alias (@contentVersion.Title) order->@contentVersion.IndexOrder</li>
+                            }
+                        </ul>
+                        <p>@Html.Raw(RenderWidgets(item.Widgets))</p>
+                        <p>@Html.Raw(RenderItems(item.Children))</p>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>
 
 <p><a id="getAllItems" href="#">getAllItems</a></p>
 <p><a id="getAllArchiveItems" href="#">getAllArchiveItems</a></p>
@@ -43,6 +70,9 @@
 </p>
 <p>
     <a id="remove" href="#">remove</a>
+</p>
+<p>
+    <a id="restore" href="#">restore</a>
 </p>
 
 @functions {
@@ -147,6 +177,17 @@
                 isDeleteAllVersions: true,
                 isDeleteContentVersions: true,
                 contentVersionId: null
+            });
+        });
+
+        $('#restore').click(function (e) {
+            e.preventDefault();
+            ajaxPostRequest('/api/sitemap/restore', {
+                itemId: 741182,
+                isRestoreAllVersions: true,
+                isRestoreWidgets: true,
+                isRestoreContentVersions: true,
+                isRestoreChildren: true
             });
         });
     });

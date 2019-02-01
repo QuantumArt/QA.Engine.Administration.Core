@@ -257,7 +257,7 @@ namespace QA.Engine.Administration.Services.Core
 
             if (item.VersionOfId != null || item.ParentId != null)
             {
-                var parent = _siteMapProvider.GetByIds(siteId, true, new int[] { item.VersionOfId ?? item.ParentId.Value }).FirstOrDefault();
+                var parent = _siteMapProvider.GetByIds(siteId, false, new int[] { item.VersionOfId ?? item.ParentId.Value }).FirstOrDefault();
                 if (parent == null || parent.Id == 0)
                     throw new InvalidOperationException("Нельзя восстановить элемент без элемента-предка.");
             }
@@ -318,10 +318,11 @@ namespace QA.Engine.Administration.Services.Core
                 .Where(x => (topLevelId != null && x.Id == topLevelId || topLevelId == null && x.ParentId == null) && x.IsPage && x.VersionOfId == null)
                 .Select(x => _mapper.Map<SiteTreeModel>(x))
                 .ToList();
+            if (!pageStructure.Any() && topLevelId.HasValue)
+                pageStructure = pages.Where(x => x.Id == topLevelId).ToList();
             if (!pageStructure.Any())
-            {
                 pageStructure = pages.Where(x => !pages.Any(y => y.Id == (x.ParentId ?? x.VersionOfId))).ToList();
-            }
+
             pageStructure.ForEach(x => x.Discriminator = discriminators.FirstOrDefault(y => y.Id == x.DiscriminatorId));
             pageStructure.ForEach(x => pages.Remove(x));
 

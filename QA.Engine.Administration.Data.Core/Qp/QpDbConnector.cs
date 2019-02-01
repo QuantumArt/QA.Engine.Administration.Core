@@ -11,6 +11,9 @@ namespace QA.Engine.Administration.Data.Core.Qp
     /// </summary>
     public class QpDbConnector : IQpDbConnector
     {
+        private readonly IDbConnection _connection;
+        private IDbTransaction _transaction;
+
         /// <summary>
         /// Подключения к БД Qp
         /// </summary>
@@ -24,7 +27,9 @@ namespace QA.Engine.Administration.Data.Core.Qp
         {
             if (string.IsNullOrEmpty(connectionString))
                 throw new ArgumentNullException("connectionString");
-            DbConnector = new DBConnector(connectionString);
+
+            _connection = new SqlConnection(connectionString);
+            DbConnector = new DBConnector(_connection);
         }
 
         /// <summary>
@@ -100,12 +105,28 @@ namespace QA.Engine.Administration.Data.Core.Qp
             return DbConnector.GetContentItemLinkIDs(fieldName, values);
         }
 
-        /// <summary>
-        /// Реальный коннектор
-        /// </summary>
-        public object Connector
+        public void BeginTransaction(IsolationLevel isolationLevel)
         {
-            get { return DbConnector; }
+            if (_transaction != null)
+                _transaction.Rollback();
+            _transaction = _connection.BeginTransaction(isolationLevel);
+            DbConnector.ExternalTransaction = _transaction;
+        }
+
+        public void CommitTransaction()
+        {
+            if (_transaction == null)
+                return;
+            _transaction.Commit();
+            _transaction = null;
+        }
+
+        public void RollbackTransaction()
+        {
+            if (_transaction == null)
+                return;
+            _transaction.Rollback();
+            _transaction = null;
         }
     }
 }
