@@ -53,13 +53,13 @@ namespace QA.Engine.Administration.Services.Core
             return items;
         }
 
-        public List<WidgetModel> GetWidgetItems(int siteId, bool isArchive, int parentId)
+        public List<WidgetTreeModel> GetWidgetItems(int siteId, bool isArchive, int parentId)
         {
             var items = _widgetProvider.GetItems(siteId, isArchive, new[] { parentId })
-                .Select(x => _mapper.Map<WidgetModel>(x))
+                .Select(x => _mapper.Map<WidgetTreeModel>(x))
                 .ToList();
             var children = _widgetProvider.GetItems(siteId, isArchive, items.Select(x => x.Id))
-                .Select(x => _mapper.Map<WidgetModel>(x))
+                .Select(x => _mapper.Map<WidgetTreeModel>(x))
                 .ToList();
             var discriminators = _itemDifinitionProvider.GetAllItemDefinitions(siteId)
                 .Select(x => _mapper.Map<DiscriminatorModel>(x))
@@ -75,19 +75,39 @@ namespace QA.Engine.Administration.Services.Core
             return items;
         }
 
-        public List<SiteTreeModel> GetSiteMapStructure(int siteId, bool isArchive)
+        public List<SiteTreeModel> GetSiteMapStructure(int siteId)
         {
-            var abstractItems = _siteMapProvider.GetAllItems(siteId, isArchive);
+            var abstractItems = _siteMapProvider.GetAllItems(siteId, false);
 
             var pages = abstractItems.Where(x => x.IsPage).Select(x => _mapper.Map<SiteTreeModel>(x)).OrderBy(x => x.IndexOrder).ToList();
-            var widgets = abstractItems.Where(x => !x.IsPage).Select(x => _mapper.Map<WidgetModel>(x)).OrderBy(x => x.IndexOrder).ToList();
+            var widgets = abstractItems.Where(x => !x.IsPage).Select(x => _mapper.Map<WidgetTreeModel>(x)).OrderBy(x => x.IndexOrder).ToList();
             var discriminators = _itemDifinitionProvider.GetAllItemDefinitions(siteId)
                 .Select(x => _mapper.Map<DiscriminatorModel>(x))
                 .ToList();
 
-            var pageStructure = GetPageStructure(pages, widgets, discriminators);
+            var pageStructure = SiteMapStructureBuilder.GetPageStructure(pages, widgets, discriminators);
 
             return pageStructure;
+        }
+
+        public ArchiveTreeModel GetArchiveStructure(int siteId)
+        {
+            var abstractItems = _siteMapProvider.GetAllItems(siteId, true);
+
+            var pages = abstractItems.Where(x => x.IsPage).Select(x => _mapper.Map<SiteTreeModel>(x)).OrderBy(x => x.IndexOrder).ToList();
+            var widgets = abstractItems.Where(x => !x.IsPage).Select(x => _mapper.Map<WidgetTreeModel>(x)).OrderBy(x => x.IndexOrder).ToList();
+            var discriminators = _itemDifinitionProvider.GetAllItemDefinitions(siteId)
+                .Select(x => _mapper.Map<DiscriminatorModel>(x))
+                .ToList();
+
+            var pageStructure = SiteMapStructureBuilder.GetPageStructure(pages, widgets, discriminators);
+            var widgetStructure = SiteMapStructureBuilder.GetWidgetStructure(null, widgets, discriminators);
+
+            return new ArchiveTreeModel
+            {
+                Pages = pageStructure,
+                Widgets = widgetStructure
+            };
         }
 
         public void PublishSiteMapItems(int siteId, int userId, List<int> itemIds)
@@ -157,7 +177,9 @@ namespace QA.Engine.Administration.Services.Core
             _qpDataProvider.Move(siteId, contentId, userId, itemId, newParentId);
         }
 
-        public void RemoveSiteMapItems(int siteId, int userId, int itemId, bool isDeleteAllVersions, bool isDeleteContentVersion, int? contentVersionId)
+        public void RemoveSiteMapItems(
+            int siteId, int userId, int itemId, 
+            bool isDeleteAllVersions, bool isDeleteContentVersion, int? contentVersionId)
         {
             if (itemId <= 0)
                 throw new ArgumentException("itemId <= 0");
@@ -184,10 +206,11 @@ namespace QA.Engine.Administration.Services.Core
 
             var allItems = _siteMapProvider.GetAllItems(siteId, false);
             var pages = allItems.Where(x => x.IsPage).Select(x => _mapper.Map<SiteTreeModel>(x)).OrderBy(x => x.IndexOrder).ToList();
-            var widgets = allItems.Where(x => !x.IsPage).Select(x => _mapper.Map<WidgetModel>(x)).OrderBy(x => x.IndexOrder).ToList();
-            var pageStructure = GetPageStructure(pages, widgets, new List<DiscriminatorModel>(), itemId);
+            var widgets = allItems.Where(x => !x.IsPage).Select(x => _mapper.Map<WidgetTreeModel>(x)).OrderBy(x => x.IndexOrder).ToList();
+            var pageStructure = item.IsPage ? SiteMapStructureBuilder.GetPageStructure(pages, widgets, null, itemId) : new List<SiteTreeModel>();
+            var widgetStructure = !item.IsPage ? SiteMapStructureBuilder.GetWidgetStructure(null, widgets, null, itemId) : new List<WidgetTreeModel>();
 
-            void funcWidgets(List<WidgetModel> items)
+            void funcWidgets(List<WidgetTreeModel> items)
             {
                 foreach (var i in items)
                 {
@@ -235,6 +258,7 @@ namespace QA.Engine.Administration.Services.Core
             }
 
             func(pageStructure);
+            funcWidgets(widgetStructure);
 
             var contentId = _siteMapProvider.GetContentId(siteId);
 
@@ -266,10 +290,11 @@ namespace QA.Engine.Administration.Services.Core
 
             var allItems = _siteMapProvider.GetAllItems(siteId, true);
             var pages = allItems.Where(x => x.IsPage).Select(x => _mapper.Map<SiteTreeModel>(x)).OrderBy(x => x.IndexOrder).ToList();
-            var widgets = allItems.Where(x => !x.IsPage).Select(x => _mapper.Map<WidgetModel>(x)).OrderBy(x => x.IndexOrder).ToList();
-            var pageStructure = GetPageStructure(pages, widgets, new List<DiscriminatorModel>(), itemId);
+            var widgets = allItems.Where(x => !x.IsPage).Select(x => _mapper.Map<WidgetTreeModel>(x)).OrderBy(x => x.IndexOrder).ToList();
+            var pageStructure = item.IsPage ? SiteMapStructureBuilder.GetPageStructure(pages, widgets, null, itemId) : new List<SiteTreeModel>();
+            var widgetStructure = !item.IsPage ? SiteMapStructureBuilder.GetWidgetStructure(null, widgets, null, itemId) : new List<WidgetTreeModel>();
 
-            void funcWidgets(List<WidgetModel> items)
+            void funcWidgets(List<WidgetTreeModel> items)
             {
                 foreach (var i in items)
                 {
@@ -305,6 +330,7 @@ namespace QA.Engine.Administration.Services.Core
             }
 
             func(pageStructure);
+            funcWidgets(widgetStructure);
 
             var contentId = _siteMapProvider.GetContentId(siteId);
 
@@ -312,88 +338,72 @@ namespace QA.Engine.Administration.Services.Core
                 _qpDataProvider.Restore(siteId, contentId, userId, itemsToRestore);
         }
 
-        private List<SiteTreeModel> GetPageStructure(List<SiteTreeModel> pages, List<WidgetModel> widgets, List<DiscriminatorModel> discriminators, int? topLevelId = null)
+        public void DeleteSiteMapItems(
+            int siteId, int userId, int itemId,
+            bool isDeleteAllVersions)
         {
-            var pageStructure = pages
-                .Where(x => (topLevelId != null && x.Id == topLevelId || topLevelId == null && x.ParentId == null) && x.IsPage && x.VersionOfId == null)
-                .Select(x => _mapper.Map<SiteTreeModel>(x))
-                .ToList();
-            if (!pageStructure.Any() && topLevelId.HasValue)
-                pageStructure = pages.Where(x => x.Id == topLevelId).ToList();
-            if (!pageStructure.Any())
-                pageStructure = pages.Where(x => !pages.Any(y => y.Id == (x.ParentId ?? x.VersionOfId))).ToList();
+            if (itemId <= 0)
+                throw new ArgumentException("itemId <= 0");
 
-            pageStructure.ForEach(x => x.Discriminator = discriminators.FirstOrDefault(y => y.Id == x.DiscriminatorId));
-            pageStructure.ForEach(x => pages.Remove(x));
+            var item = _siteMapProvider.GetByIds(siteId, true, new[] { itemId })?.FirstOrDefault();
+            if (item == null || item.Id == 0)
+                throw new InvalidOperationException("Элемент не найден.");
 
-            var elements = pageStructure;
-            var makeTree = true;
-            while (makeTree)
+            var rootPageId = _siteMapProvider.GetRootPage(siteId)?.Id;
+            if (itemId == rootPageId)
+                throw new InvalidOperationException("Нельзя удалить главную  страницу.");
+
+            var itemsToDelete = new List<AbstractItemData>();
+
+            var allItems = _siteMapProvider.GetAllItems(siteId, true);
+            var pages = allItems.Where(x => x.IsPage).Select(x => _mapper.Map<SiteTreeModel>(x)).OrderBy(x => x.IndexOrder).ToList();
+            var widgets = allItems.Where(x => !x.IsPage).Select(x => _mapper.Map<WidgetTreeModel>(x)).OrderBy(x => x.IndexOrder).ToList();
+            var pageStructure = item.IsPage ? SiteMapStructureBuilder.GetPageStructure(pages, widgets, null, itemId) : new List<SiteTreeModel>();
+            var widgetStructure = !item.IsPage ? SiteMapStructureBuilder.GetWidgetStructure(null, widgets, null, itemId) : new List<WidgetTreeModel>();
+
+            void funcWidgets(List<WidgetTreeModel> items)
             {
-                makeTree = false;
-                var tmp = new List<SiteTreeModel>();
-                foreach (var el in elements)
+                foreach (var i in items)
                 {
-                    el.Children = pages.Where(x => x.ParentId != null && x.ParentId == el.Id).ToList();
-                    el.ContentVersions = pages.Where(x => x.ParentId == null && x.VersionOfId == el.Id).ToList();
+                    itemsToDelete.AddRange(allItems.Where(x => x.Id == i.Id));
 
-                    if (el.HasChildren)
-                    {
-                        makeTree = true;
-                        tmp.AddRange(el.Children);
-                        el.Children.ForEach(x => x.Discriminator = discriminators.FirstOrDefault(y => y.Id == x.DiscriminatorId));
-                        el.Children.ForEach(x => pages.Remove(x));
-                    }
-                    else if (el.HasContentVersion)
-                    {
-                        makeTree = true;
-                        tmp.AddRange(el.ContentVersions);
-                        el.ContentVersions.ForEach(x => x.Discriminator = discriminators.FirstOrDefault(y => y.Id == x.DiscriminatorId));
-                        el.ContentVersions.ForEach(x => pages.Remove(x));
-                    }
-                    else
-                        tmp.Add(el);
-
-                    el.Widgets = GetWidgetStructure(el, widgets, discriminators);
+                    if (i.HasChildren)
+                        funcWidgets(i.Children);
                 }
-                elements = tmp;
             }
 
-            return pageStructure;
-        }
-
-        private List<WidgetModel> GetWidgetStructure(SiteTreeModel page, List<WidgetModel> widgets, List<DiscriminatorModel> discriminators)
-        {
-            var widgetStructure = widgets
-                .Where(x => x.ParentId == page.Id)
-                .ToList();
-            widgetStructure.ForEach(x => x.Discriminator = discriminators.FirstOrDefault(y => y.Id == x.DiscriminatorId));
-            widgetStructure.ForEach(x => widgets.Remove(x));
-
-            var elements = widgetStructure;
-            var makeTree = true;
-            while (makeTree)
+            void func(List<SiteTreeModel> items)
             {
-                makeTree = false;
-                var tmp = new List<WidgetModel>();
-                foreach (var el in elements)
+                foreach (var i in items)
                 {
-                    el.Children = widgets.Where(x => !x.IsPage && x.ParentId == el.Id).ToList();
+                    itemsToDelete.AddRange(allItems.Where(x => x.Id == i.Id));
 
-                    if (el.HasChildren)
-                    {
-                        makeTree = true;
-                        tmp.AddRange(el.Children);
-                        el.Children.ForEach(x => x.Discriminator = discriminators.FirstOrDefault(y => y.Id == x.DiscriminatorId));
-                        el.Children.ForEach(x => widgets.Remove(x));
-                    }
-                    else
-                        tmp.Add(el);
+                    if (i.HasContentVersion)
+                        itemsToDelete.AddRange(allItems.Where(x => i.ContentVersions.Any(y => x.Id == y.Id)));
+
+                    if (i.HasWidgets)
+                        funcWidgets(i.Widgets);
+
+                    if (i.HasChildren)
+                        func(i.Children);
                 }
-                elements = tmp;
             }
 
-            return widgetStructure;
+            if (isDeleteAllVersions)
+            {
+                var structuralVersions = allItems.Where(x => x.ParentId == item.ParentId && x.Alias == item.Alias && x.Id != item.Id).ToList();
+                if (structuralVersions.Any())
+                    itemsToDelete.AddRange(structuralVersions);
+            }
+
+            func(pageStructure);
+            funcWidgets(widgetStructure);
+
+            var contentId = _siteMapProvider.GetContentId(siteId);
+
+            if (itemsToDelete.Any())
+                _qpDataProvider.Delete(siteId, contentId, userId, itemsToDelete);
         }
+
     }
 }

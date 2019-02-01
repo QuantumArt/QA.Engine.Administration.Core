@@ -29,5 +29,9 @@ namespace QA.Engine.Administration.Data.Interfaces.Core
         /// Восстановить элементы из архива
         /// </summary>
         void Restore(int siteId, int contentId, int userId, IEnumerable<AbstractItemData> items);
+        /// <summary>
+        ///  Удалить элементы
+        /// </summary>
+        void Delete(int siteId, int contentId, int userId, IEnumerable<AbstractItemData> items);
     }
 }

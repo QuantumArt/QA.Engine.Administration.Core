@@ -135,9 +135,15 @@
             <param name="webAppQpHelper"></param>
             <param name="logger"></param>
         </member>
-        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.GetSiteMap(System.Nullable{System.Boolean})">
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.GetSiteMap">
             <summary>
             Возвращает полное дерево карты сайта
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.GetAllArchiveItems">
+            <summary>
+            Возвращает полную структуру архива
             </summary>
             <returns></returns>
         </member>
@@ -186,7 +192,7 @@
         </member>
         <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.Remove(QA.Engine.Administration.WebApp.Core.Models.RemoveModel)">
             <summary>
-            Удаление элементов
+            Удаление элементов в архив
             </summary>
             <param name="model"></param>
             <returns></returns>
@@ -194,6 +200,13 @@
         <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.Restore(QA.Engine.Administration.WebApp.Core.Models.RestoreModel)">
             <summary>
             Восстановление элементов
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.Delete(QA.Engine.Administration.WebApp.Core.Models.DeleteModel)">
+            <summary>
+            Удаление элементов
             </summary>
             <param name="model"></param>
             <returns></returns>

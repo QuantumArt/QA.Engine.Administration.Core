@@ -8,7 +8,7 @@ namespace QA.Engine.Administration.Services.Core.Mapper
     {
         public WidgetProfile()
         {
-            CreateMap<AbstractItemData, WidgetModel>()
+            CreateMap<AbstractItemData, WidgetTreeModel>()
                 .ForMember(x => x.Children, opt => opt.Ignore())
                 .ForMember(x => x.Discriminator, opt => opt.Ignore());
         }

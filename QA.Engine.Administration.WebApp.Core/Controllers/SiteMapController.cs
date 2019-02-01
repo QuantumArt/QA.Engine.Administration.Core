@@ -54,10 +54,21 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("getAllItems")]
-        public ApiResult<SiteTreeModel[]> GetSiteMap(bool? isArchive)
+        public ApiResult<SiteTreeModel[]> GetSiteMap()
         {
-            var result = _siteMapService.GetSiteMapStructure(_siteId, isArchive ?? false).ToArray();
+            var result = _siteMapService.GetSiteMapStructure(_siteId).ToArray();
             return ApiResult<SiteTreeModel[]>.Success(result);
+        }
+
+        /// <summary>
+        /// Возвращает полную структуру архива
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("getAllArchiveItems")]
+        public ApiResult<ArchiveTreeModel> GetAllArchiveItems()
+        {
+            var result = _siteMapService.GetArchiveStructure(_siteId);
+            return ApiResult<ArchiveTreeModel>.Success(result);
         }
 
         /// <summary>
@@ -80,10 +91,10 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// <param name="isArchive">Признак возврата архивных элементов</param>
         /// <returns></returns>
         [HttpGet("getWidgets")]
-        public ApiResult<WidgetModel[]> GetWidgets(int parentId, bool? isArchive)
+        public ApiResult<WidgetTreeModel[]> GetWidgets(int parentId, bool? isArchive)
         {
             var result = _siteMapService.GetWidgetItems(_siteId, isArchive ?? false, parentId).ToArray();
-            return ApiResult<WidgetModel[]>.Success(result);
+            return ApiResult<WidgetTreeModel[]>.Success(result);
         }
 
         /// <summary>
@@ -158,7 +169,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         }
 
         /// <summary>
-        /// Удаление элементов
+        /// Удаление элементов в архив
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
@@ -167,7 +178,11 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         {
             try
             {
-                _siteMapService.RemoveSiteMapItems(_siteId, _userId, model.ItemId, model.IsDeleteAllVersions ?? false, model.IsDeleteContentVersions ?? false, model.ContentVersionId);
+                _siteMapService.RemoveSiteMapItems(
+                    _siteId, _userId, model.ItemId, 
+                    model.IsDeleteAllVersions ?? false, 
+                    model.IsDeleteContentVersions ?? false, 
+                    model.ContentVersionId);
                 return ApiResult.Success();
             }
             catch (Exception e)
@@ -198,6 +213,28 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Restore error");
+                return ApiResult.Fail(e);
+            }
+        }
+
+        /// <summary>
+        /// Удаление элементов
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost("delete")]
+        public ApiResult Delete([FromBody]DeleteModel model)
+        {
+            try
+            {
+                _siteMapService.DeleteSiteMapItems(
+                    _siteId, _userId, model.ItemId,
+                    model.IsDeleteAllVersions ?? false);
+                return ApiResult.Success();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Delete error");
                 return ApiResult.Fail(e);
             }
         }

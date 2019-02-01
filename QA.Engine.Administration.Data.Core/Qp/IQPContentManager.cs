@@ -171,6 +171,12 @@ namespace QA.Engine.Administration.Data.Core.Qp
         void Restore(int userId);
 
         /// <summary>
+        /// Удаляет элемент из БД
+        /// </summary>
+        /// <param name="userId"></param>
+        void Delete(int userId);
+
+        /// <summary>
         /// Изменяет статус элементов
         /// </summary>
         void ChangeStatus(int userId, int statusId);

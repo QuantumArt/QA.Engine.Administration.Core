@@ -20,7 +20,7 @@ namespace QA.Engine.Administration.Services.Core.Models
         public bool? IsInSiteMap { get; set; }
         public int DiscriminatorId { get; set; }
 
-        public List<WidgetModel> Widgets { get; set; }
+        public List<WidgetTreeModel> Widgets { get; set; }
         public List<SiteTreeModel> Children { get; set; }
         public List<SiteTreeModel> ContentVersions { get; set; }
         public DiscriminatorModel Discriminator { get; set; }

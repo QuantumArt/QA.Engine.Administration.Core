@@ -44,31 +44,42 @@ namespace QA.Engine.Administration.Data.Core
         {
             var siteName = _qpMetadataManager.GetSiteName(siteId);
 
-            // update content
-            var values = items.Select(x => new Dictionary<string, string>
-            {
-                { ContentItemIdFieldName, x.Id.ToString(CultureInfo.InvariantCulture) },
-                { StatusTypeIdFieldName, statusId.ToString(CultureInfo.InvariantCulture) }
-            });
-            _qpDbConnector.DbConnector.MassUpdate(contentId, values, userId);
+            _qpDbConnector.BeginTransaction(IsolationLevel.Serializable);
 
-            //update extantion
-            var extantionValues = items
-                .Where(x => x.ExtensionId.HasValue)
-                .GroupBy(x => x.ExtensionId.Value, x => x.Id);
-            foreach (var item in extantionValues)
+            try
             {
-                var contentName = _qpMetadataManager.GetContentName(item.Key);
-                _qpContentManager
-                    .Connection(_qpDbConnector.InstanceConnectionString)
-                    .SiteName(siteName)
-                    .IsIncludeArchive(true)
-                    .IsShowSplittedArticle(true)
-                    .StatusName(_statusNames)
-                    .ContentId(item.Key)
-                    .ContentName(contentName)
-                    .Where($"ItemId in ({string.Join(",", item.Select(x => x))})")
-                    .ChangeStatus(userId, statusId);
+                // update content
+                var values = items.Select(x => new Dictionary<string, string>
+                {
+                    { ContentItemIdFieldName, x.Id.ToString(CultureInfo.InvariantCulture) },
+                    { StatusTypeIdFieldName, statusId.ToString(CultureInfo.InvariantCulture) }
+                });
+                _qpDbConnector.DbConnector.MassUpdate(contentId, values, userId);
+
+                //update extantion
+                var extantionValues = items
+                    .Where(x => x.ExtensionId.HasValue)
+                    .GroupBy(x => x.ExtensionId.Value, x => x.Id);
+                foreach (var item in extantionValues)
+                {
+                    var contentName = _qpMetadataManager.GetContentName(item.Key);
+                    _qpContentManager
+                        .Connect()
+                        .SiteName(siteName)
+                        .IsIncludeArchive(true)
+                        .IsShowSplittedArticle(true)
+                        .StatusName(_statusNames)
+                        .ContentId(item.Key)
+                        .ContentName(contentName)
+                        .Where($"ItemId in ({string.Join(",", item.Select(x => x))})")
+                        .ChangeStatus(userId, statusId);
+                }
+                _qpDbConnector.CommitTransaction();
+            }
+            catch (Exception e)
+            {
+                _qpDbConnector.RollbackTransaction();
+                throw e;
             }
         }
 
@@ -205,6 +216,54 @@ namespace QA.Engine.Administration.Data.Core
                         .ContentName(contentName)
                         .Where($"ItemId in ({string.Join(",", item.Select(x => x))}) AND Archive = 1")
                         .Restore(userId);
+                }
+                _qpDbConnector.CommitTransaction();
+            }
+            catch (Exception e)
+            {
+                _qpDbConnector.RollbackTransaction();
+                throw e;
+            }
+        }
+
+        public void Delete(int siteId, int contentId, int userId, IEnumerable<AbstractItemData> items)
+        {
+            var siteName = _qpMetadataManager.GetSiteName(siteId);
+
+            _qpDbConnector.BeginTransaction(IsolationLevel.Serializable);
+
+            try
+            {
+                // update content
+                var contentName = _qpMetadataManager.GetContentName(contentId);
+                _qpContentManager
+                    .Connect()
+                    .SiteName(siteName)
+                    .IsIncludeArchive(true)
+                    .IsShowSplittedArticle(true)
+                    .StatusName(_statusNames)
+                    .ContentId(contentId)
+                    .ContentName(contentName)
+                    .Where($"{ContentItemIdFieldName} in ({string.Join(",", items.Select(x => x.Id))}) AND Archive = 1")
+                    .Delete(userId);
+
+                //update extantion
+                var extantionValues = items
+                    .Where(x => x.ExtensionId.HasValue)
+                    .GroupBy(x => x.ExtensionId.Value, x => x.Id);
+                foreach (var item in extantionValues)
+                {
+                    var contentExtantionName = _qpMetadataManager.GetContentName(item.Key);
+                    _qpContentManager
+                        .Connect()
+                        .SiteName(siteName)
+                        .IsIncludeArchive(true)
+                        .IsShowSplittedArticle(true)
+                        .StatusName(_statusNames)
+                        .ContentId(item.Key)
+                        .ContentName(contentExtantionName)
+                        .Where($"ItemId in ({string.Join(",", item.Select(x => x))})")
+                        .Delete(userId);
                 }
                 _qpDbConnector.CommitTransaction();
             }
