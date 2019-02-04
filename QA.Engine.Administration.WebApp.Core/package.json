@@ -1,0 +1,47 @@
+{
+  "name": "qp-site-admin",
+  "version": "0.1.0",
+  "private": true,
+  "author": "QuantumArt",
+  "license": "ISC",
+  "scripts": {
+    "start:dev": "webpack-dev-server --config webpack.config.dev.js",
+    "clean": "rimraf wwwroot/*"
+  },
+  "dependencies": {
+    "@blueprintjs/core": "^3.12.0",
+    "mobx": "^5.8.0",
+    "mobx-react": "^5.4.3",
+    "qs": "^6.6.0",
+    "react": "^16.7.0",
+    "react-dom": "^16.7.0",
+    "react-hot-loader": "^4.6.3",
+    "tslint": "^5.12.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.2.2",
+    "@babel/plugin-proposal-class-properties": "^7.2.3",
+    "@babel/plugin-proposal-decorators": "^7.2.3",
+    "@babel/polyfill": "^7.2.5",
+    "@babel/preset-env": "^7.2.3",
+    "@babel/preset-react": "^7.0.0",
+    "@babel/preset-typescript": "^7.1.0",
+    "@types/node": "^10.12.18",
+    "@types/qs": "^6.5.1",
+    "@types/react": "^16.7.20",
+    "@types/react-dom": "^16.0.11",
+    "babel-loader": "^8.0.5",
+    "css-loader": "^2.1.0",
+    "file-loader": "^3.0.1",
+    "fork-ts-checker-webpack-plugin": "^0.5.2",
+    "html-webpack-plugin": "^3.2.0",
+    "rimraf": "^2.6.3",
+    "style-loader": "^0.23.1",
+    "tslint-config-airbnb": "^5.11.1",
+    "typescript": "^3.2.4",
+    "url-loader": "^1.1.2",
+    "webpack": "^4.28.4",
+    "webpack-cli": "^3.2.1",
+    "webpack-dev-server": "^3.1.14"
+  }
+}

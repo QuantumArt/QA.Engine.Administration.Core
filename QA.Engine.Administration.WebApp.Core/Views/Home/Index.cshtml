@@ -1,252 +1,60 @@
-﻿@using QA.Engine.Administration.Services.Core.Models
+﻿<div id="root">Loading...</div>
 
-@{
-    var model = (List<SiteTreeModel>)ViewData["model"];
-    var archive = (ArchiveTreeModel)ViewData["archive"];
-    var userId = ViewData["userId"];
+@section Scripts {
+    <script src="~/dist/main.js"></script>
+    <script src="~/dist/vendor.js"></script>
 }
+@section TestScripts{
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#publish').click(function (e) {
+                e.preventDefault();
+                ajaxRequest('/api/sitemap/publish', [741184, 741186, 741188]);
+            });
 
-<h5>UserId: @(userId)</h5>
+            $('#reorder').click(function (e) {
+                e.preventDefault();
+                ajaxRequest('/api/sitemap/reorder', {
+                    itemId: 741188,
+                    relatedItemId: 741184,
+                    isInsertBefore: true
+                });
+            });
 
-<h4>Site structure:</h4>
-<div style="display:table">
-    <div style="display:table-row">
-        <div style="display:table-cell">
-            <h5>site map</h5>
-            <ul>
-                @foreach (var item in model)
-                {
-                <li>
-                    @ContentTypeAndStatus(item) [@item.Id] @item.Alias (@item.Title) order->@item.IndexOrder
-                    <p>@Html.Raw(RenderWidgets(item.Widgets))</p>
-                    <ul>
-                        @foreach (var contentVersion in item.ContentVersions)
-                        {
-                            <li>@ContentTypeAndStatus(contentVersion) [@contentVersion.Id] @contentVersion.Alias (@contentVersion.Title) order->@contentVersion.IndexOrder</li>
-                        }
-                    </ul>
-                    <p>@Html.Raw(RenderItems(item.Children))</p>
-                </li>
+            $('#move').click(function (e) {
+                e.preventDefault();
+                ajaxRequest('/api/sitemap/move', {
+                    itemId: 741182,
+                    newParentId: 741114
+                });
+            });
+        });
+        //(function () {
+        //    var path = '/api/sitemap/publish' + location.search + '&itemids=741180';
+        //    el = document.getElementById('publish');
+        //    el.href = path;
+        //})();
+
+        function getHeaderData() {
+            getQueryVariable = function (variable) {
+                var query = window.location.search.substring(1);
+                var vars = query.split('&');
+                for (var i = 0; i < vars.length; i++) {
+                    var pair = vars[i].split('=');
+                    if (decodeURIComponent(pair[0]) == variable) {
+                        return decodeURIComponent(pair[1]);
+                    }
                 }
-            </ul>
-        </div>
-        <div style="display:table-cell">
-            <h5>archive</h5>
-            <ul>
-                @foreach (var item in archive.Pages)
-                {
-                <li>
-                    @ContentTypeAndStatus(item) [@item.Id] @item.Alias (@item.Title) order->@item.IndexOrder
-                    <p>@Html.Raw(RenderWidgets(item.Widgets))</p>
-                    <ul>
-                        @foreach (var contentVersion in item.ContentVersions)
-                        {
-                            <li>@ContentTypeAndStatus(contentVersion) [@contentVersion.Id] @contentVersion.Alias (@contentVersion.Title) order->@contentVersion.IndexOrder</li>
-                        }
-                    </ul>
-                    <p>@Html.Raw(RenderItems(item.Children))</p>
-                </li>
-                }
-                @foreach (var item in archive.Widgets)
-                {
-                    <li>
-                        (w) @(item.Published ? "Published" : "New") [@item.Id] @item.Alias (@item.Title) order->@item.IndexOrder
-                        <p>@Html.Raw(RenderWidgets(item.Children))</p>
-                    </li>
-                }
-            </ul>
-        </div>
-    </div>
-</div>
+            };
 
-<div style="display: table">
-    <div style="display: table-row">
-        <div style="display: table-cell; padding-right: 20px;">
-            <p><a id="getAllItems" href="#">getAllItems</a></p>
-            <p><a id="getAllArchiveItems" href="#">getAllArchiveItems</a></p>
-            <p><a id="getTree" href="#">getTree</a></p>
-            <p><a id="getArchiveTree" href="#">getArchiveTree</a></p>
-            <p><a id="getWidgets" href="#">getWidgets</a></p>
-            <p><a id="getArchiveWidgets" href="#">getArchiveWidgets</a></p>
-        </div>
-        <div style="display: table-cell; padding-left: 20px;">
-            <p><a id="publish" href="#">publish</a></p>
-            <p><a id="reorder" href="#">reorder</a></p>
-            <p><a id="move" href="#">move</a></p>
-            <p><a id="remove" href="#">remove</a></p>
-            <p><a id="restore" href="#">restore</a></p>
-            <p><a id="delete" href="#">delete</a></p>
-            <p><a id="edit" href="#">edit</a></p>
-        </div>
-    </div>
-</div>
-
-@functions {
-    string RenderItems(List<SiteTreeModel> models)
-    {
-        if (!models.Any())
-            return "";
-        var li = "";
-        foreach (var item in models)
-        {
-            li += item.Children.Any()
-            ? $"<li>{ContentTypeAndStatus(item)} [{item.Id}] {item.Alias} ({item.Title}) order->{item.IndexOrder}<p>{RenderItems(item.Children)}</p></li>"
-            : $"<li>{ContentTypeAndStatus(item)} [{item.Id}] {item.Alias} ({item.Title}) order->{item.IndexOrder}</li>";
-            li += RenderWidgets(item.Widgets);
-            foreach (var contentVersion in item.ContentVersions)
-            {
-                li += $"<li>{ContentTypeAndStatus(contentVersion)} [{contentVersion.Id}] {contentVersion.Alias} ({contentVersion.Title}) order->{contentVersion.IndexOrder}</li>";
-            }
+            return {
+                BackendSid: getQueryVariable('backend_sid'),
+                CustomerCode: getQueryVariable('customerCode'),
+                HostId: getQueryVariable('hostUID'),
+                SiteId: getQueryVariable('site_id')
+            };
         }
-        var result = string.Format("<ul>{0}</ul>", li);
-        return result;
-    }
-    string RenderWidgets(List<WidgetTreeModel> models)
-    {
-        if (!models.Any())
-            return "";
-        var li = "";
-        foreach (var item in models)
-        {
-            var status = item.Published ? "Published" : "New";
-            li += item.Children.Any()
-                ? $"<li>(w) {status} [{item.Id}] {item.Alias} ({item.Title}) order->{item.IndexOrder}<p>{RenderWidgets(item.Children)}</p></li>"
-                : $"<li>(w) {status} [{item.Id}] {item.Alias} ({item.Title}) order->{item.IndexOrder}</li>";
-        }
-        var result = string.Format("<ul>{0}</ul>", li);
-        return result;
-    }
-    string ContentTypeAndStatus(SiteTreeModel item)
-    {
-        var status = item.Published ? "Published" : "New";
-        if (item.ParentId == null && item.VersionOfId != null)
-            return $"(cv) {status}";
-        return $"(p) {status}";
-    }
-}
-
-<script type="text/javascript">
-    $(document).ready(function () {
-        $('#getAllItems').click(function (e) {
-            e.preventDefault();
-            var path = '/api/sitemap/getAllItems';
-            ajaxGetRequest(path, convertSiteMap);
-        });
-
-        $('#getAllArchiveItems').click(function (e) {
-            e.preventDefault();
-            var path = '/api/sitemap/getAllArchiveItems';
-            ajaxGetRequest(path, convertSiteMap);
-        });
-
-        $('#getTree').click(function (e) {
-            e.preventDefault();
-            var path = '/api/sitemap/getTree?isArchive=false&parentId=741114';
-            ajaxGetRequest(path, convertSiteMap);
-        });
-
-        $('#getArchiveTree').click(function (e) {
-            e.preventDefault();
-            var path = '/api/sitemap/getTree?isArchive=true&parentId=741182';
-            ajaxGetRequest(path, convertSiteMap);
-        });
-
-        $('#getWidgets').click(function (e) {
-            e.preventDefault();
-            var path = '/api/sitemap/getWidgets?isArchive=false&parentId=741164';
-            ajaxGetRequest(path, convertSiteMap);
-        });
-
-        $('#getArchiveWidgets').click(function (e) {
-            e.preventDefault();
-            var path = '/api/sitemap/getWidgets?isArchive=true&parentId=741182';
-            ajaxGetRequest(path, convertSiteMap);
-        });
-
-        $('#publish').click(function (e) {
-            e.preventDefault();
-            ajaxPostRequest('/api/sitemap/publish', [741244, 741210]);
-        });
-
-        $('#reorder').click(function (e) {
-            e.preventDefault();
-            ajaxPostRequest('/api/sitemap/reorder', {
-                itemId: 741188,
-                relatedItemId: 741184,
-                isInsertBefore: true
-            });
-        });
-
-        $('#move').click(function (e) {
-            e.preventDefault();
-            ajaxPostRequest('/api/sitemap/move', {
-                itemId: 741182,
-                newParentId: 741114
-            });
-        });
-
-        $('#remove').click(function (e) {
-            e.preventDefault();
-            ajaxPostRequest('/api/sitemap/remove', {
-                itemId: 741210,
-                isDeleteAllVersions: false,
-                isDeleteContentVersions: false,
-                contentVersionId: 741246
-            });
-        });
-
-        $('#restore').click(function (e) {
-            e.preventDefault();
-            ajaxPostRequest('/api/sitemap/restore', {
-                itemId: 741210,
-                isRestoreAllVersions: true,
-                isRestoreWidgets: true,
-                isRestoreContentVersions: true,
-                isRestoreChildren: true
-            });
-        });
-
-        $('#delete').click(function (e) {
-            e.preventDefault();
-            ajaxPostRequest('/api/sitemap/delete', {
-                itemId: 741238,
-                isDeleteAllVersions: false
-            });
-        });
-
-        $('#edit').click(function (e) {
-            e.preventDefault();
-            ajaxPostRequest('/api/sitemap/edit', {
-                itemId: 741246,
-                title: 'Информация 111222'
-            });
-        });
-    });
-    //(function () {
-    //    var path = '/api/sitemap/publish' + location.search + '&itemids=741180';
-    //    el = document.getElementById('publish');
-    //    el.href = path;
-    //})();
-
-    function getHeaderData() {
-        getQueryVariable = function (variable) {
-            var query = window.location.search.substring(1);
-            var vars = query.split('&');
-            for (var i = 0; i < vars.length; i++) {
-                var pair = vars[i].split('=');
-                if (decodeURIComponent(pair[0]) == variable) {
-                    return decodeURIComponent(pair[1]);
-                }
-            }
-        };
-
-        return {
-            BackendSid: getQueryVariable('backend_sid'),
-            CustomerCode: getQueryVariable('customerCode'),
-            HostId: getQueryVariable('hostUID'),
-            SiteId: getQueryVariable('site_id')
-        };
-    }
 
     function ajaxPostRequest(path, model) {
         $.ajax(path, {

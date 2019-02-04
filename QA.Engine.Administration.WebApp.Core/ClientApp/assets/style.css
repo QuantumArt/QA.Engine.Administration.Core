@@ -1,0 +1,9 @@
+body {
+    margin-top: 50px;
+}
+
+.layout {
+    display: flex;
+    align-items: flex-start;
+    padding: 10px;
+}

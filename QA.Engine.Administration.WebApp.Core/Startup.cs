@@ -1,10 +1,12 @@
-﻿using AutoMapper;
+using AutoMapper;
 using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
+using Microsoft.AspNetCore.SpaServices.Webpack;
 using QA.Engine.Administration.Services.Core;
 using QA.Engine.Administration.Services.Core.Interfaces;
 using QA.Engine.Administration.Data.Interfaces.Core;
@@ -103,6 +105,11 @@ namespace QA.Engine.Administration.WebApp.Core
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                //app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions {
+                //    HotModuleReplacement = true,
+                //    ReactHotModuleReplacement = true,
+                //    ConfigFile = "webpack.config.dev.js"
+                //});
             }
             else
             {
@@ -110,29 +117,33 @@ namespace QA.Engine.Administration.WebApp.Core
                 app.UseHsts();
             }
 
-            //app.UseStaticFiles();
+            app.UseStaticFiles();
             //app.UseSpaStaticFiles();
 
             app.UseSession();
             //app.UseAuthentication();
 
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
-            });
             app.UseSwagger();
             app.UseSwaggerUI(o =>
             {
                 o.SwaggerEndpoint("/swagger/v1/swagger.json", $"{SWAGGER_TITLE} {SWAGGER_VERSION}");
             });
 
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute(
+                    name: "default",
+                    template: "{controller=Home}/{action=Index}/{id?}");
+                routes.MapSpaFallbackRoute(
+                   name: "spa-fallback",
+                   defaults: new { controller = "Home", action = "Index" });
+            });
+
             //app.UseSpa(spa =>
             //{
             //    spa.Options.SourcePath = "ClientApp";
             //    if (env.IsDevelopment())
-            //        spa.UseReactDevelopmentServer(npmScript: "start");
+            //        spa.UseReactDevelopmentServer(npmScript: "start:dev");
             //});
         }
 
