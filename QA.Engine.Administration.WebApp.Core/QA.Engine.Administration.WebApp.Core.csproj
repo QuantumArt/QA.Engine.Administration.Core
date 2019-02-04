@@ -1,8 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
+    <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -24,5 +25,4 @@
     <ProjectReference Include="..\QA.Engine.Administration.Data.Core\QA.Engine.Administration.Data.Core.csproj" />
     <ProjectReference Include="..\QA.Engine.Administration.Services.Core\QA.Engine.Administration.Services.Core.csproj" />
   </ItemGroup>
-
 </Project>
