@@ -218,6 +218,21 @@
             <param name="model"></param>
             <returns></returns>
         </member>
+        <member name="T:QA.Engine.Administration.WebApp.Core.Models.DeleteModel">
+            <summary>
+            Модель для окончательного удаления элемента
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.DeleteModel.ItemId">
+            <summary>
+            Id элемента
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.DeleteModel.IsDeleteAllVersions">
+            <summary>
+            Удалить все версии
+            </summary>
+        </member>
         <member name="T:QA.Engine.Administration.WebApp.Core.Models.EditModel">
             <summary>
             Модель для редактирования
@@ -248,6 +263,32 @@
             Id нового родительского элемента
             </summary>
         </member>
+        <member name="T:QA.Engine.Administration.WebApp.Core.Models.RemoveModel">
+            <summary>
+            Модель для перемещения элемена в архив
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.RemoveModel.ItemId">
+            <summary>
+            Id элемента
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.RemoveModel.IsDeleteAllVersions">
+            <summary>
+            Удалять все версии
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.RemoveModel.IsDeleteContentVersions">
+            <summary>
+            Удалить контентную версию
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.RemoveModel.ContentVersionId">
+            <summary>
+            Id контентной версии, которую не удалять, а оставить в качестве полноценной страницы.
+            Возможно только при условии IsDeleteAllVersions == false и IsDeleteContentVersions == false
+            </summary>
+        </member>
         <member name="T:QA.Engine.Administration.WebApp.Core.Models.ReorderModel">
             <summary>
             Модель для изменения отображаемой сортировки страниц
@@ -266,6 +307,36 @@
         <member name="P:QA.Engine.Administration.WebApp.Core.Models.ReorderModel.IsInsertBefore">
             <summary>
             Признак - переместить страницу ItemId перед страницей RelatedItemId
+            </summary>
+        </member>
+        <member name="T:QA.Engine.Administration.WebApp.Core.Models.RestoreModel">
+            <summary>
+            Восстановление из архива, возможно только  в случае наличия родительского элемента не в архиве
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.RestoreModel.ItemId">
+            <summary>
+            Id элемента
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.RestoreModel.IsRestoreAllVersions">
+            <summary>
+            Восстанавливать все версии
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.RestoreModel.IsRestoreWidgets">
+            <summary>
+            Восстанавливать виджеты
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.RestoreModel.IsRestoreContentVersions">
+            <summary>
+            Восстанавливать контентные верисс
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.RestoreModel.IsRestoreChildren">
+            <summary>
+            Восстанавлявать дочерние элементы
             </summary>
         </member>
     </members>

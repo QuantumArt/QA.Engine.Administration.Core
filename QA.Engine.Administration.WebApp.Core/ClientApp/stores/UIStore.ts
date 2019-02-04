@@ -23,7 +23,7 @@ export default class UIStore {
             this.siteTreeState = TreeState.ERROR;
         }
     }
-    @computed get tree() {
-        // const uiTree: ITreeNode[] =
-    }
+    // @computed get tree() {
+    //     // const uiTree: ITreeNode[] =
+    // }
 }

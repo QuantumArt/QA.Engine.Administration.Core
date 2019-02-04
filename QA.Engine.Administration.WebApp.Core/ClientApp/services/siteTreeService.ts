@@ -17,9 +17,9 @@ class SiteTreeApi {
         }
     }
 
-    private mapData(data) {
+    // private mapData(data) {
 
-    }
+    // }
 }
 
 const siteTreeService = new SiteTreeApi();
