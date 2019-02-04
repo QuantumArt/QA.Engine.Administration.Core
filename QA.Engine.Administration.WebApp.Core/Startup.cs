@@ -104,12 +104,12 @@ namespace QA.Engine.Administration.WebApp.Core
         {
             if (env.IsDevelopment())
             {
-                app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions {
-                    HotModuleReplacement = true,
-                    ReactHotModuleReplacement = true,
-                    ConfigFile = "webpack.config.dev.js"
-                });
                 app.UseDeveloperExceptionPage();
+                //app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions {
+                //    HotModuleReplacement = true,
+                //    ReactHotModuleReplacement = true,
+                //    ConfigFile = "webpack.config.dev.js"
+                //});
             }
             else
             {
@@ -123,23 +123,27 @@ namespace QA.Engine.Administration.WebApp.Core
             app.UseSession();
             //app.UseAuthentication();
 
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
-            });
             app.UseSwagger();
             app.UseSwaggerUI(o =>
             {
                 o.SwaggerEndpoint("/swagger/v1/swagger.json", $"{SWAGGER_TITLE} {SWAGGER_VERSION}");
             });
 
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute(
+                    name: "default",
+                    template: "{controller=Home}/{action=Index}/{id?}");
+                routes.MapSpaFallbackRoute(
+                   name: "spa-fallback",
+                   defaults: new { controller = "Home", action = "Index" });
+            });
+
             //app.UseSpa(spa =>
             //{
             //    spa.Options.SourcePath = "ClientApp";
             //    if (env.IsDevelopment())
-            //        spa.UseReactDevelopmentServer("http://localhost:3000");
+            //        spa.UseReactDevelopmentServer(npmScript: "start:dev");
             //});
         }
 

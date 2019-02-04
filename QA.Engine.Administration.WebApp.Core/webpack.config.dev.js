@@ -1,3 +1,4 @@
+const webpack = require('webpack');
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
@@ -5,17 +6,18 @@ const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 module.exports = {
     mode: 'development',
     entry: {
-        vendor: ['@babel/polyfill'],
+        vendor: '@babel/polyfill',
         main: './ClientApp/index.tsx'
     },
     output: {
-        filename: '[name].[hash].js',
+        filename: '[name].bundle.js',
         path: path.join(__dirname, 'wwwroot/dist'),
-        publicPath: '/dist/'
+        publicPath: '/'
     },
-    devtool: false,
+    devtool: 'eval',
     resolve: {
         extensions: ['.ts', '.tsx', '.js', '.json'],
+        modules: ['node_modules'],
         alias: {
             components: path.resolve(__dirname, 'ClientApp/components/'),
             services: path.resolve(__dirname, 'ClientApp/services/'),
@@ -27,14 +29,17 @@ module.exports = {
         rules: [
             {
                 test: /\.tsx?$/,
-                exclude: /node_modules/,
+                // exclude: /node_modules/,
                 use: {
                     loader: 'babel-loader'
                 }
             },
             {
                 test: /\.css$/,
-                use: ['style-loader', 'css-loader'],
+                use: [
+                    { loader: 'style-loader' },
+                    { loader: 'css-loader' }
+                ],
             },
             {
                 test: /\.(jpg|jpeg|png|gif|svg)?$/,
@@ -59,10 +64,22 @@ module.exports = {
         ]
     },
     plugins: [
+        new webpack.HotModuleReplacementPlugin(),
         new ForkTsCheckerWebpackPlugin(),
-        new HtmlWebpackPlugin()
+        new HtmlWebpackPlugin({
+            title: 'Dev Mode',
+            template: 'ClientApp/assets/index.html'
+        })
     ],
     optimization: {
         namedModules: true
+    },
+    devServer: {
+        hot: true,
+        port: 3000,
+        proxy: {
+            '/api': 'http://localhost:3001',
+        },
+        open: true
     }
 };

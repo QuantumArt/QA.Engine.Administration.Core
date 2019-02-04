@@ -8,11 +8,12 @@
     "jsx": "react",
     "experimentalDecorators": true,
     "paths": {
-      "components/*": ["src/components/*"],
-      "services/*": ["src/services/*"],
-      "stores/*": ["src/stores/*"],
-      "assets/*": ["src/assets/*"]
-    }
+      "components/*": ["ClientApp/components/*"],
+      "services/*": ["ClientApp/services/*"],
+      "stores/*": ["ClientApp/stores/*"],
+      "assets/*": ["ClientApp/assets/*"]
+    },
+    "outDir": "wwwroot/built"
   },
   "include": [
     "./ClientApp/**/*"
