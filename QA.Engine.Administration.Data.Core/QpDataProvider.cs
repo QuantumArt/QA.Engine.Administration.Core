@@ -40,6 +40,20 @@ namespace QA.Engine.Administration.Data.Core
             _metaInfoRepository = metaInfoRepository;
         }
 
+        public void Edit(int siteId, int contentId, int userId, int itemId, string title)
+        {
+            var columnName = GetColumnNameByNetName(siteId, "Title");
+            if (string.IsNullOrEmpty(columnName))
+                throw new Exception("NetName для поля Title не найдено.");
+
+            var value = new Dictionary<string, string>
+            {
+                { ContentItemIdFieldName, itemId.ToString(CultureInfo.InvariantCulture) },
+                { columnName, title }
+            };
+            _qpDbConnector.DbConnector.MassUpdate(contentId, new[] { value }, userId);
+        }
+
         public void Publish(int siteId, int contentId, int userId, IEnumerable<AbstractItemData> items, int statusId)
         {
             var siteName = _qpMetadataManager.GetSiteName(siteId);
@@ -158,10 +172,9 @@ namespace QA.Engine.Administration.Data.Core
         {
             var columnNames = GetColumnNamesByNetNames(siteId, new List<string> { "Name", "Parent", "VersionOf", "IsPage" });
 
-            var values = new List<Dictionary<string, string>>();
-            foreach(var x in columnNames)
+            var value = new Dictionary<string, string> { { ContentItemIdFieldName, item.Id.ToString(CultureInfo.InvariantCulture) } };
+            foreach (var x in columnNames)
             {
-                var value = new Dictionary<string, string> { { ContentItemIdFieldName, item.Id.ToString(CultureInfo.InvariantCulture) } };
                 switch(x.Key)
                 {
                     case "Name":
@@ -171,7 +184,7 @@ namespace QA.Engine.Administration.Data.Core
                         value.Add(x.Value, item.ParentId.ToString());
                         break;
                     case "VersionOf":
-                        value.Add(x.Value, "null");
+                        value.Add(x.Value, null);
                         break;
                     case "IsPage":
                         value.Add(x.Value, "1");
@@ -180,7 +193,7 @@ namespace QA.Engine.Administration.Data.Core
                         break;
                 }
             }
-            _qpDbConnector.DbConnector.MassUpdate(contentId, values, userId);
+            _qpDbConnector.DbConnector.MassUpdate(contentId, new[] { value }, userId);
         }
 
         public void Restore(int siteId, int contentId, int userId, IEnumerable<AbstractItemData> items)

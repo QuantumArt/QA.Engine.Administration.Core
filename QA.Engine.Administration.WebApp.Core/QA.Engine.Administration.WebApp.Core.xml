@@ -190,6 +190,13 @@
             <param name="model"></param>
             <returns></returns>
         </member>
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.Edit(QA.Engine.Administration.WebApp.Core.Models.EditModel)">
+            <summary>
+            Редактировать
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
         <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.Remove(QA.Engine.Administration.WebApp.Core.Models.RemoveModel)">
             <summary>
             Удаление элементов в архив
@@ -210,6 +217,21 @@
             </summary>
             <param name="model"></param>
             <returns></returns>
+        </member>
+        <member name="T:QA.Engine.Administration.WebApp.Core.Models.EditModel">
+            <summary>
+            Модель для редактирования
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.EditModel.ItemId">
+            <summary>
+            Id элемента
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.EditModel.Title">
+            <summary>
+            Заголовок
+            </summary>
         </member>
         <member name="T:QA.Engine.Administration.WebApp.Core.Models.MoveModel">
             <summary>

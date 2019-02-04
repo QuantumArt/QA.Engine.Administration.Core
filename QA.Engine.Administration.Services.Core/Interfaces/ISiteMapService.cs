@@ -9,6 +9,7 @@ namespace QA.Engine.Administration.Services.Core.Interfaces
         List<WidgetTreeModel> GetWidgetItems(int siteId, bool isArchive, int parentId);
         List<SiteTreeModel> GetSiteMapStructure(int siteId);
         ArchiveTreeModel GetArchiveStructure(int siteId);
+        void EditSiteMapItem(int siteId, int userId, int itemId, string title);
         void PublishSiteMapItems(int siteId, int userId, List<int> itemIds);
         void ReorderSiteMapItems(int siteId, int userId, int itemId, int relatedItemId, bool isInsertBefore, int step);
         void MoveSiteMapItem(int siteId, int userId, int itemId, int newParentId);

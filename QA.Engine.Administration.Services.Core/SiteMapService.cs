@@ -110,6 +110,20 @@ namespace QA.Engine.Administration.Services.Core
             };
         }
 
+        public void EditSiteMapItem(int siteId, int userId, int itemId, string title)
+        {
+            if (itemId <= 0)
+                throw new ArgumentException("itemId <= 0");
+
+            var item = _siteMapProvider.GetByIds(siteId, false, new[] { itemId })?.FirstOrDefault();
+            if (item == null)
+                throw new InvalidOperationException("Элемент не найден.");
+
+            var contentId = _siteMapProvider.GetContentId(siteId);
+
+            _qpDataProvider.Edit(siteId, contentId, userId, itemId, title);
+        }
+
         public void PublishSiteMapItems(int siteId, int userId, List<int> itemIds)
         {
             if (itemIds == null || !itemIds.Any())
@@ -207,8 +221,8 @@ namespace QA.Engine.Administration.Services.Core
             var allItems = _siteMapProvider.GetAllItems(siteId, false);
             var pages = allItems.Where(x => x.IsPage).Select(x => _mapper.Map<SiteTreeModel>(x)).OrderBy(x => x.IndexOrder).ToList();
             var widgets = allItems.Where(x => !x.IsPage).Select(x => _mapper.Map<WidgetTreeModel>(x)).OrderBy(x => x.IndexOrder).ToList();
-            var pageStructure = item.IsPage ? SiteMapStructureBuilder.GetPageStructure(pages, widgets, null, itemId) : new List<SiteTreeModel>();
-            var widgetStructure = !item.IsPage ? SiteMapStructureBuilder.GetWidgetStructure(null, widgets, null, itemId) : new List<WidgetTreeModel>();
+            var pageStructure = item.IsPage ? SiteMapStructureBuilder.GetCurrentPageStructure(itemId, pages, widgets) : new List<SiteTreeModel>();
+            var widgetStructure = !item.IsPage ? SiteMapStructureBuilder.GetCurrentWidgetStructure(itemId, widgets) : new List<WidgetTreeModel>();
 
             void funcWidgets(List<WidgetTreeModel> items)
             {
@@ -234,6 +248,7 @@ namespace QA.Engine.Administration.Services.Core
                         {
                             moveContentVersion.Alias = item.Alias;
                             moveContentVersion.ParentId = item.ParentId;
+                            moveContentVersion.VersionOfId = null;
                         }
                     }
                     else
@@ -253,8 +268,13 @@ namespace QA.Engine.Administration.Services.Core
             if (isDeleteAllVersions)
             { 
                 var structuralVersions = allItems.Where(x => x.ParentId == item.ParentId && x.Alias == item.Alias && x.Id != item.Id).ToList();
-                if (structuralVersions.Any())
-                    itemsToArchive.AddRange(structuralVersions);
+                foreach (var structuralVersion in structuralVersions)
+                {
+                    if (!structuralVersion.IsPage)
+                        continue;
+                    var structuralVersionPageStructure = SiteMapStructureBuilder.GetCurrentPageStructure(structuralVersion.Id, pages, widgets);
+                    func(structuralVersionPageStructure);
+                }
             }
 
             func(pageStructure);
@@ -291,8 +311,8 @@ namespace QA.Engine.Administration.Services.Core
             var allItems = _siteMapProvider.GetAllItems(siteId, true);
             var pages = allItems.Where(x => x.IsPage).Select(x => _mapper.Map<SiteTreeModel>(x)).OrderBy(x => x.IndexOrder).ToList();
             var widgets = allItems.Where(x => !x.IsPage).Select(x => _mapper.Map<WidgetTreeModel>(x)).OrderBy(x => x.IndexOrder).ToList();
-            var pageStructure = item.IsPage ? SiteMapStructureBuilder.GetPageStructure(pages, widgets, null, itemId) : new List<SiteTreeModel>();
-            var widgetStructure = !item.IsPage ? SiteMapStructureBuilder.GetWidgetStructure(null, widgets, null, itemId) : new List<WidgetTreeModel>();
+            var pageStructure = item.IsPage ? SiteMapStructureBuilder.GetCurrentPageStructure(itemId, pages, widgets) : new List<SiteTreeModel>();
+            var widgetStructure = !item.IsPage ? SiteMapStructureBuilder.GetCurrentWidgetStructure(itemId, widgets) : new List<WidgetTreeModel>();
 
             void funcWidgets(List<WidgetTreeModel> items)
             {
@@ -325,8 +345,13 @@ namespace QA.Engine.Administration.Services.Core
             if (isRestoreAllVersions && item.IsPage && item.VersionOfId == null)
             {
                 var structuralVersions = allItems.Where(x => x.ParentId == item.ParentId && x.Alias == item.Alias && x.Id != item.Id).ToList();
-                if (structuralVersions.Any())
-                    itemsToRestore.AddRange(structuralVersions);
+                foreach (var structuralVersion in structuralVersions)
+                {
+                    if (!structuralVersion.IsPage)
+                        continue;
+                    var structuralVersionPageStructure = SiteMapStructureBuilder.GetCurrentPageStructure(structuralVersion.Id, pages, widgets);
+                    func(structuralVersionPageStructure);
+                }
             }
 
             func(pageStructure);
@@ -358,8 +383,8 @@ namespace QA.Engine.Administration.Services.Core
             var allItems = _siteMapProvider.GetAllItems(siteId, true);
             var pages = allItems.Where(x => x.IsPage).Select(x => _mapper.Map<SiteTreeModel>(x)).OrderBy(x => x.IndexOrder).ToList();
             var widgets = allItems.Where(x => !x.IsPage).Select(x => _mapper.Map<WidgetTreeModel>(x)).OrderBy(x => x.IndexOrder).ToList();
-            var pageStructure = item.IsPage ? SiteMapStructureBuilder.GetPageStructure(pages, widgets, null, itemId) : new List<SiteTreeModel>();
-            var widgetStructure = !item.IsPage ? SiteMapStructureBuilder.GetWidgetStructure(null, widgets, null, itemId) : new List<WidgetTreeModel>();
+            var pageStructure = item.IsPage ? SiteMapStructureBuilder.GetCurrentPageStructure(itemId, pages, widgets) : new List<SiteTreeModel>();
+            var widgetStructure = !item.IsPage ? SiteMapStructureBuilder.GetCurrentWidgetStructure(itemId, widgets) : new List<WidgetTreeModel>();
 
             void funcWidgets(List<WidgetTreeModel> items)
             {
@@ -392,8 +417,13 @@ namespace QA.Engine.Administration.Services.Core
             if (isDeleteAllVersions)
             {
                 var structuralVersions = allItems.Where(x => x.ParentId == item.ParentId && x.Alias == item.Alias && x.Id != item.Id).ToList();
-                if (structuralVersions.Any())
-                    itemsToDelete.AddRange(structuralVersions);
+                foreach (var structuralVersion in structuralVersions)
+                {
+                    if (!structuralVersion.IsPage)
+                        continue;
+                    var structuralVersionPageStructure = SiteMapStructureBuilder.GetCurrentPageStructure(structuralVersion.Id, pages, widgets);
+                    func(structuralVersionPageStructure);
+                }
             }
 
             func(pageStructure);

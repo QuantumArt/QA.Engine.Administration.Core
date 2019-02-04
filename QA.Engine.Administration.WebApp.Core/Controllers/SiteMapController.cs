@@ -169,6 +169,26 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         }
 
         /// <summary>
+        /// Редактировать
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost("edit")]
+        public ApiResult Edit([FromBody]EditModel model)
+        {
+            try
+            {
+                _siteMapService.EditSiteMapItem(_siteId, _userId, model.ItemId, model.Title);
+                return ApiResult.Success();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Edit error");
+                return ApiResult.Fail(e);
+            }
+        }
+
+        /// <summary>
         /// Удаление элементов в архив
         /// </summary>
         /// <param name="model"></param>

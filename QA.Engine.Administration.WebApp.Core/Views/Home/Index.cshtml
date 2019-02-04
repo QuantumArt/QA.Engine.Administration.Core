@@ -18,13 +18,13 @@
                 {
                 <li>
                     @ContentTypeAndStatus(item) [@item.Id] @item.Alias (@item.Title) order->@item.IndexOrder
+                    <p>@Html.Raw(RenderWidgets(item.Widgets))</p>
                     <ul>
                         @foreach (var contentVersion in item.ContentVersions)
                         {
                             <li>@ContentTypeAndStatus(contentVersion) [@contentVersion.Id] @contentVersion.Alias (@contentVersion.Title) order->@contentVersion.IndexOrder</li>
                         }
                     </ul>
-                    <p>@Html.Raw(RenderWidgets(item.Widgets))</p>
                     <p>@Html.Raw(RenderItems(item.Children))</p>
                 </li>
                 }
@@ -35,17 +35,17 @@
             <ul>
                 @foreach (var item in archive.Pages)
                 {
-                    <li>
-                        @ContentTypeAndStatus(item) [@item.Id] @item.Alias (@item.Title) order->@item.IndexOrder
-                        <ul>
-                            @foreach (var contentVersion in item.ContentVersions)
-                            {
-                                <li>@ContentTypeAndStatus(contentVersion) [@contentVersion.Id] @contentVersion.Alias (@contentVersion.Title) order->@contentVersion.IndexOrder</li>
-                            }
-                        </ul>
-                        <p>@Html.Raw(RenderWidgets(item.Widgets))</p>
-                        <p>@Html.Raw(RenderItems(item.Children))</p>
-                    </li>
+                <li>
+                    @ContentTypeAndStatus(item) [@item.Id] @item.Alias (@item.Title) order->@item.IndexOrder
+                    <p>@Html.Raw(RenderWidgets(item.Widgets))</p>
+                    <ul>
+                        @foreach (var contentVersion in item.ContentVersions)
+                        {
+                            <li>@ContentTypeAndStatus(contentVersion) [@contentVersion.Id] @contentVersion.Alias (@contentVersion.Title) order->@contentVersion.IndexOrder</li>
+                        }
+                    </ul>
+                    <p>@Html.Raw(RenderItems(item.Children))</p>
+                </li>
                 }
                 @foreach (var item in archive.Widgets)
                 {
@@ -76,6 +76,7 @@
             <p><a id="remove" href="#">remove</a></p>
             <p><a id="restore" href="#">restore</a></p>
             <p><a id="delete" href="#">delete</a></p>
+            <p><a id="edit" href="#">edit</a></p>
         </div>
     </div>
 </div>
@@ -89,13 +90,13 @@
         foreach (var item in models)
         {
             li += item.Children.Any()
-                ? $"<li>{ContentTypeAndStatus(item)} [{item.Id}] {item.Alias} ({item.Title}) order->{item.IndexOrder}<p>{RenderItems(item.Children)}</p></li>"
-                : $"<li>{ContentTypeAndStatus(item)} [{item.Id}] {item.Alias} ({item.Title}) order->{item.IndexOrder}</li>";
+            ? $"<li>{ContentTypeAndStatus(item)} [{item.Id}] {item.Alias} ({item.Title}) order->{item.IndexOrder}<p>{RenderItems(item.Children)}</p></li>"
+            : $"<li>{ContentTypeAndStatus(item)} [{item.Id}] {item.Alias} ({item.Title}) order->{item.IndexOrder}</li>";
+            li += RenderWidgets(item.Widgets);
             foreach (var contentVersion in item.ContentVersions)
             {
                 li += $"<li>{ContentTypeAndStatus(contentVersion)} [{contentVersion.Id}] {contentVersion.Alias} ({contentVersion.Title}) order->{contentVersion.IndexOrder}</li>";
             }
-            li += RenderWidgets(item.Widgets);
         }
         var result = string.Format("<ul>{0}</ul>", li);
         return result;
@@ -164,7 +165,7 @@
 
         $('#publish').click(function (e) {
             e.preventDefault();
-            ajaxPostRequest('/api/sitemap/publish', [741212]);
+            ajaxPostRequest('/api/sitemap/publish', [741244, 741210]);
         });
 
         $('#reorder').click(function (e) {
@@ -188,9 +189,9 @@
             e.preventDefault();
             ajaxPostRequest('/api/sitemap/remove', {
                 itemId: 741210,
-                isDeleteAllVersions: true,
-                isDeleteContentVersions: true,
-                contentVersionId: null
+                isDeleteAllVersions: false,
+                isDeleteContentVersions: false,
+                contentVersionId: 741246
             });
         });
 
@@ -208,8 +209,16 @@
         $('#delete').click(function (e) {
             e.preventDefault();
             ajaxPostRequest('/api/sitemap/delete', {
-                itemId: 741222,
-                isDeleteAllVersions: true
+                itemId: 741238,
+                isDeleteAllVersions: false
+            });
+        });
+
+        $('#edit').click(function (e) {
+            e.preventDefault();
+            ajaxPostRequest('/api/sitemap/edit', {
+                itemId: 741246,
+                title: 'Информация 111222'
             });
         });
     });

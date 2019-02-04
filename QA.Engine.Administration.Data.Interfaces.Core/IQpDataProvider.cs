@@ -6,6 +6,10 @@ namespace QA.Engine.Administration.Data.Interfaces.Core
     public interface IQpDataProvider
     {
         /// <summary>
+        /// Редактировать элемент
+        /// </summary>
+        void Edit(int siteId, int contentId, int userId, int itemId, string title);
+        /// <summary>
         /// Изменить статус публикации
         /// </summary>
         void Publish(int siteId, int contentId, int userId, IEnumerable<AbstractItemData> items, int statusId);

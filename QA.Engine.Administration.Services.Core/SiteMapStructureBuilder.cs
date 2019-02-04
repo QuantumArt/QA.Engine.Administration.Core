@@ -8,13 +8,11 @@ namespace QA.Engine.Administration.Services.Core
 {
     public class SiteMapStructureBuilder
     {
-        public static List<SiteTreeModel> GetPageStructure(List<SiteTreeModel> pages, List<WidgetTreeModel> widgets, List<DiscriminatorModel> discriminators, int? topLevelId = null)
+        public static List<SiteTreeModel> GetPageStructure(List<SiteTreeModel> pages, List<WidgetTreeModel> widgets, List<DiscriminatorModel> discriminators)
         {
             var pageStructure = pages
-                .Where(x => (topLevelId != null && x.Id == topLevelId || topLevelId == null && x.ParentId == null) && x.IsPage && x.VersionOfId == null)
+                .Where(x => x.ParentId == null && x.IsPage && x.VersionOfId == null)
                 .ToList();
-            if (!pageStructure.Any() && topLevelId.HasValue)
-                pageStructure = pages.Where(x => x.Id == topLevelId).ToList();
             if (!pageStructure.Any())
                 pageStructure = pages.Where(x => !pages.Any(y => y.Id == (x.ParentId ?? x.VersionOfId))).ToList();
 
@@ -22,6 +20,62 @@ namespace QA.Engine.Administration.Services.Core
                 pageStructure.ForEach(x => x.Discriminator = discriminators.FirstOrDefault(y => y.Id == x.DiscriminatorId));
             pageStructure.ForEach(x => pages.Remove(x));
 
+            var result = GetPageTree(pageStructure, pages, widgets, discriminators);
+
+            return result;
+        }
+
+        public static List<SiteTreeModel> GetCurrentPageStructure(int topLevelId, List<SiteTreeModel> pages, List<WidgetTreeModel> widgets, List<DiscriminatorModel> discriminators = null)
+        {
+            var pageStructure = pages
+                .Where(x => x.Id == topLevelId)
+                .ToList();
+
+            if (discriminators != null && discriminators.Any())
+                pageStructure.ForEach(x => x.Discriminator = discriminators.FirstOrDefault(y => y.Id == x.DiscriminatorId));
+            pageStructure.ForEach(x => pages.Remove(x));
+
+            var result = GetPageTree(pageStructure, pages, widgets, discriminators);
+
+            return result;
+        }
+
+        public static List<WidgetTreeModel> GetWidgetStructure(SiteTreeModel page, List<WidgetTreeModel> widgets, List<DiscriminatorModel> discriminators)
+        {
+            var widgetStructure = widgets
+                .Where(x => x.ParentId == page?.Id)
+                .ToList();
+            if (!widgetStructure.Any() && page == null)
+                widgetStructure = widgets.Where(x => !widgets.Any(y => y.Id == x.ParentId)).ToList();
+
+            if (discriminators != null && discriminators.Any())
+                widgetStructure.ForEach(x => x.Discriminator = discriminators.FirstOrDefault(y => y.Id == x.DiscriminatorId));
+            widgetStructure.ForEach(x => widgets.Remove(x));
+
+            var result = GetWidgetTree(widgetStructure, widgets, discriminators);
+
+            return result;
+        }
+
+        public static List<WidgetTreeModel> GetCurrentWidgetStructure(int topLevelId, List<WidgetTreeModel> widgets, List<DiscriminatorModel> discriminators = null)
+        {
+            var widgetStructure = widgets
+                .Where(x => topLevelId == x.Id)
+                .ToList();
+
+            if (discriminators != null && discriminators.Any())
+                widgetStructure.ForEach(x => x.Discriminator = discriminators.FirstOrDefault(y => y.Id == x.DiscriminatorId));
+            widgetStructure.ForEach(x => widgets.Remove(x));
+
+            var result = GetWidgetTree(widgetStructure, widgets, discriminators);
+
+            return result;
+        }
+
+        #region private methods
+
+        private static List<SiteTreeModel> GetPageTree(List<SiteTreeModel> pageStructure, List<SiteTreeModel> pages, List<WidgetTreeModel> widgets, List<DiscriminatorModel> discriminators)
+        {
             var elements = pageStructure;
             var makeTree = true;
             while (makeTree)
@@ -49,8 +103,8 @@ namespace QA.Engine.Administration.Services.Core
                             el.ContentVersions.ForEach(x => x.Discriminator = discriminators.FirstOrDefault(y => y.Id == x.DiscriminatorId));
                         el.ContentVersions.ForEach(x => pages.Remove(x));
                     }
-                    else
-                        tmp.Add(el);
+                    //else
+                    //    tmp.Add(el);
 
                     el.Widgets = GetWidgetStructure(el, widgets, discriminators);
                 }
@@ -60,18 +114,8 @@ namespace QA.Engine.Administration.Services.Core
             return pageStructure;
         }
 
-        public static List<WidgetTreeModel> GetWidgetStructure(SiteTreeModel page, List<WidgetTreeModel> widgets, List<DiscriminatorModel> discriminators, int? topLevelId = null)
+        private static List<WidgetTreeModel> GetWidgetTree(List<WidgetTreeModel> widgetStructure, List<WidgetTreeModel> widgets, List<DiscriminatorModel> discriminators)
         {
-            var widgetStructure = widgets
-                .Where(x => topLevelId != null && topLevelId == x.Id || topLevelId == null && x.ParentId == page?.Id)
-                .ToList();
-            if (!widgetStructure.Any() && page == null)
-                widgetStructure = widgets.Where(x => !widgets.Any(y => y.Id == x.ParentId)).ToList();
-
-            if (discriminators != null && discriminators.Any())
-                widgetStructure.ForEach(x => x.Discriminator = discriminators.FirstOrDefault(y => y.Id == x.DiscriminatorId));
-            widgetStructure.ForEach(x => widgets.Remove(x));
-
             var elements = widgetStructure;
             var makeTree = true;
             while (makeTree)
@@ -98,5 +142,7 @@ namespace QA.Engine.Administration.Services.Core
 
             return widgetStructure;
         }
+
+        #endregion
     }
 }
