@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Provider } from 'mobx-react';
+import DevTools from 'mobx-react-devtools'
 import { hot } from 'react-hot-loader';
 import { Alignment, Button, Classes, Navbar, NavbarGroup, NavbarHeading } from '@blueprintjs/core';
 import '@blueprintjs/core/lib/css/blueprint.css';
@@ -23,6 +24,7 @@ const app = hot(module)(() => (
                 </NavbarGroup>
             </Navbar>
             <SiteTree/>
+            <DevTools />
         </div>
     </Provider>
 ));

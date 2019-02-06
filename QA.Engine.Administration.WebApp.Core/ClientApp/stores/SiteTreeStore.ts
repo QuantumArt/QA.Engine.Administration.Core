@@ -1,5 +1,5 @@
-import { action, observable } from 'mobx';
-import siteTreeService, { IApiResultWidgetTreeModel, ISiteTreeModel, IWidgetTreeModel, IDiscriminatorModel } from 'services/siteTreeService';
+import { action, observable, computed, set, autorun, reaction } from 'mobx';
+import siteTreeService, { IApiResultWidgetTreeModel, ISiteTreeModel, IWidgetTreeModel } from 'services/siteTreeService';
 import { ITreeNode } from '@blueprintjs/core';
 
 enum TreeState {
@@ -13,8 +13,30 @@ export interface ITreeElement extends ITreeNode{
 }
 
 export default class SiteTreeStore {
-    @observable siteTreeState: TreeState = TreeState.NONE;
-    @observable siteTree: ITreeNode[] = [];
+    @observable public siteTreeState: TreeState = TreeState.NONE;
+    @observable public tree: ITreeNode[] = [];
+
+    @action.bound
+    public handleNodeExpand = (nodeData: ITreeNode) => {
+        nodeData.isExpanded = true;
+    }
+
+    @action.bound
+    public handleNodeCollapse = (nodeData: ITreeNode) => {
+        nodeData.isExpanded = false;
+    }
+
+    @action
+    public async fetchSiteTree() {
+        try {
+            this.siteTreeState = TreeState.PENDING;
+            const res: IApiResultWidgetTreeModel = await siteTreeService.getSiteTree();
+            this.convertTree(res.data);
+        } catch (e) {
+            console.log(e);
+            this.siteTreeState = TreeState.ERROR;
+        }
+    }
 
     private convertTree(data: ISiteTreeModel[]): void {
         const hMap = new Map<number, ITreeElement>();
@@ -23,7 +45,7 @@ export default class SiteTreeStore {
             parentId: el.parentId,
             childNodes: [],
             label: el.title,
-            isExpanded: true,
+            isExpanded: false,
         });
         const mapSubtree = (elements: IWidgetTreeModel[]): void => {
             elements.forEach((el: IWidgetTreeModel) => {
@@ -47,18 +69,6 @@ export default class SiteTreeStore {
                 delete el.parentId;
             }
         });
-        this.siteTree = tree;
-    }
-
-    @action
-    async fetchSiteTree() {
-        try {
-            this.siteTreeState = TreeState.PENDING;
-            const res: IApiResultWidgetTreeModel = await siteTreeService.getSiteTree();
-            this.convertTree(res.data);
-        } catch (e) {
-            console.log(e);
-            this.siteTreeState = TreeState.ERROR;
-        }
+        this.tree = tree;
     }
 }

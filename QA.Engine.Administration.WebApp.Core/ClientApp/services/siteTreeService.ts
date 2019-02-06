@@ -62,7 +62,7 @@ export interface IDiscriminatorModel {
 }
 
 class SiteTreeApi {
-    public async getSiteTree() {
+    public async getSiteTree(): Promise<IApiResultWidgetTreeModel> {
         try {
             const params = qs.stringify({
                 backend_sid: 'c3386b2f-e098-4dfb-a794-e774cba9fcfc',
@@ -76,10 +76,6 @@ class SiteTreeApi {
             console.log(e);
         }
     }
-
-    // private mapData(data) {
-
-    // }
 }
 
 const siteTreeService = new SiteTreeApi();

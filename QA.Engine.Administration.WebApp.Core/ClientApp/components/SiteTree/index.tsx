@@ -1,7 +1,10 @@
 import * as React from 'react';
 import { inject, observer } from 'mobx-react';
-import { Icon, ITreeNode, Tooltip, Tree, Card } from '@blueprintjs/core';
+import { Tree, Card } from '@blueprintjs/core';
 import SiteTreeStore from 'stores/SiteTreeStore';
+
+@observer
+class TreeR extends Tree {}
 
 interface Props {
     siteTreeStore?: SiteTreeStore;
@@ -10,11 +13,6 @@ interface Props {
 @inject('siteTreeStore')
 @observer
 export default class SiteTree extends React.Component<Props> {
-
-    handleNodeClick = (nodeData: ITreeNode, _nodePath: number[], e: React.MouseEvent<HTMLElement>) => {
-        console.log(nodeData, _nodePath);
-    }
-
     componentDidMount(): void {
         this.props.siteTreeStore.fetchSiteTree();
     }
@@ -23,33 +21,12 @@ export default class SiteTree extends React.Component<Props> {
         const { siteTreeStore } = this.props;
         return (
             <Card>
-                <Tree
-                    contents={siteTreeStore.siteTree}
-                    onNodeClick={this.handleNodeClick}
+                <TreeR
+                    contents={siteTreeStore.tree}
+                    onNodeCollapse={siteTreeStore.handleNodeCollapse}
+                    onNodeExpand={siteTreeStore.handleNodeExpand}
                 />
             </Card>
         );
     }
 }
-
-const testnodes: ITreeNode[] = [
-    {
-        id: 0,
-        hasCaret: true,
-        icon: 'application',
-        label: 'Root',
-        isExpanded: true,
-        childNodes: [
-            {
-                id: 1,
-                icon: 'document',
-                label: 'start_page',
-                secondaryLabel: (
-                    <Tooltip content="An eye!">
-                        <Icon icon="eye-open"/>
-                    </Tooltip>
-                ),
-            },
-        ],
-    },
-];
