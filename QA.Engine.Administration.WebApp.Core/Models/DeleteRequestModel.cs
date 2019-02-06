@@ -1,15 +1,14 @@
-﻿namespace QA.Engine.Administration.WebApp.Core.Models
+namespace QA.Engine.Administration.WebApp.Core.Models
 {
     /// <summary>
     /// Модель для окончательного удаления элемента
     /// </summary>
-    public class DeleteModel
+    public class DeleteRequestModel
     {
         /// <summary>
         /// Id элемента
         /// </summary>
         public int ItemId { get; set; }
-
         /// <summary>
         /// Удалить все версии
         /// </summary>

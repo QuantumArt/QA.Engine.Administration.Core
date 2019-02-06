@@ -26,4 +26,40 @@
     <ProjectReference Include="..\QA.Engine.Administration.Data.Core\QA.Engine.Administration.Data.Core.csproj" />
     <ProjectReference Include="..\QA.Engine.Administration.Services.Core\QA.Engine.Administration.Services.Core.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Update="ClientApp\models\ArchiveViewModel.ts">
+      <CustomToolNamespace>Models\ArchiveViewModel.cs</CustomToolNamespace>
+    </None>
+    <None Update="ClientApp\models\DiscriminatorViewModel.ts">
+      <CustomToolNamespace>Models\DiscriminatorViewModel.cs</CustomToolNamespace>
+    </None>
+    <None Update="ClientApp\models\PageViewModel.ts">
+      <CustomToolNamespace>Models\PageViewModel.cs</CustomToolNamespace>
+    </None>
+    <None Update="ClientApp\models\RegionViewModel.ts">
+      <CustomToolNamespace>Models\RegionViewModel.cs</CustomToolNamespace>
+    </None>
+    <None Update="ClientApp\models\request\DeleteRequestModel.ts">
+      <CustomToolNamespace>Models\DeleteRequestModel.cs</CustomToolNamespace>
+    </None>
+    <None Update="ClientApp\models\request\EditRequestModel.ts">
+      <CustomToolNamespace>Models\EditRequestModel.cs</CustomToolNamespace>
+    </None>
+    <None Update="ClientApp\models\request\MoveRequestModel.ts">
+      <CustomToolNamespace>Models\MoveRequestModel.cs</CustomToolNamespace>
+    </None>
+    <None Update="ClientApp\models\request\RemoveRequestModel.ts">
+      <CustomToolNamespace>Models\RemoveRequestModel.cs</CustomToolNamespace>
+    </None>
+    <None Update="ClientApp\models\request\ReorderRequestModel.ts">
+      <CustomToolNamespace>Models\ReorderRequestModel.cs</CustomToolNamespace>
+    </None>
+    <None Update="ClientApp\models\request\RestoreRequestModel.ts">
+      <CustomToolNamespace>Models\RestoreRequestModel.cs</CustomToolNamespace>
+    </None>
+    <None Update="ClientApp\models\WidgetViewModel.ts">
+      <CustomToolNamespace>Models\WidgetViewModel.cs</CustomToolNamespace>
+    </None>
+  </ItemGroup>
 </Project>

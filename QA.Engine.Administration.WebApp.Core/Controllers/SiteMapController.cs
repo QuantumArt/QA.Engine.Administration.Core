@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -22,9 +23,9 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         private readonly ISiteMapService _siteMapService;
         private readonly ISiteMapModifyService _siteMapModifyService;
         private readonly IItemDifinitionService _itemDifinitionService;
+        private readonly IMapper _mapper;
         private readonly ILogger<SiteMapController> _logger;
-        // public const int SITE_ID = 35; // beeline ge
-        // public const int SITE_ID = 52; // demosite
+        
         private readonly int _siteId;
         private readonly int _step;
         private readonly int _userId;
@@ -33,19 +34,14 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// <summary>
         /// Конструктор
         /// </summary>
-        /// <param name="siteMapService"></param>
-        /// <param name="siteMapModifyService"></param>
-        /// <param name="itemDifinitionService"></param>
-        /// <param name="options"></param>
-        /// <param name="webAppQpHelper"></param>
-        /// <param name="logger"></param>
         public SiteMapController(
             ISiteMapService siteMapService, ISiteMapModifyService siteMapModifyService, IItemDifinitionService itemDifinitionService,
-            IOptions<EnvironmentConfiguration> options, IWebAppQpHelper webAppQpHelper, ILogger<SiteMapController> logger)
+            IOptions<EnvironmentConfiguration> options, IWebAppQpHelper webAppQpHelper, IMapper mapper, ILogger<SiteMapController> logger)
         {
             _siteMapService = siteMapService;
             _siteMapModifyService = siteMapModifyService;
             _itemDifinitionService = itemDifinitionService;
+            _mapper = mapper;
             _logger = logger;
 
             _siteId = webAppQpHelper.SiteId;
@@ -59,10 +55,11 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("getAllItems")]
-        public ApiResult<PageModel[]> GetSiteMap([FromQuery]int[] regionIds = null)
+        public ApiResult<List<PageViewModel>> GetSiteMap([FromQuery]int[] regionIds = null)
         {
-            var result = _siteMapService.GetSiteMapStructure(_siteId, regionIds, _useHierarchyRegionFilter).ToArray();
-            return ApiResult<PageModel[]>.Success(result);
+            var siteMap = _siteMapService.GetSiteMapStructure(_siteId, regionIds, _useHierarchyRegionFilter);
+            var result = _mapper.Map<List<PageViewModel>>(siteMap);
+            return ApiResult<List<PageViewModel>>.Success(result);
         }
 
         /// <summary>
@@ -70,10 +67,11 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("getAllArchiveItems")]
-        public ApiResult<ArchiveModel> GetAllArchiveItems()
+        public ApiResult<ArchiveViewModel> GetAllArchiveItems()
         {
-            var result = _siteMapService.GetArchiveStructure(_siteId);
-            return ApiResult<ArchiveModel>.Success(result);
+            var archive = _siteMapService.GetArchiveStructure(_siteId);
+            var result = _mapper.Map<ArchiveViewModel>(archive);
+            return ApiResult<ArchiveViewModel>.Success(result);
         }
 
         /// <summary>
@@ -83,11 +81,12 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// <param name="isArchive">Признак возврата архивных элементов</param>
         /// <param name="regionIds">Id регионов</param>
         /// <returns></returns>
-        [HttpGet("getTree")]
-        public ApiResult<PageModel[]> GetSiteTree(int? parentId, bool? isArchive, [FromQuery]int[] regionIds = null)
+        [HttpGet("getPageTree")]
+        public ApiResult<List<PageViewModel>> GetPageTree(int? parentId, bool? isArchive, [FromQuery]int[] regionIds = null)
         {
-            var result = _siteMapService.GetSiteMapItems(_siteId, isArchive ?? false, parentId, regionIds, _useHierarchyRegionFilter).ToArray();
-            return ApiResult<PageModel[]>.Success(result);
+            var siteMap = _siteMapService.GetSiteMapItems(_siteId, isArchive ?? false, parentId, regionIds, _useHierarchyRegionFilter);
+            var result = _mapper.Map<List<PageViewModel>>(siteMap);
+            return ApiResult<List<PageViewModel>>.Success(result);
         }
 
         /// <summary>
@@ -97,11 +96,12 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// <param name="isArchive">Признак возврата архивных элементов</param>
         /// <param name="regionIds">Id регионов</param>
         /// <returns></returns>
-        [HttpGet("getWidgets")]
-        public ApiResult<WidgetModel[]> GetWidgets(int parentId, bool? isArchive, [FromQuery]int[] regionIds = null)
+        [HttpGet("getWidgetTree")]
+        public ApiResult<List<WidgetViewModel>> GetWidgetTree(int parentId, bool? isArchive, [FromQuery]int[] regionIds = null)
         {
-            var result = _siteMapService.GetWidgetItems(_siteId, isArchive ?? false, parentId, regionIds, _useHierarchyRegionFilter).ToArray();
-            return ApiResult<WidgetModel[]>.Success(result);
+            var widgets = _siteMapService.GetWidgetItems(_siteId, isArchive ?? false, parentId, regionIds, _useHierarchyRegionFilter);
+            var result = _mapper.Map<List<WidgetViewModel>>(widgets);
+            return ApiResult<List<WidgetViewModel>>.Success(result);
         }
 
         /// <summary>
@@ -109,10 +109,11 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("getDefinitions")]
-        public ApiResult<DiscriminatorModel[]> GetDescriminators()
+        public ApiResult<List<DiscriminatorViewModel>> GetDescriminators()
         {
-            var result = _itemDifinitionService.GetAllItemDefinitions(_siteId).ToArray();
-            return ApiResult<DiscriminatorModel[]>.Success(result);
+            var discriminators = _itemDifinitionService.GetAllItemDefinitions(_siteId).ToArray();
+            var result = _mapper.Map<List<DiscriminatorViewModel>>(discriminators);
+            return ApiResult<List<DiscriminatorViewModel>>.Success(result);
         }
 
         /// <summary>
@@ -141,7 +142,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost("reorder")]
-        public ApiResult Reorder([FromBody]ReorderModel model)
+        public ApiResult Reorder([FromBody]ReorderRequestModel model)
         {
             try
             {
@@ -161,7 +162,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost("move")]
-        public ApiResult Move([FromBody]MoveModel model)
+        public ApiResult Move([FromBody]MoveRequestModel model)
         {
             try
             {
@@ -181,7 +182,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost("edit")]
-        public ApiResult Edit([FromBody]EditModel model)
+        public ApiResult Edit([FromBody]EditRequestModel model)
         {
             try
             {
@@ -201,7 +202,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost("remove")]
-        public ApiResult Remove([FromBody]RemoveModel model)
+        public ApiResult Remove([FromBody]RemoveRequestModel model)
         {
             try
             {
@@ -225,7 +226,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost("restore")]
-        public ApiResult Restore([FromBody]RestoreModel model)
+        public ApiResult Restore([FromBody]RestoreRequestModel model)
         {
             try
             {
@@ -250,7 +251,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost("delete")]
-        public ApiResult Delete([FromBody]DeleteModel model)
+        public ApiResult Delete([FromBody]DeleteRequestModel model)
         {
             try
             {

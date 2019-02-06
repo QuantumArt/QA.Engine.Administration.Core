@@ -1,9 +1,9 @@
-﻿namespace QA.Engine.Administration.WebApp.Core.Models
+namespace QA.Engine.Administration.WebApp.Core.Models
 {
     /// <summary>
     /// Модель для редактирования
     /// </summary>
-    public class EditModel
+    public class EditRequestModel
     {
         /// <summary>
         /// Id элемента
