@@ -13,6 +13,7 @@ enum TreeState {
 
 export interface ITreeElement extends ITreeNode {
     parentId: number;
+    isContextMenuActive: boolean; // brings in a controlled menu, not used now
 }
 
 export default class SiteTreeStore {
@@ -36,8 +37,8 @@ export default class SiteTreeStore {
     }
 
     @action.bound
-    public handleContextMenu = (nodeData: ISiteTreeModel) => {
-        console.log(nodeData.alias);
+    public handleContextMenu = (nodeData: ITreeElement) => {
+        nodeData.isContextMenuActive = !nodeData.isContextMenuActive;
     }
 
     @action
@@ -67,7 +68,8 @@ export default class SiteTreeStore {
                 }
                 return 'folder-close';
             };
-            return {
+
+            const treeElement = observable<ITreeElement>({
                 id: el.id,
                 parentId: el.parentId,
                 childNodes: [],
@@ -75,11 +77,13 @@ export default class SiteTreeStore {
                 isExpanded: false,
                 icon: getIcon(),
                 hasCaret: hasChildren,
-                secondaryLabel: React.createElement(ContextMenu, {
-                    isOpen: false,
-                    node: el,
-                }),
-            };
+                isContextMenuActive: false,
+            });
+            treeElement.secondaryLabel = React.createElement(ContextMenu, {
+                node: treeElement,
+            });
+
+            return treeElement;
         };
         const mapSubtree = (elements: IWidgetTreeModel[]): void => {
             elements.forEach((el: IWidgetTreeModel) => {

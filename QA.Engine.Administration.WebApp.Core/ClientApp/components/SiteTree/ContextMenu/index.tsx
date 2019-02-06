@@ -1,13 +1,12 @@
 import * as React from 'react';
 import { inject, observer } from 'mobx-react';
-import { Popover, Menu, MenuItem, Button } from '@blueprintjs/core';
-import SiteTreeStore from 'stores/SiteTreeStore';
-import { ISiteTreeModel } from 'services/siteTreeService';
+import { Button, Popover, Position } from '@blueprintjs/core';
+import SiteTreeStore, { ITreeElement } from 'stores/SiteTreeStore';
+import ElementMenu from './ElementMenu';
 
 interface Props {
-    isOpen: boolean;
     siteTreeStore?: SiteTreeStore;
-    node: ISiteTreeModel;
+    node: ITreeElement;
 }
 
 @inject('siteTreeStore')
@@ -19,17 +18,11 @@ export default class ContextMenu extends React.Component<Props> {
     }
 
     render() {
-        const { siteTreeStore } = this.props;
         return (
             <Popover
-                isOpen={this.props.isOpen}
-                content={
-                    <Menu>
-                        <MenuItem text="Submenu">
-                            <MenuItem text="Child"/>
-                        </MenuItem>
-                    </Menu>
-                }
+                content={<ElementMenu />}
+                position={Position.RIGHT}
+                autoFocus={false}
             >
                 <Button
                     icon="cog"

@@ -29,7 +29,6 @@ export default class SiteTree extends React.Component<Props> {
                     className="site-tree"
                     onNodeCollapse={siteTreeStore.handleNodeCollapse}
                     onNodeExpand={siteTreeStore.handleNodeExpand}
-                    onNodeContextMenu={siteTreeStore.handleContextMenu}
                 />
             </Card>
         );
