@@ -75,12 +75,10 @@ export default class SiteTreeStore {
                 isExpanded: false,
                 icon: getIcon(),
                 hasCaret: hasChildren,
-                secondaryLabel: (
-                    <ContextMenu
-                        isOpen={false}
-                        node={el}
-                    />
-                ),
+                secondaryLabel: React.createElement(ContextMenu, {
+                    isOpen: false,
+                    node: el,
+                }),
             };
         };
         const mapSubtree = (elements: IWidgetTreeModel[]): void => {
