@@ -8,10 +8,10 @@ namespace QA.Engine.Administration.Services.Core
 {
     public class SiteMapStructureBuilder
     {
-        public static List<SiteTreeModel> GetPageStructure(List<SiteTreeModel> pages, List<WidgetTreeModel> widgets, List<DiscriminatorModel> discriminators)
+        public static List<PageModel> GetPageStructure(List<PageModel> pages, List<WidgetModel> widgets, List<DiscriminatorModel> discriminators)
         {
             var pageStructure = pages
-                .Where(x => x.ParentId == null && x.IsPage && x.VersionOfId == null)
+                .Where(x => x.ParentId == null && x.VersionOfId == null)
                 .ToList();
             if (!pageStructure.Any())
                 pageStructure = pages.Where(x => !pages.Any(y => y.Id == (x.ParentId ?? x.VersionOfId))).ToList();
@@ -25,7 +25,7 @@ namespace QA.Engine.Administration.Services.Core
             return result;
         }
 
-        public static List<SiteTreeModel> GetCurrentPageStructure(int topLevelId, List<SiteTreeModel> pages, List<WidgetTreeModel> widgets, List<DiscriminatorModel> discriminators = null)
+        public static List<PageModel> GetCurrentPageStructure(int topLevelId, List<PageModel> pages, List<WidgetModel> widgets, List<DiscriminatorModel> discriminators = null)
         {
             var pageStructure = pages
                 .Where(x => x.Id == topLevelId)
@@ -40,7 +40,7 @@ namespace QA.Engine.Administration.Services.Core
             return result;
         }
 
-        public static List<WidgetTreeModel> GetWidgetStructure(SiteTreeModel page, List<WidgetTreeModel> widgets, List<DiscriminatorModel> discriminators)
+        public static List<WidgetModel> GetWidgetStructure(PageModel page, List<WidgetModel> widgets, List<DiscriminatorModel> discriminators)
         {
             var widgetStructure = widgets
                 .Where(x => x.ParentId == page?.Id)
@@ -57,7 +57,7 @@ namespace QA.Engine.Administration.Services.Core
             return result;
         }
 
-        public static List<WidgetTreeModel> GetCurrentWidgetStructure(int topLevelId, List<WidgetTreeModel> widgets, List<DiscriminatorModel> discriminators = null)
+        public static List<WidgetModel> GetCurrentWidgetStructure(int topLevelId, List<WidgetModel> widgets, List<DiscriminatorModel> discriminators = null)
         {
             var widgetStructure = widgets
                 .Where(x => topLevelId == x.Id)
@@ -74,14 +74,14 @@ namespace QA.Engine.Administration.Services.Core
 
         #region private methods
 
-        private static List<SiteTreeModel> GetPageTree(List<SiteTreeModel> pageStructure, List<SiteTreeModel> pages, List<WidgetTreeModel> widgets, List<DiscriminatorModel> discriminators)
+        private static List<PageModel> GetPageTree(List<PageModel> pageStructure, List<PageModel> pages, List<WidgetModel> widgets, List<DiscriminatorModel> discriminators)
         {
             var elements = pageStructure;
             var makeTree = true;
             while (makeTree)
             {
                 makeTree = false;
-                var tmp = new List<SiteTreeModel>();
+                var tmp = new List<PageModel>();
                 foreach (var el in elements)
                 {
                     el.Children = pages.Where(x => x.ParentId != null && x.ParentId == el.Id).ToList();
@@ -114,17 +114,17 @@ namespace QA.Engine.Administration.Services.Core
             return pageStructure;
         }
 
-        private static List<WidgetTreeModel> GetWidgetTree(List<WidgetTreeModel> widgetStructure, List<WidgetTreeModel> widgets, List<DiscriminatorModel> discriminators)
+        private static List<WidgetModel> GetWidgetTree(List<WidgetModel> widgetStructure, List<WidgetModel> widgets, List<DiscriminatorModel> discriminators)
         {
             var elements = widgetStructure;
             var makeTree = true;
             while (makeTree)
             {
                 makeTree = false;
-                var tmp = new List<WidgetTreeModel>();
+                var tmp = new List<WidgetModel>();
                 foreach (var el in elements)
                 {
-                    el.Children = widgets.Where(x => !x.IsPage && x.ParentId == el.Id).ToList();
+                    el.Children = widgets.Where(x => x.ParentId == el.Id).ToList();
 
                     if (el.HasChildren)
                     {

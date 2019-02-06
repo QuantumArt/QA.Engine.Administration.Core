@@ -3,8 +3,9 @@ using System.Collections.Generic;
 
 namespace QA.Engine.Administration.Services.Core.Interfaces
 {
-    public interface IItemDifinitionService
+    public interface IRegionService
     {
-        List<DiscriminatorModel> GetAllItemDefinitions(int siteId);
+        List<RegionModel> GetRegions(int siteId);
+        List<RegionModel> GetRegionStructure(int siteId);
     }
 }

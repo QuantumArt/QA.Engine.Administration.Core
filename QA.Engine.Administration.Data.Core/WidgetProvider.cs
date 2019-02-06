@@ -44,7 +44,7 @@ INNER JOIN [|QPDiscriminator|] def on ai.[|QPAbstractItem.Discriminator|] = def.
 WHERE ai.archive=0 AND def.[|QPDiscriminator.IsPage|]=0 AND ai.[|QPAbstractItem.Parent|] IN @ParentIds
 ";
 
-        public IEnumerable<AbstractItemData> GetItems(int siteId, bool isArchive, IEnumerable<int> parentIds)
+        public List<AbstractItemData> GetItems(int siteId, bool isArchive, IEnumerable<int> parentIds)
         {
             const int maxParentIdsPerRequest = 500;
 
@@ -53,7 +53,7 @@ WHERE ai.archive=0 AND def.[|QPDiscriminator.IsPage|]=0 AND ai.[|QPAbstractItem.
             if (parentIds == null)
                 throw new ArgumentNullException("parentIds", "need not null and not empty parent ids");
             if (!parentIds.Any())
-                return Array.Empty<AbstractItemData>();
+                return new List<AbstractItemData>();
 
             if (parentIds.Count() > maxParentIdsPerRequest)
             {
@@ -67,7 +67,7 @@ WHERE ai.archive=0 AND def.[|QPDiscriminator.IsPage|]=0 AND ai.[|QPAbstractItem.
             }
             else
             {
-                return _connection.Query<AbstractItemData>(query, new { Archive = isArchive, ParentIds = parentIds });
+                return _connection.Query<AbstractItemData>(query, new { Archive = isArchive, ParentIds = parentIds }).ToList();
             }
         }
 

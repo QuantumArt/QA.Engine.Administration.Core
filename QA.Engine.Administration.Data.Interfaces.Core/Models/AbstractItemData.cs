@@ -1,4 +1,6 @@
-﻿namespace QA.Engine.Administration.Data.Interfaces.Core.Models
+﻿using System.Collections.Generic;
+
+namespace QA.Engine.Administration.Data.Interfaces.Core.Models
 {
     public class AbstractItemData
     {
@@ -17,5 +19,6 @@
         public bool Published { get; set; }
         public bool? IsInSiteMap { get; set; }
         public int DiscriminatorId { get; set; }
+        public List<RegionData> Regions { get; set; }
     }
 }
