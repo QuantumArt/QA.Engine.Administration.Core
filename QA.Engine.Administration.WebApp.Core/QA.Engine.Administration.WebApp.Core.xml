@@ -142,7 +142,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.GetSiteTree(System.Nullable{System.Int32},System.Nullable{System.Boolean},System.Int32[])">
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.GetPageTree(System.Nullable{System.Int32},System.Nullable{System.Boolean},System.Int32[])">
             <summary>
             Возвращает дочерние страницы родительского элемента (страницы)
             </summary>
@@ -151,7 +151,7 @@
             <param name="regionIds">Id регионов</param>
             <returns></returns>
         </member>
-        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.GetWidgets(System.Int32,System.Nullable{System.Boolean},System.Int32[])">
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.GetWidgetTree(System.Int32,System.Nullable{System.Boolean},System.Int32[])">
             <summary>
             Возвращает дочерние виджеты у родительского элемента (страницы или виджета)
             </summary>

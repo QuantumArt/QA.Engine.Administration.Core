@@ -14,7 +14,7 @@ import configureStores from 'stores/configureStores';
 const stores = configureStores();
 
 const app = hot(module)(() => (
-    <Provider siteTreeStore={stores.siteTreeStore}>
+    <Provider siteTreeStore={stores.siteTreeStore} archiveStore={stores.archiveStrore}>
         <div className="layout">
             <Navbar fixedToTop>
                 <NavbarGroup align={Alignment.LEFT}>

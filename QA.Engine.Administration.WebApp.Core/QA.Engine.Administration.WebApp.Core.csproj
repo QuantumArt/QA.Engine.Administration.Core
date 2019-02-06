@@ -13,6 +13,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="ClientApp\services\archiveService.ts" />
+    <None Remove="ClientApp\stores\ArchiveStore.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="8.0.0" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
@@ -25,6 +30,11 @@
   <ItemGroup>
     <ProjectReference Include="..\QA.Engine.Administration.Data.Core\QA.Engine.Administration.Data.Core.csproj" />
     <ProjectReference Include="..\QA.Engine.Administration.Services.Core\QA.Engine.Administration.Services.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\services\ArchiveService.ts" />
+    <TypeScriptCompile Include="ClientApp\stores\ArchiveStore.ts" />
   </ItemGroup>
 
   <ItemGroup>
