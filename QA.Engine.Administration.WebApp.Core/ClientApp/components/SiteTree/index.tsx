@@ -20,11 +20,13 @@ export default class SiteTree extends React.Component<Props> {
     render() {
         const { siteTreeStore } = this.props;
         return (
-            <Card>
+            <Card className="tree-card">
                 <TreeR
                     contents={siteTreeStore.tree}
+                    className="site-tree"
                     onNodeCollapse={siteTreeStore.handleNodeCollapse}
                     onNodeExpand={siteTreeStore.handleNodeExpand}
+                    onNodeContextMenu={siteTreeStore.handleContextMenu}
                 />
             </Card>
         );
