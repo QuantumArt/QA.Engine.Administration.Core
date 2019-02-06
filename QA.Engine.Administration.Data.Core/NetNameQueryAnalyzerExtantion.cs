@@ -50,7 +50,7 @@ namespace QA.Engine.Administration.Data.Core
                     throw new Exception($"Content with netname '{tableNetName}' was not found for site {siteId}");
                 }
 
-                var tableNetNameValue = $"CONTENT_{contentMetaInfo.ContentId}_NEW";
+                var tableNetNameValue = $"content_{contentMetaInfo.ContentId}_united";
 
                 sb.Replace($"|{tableNetName}|", tableNetNameValue);
 

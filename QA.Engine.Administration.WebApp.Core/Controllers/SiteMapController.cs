@@ -20,6 +20,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
     public class SiteMapController : ControllerBase
     {
         private readonly ISiteMapService _siteMapService;
+        private readonly ISiteMapModifyService _siteMapModifyService;
         private readonly IItemDifinitionService _itemDifinitionService;
         private readonly ILogger<SiteMapController> _logger;
         // public const int SITE_ID = 35; // beeline ge
@@ -27,26 +28,30 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         private readonly int _siteId;
         private readonly int _step;
         private readonly int _userId;
+        private readonly bool _useHierarchyRegionFilter;
 
         /// <summary>
         /// Конструктор
         /// </summary>
         /// <param name="siteMapService"></param>
+        /// <param name="siteMapModifyService"></param>
         /// <param name="itemDifinitionService"></param>
         /// <param name="options"></param>
         /// <param name="webAppQpHelper"></param>
         /// <param name="logger"></param>
         public SiteMapController(
-            ISiteMapService siteMapService, IItemDifinitionService itemDifinitionService,
+            ISiteMapService siteMapService, ISiteMapModifyService siteMapModifyService, IItemDifinitionService itemDifinitionService,
             IOptions<EnvironmentConfiguration> options, IWebAppQpHelper webAppQpHelper, ILogger<SiteMapController> logger)
         {
             _siteMapService = siteMapService;
+            _siteMapModifyService = siteMapModifyService;
             _itemDifinitionService = itemDifinitionService;
             _logger = logger;
 
             _siteId = webAppQpHelper.SiteId;
             _userId = webAppQpHelper.UserId;
             _step = options.Value.IndexOrderStep;
+            _useHierarchyRegionFilter = options.Value?.UseHierarchyRegionFilter ?? false;
         }
 
         /// <summary>
@@ -54,10 +59,10 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("getAllItems")]
-        public ApiResult<SiteTreeModel[]> GetSiteMap()
+        public ApiResult<PageModel[]> GetSiteMap([FromQuery]int[] regionIds = null)
         {
-            var result = _siteMapService.GetSiteMapStructure(_siteId).ToArray();
-            return ApiResult<SiteTreeModel[]>.Success(result);
+            var result = _siteMapService.GetSiteMapStructure(_siteId, regionIds, _useHierarchyRegionFilter).ToArray();
+            return ApiResult<PageModel[]>.Success(result);
         }
 
         /// <summary>
@@ -65,10 +70,10 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("getAllArchiveItems")]
-        public ApiResult<ArchiveTreeModel> GetAllArchiveItems()
+        public ApiResult<ArchiveModel> GetAllArchiveItems()
         {
             var result = _siteMapService.GetArchiveStructure(_siteId);
-            return ApiResult<ArchiveTreeModel>.Success(result);
+            return ApiResult<ArchiveModel>.Success(result);
         }
 
         /// <summary>
@@ -76,12 +81,13 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// </summary>
         /// <param name="parentId">Id родительской страницы</param>
         /// <param name="isArchive">Признак возврата архивных элементов</param>
+        /// <param name="regionIds">Id регионов</param>
         /// <returns></returns>
         [HttpGet("getTree")]
-        public ApiResult<SiteTreeModel[]> GetSiteTree(int? parentId, bool? isArchive)
+        public ApiResult<PageModel[]> GetSiteTree(int? parentId, bool? isArchive, [FromQuery]int[] regionIds = null)
         {
-            var result = _siteMapService.GetSiteMapItems(_siteId, isArchive ?? false, parentId).ToArray();
-            return ApiResult<SiteTreeModel[]>.Success(result);
+            var result = _siteMapService.GetSiteMapItems(_siteId, isArchive ?? false, parentId, regionIds, _useHierarchyRegionFilter).ToArray();
+            return ApiResult<PageModel[]>.Success(result);
         }
 
         /// <summary>
@@ -89,12 +95,13 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// </summary>
         /// <param name="parentId">Id родительского элемента</param>
         /// <param name="isArchive">Признак возврата архивных элементов</param>
+        /// <param name="regionIds">Id регионов</param>
         /// <returns></returns>
         [HttpGet("getWidgets")]
-        public ApiResult<WidgetTreeModel[]> GetWidgets(int parentId, bool? isArchive)
+        public ApiResult<WidgetModel[]> GetWidgets(int parentId, bool? isArchive, [FromQuery]int[] regionIds = null)
         {
-            var result = _siteMapService.GetWidgetItems(_siteId, isArchive ?? false, parentId).ToArray();
-            return ApiResult<WidgetTreeModel[]>.Success(result);
+            var result = _siteMapService.GetWidgetItems(_siteId, isArchive ?? false, parentId, regionIds, _useHierarchyRegionFilter).ToArray();
+            return ApiResult<WidgetModel[]>.Success(result);
         }
 
         /// <summary>
@@ -118,7 +125,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         {
             try
             {
-                _siteMapService.PublishSiteMapItems(_siteId, _userId, itemIds);
+                _siteMapModifyService.PublishSiteMapItems(_siteId, _userId, itemIds);
                 return ApiResult.Success();
             }
             catch(Exception e)
@@ -138,7 +145,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         {
             try
             {
-                _siteMapService.ReorderSiteMapItems(_siteId, _userId, model.ItemId, model.RelatedItemId, model.IsInsertBefore, _step);
+                _siteMapModifyService.ReorderSiteMapItems(_siteId, _userId, model.ItemId, model.RelatedItemId, model.IsInsertBefore, _step);
                 return ApiResult.Success();
             }
             catch (Exception e)
@@ -158,7 +165,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         {
             try
             {
-                _siteMapService.MoveSiteMapItem(_siteId, _userId, model.ItemId, model.NewParentId);
+                _siteMapModifyService.MoveSiteMapItem(_siteId, _userId, model.ItemId, model.NewParentId);
                 return ApiResult.Success();
             }
             catch (Exception e)
@@ -178,7 +185,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         {
             try
             {
-                _siteMapService.EditSiteMapItem(_siteId, _userId, model.ItemId, model.Title);
+                _siteMapModifyService.EditSiteMapItem(_siteId, _userId, model.ItemId, model.Title);
                 return ApiResult.Success();
             }
             catch (Exception e)
@@ -198,7 +205,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         {
             try
             {
-                _siteMapService.RemoveSiteMapItems(
+                _siteMapModifyService.RemoveSiteMapItems(
                     _siteId, _userId, model.ItemId, 
                     model.IsDeleteAllVersions ?? false, 
                     model.IsDeleteContentVersions ?? false, 
@@ -222,7 +229,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         {
             try
             {
-                _siteMapService.RestoreSiteMapItems(
+                _siteMapModifyService.RestoreSiteMapItems(
                     _siteId, _userId, model.ItemId, 
                     model.IsRestoreAllVersions ?? false, 
                     model.IsRestoreChildren?? false, 
@@ -247,7 +254,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         {
             try
             {
-                _siteMapService.DeleteSiteMapItems(
+                _siteMapModifyService.DeleteSiteMapItems(
                     _siteId, _userId, model.ItemId,
                     model.IsDeleteAllVersions ?? false);
                 return ApiResult.Success();

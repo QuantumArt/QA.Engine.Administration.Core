@@ -5,10 +5,9 @@ namespace QA.Engine.Administration.Data.Interfaces.Core
 {
     public interface ISiteMapProvider
     {
-        IEnumerable<AbstractItemData> GetAllItems(int siteId, bool isArchive);
-        IEnumerable<AbstractItemData> GetItems(int siteId, bool isArchive, IEnumerable<int> parentId);
-        IEnumerable<AbstractItemData> GetByIds(int siteId, bool isArchive, IEnumerable<int> itemIds);
-        int GetContentId(int siteId);
+        List<AbstractItemData> GetAllItems(int siteId, bool isArchive, bool useRegion);
+        List<AbstractItemData> GetItems(int siteId, bool isArchive, IEnumerable<int> parentId, bool useRegion);
+        List<AbstractItemData> GetByIds(int siteId, bool isArchive, IEnumerable<int> itemIds);
         AbstractItemData GetRootPage(int siteId);
     }
 }

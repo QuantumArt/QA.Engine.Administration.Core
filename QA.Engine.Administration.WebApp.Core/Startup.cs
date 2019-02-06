@@ -76,16 +76,18 @@ namespace QA.Engine.Administration.WebApp.Core
 
             services.AddScoped<ISiteMapProvider, SiteMapProvider>();
             services.AddScoped<IWidgetProvider, WidgetProvider>();
-            services.AddScoped<IItemDifinitionProvider, ItemDifinitionProvider>();
-            services.AddScoped<IStatusTypeProvider, StatusTypeProvider>();
+            services.AddScoped<IDictionaryProvider, DictionaryProvider>();
             services.AddScoped<IQpDataProvider, QpDataProvider>();
+            services.AddScoped<ISettingsProvider, SettingsProvider>();
 
             services.AddScoped<IQpDbConnector, QpDbConnector>(sp => new QpDbConnector(GetConnectionString(sp)));
             services.AddScoped<IQpMetadataManager, QpMetadataManager>();
             services.AddScoped<IQpContentManager, QpContentManager>();
 
             services.AddScoped<ISiteMapService, SiteMapService>();
+            services.AddScoped<ISiteMapModifyService, SiteMapModifyService>();
             services.AddScoped<IItemDifinitionService, ItemDifinitionService>();
+            services.AddScoped<IRegionService, RegionService>();
 
             services.AddDistributedMemoryCache();
 

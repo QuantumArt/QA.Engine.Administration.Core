@@ -9,19 +9,20 @@ namespace QA.Engine.Administration.Services.Core
 {
     public class ItemDifinitionService : IItemDifinitionService
     {
-        private readonly IItemDifinitionProvider _itemDifinitionProvider;
+        private readonly IDictionaryProvider _dictionaryProvider;
         private readonly IMapper _mapper;
 
-        public ItemDifinitionService(IItemDifinitionProvider itemDifinitionProvider, IMapper mapper)
+        public ItemDifinitionService(IDictionaryProvider dictionaryProvider, IMapper mapper)
         {
-            _itemDifinitionProvider = itemDifinitionProvider;
+            _dictionaryProvider = dictionaryProvider;
             _mapper = mapper;
         }
 
-        public IEnumerable<DiscriminatorModel> GetAllItemDefinitions(int siteId)
+        public List<DiscriminatorModel> GetAllItemDefinitions(int siteId)
         {
-            return _itemDifinitionProvider.GetAllItemDefinitions(siteId)
-                .Select(x => _mapper.Map<DiscriminatorModel>(x));
+            return _dictionaryProvider.GetAllItemDefinitions(siteId)
+                .Select(x => _mapper.Map<DiscriminatorModel>(x))
+                .ToList();
         }
     }
 }
