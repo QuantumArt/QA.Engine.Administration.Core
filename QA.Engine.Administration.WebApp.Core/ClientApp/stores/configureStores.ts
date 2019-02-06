@@ -1,7 +1,8 @@
-import UIStore from './UIStore';
+import SiteTreeStore from './SiteTreeStore';
 
 export default function configureStores() {
+
     return {
-        UIStore: new UIStore(),
+        siteTreeStore: new SiteTreeStore(),
     };
 }

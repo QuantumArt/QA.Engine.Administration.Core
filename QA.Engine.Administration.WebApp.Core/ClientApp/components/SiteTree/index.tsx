@@ -1,13 +1,13 @@
 import * as React from 'react';
 import { inject, observer } from 'mobx-react';
 import { Icon, ITreeNode, Tooltip, Tree, Card } from '@blueprintjs/core';
-import UIStore from 'stores/UIStore';
+import SiteTreeStore from 'stores/SiteTreeStore';
 
 interface Props {
-    uiStore?: UIStore;
+    siteTreeStore?: SiteTreeStore;
 }
 
-@inject('uiStore')
+@inject('siteTreeStore')
 @observer
 export default class SiteTree extends React.Component<Props> {
 
@@ -16,15 +16,15 @@ export default class SiteTree extends React.Component<Props> {
     }
 
     componentDidMount(): void {
-        this.props.uiStore.fetchSiteTree();
+        this.props.siteTreeStore.fetchSiteTree();
     }
 
     render() {
-        const { uiStore } = this.props;
+        const { siteTreeStore } = this.props;
         return (
             <Card>
                 <Tree
-                    contents={testnodes}
+                    contents={siteTreeStore.siteTree}
                     onNodeClick={this.handleNodeClick}
                 />
             </Card>
