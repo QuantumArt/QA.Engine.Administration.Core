@@ -1,6 +1,8 @@
+import * as React from 'react';
 import { action, observable } from 'mobx';
 import siteTreeService, { IApiResultWidgetTreeModel, ISiteTreeModel, IWidgetTreeModel } from 'services/siteTreeService';
 import { IconName, ITreeNode } from '@blueprintjs/core';
+import ContextMenu from 'components/SiteTree/ContextMenu';
 
 enum TreeState {
     NONE,
@@ -31,6 +33,11 @@ export default class SiteTreeStore {
             nodeData.icon = 'folder-close';
         }
         nodeData.isExpanded = false;
+    }
+
+    @action.bound
+    public handleContextMenu = (nodeData: ISiteTreeModel) => {
+        console.log(nodeData.alias);
     }
 
     @action
@@ -68,6 +75,12 @@ export default class SiteTreeStore {
                 isExpanded: false,
                 icon: getIcon(),
                 hasCaret: hasChildren,
+                secondaryLabel: (
+                    <ContextMenu
+                        isOpen={false}
+                        node={el}
+                    />
+                ),
             };
         };
         const mapSubtree = (elements: IWidgetTreeModel[]): void => {
