@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { action, observable } from 'mobx';
-import siteTreeService, { IApiResultWidgetTreeModel, ISiteTreeModel, IWidgetTreeModel } from 'services/siteTreeService';
+import siteTreeService from 'services/siteTreeService';
 import { IconName, ITreeNode } from '@blueprintjs/core';
 import ContextMenu from 'components/SiteTree/ContextMenu';
 

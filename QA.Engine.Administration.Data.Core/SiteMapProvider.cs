@@ -42,6 +42,8 @@ SELECT
     def.content_item_id AS DiscriminatorId,
     def.[|QPDiscriminator.Name|] as Discriminator,
     def.[|QPDiscriminator.IsPage|] as IsPage,
+    def.[|QPDiscriminator.Title|] as DiscriminatorTitle,
+    def.[|QPDiscriminator.IconUrl|] as IconUrl,
     CASE WHEN ai.[STATUS_TYPE_ID] = (SELECT TOP 1 st.STATUS_TYPE_ID FROM [STATUS_TYPE] st WHERE st.[STATUS_TYPE_NAME]=N'Published') THEN 1 ELSE 0 END AS Published
 FROM [|QPAbstractItem|] ai
 INNER JOIN [|QPDiscriminator|] def on ai.[|QPAbstractItem.Discriminator|] = def.content_item_id
@@ -65,6 +67,8 @@ SELECT
     def.content_item_id AS DiscriminatorId,
     def.[|QPDiscriminator.Name|] as Discriminator,
     def.[|QPDiscriminator.IsPage|] as IsPage,
+    def.[|QPDiscriminator.Title|] as DiscriminatorTitle,
+    def.[|QPDiscriminator.IconUrl|] as IconUrl,
     CASE WHEN ai.[STATUS_TYPE_ID] = (SELECT TOP 1 st.STATUS_TYPE_ID FROM [STATUS_TYPE] st WHERE st.[STATUS_TYPE_NAME]=N'Published') THEN 1 ELSE 0 END AS Published
 FROM [|QPAbstractItem|] ai
 INNER JOIN [|QPDiscriminator|] def ON ai.[|QPAbstractItem.Discriminator|] = def.content_item_id
@@ -103,6 +107,8 @@ SELECT
     def.content_item_id AS DiscriminatorId,
     def.[|QPDiscriminator.Name|] as Discriminator,
     def.[|QPDiscriminator.IsPage|] as IsPage,
+    def.[|QPDiscriminator.Title|] as DiscriminatorTitle,
+    def.[|QPDiscriminator.IconUrl|] as IconUrl,
     CASE WHEN ai.[STATUS_TYPE_ID] = (SELECT TOP 1 st.STATUS_TYPE_ID FROM [STATUS_TYPE] st WHERE st.[STATUS_TYPE_NAME]=N'Published') THEN 1 ELSE 0 END AS Published
 FROM [|QPAbstractItem|] ai
 INNER JOIN [|QPDiscriminator|] def on ai.[|QPAbstractItem.Discriminator|] = def.content_item_id
@@ -131,6 +137,8 @@ SELECT
     def.content_item_id AS DiscriminatorId,
     def.[|QPDiscriminator.Name|] as Discriminator,
     def.[|QPDiscriminator.IsPage|] as IsPage,
+    def.[|QPDiscriminator.Title|] as DiscriminatorTitle,
+    def.[|QPDiscriminator.IconUrl|] as IconUrl,
     CASE WHEN ai.[STATUS_TYPE_ID] = (SELECT TOP 1 st.STATUS_TYPE_ID FROM [STATUS_TYPE] st WHERE st.[STATUS_TYPE_NAME]=N'Published') THEN 1 ELSE 0 END AS Published
 FROM [|QPAbstractItem|] ai
 INNER JOIN [|QPDiscriminator|] def ON ai.[|QPAbstractItem.Discriminator|] = def.content_item_id
@@ -174,6 +182,8 @@ SELECT
     def.content_item_id AS DiscriminatorId,
     def.[|QPDiscriminator.Name|] as Discriminator,
     def.[|QPDiscriminator.IsPage|] as IsPage,
+    def.[|QPDiscriminator.Title|] as DiscriminatorTitle,
+    def.[|QPDiscriminator.IconUrl|] as IconUrl,
     CASE WHEN ai.[STATUS_TYPE_ID] = (SELECT TOP 1 st.STATUS_TYPE_ID FROM [STATUS_TYPE] st WHERE st.[STATUS_TYPE_NAME]=N'Published') THEN 1 ELSE 0 END AS Published
 FROM [|QPAbstractItem|] ai
 INNER JOIN [|QPDiscriminator|] def on ai.[|QPAbstractItem.Discriminator|] = def.content_item_id
@@ -198,6 +208,8 @@ SELECT
     def.content_item_id AS DiscriminatorId,
     def.[|QPDiscriminator.Name|] as Discriminator,
     def.[|QPDiscriminator.IsPage|] as IsPage,
+    def.[|QPDiscriminator.Title|] as DiscriminatorTitle,
+    def.[|QPDiscriminator.IconUrl|] as IconUrl,
     CASE WHEN ai.[STATUS_TYPE_ID] = (SELECT TOP 1 st.STATUS_TYPE_ID FROM [STATUS_TYPE] st WHERE st.[STATUS_TYPE_NAME]=N'Published') THEN 1 ELSE 0 END AS Published
 FROM [|QPAbstractItem|] ai
 INNER JOIN [|QPDiscriminator|] def on ai.[|QPAbstractItem.Discriminator|] = def.content_item_id

@@ -35,16 +35,20 @@ module Models {
         public published: boolean = false;
         // ISINSITEMAP
         public isInSiteMap: boolean = null;
+        // DISCRIMINATOR
+        public discriminator: string = null;
         // DISCRIMINATORID
         public discriminatorId: number = 0;
+        // DISCRIMINATORTITLE
+        public discriminatorTitle: string = null;
+        // ICONURL
+        public iconUrl: string = null;
         // WIDGETS
         public widgets: WidgetViewModel[] = [];
         // CHILDREN
         public children: PageViewModel[] = [];
         // CONTENTVERSIONS
         public contentVersions: PageViewModel[] = [];
-        // DISCRIMINATOR
-        public discriminator: DiscriminatorViewModel = null;
         // REGIONS
         public regions: RegionViewModel[] = [];
         // HASWIDGETS

@@ -11,8 +11,7 @@ namespace QA.Engine.Administration.Services.Core.Mapper
             CreateMap<AbstractItemData, PageModel>()
                 .ForMember(x => x.Children, opt => opt.Ignore())
                 .ForMember(x => x.Widgets, opt => opt.Ignore())
-                .ForMember(x => x.ContentVersions, opt => opt.Ignore())
-                .ForMember(x => x.Discriminator, opt => opt.Ignore());
+                .ForMember(x => x.ContentVersions, opt => opt.Ignore());
         }
     }
 }

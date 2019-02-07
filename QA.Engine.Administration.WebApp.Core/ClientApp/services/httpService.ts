@@ -16,36 +16,37 @@ abstract class HttpService<T> {
         };
 
         const res = await fetch(path, init);
-        console.log('get response', res);
 
         var result = await <Promise<ApiResult<T>>>res.json();
-        console.log('get result', result);
+        console.log(`api get '${path}' result`, result);
 
         if (!result.isSuccess) {
-            console.error(`get '${path}' error`, result.error);
+            console.error(`api get '${path}' error`, result.error);
+            throw `Api GET '${path}' error. Error: ${result.error}`;
         }
 
         return result.data;
     }
 
-    protected async post(path: string, body: any): Promise<boolean> {
+    protected async post(path: string, model: any): Promise<boolean> {
 
         const headers = new Headers();
         headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
+        headers.append('Content-Type', 'application/json');
         const init = {
             method: 'POST',
             headers: headers,
-            body
+            body: JSON.stringify(model)
         };
 
         const res = await fetch(path, init);
-        console.log('post response', res);
 
         var result = await <Promise<ApiResult<null>>>res.json();
-        console.log('post result', result);
+        console.log(`api post '${path}' result`, result);
 
         if (!result.isSuccess) {
-            console.error(`post '${path}' error`, result.error);
+            console.error(`api get '${path}' error`, result.error);
+            throw `Api GET '${path}' error. Error: ${result.error}`;
         }
 
         return result.isSuccess;

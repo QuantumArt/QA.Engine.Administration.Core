@@ -33,12 +33,16 @@ module Models {
         public versionOfId: number = null;
         // PUBLISHED
         public published: boolean = false;
+        // DISCRIMINATOR
+        public discriminator: string = null;
         // DISCRIMINATORID
         public discriminatorId: number = 0;
+        // DISCRIMINATORTITLE
+        public discriminatorTitle: string = null;
+        // ICONURL
+        public iconUrl: string = null;
         // CHILDREN
         public children: WidgetViewModel[] = [];
-        // DISCRIMINATOR
-        public discriminator: DiscriminatorViewModel = null;
         // REGIONS
         public regions: RegionViewModel[] = [];
         // HASCHILDREN

@@ -19,6 +19,8 @@ namespace QA.Engine.Administration.Data.Interfaces.Core.Models
         public bool Published { get; set; }
         public bool? IsInSiteMap { get; set; }
         public int DiscriminatorId { get; set; }
+        public string DiscriminatorTitle { get; set; }
+        public string IconUrl { get; set; }
         public List<RegionData> Regions { get; set; }
     }
 }

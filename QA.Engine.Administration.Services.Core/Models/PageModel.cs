@@ -17,12 +17,14 @@ namespace QA.Engine.Administration.Services.Core.Models
         public int? VersionOfId { get; set; }
         public bool Published { get; set; }
         public bool? IsInSiteMap { get; set; }
+        public string Discriminator { get; set; }
         public int DiscriminatorId { get; set; }
+        public string DiscriminatorTitle { get; set; }
+        public string IconUrl { get; set; }
 
         public List<WidgetModel> Widgets { get; set; }
         public List<PageModel> Children { get; set; }
         public List<PageModel> ContentVersions { get; set; }
-        public DiscriminatorModel Discriminator { get; set; }
         public List<RegionModel> Regions { get; set; }
 
         public bool HasWidgets { get { return Widgets?.Any() ?? false; } }

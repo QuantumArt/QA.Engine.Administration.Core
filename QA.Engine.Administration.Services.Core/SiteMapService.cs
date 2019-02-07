@@ -49,16 +49,9 @@ namespace QA.Engine.Administration.Services.Core
                 .Where(regionFilter)
                 .Select(x => _mapper.Map<PageModel>(x))
                 .ToList();
-            var discriminators = _dictionaryProvider.GetAllItemDefinitions(siteId)
-                .Select(x => _mapper.Map<DiscriminatorModel>(x))
-                .ToList();
 
             foreach (var item in items)
-            {
                 item.Children = children.Where(x => x.ParentId == item.Id).ToList();
-                item.Discriminator = discriminators.FirstOrDefault(x => x.Id == item.DiscriminatorId);
-                item.Children.ForEach(x => x.Discriminator = discriminators.FirstOrDefault(y => y.Id == x.DiscriminatorId));
-            }
 
             return items;
         }
@@ -83,16 +76,9 @@ namespace QA.Engine.Administration.Services.Core
                 .Where(regionFilter)
                 .Select(x => _mapper.Map<WidgetModel>(x))
                 .ToList();
-            var discriminators = _dictionaryProvider.GetAllItemDefinitions(siteId)
-                .Select(x => _mapper.Map<DiscriminatorModel>(x))
-                .ToList();
 
             foreach (var item in items)
-            {
                 item.Children = children.Where(x => x.ParentId == item.Id).ToList();
-                item.Discriminator = discriminators.FirstOrDefault(x => x.Id == item.DiscriminatorId);
-                item.Children.ForEach(x => x.Discriminator = discriminators.FirstOrDefault(y => y.Id == x.DiscriminatorId));
-            }
 
             return items;
         }
@@ -115,11 +101,8 @@ namespace QA.Engine.Administration.Services.Core
 
             var pages = abstractItems.Where(x => x.IsPage).Select(x => _mapper.Map<PageModel>(x)).OrderBy(x => x.IndexOrder).ToList();
             var widgets = abstractItems.Where(x => !x.IsPage).Select(x => _mapper.Map<WidgetModel>(x)).OrderBy(x => x.IndexOrder).ToList();
-            var discriminators = _dictionaryProvider.GetAllItemDefinitions(siteId)
-                .Select(x => _mapper.Map<DiscriminatorModel>(x))
-                .ToList();
 
-            var pageStructure = SiteMapStructureBuilder.GetPageStructure(pages, widgets, discriminators);
+            var pageStructure = SiteMapStructureBuilder.GetPageStructure(pages, widgets);
 
             return pageStructure;
         }
@@ -131,12 +114,9 @@ namespace QA.Engine.Administration.Services.Core
 
             var pages = abstractItems.Where(x => x.IsPage).Select(x => _mapper.Map<PageModel>(x)).OrderBy(x => x.IndexOrder).ToList();
             var widgets = abstractItems.Where(x => !x.IsPage).Select(x => _mapper.Map<WidgetModel>(x)).OrderBy(x => x.IndexOrder).ToList();
-            var discriminators = _dictionaryProvider.GetAllItemDefinitions(siteId)
-                .Select(x => _mapper.Map<DiscriminatorModel>(x))
-                .ToList();
 
-            var pageStructure = SiteMapStructureBuilder.GetPageStructure(pages, widgets, discriminators);
-            var widgetStructure = SiteMapStructureBuilder.GetWidgetStructure(null, widgets, discriminators);
+            var pageStructure = SiteMapStructureBuilder.GetPageStructure(pages, widgets);
+            var widgetStructure = SiteMapStructureBuilder.GetWidgetStructure(null, widgets);
 
             return new ArchiveModel
             {
