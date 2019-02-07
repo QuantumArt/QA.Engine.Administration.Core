@@ -11,7 +11,3 @@ body {
 .tree-card {
     min-width: 350px;
 }
-
-.site-tree .bp3-tree-node-content:hover {
-    background: inherit;
-}

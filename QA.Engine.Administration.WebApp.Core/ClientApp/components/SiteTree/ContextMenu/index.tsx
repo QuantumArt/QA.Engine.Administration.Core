@@ -12,17 +12,20 @@ interface Props {
 @inject('siteTreeStore')
 @observer
 export default class ContextMenu extends React.Component<Props> {
-    private handleClick = () => {
+    private handleClick = (e: React.MouseEvent<HTMLElement>) => {
+        e.stopPropagation();
         const { siteTreeStore, node } = this.props;
         siteTreeStore.handleContextMenu(node);
     }
 
     render() {
-        return (
+        const { node } = this.props;
+        return node.isSelected ?
             <Popover
                 content={<ElementMenu />}
                 position={Position.RIGHT}
                 autoFocus={false}
+                isOpen={node.isContextMenuActive}
             >
                 <Button
                     icon="cog"
@@ -30,6 +33,6 @@ export default class ContextMenu extends React.Component<Props> {
                     onClick={this.handleClick}
                 />
             </Popover>
-        );
+            : null;
     }
 }

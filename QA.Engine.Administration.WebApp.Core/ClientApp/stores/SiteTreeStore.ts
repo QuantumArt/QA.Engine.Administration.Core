@@ -12,15 +12,16 @@ enum TreeState {
 }
 
 export interface ITreeElement extends ITreeNode {
+    childNodes: ITreeElement[];
     parentId: number;
-    isContextMenuActive: boolean; // brings in a controlled menu, not used now
+    isContextMenuActive: boolean;
 }
 
 export default class SiteTreeStore {
     @observable public siteTreeState: TreeState = TreeState.NONE;
     @observable public tree: ITreeElement[] = [];
 
-    @action.bound
+    @action
     public handleNodeExpand = (nodeData: ITreeElement) => {
         if (nodeData.childNodes.length !== 0 && nodeData.parentId !== null) {
             nodeData.icon = 'folder-open';
@@ -28,7 +29,7 @@ export default class SiteTreeStore {
         nodeData.isExpanded = true;
     }
 
-    @action.bound
+    @action
     public handleNodeCollapse = (nodeData: ITreeElement) => {
         if (nodeData.childNodes.length !== 0 && nodeData.parentId !== null) {
             nodeData.icon = 'folder-close';
@@ -36,7 +37,17 @@ export default class SiteTreeStore {
         nodeData.isExpanded = false;
     }
 
-    @action.bound
+    @action
+    public handleNodeClick = (nodeData: ITreeElement) => {
+        const originallySelected = nodeData.isSelected;
+        this.forEachNode(this.tree, (n) => {
+            n.isSelected = false;
+            n.isContextMenuActive = false;
+        });
+        nodeData.isSelected = originallySelected == null ? true : !originallySelected;
+    }
+
+    @action
     public handleContextMenu = (nodeData: ITreeElement) => {
         nodeData.isContextMenuActive = !nodeData.isContextMenuActive;
     }
@@ -101,5 +112,15 @@ export default class SiteTreeStore {
         const tree: ITreeElement[] = [];
         hMap.forEach(el => el.parentId === null && tree.push(el));
         this.tree = tree;
+    }
+
+    private forEachNode(nodes: ITreeElement[], cb: (node: ITreeElement) => void): void {
+        if (nodes === null) {
+            return;
+        }
+        for (const node of nodes) {
+            cb(node);
+            this.forEachNode(node.childNodes, cb);
+        }
     }
 }
