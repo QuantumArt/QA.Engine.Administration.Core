@@ -1,9 +1,12 @@
+using QA.Engine.Administration.WebApp.Core.Annotations;
+
 namespace QA.Engine.Administration.WebApp.Core.Models
 {
     /// <summary>
     /// Модель для редактирования
     /// </summary>
-    public class EditRequestModel
+    [TypeScriptType]
+    public class EditModel
     {
         /// <summary>
         /// Id элемента

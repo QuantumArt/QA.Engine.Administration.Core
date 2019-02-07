@@ -1,7 +1,7 @@
-import HttpService from './httpService';
+import HttpService from './HttpService';
 
-class SiteTreeService extends HttpService<Models.PageViewModel[]> {
-    public async getSiteTree(): Promise<Models.PageViewModel[]> {
+class SiteTreeService extends HttpService<PageViewModel[]> {
+    public async getSiteTree(): Promise<PageViewModel[]> {
         try {
             return await this.get('/api/SiteMap/getAllItems');
         } catch (e) {

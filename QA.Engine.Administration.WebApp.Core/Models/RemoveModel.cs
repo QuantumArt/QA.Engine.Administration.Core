@@ -1,9 +1,12 @@
+using QA.Engine.Administration.WebApp.Core.Annotations;
+
 namespace QA.Engine.Administration.WebApp.Core.Models
 {
     /// <summary>
     /// Модель для перемещения элемена в архив
     /// </summary>
-    public class RemoveRequestModel
+    [TypeScriptType]
+    public class RemoveModel
     {
         /// <summary>
         /// Id элемента

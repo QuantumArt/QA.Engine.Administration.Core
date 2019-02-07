@@ -1,9 +1,12 @@
+using QA.Engine.Administration.WebApp.Core.Annotations;
+
 namespace QA.Engine.Administration.WebApp.Core.Models
 {
     /// <summary>
     /// Модель для изменения родительского элемента
     /// </summary>
-    public class MoveRequestModel
+    [TypeScriptType]
+    public class MoveModel
     {
         /// <summary>
         /// Id страницы, родительский элемент у которой хотим изменить

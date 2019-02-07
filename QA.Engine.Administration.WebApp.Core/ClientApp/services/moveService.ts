@@ -1,11 +1,11 @@
-import HttpService from './httpService';
+import HttpService from './HttpService';
 
 class MoveService extends HttpService<void> {
     public async move(itemId: number, newParentId: number): Promise<boolean> {
         try {
-            const model = <Models.MoveRequestModel>{
-                itemId: itemId,
-                newParentId: newParentId
+            const model = <MoveModel>{
+                itemId,
+                newParentId,
             };
             return await this.post('/api/SiteMap/move', model);
         } catch (e) {

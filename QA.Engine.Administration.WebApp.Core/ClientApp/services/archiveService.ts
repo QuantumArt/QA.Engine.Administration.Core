@@ -1,7 +1,7 @@
-import HttpService from './httpService';
+import HttpService from './HttpService';
 
-class ArchiveService extends HttpService<Models.ArchiveViewModel> {
-    public async getArchive(): Promise<Models.ArchiveViewModel> {
+class ArchiveService extends HttpService<ArchiveViewModel> {
+    public async getArchive(): Promise<ArchiveViewModel> {
         try {
             return await this.get('/api/SiteMap/getAllArchiveItems');
         } catch (e) {

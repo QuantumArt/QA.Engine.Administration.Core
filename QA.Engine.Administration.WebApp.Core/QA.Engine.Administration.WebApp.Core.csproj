@@ -15,6 +15,8 @@
   <ItemGroup>
     <None Remove="ClientApp\services\archiveService.ts" />
     <None Remove="ClientApp\services\httpService.ts" />
+    <None Remove="ClientApp\services\moveService.ts" />
+    <None Remove="ClientApp\services\removeService.ts" />
     <None Remove="ClientApp\stores\ArchiveStore.ts" />
   </ItemGroup>
 
@@ -36,41 +38,46 @@
   <ItemGroup>
     <TypeScriptCompile Include="ClientApp\services\archiveService.ts" />
     <TypeScriptCompile Include="ClientApp\services\httpService.ts" />
+    <TypeScriptCompile Include="ClientApp\services\removeService.ts" />
+    <TypeScriptCompile Include="ClientApp\services\moveService.ts" />
     <TypeScriptCompile Include="ClientApp\stores\ArchiveStore.ts" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="ClientApp\models\ArchiveViewModel.ts">
+    <None Update="ClientApp\types\ArchiveModel.d.ts">
+      <CustomToolNamespace>Models\ArchiveModel.cs</CustomToolNamespace>
+    </None>
+    <None Update="ClientApp\types\ArchiveViewModel.d.ts">
       <CustomToolNamespace>Models\ArchiveViewModel.cs</CustomToolNamespace>
     </None>
-    <None Update="ClientApp\models\DiscriminatorViewModel.ts">
+    <None Update="ClientApp\types\DeleteModel.d.ts">
+      <CustomToolNamespace>Models\DeleteModel.cs</CustomToolNamespace>
+    </None>
+    <None Update="ClientApp\types\DiscriminatorViewModel.d.ts">
       <CustomToolNamespace>Models\DiscriminatorViewModel.cs</CustomToolNamespace>
     </None>
-    <None Update="ClientApp\models\PageViewModel.ts">
+    <None Update="ClientApp\types\EditModel.d.ts">
+      <CustomToolNamespace>Models\EditModel.cs</CustomToolNamespace>
+    </None>
+    <None Update="ClientApp\types\MoveModel.d.ts">
+      <CustomToolNamespace>Models\MoveModel.cs</CustomToolNamespace>
+    </None>
+    <None Update="ClientApp\types\PageViewModel.d.ts">
       <CustomToolNamespace>Models\PageViewModel.cs</CustomToolNamespace>
     </None>
-    <None Update="ClientApp\models\RegionViewModel.ts">
+    <None Update="ClientApp\types\RegionViewModel.d.ts">
       <CustomToolNamespace>Models\RegionViewModel.cs</CustomToolNamespace>
     </None>
-    <None Update="ClientApp\models\request\DeleteRequestModel.ts">
-      <CustomToolNamespace>Models\DeleteRequestModel.cs</CustomToolNamespace>
+    <None Update="ClientApp\types\RemoveModel.d.ts">
+      <CustomToolNamespace>Models\RemoveModel.cs</CustomToolNamespace>
     </None>
-    <None Update="ClientApp\models\request\EditRequestModel.ts">
-      <CustomToolNamespace>Models\EditRequestModel.cs</CustomToolNamespace>
+    <None Update="ClientApp\types\ReorderModel.d.ts">
+      <CustomToolNamespace>Models\ReorderModel.cs</CustomToolNamespace>
     </None>
-    <None Update="ClientApp\models\request\MoveRequestModel.ts">
-      <CustomToolNamespace>Models\MoveRequestModel.cs</CustomToolNamespace>
+    <None Update="ClientApp\types\RestoreModel.d.ts">
+      <CustomToolNamespace>Models\RestoreModel.cs</CustomToolNamespace>
     </None>
-    <None Update="ClientApp\models\request\RemoveRequestModel.ts">
-      <CustomToolNamespace>Models\RemoveRequestModel.cs</CustomToolNamespace>
-    </None>
-    <None Update="ClientApp\models\request\ReorderRequestModel.ts">
-      <CustomToolNamespace>Models\ReorderRequestModel.cs</CustomToolNamespace>
-    </None>
-    <None Update="ClientApp\models\request\RestoreRequestModel.ts">
-      <CustomToolNamespace>Models\RestoreRequestModel.cs</CustomToolNamespace>
-    </None>
-    <None Update="ClientApp\models\WidgetViewModel.ts">
+    <None Update="ClientApp\types\WidgetViewModel.d.ts">
       <CustomToolNamespace>Models\WidgetViewModel.cs</CustomToolNamespace>
     </None>
   </ItemGroup>

@@ -1,13 +1,13 @@
-import HttpService from './httpService';
+import HttpService from './HttpService';
 
 class RemoveService extends HttpService<void> {
     public async remove(itemId: number): Promise<boolean> {
         try {
-            const model = <Models.RemoveRequestModel>{
-                itemId: itemId,
+            const model = <RemoveModel>{
+                itemId,
                 isDeleteAllVersions: true,
                 isDeleteContentVersions: true,
-                contentVersionId: null
+                contentVersionId: null,
             };
             return await this.post('/api/SiteMap/remove', model);
         } catch (e) {

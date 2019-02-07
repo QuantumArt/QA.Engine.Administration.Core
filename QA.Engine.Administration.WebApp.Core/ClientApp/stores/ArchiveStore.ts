@@ -1,15 +1,15 @@
 import { action } from 'mobx';
-import archiveService from 'services/archiveService';
-import removeService from 'services/removeService';
+import ArchiveService from 'services/ArchiveService';
+import RemoveService from 'services/RemoveService';
 
 export default class ArchiveStore {
-    public Archive: Models.ArchiveViewModel;
+    public archive: ArchiveViewModel;
 
     @action
     public async fetchSiteTree() {
         try {
-            const result: Models.ArchiveViewModel = await archiveService.getArchive();
-            this.Archive = result;
+            const result: ArchiveViewModel = await ArchiveService.getArchive();
+            this.archive = result;
             console.log(result);
         } catch (e) {
             console.error(e);
@@ -19,7 +19,7 @@ export default class ArchiveStore {
     @action
     public async fetchTest() {
         try {
-            const result: boolean = await removeService.remove(741210);
+            const result: boolean = await RemoveService.remove(741210);
             console.log(result);
         } catch (e) {
             console.error(e);

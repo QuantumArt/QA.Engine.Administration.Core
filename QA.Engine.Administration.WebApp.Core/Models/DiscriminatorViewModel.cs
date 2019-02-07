@@ -1,5 +1,8 @@
+using QA.Engine.Administration.WebApp.Core.Annotations;
+
 namespace QA.Engine.Administration.WebApp.Core.Models
 {
+    [TypeScriptType]
     public class DiscriminatorViewModel
     {
         public int Id { get; set; }

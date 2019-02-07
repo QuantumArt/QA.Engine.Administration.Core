@@ -11,13 +11,13 @@ abstract class HttpService<T> {
         const headers = new Headers();
         headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
         const init = {
+            headers,
             method: 'GET',
-            headers: headers
         };
 
         const res = await fetch(path, init);
 
-        var result = await <Promise<ApiResult<T>>>res.json();
+        const result = await <Promise<ApiResult<T>>>res.json();
         console.log(`api get '${path}' result`, result);
 
         if (!result.isSuccess) {
@@ -34,14 +34,14 @@ abstract class HttpService<T> {
         headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
         headers.append('Content-Type', 'application/json');
         const init = {
+            headers,
             method: 'POST',
-            headers: headers,
-            body: JSON.stringify(model)
+            body: JSON.stringify(model),
         };
 
         const res = await fetch(path, init);
 
-        var result = await <Promise<ApiResult<null>>>res.json();
+        const result = await <Promise<ApiResult<null>>>res.json();
         console.log(`api post '${path}' result`, result);
 
         if (!result.isSuccess) {
@@ -56,7 +56,7 @@ abstract class HttpService<T> {
         const getQueryVariable = (variable: string) => {
             const result = window.location.search.substring(1).split('&')
                 .map(x => ({ name: x.split('=')[0], value: x.split('=')[1] }))
-                .filter(x => x.name == variable)[0];
+                .filter(x => x.name === variable)[0];
             return result == null ? null : result.value;
         };
 
@@ -64,7 +64,7 @@ abstract class HttpService<T> {
             BackendSid: getQueryVariable('backend_sid'),
             CustomerCode: getQueryVariable('customerCode'),
             HostId: getQueryVariable('hostUID'),
-            SiteId: getQueryVariable('site_id')
+            SiteId: getQueryVariable('site_id'),
         };
     }
 

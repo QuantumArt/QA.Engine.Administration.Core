@@ -67,11 +67,11 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("getAllArchiveItems")]
-        public ApiResult<ArchiveViewModel> GetAllArchiveItems()
+        public ApiResult<Models.ArchiveViewModel> GetAllArchiveItems()
         {
             var archive = _siteMapService.GetArchiveStructure(_siteId);
-            var result = _mapper.Map<ArchiveViewModel>(archive);
-            return ApiResult<ArchiveViewModel>.Success(result);
+            var result = _mapper.Map<Models.ArchiveViewModel>(archive);
+            return ApiResult<Models.ArchiveViewModel>.Success(result);
         }
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost("reorder")]
-        public ApiResult Reorder([FromBody]ReorderRequestModel model)
+        public ApiResult Reorder([FromBody]ReorderModel model)
         {
             try
             {
@@ -162,7 +162,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost("move")]
-        public ApiResult Move([FromBody]MoveRequestModel model)
+        public ApiResult Move([FromBody]MoveModel model)
         {
             try
             {
@@ -182,7 +182,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost("edit")]
-        public ApiResult Edit([FromBody]EditRequestModel model)
+        public ApiResult Edit([FromBody]EditModel model)
         {
             try
             {
@@ -202,7 +202,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost("remove")]
-        public ApiResult Remove([FromBody]RemoveRequestModel model)
+        public ApiResult Remove([FromBody]RemoveModel model)
         {
             try
             {
@@ -226,7 +226,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost("restore")]
-        public ApiResult Restore([FromBody]RestoreRequestModel model)
+        public ApiResult Restore([FromBody]RestoreModel model)
         {
             try
             {
@@ -251,7 +251,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost("delete")]
-        public ApiResult Delete([FromBody]DeleteRequestModel model)
+        public ApiResult Delete([FromBody]DeleteModel model)
         {
             try
             {

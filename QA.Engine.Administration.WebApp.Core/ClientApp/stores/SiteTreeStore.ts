@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { action, observable } from 'mobx';
-import siteTreeService from 'services/siteTreeService';
+import SiteTreeService from 'services/SiteTreeService';
 import { IconName, ITreeNode } from '@blueprintjs/core';
 import ContextMenu from 'components/SiteTree/ContextMenu';
 
@@ -56,7 +56,7 @@ export default class SiteTreeStore {
     public async fetchSiteTree() {
         this.siteTreeState = TreeState.PENDING;
         try {
-            const res: Models.PageViewModel[] = await siteTreeService.getSiteTree();
+            const res: PageViewModel[] = await SiteTreeService.getSiteTree();
             this.siteTreeState = TreeState.SUCCESS;
             this.convertTree(res);
         } catch (e) {
@@ -65,9 +65,9 @@ export default class SiteTreeStore {
         }
     }
 
-    private convertTree(data: Models.PageViewModel[]): void {
+    private convertTree(data: PageViewModel[]): void {
         const hMap = new Map<number, ITreeElement>();
-        const mapElement = (el: Models.PageViewModel): ITreeElement => {
+        const mapElement = (el: PageViewModel): ITreeElement => {
             const hasChildren = el.children.length !== 0;
             const isRootNode = el.parentId === null;
             const getIcon = (): IconName => {
@@ -96,8 +96,8 @@ export default class SiteTreeStore {
 
             return treeElement;
         };
-        const mapSubtree = (elements: Models.PageViewModel[]): void => {
-            elements.forEach((el: Models.PageViewModel) => {
+        const mapSubtree = (elements: PageViewModel[]): void => {
+            elements.forEach((el: PageViewModel) => {
                 if (el.children.length !== 0) {
                     hMap.set(el.id, mapElement(el));
                     mapSubtree(el.children);

@@ -1,9 +1,12 @@
+using QA.Engine.Administration.WebApp.Core.Annotations;
+
 namespace QA.Engine.Administration.WebApp.Core.Models
 {
     /// <summary>
     /// Модель для окончательного удаления элемента
     /// </summary>
-    public class DeleteRequestModel
+    [TypeScriptType]
+    public class DeleteModel
     {
         /// <summary>
         /// Id элемента

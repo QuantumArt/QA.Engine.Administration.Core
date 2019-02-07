@@ -1,9 +1,12 @@
+using QA.Engine.Administration.WebApp.Core.Annotations;
+
 namespace QA.Engine.Administration.WebApp.Core.Models
 {
     /// <summary>
     /// Модель для изменения отображаемой сортировки страниц
     /// </summary>
-    public class ReorderRequestModel
+    [TypeScriptType]
+    public class ReorderModel
     {
         /// <summary>
         /// Id страницы, позицию которой хотим изменить

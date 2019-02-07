@@ -1,9 +1,12 @@
+using QA.Engine.Administration.WebApp.Core.Annotations;
+
 namespace QA.Engine.Administration.WebApp.Core.Models
 {
     /// <summary>
     /// Восстановление из архива, возможно только  в случае наличия родительского элемента не в архиве
     /// </summary>
-    public class RestoreRequestModel
+    [TypeScriptType]
+    public class RestoreModel
     {
         /// <summary>
         /// Id элемента
