@@ -1,10 +1,11 @@
 import * as React from 'react';
 import { action, observable } from 'mobx';
-import siteTreeService from 'services/siteTreeService';
 import { IconName, ITreeNode } from '@blueprintjs/core';
 import ContextMenu from 'components/SiteTree/ContextMenu';
+import siteTreeService from 'services/siteTreeService';
+import { tabsStore } from './index';
 
-enum TreeState {
+export enum TreeState {
     NONE,
     PENDING,
     ERROR,
@@ -15,11 +16,12 @@ export interface ITreeElement extends ITreeNode {
     childNodes: ITreeElement[];
     parentId: number;
     isContextMenuActive: boolean;
+    label: string;
 }
 
 export default class SiteTreeStore {
     @observable public siteTreeState: TreeState = TreeState.NONE;
-    @observable public tree: ITreeElement[] = [];
+    @observable public tree: ITreeElement[];
 
     @action
     public handleNodeExpand = (nodeData: ITreeElement) => {
@@ -45,6 +47,7 @@ export default class SiteTreeStore {
             n.isContextMenuActive = false;
         });
         nodeData.isSelected = originallySelected == null ? true : !originallySelected;
+        tabsStore.setTabData(nodeData);
     }
 
     @action
