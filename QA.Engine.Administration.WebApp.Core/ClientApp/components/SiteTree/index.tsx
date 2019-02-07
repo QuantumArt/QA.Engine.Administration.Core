@@ -15,19 +15,16 @@ interface Props {
 @inject('siteTreeStore', 'archiveStore')
 @observer
 export default class SiteTree extends React.Component<Props> {
-    componentDidMount(): void {
-        this.props.siteTreeStore.fetchSiteTree();
-        this.props.archiveStore.fetchSiteTree();
-    }
-
     render() {
         const { siteTreeStore } = this.props;
         return (
-            <Card>
+            <Card className="tree-card">
                 <TreeR
                     contents={siteTreeStore.tree}
+                    className="site-tree"
                     onNodeCollapse={siteTreeStore.handleNodeCollapse}
                     onNodeExpand={siteTreeStore.handleNodeExpand}
+                    onNodeClick={siteTreeStore.handleNodeClick}
                 />
             </Card>
         );

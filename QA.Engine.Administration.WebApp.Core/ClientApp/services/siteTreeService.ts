@@ -61,7 +61,7 @@ export interface IDiscriminatorModel {
     preferredContentId?: number; // int32
 }
 
-class SiteTreeApi {
+class SiteTreeService {
     public async getSiteTree(): Promise<IApiResultWidgetTreeModel> {
         try {
             const params = qs.stringify({
@@ -78,5 +78,4 @@ class SiteTreeApi {
     }
 }
 
-const siteTreeService = new SiteTreeApi();
-export default siteTreeService;
+export default new SiteTreeService();

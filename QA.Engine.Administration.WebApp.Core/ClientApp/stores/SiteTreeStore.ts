@@ -1,6 +1,8 @@
+import * as React from 'react';
 import { action, observable } from 'mobx';
 import siteTreeService, { IApiResultWidgetTreeModel, ISiteTreeModel, IWidgetTreeModel } from 'services/siteTreeService';
 import { IconName, ITreeNode } from '@blueprintjs/core';
+import ContextMenu from 'components/SiteTree/ContextMenu';
 
 enum TreeState {
     NONE,
@@ -10,14 +12,16 @@ enum TreeState {
 }
 
 export interface ITreeElement extends ITreeNode {
+    childNodes: ITreeElement[];
     parentId: number;
+    isContextMenuActive: boolean;
 }
 
 export default class SiteTreeStore {
     @observable public siteTreeState: TreeState = TreeState.NONE;
     @observable public tree: ITreeElement[] = [];
 
-    @action.bound
+    @action
     public handleNodeExpand = (nodeData: ITreeElement) => {
         if (nodeData.childNodes.length !== 0 && nodeData.parentId !== null) {
             nodeData.icon = 'folder-open';
@@ -25,12 +29,27 @@ export default class SiteTreeStore {
         nodeData.isExpanded = true;
     }
 
-    @action.bound
+    @action
     public handleNodeCollapse = (nodeData: ITreeElement) => {
         if (nodeData.childNodes.length !== 0 && nodeData.parentId !== null) {
             nodeData.icon = 'folder-close';
         }
         nodeData.isExpanded = false;
+    }
+
+    @action
+    public handleNodeClick = (nodeData: ITreeElement) => {
+        const originallySelected = nodeData.isSelected;
+        this.forEachNode(this.tree, (n) => {
+            n.isSelected = false;
+            n.isContextMenuActive = false;
+        });
+        nodeData.isSelected = originallySelected == null ? true : !originallySelected;
+    }
+
+    @action
+    public handleContextMenu = (nodeData: ITreeElement) => {
+        nodeData.isContextMenuActive = !nodeData.isContextMenuActive;
     }
 
     @action
@@ -60,7 +79,8 @@ export default class SiteTreeStore {
                 }
                 return 'folder-close';
             };
-            return {
+
+            const treeElement = observable<ITreeElement>({
                 id: el.id,
                 parentId: el.parentId,
                 childNodes: [],
@@ -68,7 +88,13 @@ export default class SiteTreeStore {
                 isExpanded: false,
                 icon: getIcon(),
                 hasCaret: hasChildren,
-            };
+                isContextMenuActive: false,
+            });
+            treeElement.secondaryLabel = React.createElement(ContextMenu, {
+                node: treeElement,
+            });
+
+            return treeElement;
         };
         const mapSubtree = (elements: IWidgetTreeModel[]): void => {
             elements.forEach((el: IWidgetTreeModel) => {
@@ -86,5 +112,15 @@ export default class SiteTreeStore {
         const tree: ITreeElement[] = [];
         hMap.forEach(el => el.parentId === null && tree.push(el));
         this.tree = tree;
+    }
+
+    private forEachNode(nodes: ITreeElement[], cb: (node: ITreeElement) => void): void {
+        if (nodes === null) {
+            return;
+        }
+        for (const node of nodes) {
+            cb(node);
+            this.forEachNode(node.childNodes, cb);
+        }
     }
 }

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Provider } from 'mobx-react';
-import DevTools from 'mobx-react-devtools'
+import DevTools from 'mobx-react-devtools'; // tslint:disable-line
 import { hot } from 'react-hot-loader';
 import { Alignment, Button, Classes, Navbar, NavbarGroup, NavbarHeading } from '@blueprintjs/core';
 import '@blueprintjs/core/lib/css/blueprint.css';
@@ -14,7 +14,10 @@ import configureStores from 'stores/configureStores';
 const stores = configureStores();
 
 const app = hot(module)(() => (
-    <Provider siteTreeStore={stores.siteTreeStore} archiveStore={stores.archiveStrore}>
+    <Provider
+        siteTreeStore={stores.siteTreeStore}
+        archiveStore={stores.archiveStrore}
+    >
         <div className="layout">
             <Navbar fixedToTop>
                 <NavbarGroup align={Alignment.LEFT}>
