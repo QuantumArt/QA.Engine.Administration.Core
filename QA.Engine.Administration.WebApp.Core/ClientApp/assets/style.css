@@ -8,6 +8,32 @@ body {
     padding: 10px;
 }
 
-.tree-card {
-    min-width: 350px;
+.tree-pane {
+    width: 30%;
+    min-width: 250px;
+}
+
+.tabs-pane {
+    width: 70%;
+    margin-left: 10px;
+}
+
+.tab {
+
+}
+
+.tab-content {
+    padding: 25px 10px 0;
+}
+
+.tab-navbar {
+    /*box-shadow: none;*/
+    /*padding: 0;*/
+}
+
+.context-button.bp3-button.bp3-minimal:active,
+.context-button.bp3-button.bp3-minimal:focus,
+.context-button.bp3-button.bp3-minimal.bp3-active {
+    outline: none;
+    background: rgba(167, 182, 194, 0.5);
 }

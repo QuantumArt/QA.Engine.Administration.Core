@@ -11,12 +11,17 @@ export default class ElementMenu extends React.Component<Props> {
     render() {
         return (
             <Menu>
-                <MenuDivider title="View"/>
-                <MenuItem text="Primary" intent={Intent.PRIMARY}/>
-                <MenuItem text="Success" intent={Intent.SUCCESS}/>
-                <MenuDivider title="Edit"/>
-                <MenuItem text="Default"/>
-                <MenuItem text="Danger" intent={Intent.DANGER}/>
+                <MenuItem icon="refresh" text="Обновить"/>
+                <MenuItem icon="eye-open" text="Просмотр"/>
+                <MenuItem icon="history" text="История изменений"/>
+                <MenuDivider/>
+                <MenuItem icon="confirm" text="Публиковать" intent={Intent.SUCCESS}/>
+                <MenuDivider/>
+                <MenuItem icon="new-object" text="Добавить подраздел" intent={Intent.PRIMARY}/>
+                <MenuItem icon="add" text="Добавить версию" intent={Intent.PRIMARY}/>
+                <MenuItem icon="edit" text="Редактировать" intent={Intent.PRIMARY}/>
+                <MenuDivider/>
+                <MenuItem icon="box" text="Архивировать" intent={Intent.DANGER}/>
             </Menu>
         )
     }

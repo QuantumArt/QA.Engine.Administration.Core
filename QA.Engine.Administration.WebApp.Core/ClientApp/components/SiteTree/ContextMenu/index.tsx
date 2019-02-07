@@ -31,6 +31,7 @@ export default class ContextMenu extends React.Component<Props> {
                     icon="cog"
                     minimal
                     onClick={this.handleClick}
+                    className="context-button"
                 />
             </Popover>
             : null;

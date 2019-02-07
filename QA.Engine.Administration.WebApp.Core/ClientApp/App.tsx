@@ -9,6 +9,7 @@ import 'normalize.css/normalize.css';
 import 'assets/style.css';
 
 import SiteTree from 'components/SiteTree';
+import TabsContainer from 'components/TabsContainer';
 import configureStores from 'stores/configureStores';
 
 const stores = configureStores();
@@ -26,7 +27,8 @@ const app = hot(module)(() => (
                     <Button className={Classes.MINIMAL} icon="box" text="Archive"/>
                 </NavbarGroup>
             </Navbar>
-            <SiteTree/>
+            <SiteTree />
+            <TabsContainer />
             <DevTools />
         </div>
     </Provider>
