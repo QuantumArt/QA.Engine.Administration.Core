@@ -18,7 +18,7 @@ export default class SiteTree extends React.Component<Props> {
     render() {
         const { siteTreeStore } = this.props;
         return (
-            <Card className="tree-card">
+            <Card className="tree-pane">
                 <TreeR
                     contents={siteTreeStore.tree}
                     className="site-tree"
