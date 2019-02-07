@@ -1,4 +1,4 @@
-import * as qs from 'qs';
+import HttpService from './httpService';
 
 export interface IApiResultWidgetTreeModel {
     data?: IWidgetTreeModel[];
@@ -61,17 +61,10 @@ export interface IDiscriminatorModel {
     preferredContentId?: number; // int32
 }
 
-class SiteTreeService {
-    public async getSiteTree(): Promise<IApiResultWidgetTreeModel> {
+class SiteTreeService extends HttpService<Models.PageViewModel[]> {
+    public async getSiteTree(): Promise<Models.PageViewModel[]> {
         try {
-            const params = qs.stringify({
-                backend_sid: 'c3386b2f-e098-4dfb-a794-e774cba9fcfc',
-                customerCode: 'qa_demosite',
-                site_id: 52,
-            });
-            const res = await fetch(`/api/SiteMap/getAllItems?${params}`);
-
-            return await res.json();
+            return await this.get('/api/SiteMap/getAllItems');
         } catch (e) {
             console.log(e);
         }

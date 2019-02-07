@@ -56,18 +56,18 @@ export default class SiteTreeStore {
     public async fetchSiteTree() {
         this.siteTreeState = TreeState.PENDING;
         try {
-            const res: IApiResultWidgetTreeModel = await siteTreeService.getSiteTree();
+            const res: Models.PageViewModel[] = await siteTreeService.getSiteTree();
             this.siteTreeState = TreeState.SUCCESS;
-            this.convertTree(res.data);
+            this.convertTree(res);
         } catch (e) {
             console.log(e);
             this.siteTreeState = TreeState.ERROR;
         }
     }
 
-    private convertTree(data: ISiteTreeModel[]): void {
+    private convertTree(data: Models.PageViewModel[]): void {
         const hMap = new Map<number, ITreeElement>();
-        const mapElement = (el: ISiteTreeModel): ITreeElement => {
+        const mapElement = (el: Models.PageViewModel): ITreeElement => {
             const hasChildren = el.children.length !== 0;
             const isRootNode = el.parentId === null;
             const getIcon = (): IconName => {
@@ -96,8 +96,8 @@ export default class SiteTreeStore {
 
             return treeElement;
         };
-        const mapSubtree = (elements: IWidgetTreeModel[]): void => {
-            elements.forEach((el: IWidgetTreeModel) => {
+        const mapSubtree = (elements: Models.PageViewModel[]): void => {
+            elements.forEach((el: Models.PageViewModel) => {
                 if (el.children.length !== 0) {
                     hMap.set(el.id, mapElement(el));
                     mapSubtree(el.children);
