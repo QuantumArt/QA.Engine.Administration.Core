@@ -8,7 +8,7 @@ export default class ArchiveStore {
     public async fetchSiteTree() {
         try {
             //this.siteTreeState = TreeState.PENDING;
-            const res: Models.ArchiveViewModel = await archiveService.getSiteTree();
+            const res: Models.ArchiveViewModel = await archiveService.getArchive();
             this.Archive = res;
             console.log(res);
         } catch (e) {

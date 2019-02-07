@@ -1,16 +1,9 @@
-import * as qs from 'qs';
+import HttpService from './httpService';
 
-class ArchiveService {
-    public async getSiteTree(): Promise<Models.ArchiveViewModel> {
+class ArchiveService extends HttpService<Models.ArchiveViewModel> {
+    public async getArchive(): Promise<Models.ArchiveViewModel> {
         try {
-            const params = qs.stringify({
-                backend_sid: 'c3386b2f-e098-4dfb-a794-e774cba9fcfc',
-                customerCode: 'qa_demosite',
-                site_id: 52,
-            });
-            const res = await fetch(`/api/SiteMap/getAllArchiveItems?${params}`);
-
-            return await res.json();
+            return await this.get('/api/SiteMap/getAllArchiveItems');
         } catch (e) {
             console.log(e);
         }

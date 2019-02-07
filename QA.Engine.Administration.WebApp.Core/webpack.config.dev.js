@@ -14,7 +14,8 @@ module.exports = {
         path: path.join(__dirname, 'wwwroot/dist'),
         publicPath: '/'
     },
-    devtool: 'eval',
+    //devtool: 'eval',
+    devtool: 'source-map',
     resolve: {
         extensions: ['.ts', '.tsx', '.js', '.json'],
         modules: ['node_modules'],
@@ -80,6 +81,7 @@ module.exports = {
         proxy: {
             '/api': 'http://localhost:3001',
         },
-        open: true
+        open: true,
+        openPage: '?backend_sid=c3386b2f-e098-4dfb-a794-e774cba9fcfc&site_id=52&param_name=site_id&customerCode=qa_demosite&actionCode=custom_635494192491212659&hostUID=fc4a5aa1-48b9-4a3a-84c1-bcd99a8a8ff3'
     }
 };
