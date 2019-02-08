@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { inject, observer } from 'mobx-react';
 import { Button, Popover, Position } from '@blueprintjs/core';
-import SiteTreeStore, { ITreeElement } from 'stores/SiteTreeStore';
+import { SiteTreeState, ITreeElement } from 'stores/SiteTreeStore';
 import ElementMenu from './ElementMenu';
 
 interface Props {
-    siteTreeStore?: SiteTreeStore;
+    siteTreeStore?: SiteTreeState;
     node: ITreeElement;
 }
 

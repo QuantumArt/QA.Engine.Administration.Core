@@ -1,7 +1,7 @@
 import { action, observable } from 'mobx';
 import { ITreeElement } from './SiteTreeStore';
 
-export enum TabsState {
+export enum TabTypes {
     NONE,
     COMMON,
     WIDGETS,
@@ -12,12 +12,12 @@ export interface ITabData {
     label: string;
 }
 
-export default class TabsStore {
-    @observable currentTab: TabsState = TabsState.NONE;
+export class TabsState {
+    @observable currentTab: TabTypes = TabTypes.NONE;
     @observable tabData: ITabData = null;
 
     @action
-    setTab = (id: TabsState) => {
+    setTab = (id: TabTypes) => {
         this.currentTab = id;
     }
 
@@ -25,9 +25,9 @@ export default class TabsStore {
     setTabData = (nodeData: ITreeElement) => {
         if (nodeData.isSelected) {
             this.tabData = this.extractData(nodeData);
-            this.currentTab = TabsState.COMMON;
+            this.currentTab = TabTypes.COMMON;
         } else {
-            this.currentTab = TabsState.NONE;
+            this.currentTab = TabTypes.NONE;
             this.tabData = null;
         }
     }
@@ -39,3 +39,6 @@ export default class TabsStore {
         };
     }
 }
+
+const tabsStore = new TabsState();
+export default tabsStore;

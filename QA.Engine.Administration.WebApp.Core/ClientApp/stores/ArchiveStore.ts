@@ -1,7 +1,11 @@
 import { action } from 'mobx';
 import SiteMapService from 'services/SiteMapService';
 
-export default class ArchiveStore {
+export class ArchiveState {
+    constructor() {
+        this.fetchSiteTree();
+    }
+
     public archive: ArchiveViewModel;
 
     @action
@@ -35,3 +39,6 @@ export default class ArchiveStore {
         }
     }
 }
+
+const archiveStore = new ArchiveState();
+export default archiveStore;

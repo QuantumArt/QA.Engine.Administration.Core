@@ -5,11 +5,13 @@
   "author": "QuantumArt",
   "license": "ISC",
   "scripts": {
+    "build": "webpack --config webpack.config.prod.js",
     "start:dev": "webpack-dev-server --config webpack.config.dev.js",
     "clean": "rimraf wwwroot/*"
   },
   "dependencies": {
     "@blueprintjs/core": "^3.12.0",
+    "classnames": "^2.2.6",
     "lodash": "^4.17.11",
     "mobx": "^5.8.0",
     "mobx-react": "^5.4.3",
@@ -17,6 +19,7 @@
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
     "react-hot-loader": "^4.6.3",
+    "tslib": "^1.9.3",
     "tslint": "^5.12.1"
   },
   "devDependencies": {
@@ -27,6 +30,7 @@
     "@babel/preset-env": "^7.2.3",
     "@babel/preset-react": "^7.0.0",
     "@babel/preset-typescript": "^7.1.0",
+    "@types/classnames": "^2.2.7",
     "@types/lodash": "^4.14.120",
     "@types/node": "^10.12.18",
     "@types/qs": "^6.5.1",

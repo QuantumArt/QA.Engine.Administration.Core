@@ -1,16 +1,16 @@
 import * as React from 'react';
 import { inject, observer } from 'mobx-react';
-import { Tree, Card } from '@blueprintjs/core';
-import SiteTreeStore from 'stores/SiteTreeStore';
-import ArchiveStore from 'stores/ArchiveStore';
+import { Card, Tree, Spinner } from '@blueprintjs/core';
+import { SiteTreeState } from 'stores/SiteTreeStore';
+import { ArchiveState } from 'stores/ArchiveStore';
 import TreeState from 'enums/TreeState';
 
 @observer
 class TreeR extends Tree {}
 
 interface Props {
-    siteTreeStore?: SiteTreeStore;
-    archiveStore?: ArchiveStore;
+    siteTreeStore?: SiteTreeState;
+    archiveStore?: ArchiveState;
 }
 
 @inject('siteTreeStore', 'archiveStore')
@@ -18,16 +18,19 @@ interface Props {
 export default class SiteTree extends React.Component<Props> {
     render() {
         const { siteTreeStore } = this.props;
-        console.log('TreeState', TreeState);
+        const isLoading = siteTreeStore.siteTreeState === TreeState.NONE || siteTreeStore.siteTreeState === TreeState.PENDING;
         return (
             <Card className="tree-pane">
-                <TreeR
-                    contents={siteTreeStore.tree}
-                    className="site-tree"
-                    onNodeCollapse={siteTreeStore.handleNodeCollapse}
-                    onNodeExpand={siteTreeStore.handleNodeExpand}
-                    onNodeClick={siteTreeStore.handleNodeClick}
-                />
+                {isLoading ?
+                    <Spinner size={30} /> :
+                    <TreeR
+                        contents={siteTreeStore.tree}
+                        className="site-tree"
+                        onNodeCollapse={siteTreeStore.handleNodeCollapse}
+                        onNodeExpand={siteTreeStore.handleNodeExpand}
+                        onNodeClick={siteTreeStore.handleNodeClick}
+                    />
+                }
             </Card>
         );
     }

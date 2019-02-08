@@ -1,18 +1,18 @@
 import * as React from 'react';
 import { observer, inject } from 'mobx-react';
 import { Card, Tabs, Tab, TabId } from '@blueprintjs/core';
-import TabsStore, { TabsState } from 'stores/TabsStore';
+import { TabTypes, TabsState } from 'stores/TabsStore';
 import CommonTab from './CommonTab';
 import WidgetsTab from './WidgetsTab';
 
 interface Props {
-    tabsStore?: TabsStore;
+    tabsStore?: TabsState;
 }
 
 @inject('tabsStore')
 @observer
 export default class TabsContainer extends React.Component<Props> {
-    private handleChange = (newTabId: TabId & TabsState) => {
+    private handleChange = (newTabId: TabId & TabTypes) => {
         const { tabsStore } = this.props;
         if (tabsStore.tabData !== null) {
             tabsStore.setTab(newTabId);
@@ -29,8 +29,8 @@ export default class TabsContainer extends React.Component<Props> {
                     id="element-view"
                     animate
                 >
-                    <Tab id={TabsState.COMMON} title="Common" panel={<CommonTab data={tabsStore.tabData} />} />
-                    <Tab id={TabsState.WIDGETS} title="Widgets" panel={<WidgetsTab />} />
+                    <Tab id={TabTypes.COMMON} title="Common" panel={<CommonTab data={tabsStore.tabData} />} />
+                    <Tab id={TabTypes.WIDGETS} title="Widgets" panel={<WidgetsTab />} />
                 </Tabs>
             </Card>
         );

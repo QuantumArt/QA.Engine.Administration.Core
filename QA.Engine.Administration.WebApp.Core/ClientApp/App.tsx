@@ -6,17 +6,19 @@ import { Alignment, Button, Classes, Navbar, NavbarGroup, NavbarHeading } from '
 import '@blueprintjs/core/lib/css/blueprint.css';
 import '@blueprintjs/icons/lib/css/blueprint-icons.css';
 import 'normalize.css/normalize.css';
-import 'assets/style.css';
 
+import 'assets/style.css';
 import SiteTree from 'components/SiteTree';
 import TabsContainer from 'components/TabsContainer';
-import { siteTreeStore, archiveStrore, tabsStore } from './stores';
+import SiteTreeStore from 'stores/SiteTreeStore';
+import TabsStore from 'stores/TabsStore';
+import ArchiveStore from 'stores/ArchiveStore';
 
 const app = hot(module)(() => (
     <Provider
-        siteTreeStore={siteTreeStore}
-        archiveStore={archiveStrore}
-        tabsStore={tabsStore}
+        siteTreeStore={SiteTreeStore}
+        archiveStore={ArchiveStore}
+        tabsStore={TabsStore}
     >
         <div className="layout">
             <Navbar fixedToTop>

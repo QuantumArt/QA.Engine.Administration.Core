@@ -4,7 +4,7 @@ import { IconName, ITreeNode } from '@blueprintjs/core';
 import ContextMenu from 'components/SiteTree/ContextMenu';
 import TreeState from 'enums/TreeState';
 import SiteMapService from 'services/SiteMapService';
-import { tabsStore } from './index';
+import TabsStore from './TabsStore';
 
 export interface ITreeElement extends ITreeNode {
     childNodes: ITreeElement[];
@@ -13,7 +13,11 @@ export interface ITreeElement extends ITreeNode {
     label: string;
 }
 
-export default class SiteTreeStore {
+export class SiteTreeState {
+    constructor() {
+        this.fetchSiteTree();
+    }
+
     @observable public siteTreeState: TreeState = TreeState.NONE;
     @observable public tree: ITreeElement[];
 
@@ -41,7 +45,7 @@ export default class SiteTreeStore {
             n.isContextMenuActive = false;
         });
         nodeData.isSelected = originallySelected == null ? true : !originallySelected;
-        tabsStore.setTabData(nodeData);
+        TabsStore.setTabData(nodeData);
     }
 
     @action
@@ -125,3 +129,6 @@ export default class SiteTreeStore {
         }
     }
 }
+
+const siteTreeStore = new SiteTreeState();
+export default siteTreeStore;
