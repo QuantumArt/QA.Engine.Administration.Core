@@ -1,6 +1,6 @@
-// const webpack = require('webpack');
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
     mode: 'development',
@@ -66,7 +66,11 @@ module.exports = {
         new HtmlWebpackPlugin({
             title: 'Dev Mode',
             template: 'ClientApp/assets/index.html'
-        })
+        }),
+        CopyWebpackPlugin([{
+            from: './ClientApp/assets/pmrpc.js',
+            to: './scripts'
+        }])
     ],
     optimization: {
     },

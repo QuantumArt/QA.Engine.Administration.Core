@@ -3,7 +3,7 @@ import SiteMapService from 'services/SiteMapService';
 
 export class ArchiveState {
     constructor() {
-        this.fetchSiteTree();
+        // this.fetchSiteTree();
     }
 
     public archive: ArchiveViewModel;

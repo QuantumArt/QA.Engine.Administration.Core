@@ -8,21 +8,64 @@ interface Props {
 
 @observer
 export default class ElementMenu extends React.Component<Props> {
+    private handleClick = (e: React.MouseEvent<HTMLElement>, cb: () => void) => {
+        e.stopPropagation();
+        cb();
+    }
+
+    private handlerExample = () => {
+        // example method for menu action. Will be taken from some store in the future.
+        console.log('click');
+    }
+
     render() {
         return (
             <Menu>
-                <MenuItem icon="refresh" text="Обновить"/>
-                <MenuItem icon="eye-open" text="Просмотр"/>
-                <MenuItem icon="history" text="История изменений"/>
+                <MenuItem
+                    onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.handlerExample)}
+                    icon="refresh"
+                    text="Обновить"
+                />
+                <MenuItem
+                    onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.handlerExample)}
+                    icon="eye-open"
+                    text="Просмотр"
+                />
+                <MenuItem
+                    onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.handlerExample)}
+                    icon="history"
+                    text="История изменений"
+                />
                 <MenuDivider/>
-                <MenuItem icon="confirm" text="Публиковать" intent={Intent.SUCCESS}/>
+                <MenuItem
+                    onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.handlerExample)}
+                    icon="confirm"
+                    text="Публиковать"
+                    intent={Intent.SUCCESS}
+                />
                 <MenuDivider/>
-                <MenuItem icon="new-object" text="Добавить подраздел" intent={Intent.PRIMARY}/>
-                <MenuItem icon="add" text="Добавить версию" intent={Intent.PRIMARY}/>
-                <MenuItem icon="edit" text="Редактировать" intent={Intent.PRIMARY}/>
+                <MenuItem
+                    onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.handlerExample)}
+                    icon="new-object"
+                    text="Добавить подраздел"
+                    intent={Intent.PRIMARY}/>
+                <MenuItem
+                    onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.handlerExample)}
+                    icon="add"
+                    text="Добавить версию"
+                    intent={Intent.PRIMARY}/>
+                <MenuItem
+                    onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.handlerExample)}
+                    icon="edit"
+                    text="Редактировать"
+                    intent={Intent.PRIMARY}/>
                 <MenuDivider/>
-                <MenuItem icon="box" text="Архивировать" intent={Intent.DANGER}/>
+                <MenuItem
+                    onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.handlerExample)}
+                    icon="box"
+                    text="Архивировать"
+                    intent={Intent.DANGER}/>
             </Menu>
-        )
+        );
     }
 }

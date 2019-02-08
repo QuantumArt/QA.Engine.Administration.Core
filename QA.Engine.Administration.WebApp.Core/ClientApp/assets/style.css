@@ -17,19 +17,11 @@ body {
 .tabs-pane {
     width: 70%;
     margin-left: 10px;
-}
-
-.tab {
-
+    z-index: 1;
 }
 
 .tab-content {
     padding: 25px 10px 0;
-}
-
-.tab-navbar {
-    /*box-shadow: none;*/
-    /*padding: 0;*/
 }
 
 .context-button.bp3-button.bp3-minimal:active,

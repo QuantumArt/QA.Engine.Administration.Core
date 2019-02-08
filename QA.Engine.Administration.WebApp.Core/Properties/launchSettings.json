@@ -33,6 +33,15 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
+    "Development Bee": {
+      "commandName": "Project",
+      "launchBrowser": false,
+      "launchUrl": "?backend_sid=98156264-5519-472e-8928-a23a0d0b0238&site_id=35&param_name=site_id&customerCode=qp_beeline_main_ge&actionCode=custom_634901353592264365&hostUID=c9dc51c6-6f19-4c72-942b-6da8f1b7d362",
+      "applicationUrl": "http://localhost:3001",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
     "QA.Engine.Administration.WebApp.Core": {
       "commandName": "Project",
       "launchBrowser": true,

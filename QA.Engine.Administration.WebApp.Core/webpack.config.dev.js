@@ -2,6 +2,7 @@ const webpack = require('webpack');
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
     mode: 'development',
@@ -14,7 +15,6 @@ module.exports = {
         path: path.join(__dirname, 'wwwroot/dist'),
         publicPath: '/'
     },
-    //devtool: 'eval',
     devtool: 'source-map',
     resolve: {
         extensions: ['.ts', '.tsx', '.js', '.json'],
@@ -31,7 +31,7 @@ module.exports = {
         rules: [
             {
                 test: /\.tsx?$/,
-                // exclude: /node_modules/,
+                exclude: /node_modules/,
                 use: {
                     loader: 'babel-loader'
                 }
@@ -71,7 +71,11 @@ module.exports = {
         new HtmlWebpackPlugin({
             title: 'Dev Mode',
             template: 'ClientApp/assets/index.html'
-        })
+        }),
+        CopyWebpackPlugin([{
+            from: './ClientApp/assets/pmrpc.js',
+            to: './scripts'
+        }])
     ],
     optimization: {
         namedModules: true
