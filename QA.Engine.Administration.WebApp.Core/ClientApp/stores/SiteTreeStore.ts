@@ -2,15 +2,9 @@ import * as React from 'react';
 import { action, observable } from 'mobx';
 import { IconName, ITreeNode } from '@blueprintjs/core';
 import ContextMenu from 'components/SiteTree/ContextMenu';
+import TreeState from 'enums/TreeState';
 import SiteMapService from 'services/SiteMapService';
 import { tabsStore } from './index';
-
-export enum TreeState {
-    NONE,
-    PENDING,
-    ERROR,
-    SUCCESS,
-}
 
 export interface ITreeElement extends ITreeNode {
     childNodes: ITreeElement[];

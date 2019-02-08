@@ -21,6 +21,7 @@ module.exports = {
         modules: ['node_modules'],
         alias: {
             components: path.resolve(__dirname, 'ClientApp/components/'),
+            enums: path.resolve(__dirname, 'ClientApp/enums/'),
             services: path.resolve(__dirname, 'ClientApp/services/'),
             stores: path.resolve(__dirname, 'ClientApp/stores/'),
             assets: path.resolve(__dirname, 'ClientApp/assets/'),

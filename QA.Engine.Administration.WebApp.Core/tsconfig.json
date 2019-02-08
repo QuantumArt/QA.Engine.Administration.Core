@@ -9,6 +9,7 @@
     "experimentalDecorators": true,
     "paths": {
       "components/*": ["ClientApp/components/*"],
+      "enums/*": ["ClientApp/enums/*"],
       "services/*": ["ClientApp/services/*"],
       "stores/*": ["ClientApp/stores/*"],
       "assets/*": ["ClientApp/assets/*"]

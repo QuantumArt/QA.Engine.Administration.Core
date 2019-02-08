@@ -13,6 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="ClientApp\enums\TreeState.ts" />
     <None Remove="ClientApp\stores\ArchiveStore.ts" />
   </ItemGroup>
 
@@ -32,6 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\enums\TreeState.ts" />
     <TypeScriptCompile Include="ClientApp\stores\ArchiveStore.ts" />
   </ItemGroup>
 

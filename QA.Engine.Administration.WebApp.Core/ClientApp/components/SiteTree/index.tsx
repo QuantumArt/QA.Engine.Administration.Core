@@ -3,6 +3,7 @@ import { inject, observer } from 'mobx-react';
 import { Tree, Card } from '@blueprintjs/core';
 import SiteTreeStore from 'stores/SiteTreeStore';
 import ArchiveStore from 'stores/ArchiveStore';
+import TreeState from 'enums/TreeState';
 
 @observer
 class TreeR extends Tree {}
@@ -17,6 +18,7 @@ interface Props {
 export default class SiteTree extends React.Component<Props> {
     render() {
         const { siteTreeStore } = this.props;
+        console.log('TreeState', TreeState);
         return (
             <Card className="tree-pane">
                 <TreeR
