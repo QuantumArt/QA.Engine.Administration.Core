@@ -10,14 +10,13 @@ import 'assets/style.css';
 
 import SiteTree from 'components/SiteTree';
 import TabsContainer from 'components/TabsContainer';
-import configureStores from 'stores/configureStores';
-
-const stores = configureStores();
+import { siteTreeStore, archiveStrore, tabsStore } from './stores';
 
 const app = hot(module)(() => (
     <Provider
-        siteTreeStore={stores.siteTreeStore}
-        archiveStore={stores.archiveStrore}
+        siteTreeStore={siteTreeStore}
+        archiveStore={archiveStrore}
+        tabsStore={tabsStore}
     >
         <div className="layout">
             <Navbar fixedToTop>
