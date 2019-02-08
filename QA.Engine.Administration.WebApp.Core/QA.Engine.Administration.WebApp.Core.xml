@@ -120,23 +120,46 @@
             Id пользователя
             </summary>
         </member>
-        <member name="T:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController">
+        <member name="T:QA.Engine.Administration.WebApp.Core.Controllers.DictionaryController">
             <summary>
-            Api карты сайта
+            Api справочников
             </summary>
         </member>
-        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.#ctor(QA.Engine.Administration.Services.Core.Interfaces.ISiteMapService,QA.Engine.Administration.Services.Core.Interfaces.ISiteMapModifyService,QA.Engine.Administration.Services.Core.Interfaces.IItemDifinitionService,Microsoft.Extensions.Options.IOptions{QA.Engine.Administration.WebApp.Core.EnvironmentConfiguration},QA.Engine.Administration.WebApp.Core.Auth.IWebAppQpHelper,AutoMapper.IMapper,Microsoft.Extensions.Logging.ILogger{QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController})">
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.DictionaryController.GetDescriminators">
+            <summary>
+            Возвращает типы контента
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.DictionaryController.GetFlatRegions">
+            <summary>
+            Возвращает регионы списком
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.DictionaryController.GetTreeRegions">
+            <summary>
+            Возвращает дерево регионов
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController">
+            <summary>
+            Api получения карты сайта
+            </summary>
+        </member>
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.#ctor(QA.Engine.Administration.Services.Core.Interfaces.ISiteMapService,QA.Engine.Administration.Services.Core.Interfaces.ISiteMapModifyService,Microsoft.Extensions.Options.IOptions{QA.Engine.Administration.WebApp.Core.EnvironmentConfiguration},QA.Engine.Administration.WebApp.Core.Auth.IWebAppQpHelper,AutoMapper.IMapper,Microsoft.Extensions.Logging.ILogger{QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController})">
             <summary>
             Конструктор
             </summary>
         </member>
-        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.GetSiteMap(System.Int32[])">
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.GetSiteMapTree(System.Int32[])">
             <summary>
             Возвращает полное дерево карты сайта
             </summary>
             <returns></returns>
         </member>
-        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.GetAllArchiveItems">
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.GetArchiveTree">
             <summary>
             Возвращает полную структуру архива
             </summary>
@@ -160,12 +183,6 @@
             <param name="regionIds">Id регионов</param>
             <returns></returns>
         </member>
-        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.GetDescriminators">
-            <summary>
-            Возвращает типы контента
-            </summary>
-            <returns></returns>
-        </member>
         <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.Publish(System.Collections.Generic.List{System.Int32})">
             <summary>
             Опубликовать страницу
@@ -173,165 +190,180 @@
             <param name="itemIds">Id страниц</param>
             <returns></returns>
         </member>
-        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.Reorder(QA.Engine.Administration.WebApp.Core.Models.ReorderRequestModel)">
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.Reorder(QA.Engine.Administration.WebApp.Core.Models.ReorderModel)">
             <summary>
             Изменить порядок отображения страниц
             </summary>
             <param name="model"></param>
             <returns></returns>
         </member>
-        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.Move(QA.Engine.Administration.WebApp.Core.Models.MoveRequestModel)">
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.Move(QA.Engine.Administration.WebApp.Core.Models.MoveModel)">
             <summary>
             Переместить страницу к новому родительскому элементу
             </summary>
             <param name="model"></param>
             <returns></returns>
         </member>
-        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.Edit(QA.Engine.Administration.WebApp.Core.Models.EditRequestModel)">
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.Edit(QA.Engine.Administration.WebApp.Core.Models.EditModel)">
             <summary>
             Редактировать
             </summary>
             <param name="model"></param>
             <returns></returns>
         </member>
-        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.Remove(QA.Engine.Administration.WebApp.Core.Models.RemoveRequestModel)">
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.Remove(QA.Engine.Administration.WebApp.Core.Models.RemoveModel)">
             <summary>
             Удаление элементов в архив
             </summary>
             <param name="model"></param>
             <returns></returns>
         </member>
-        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.Restore(QA.Engine.Administration.WebApp.Core.Models.RestoreRequestModel)">
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.Restore(QA.Engine.Administration.WebApp.Core.Models.RestoreModel)">
             <summary>
             Восстановление элементов
             </summary>
             <param name="model"></param>
             <returns></returns>
         </member>
-        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.Delete(QA.Engine.Administration.WebApp.Core.Models.DeleteRequestModel)">
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.Delete(QA.Engine.Administration.WebApp.Core.Models.DeleteModel)">
             <summary>
             Удаление элементов
             </summary>
             <param name="model"></param>
             <returns></returns>
         </member>
-        <member name="T:QA.Engine.Administration.WebApp.Core.Models.DeleteRequestModel">
+        <member name="T:QA.Engine.Administration.WebApp.Core.Models.ArchiveViewModel">
+            <summary>
+            Структура архива
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.ArchiveViewModel.Pages">
+            <summary>
+            Архивные страницы
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.ArchiveViewModel.Widgets">
+            <summary>
+            Архивные виджеты
+            </summary>
+        </member>
+        <member name="T:QA.Engine.Administration.WebApp.Core.Models.DeleteModel">
             <summary>
             Модель для окончательного удаления элемента
             </summary>
         </member>
-        <member name="P:QA.Engine.Administration.WebApp.Core.Models.DeleteRequestModel.ItemId">
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.DeleteModel.ItemId">
             <summary>
             Id элемента
             </summary>
         </member>
-        <member name="P:QA.Engine.Administration.WebApp.Core.Models.DeleteRequestModel.IsDeleteAllVersions">
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.DeleteModel.IsDeleteAllVersions">
             <summary>
             Удалить все версии
             </summary>
         </member>
-        <member name="T:QA.Engine.Administration.WebApp.Core.Models.EditRequestModel">
+        <member name="T:QA.Engine.Administration.WebApp.Core.Models.EditModel">
             <summary>
             Модель для редактирования
             </summary>
         </member>
-        <member name="P:QA.Engine.Administration.WebApp.Core.Models.EditRequestModel.ItemId">
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.EditModel.ItemId">
             <summary>
             Id элемента
             </summary>
         </member>
-        <member name="P:QA.Engine.Administration.WebApp.Core.Models.EditRequestModel.Title">
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.EditModel.Title">
             <summary>
             Заголовок
             </summary>
         </member>
-        <member name="T:QA.Engine.Administration.WebApp.Core.Models.MoveRequestModel">
+        <member name="T:QA.Engine.Administration.WebApp.Core.Models.MoveModel">
             <summary>
             Модель для изменения родительского элемента
             </summary>
         </member>
-        <member name="P:QA.Engine.Administration.WebApp.Core.Models.MoveRequestModel.ItemId">
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.MoveModel.ItemId">
             <summary>
             Id страницы, родительский элемент у которой хотим изменить
             </summary>
         </member>
-        <member name="P:QA.Engine.Administration.WebApp.Core.Models.MoveRequestModel.NewParentId">
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.MoveModel.NewParentId">
             <summary>
             Id нового родительского элемента
             </summary>
         </member>
-        <member name="T:QA.Engine.Administration.WebApp.Core.Models.RemoveRequestModel">
+        <member name="T:QA.Engine.Administration.WebApp.Core.Models.RemoveModel">
             <summary>
             Модель для перемещения элемена в архив
             </summary>
         </member>
-        <member name="P:QA.Engine.Administration.WebApp.Core.Models.RemoveRequestModel.ItemId">
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.RemoveModel.ItemId">
             <summary>
             Id элемента
             </summary>
         </member>
-        <member name="P:QA.Engine.Administration.WebApp.Core.Models.RemoveRequestModel.IsDeleteAllVersions">
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.RemoveModel.IsDeleteAllVersions">
             <summary>
             Удалять все версии
             </summary>
         </member>
-        <member name="P:QA.Engine.Administration.WebApp.Core.Models.RemoveRequestModel.IsDeleteContentVersions">
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.RemoveModel.IsDeleteContentVersions">
             <summary>
             Удалить контентную версию
             </summary>
         </member>
-        <member name="P:QA.Engine.Administration.WebApp.Core.Models.RemoveRequestModel.ContentVersionId">
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.RemoveModel.ContentVersionId">
             <summary>
             Id контентной версии, которую не удалять, а оставить в качестве полноценной страницы.
             Возможно только при условии IsDeleteAllVersions == false и IsDeleteContentVersions == false
             </summary>
         </member>
-        <member name="T:QA.Engine.Administration.WebApp.Core.Models.ReorderRequestModel">
+        <member name="T:QA.Engine.Administration.WebApp.Core.Models.ReorderModel">
             <summary>
             Модель для изменения отображаемой сортировки страниц
             </summary>
         </member>
-        <member name="P:QA.Engine.Administration.WebApp.Core.Models.ReorderRequestModel.ItemId">
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.ReorderModel.ItemId">
             <summary>
             Id страницы, позицию которой хотим изменить
             </summary>
         </member>
-        <member name="P:QA.Engine.Administration.WebApp.Core.Models.ReorderRequestModel.RelatedItemId">
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.ReorderModel.RelatedItemId">
             <summary>
             Id страницы, рядом с которой хотим поместить страницу
             </summary>
         </member>
-        <member name="P:QA.Engine.Administration.WebApp.Core.Models.ReorderRequestModel.IsInsertBefore">
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.ReorderModel.IsInsertBefore">
             <summary>
             Признак - переместить страницу ItemId перед страницей RelatedItemId
             </summary>
         </member>
-        <member name="T:QA.Engine.Administration.WebApp.Core.Models.RestoreRequestModel">
+        <member name="T:QA.Engine.Administration.WebApp.Core.Models.RestoreModel">
             <summary>
             Восстановление из архива, возможно только  в случае наличия родительского элемента не в архиве
             </summary>
         </member>
-        <member name="P:QA.Engine.Administration.WebApp.Core.Models.RestoreRequestModel.ItemId">
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.RestoreModel.ItemId">
             <summary>
             Id элемента
             </summary>
         </member>
-        <member name="P:QA.Engine.Administration.WebApp.Core.Models.RestoreRequestModel.IsRestoreAllVersions">
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.RestoreModel.IsRestoreAllVersions">
             <summary>
             Восстанавливать все версии
             </summary>
         </member>
-        <member name="P:QA.Engine.Administration.WebApp.Core.Models.RestoreRequestModel.IsRestoreWidgets">
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.RestoreModel.IsRestoreWidgets">
             <summary>
             Восстанавливать виджеты
             </summary>
         </member>
-        <member name="P:QA.Engine.Administration.WebApp.Core.Models.RestoreRequestModel.IsRestoreContentVersions">
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.RestoreModel.IsRestoreContentVersions">
             <summary>
             Восстанавливать контентные верисс
             </summary>
         </member>
-        <member name="P:QA.Engine.Administration.WebApp.Core.Models.RestoreRequestModel.IsRestoreChildren">
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.RestoreModel.IsRestoreChildren">
             <summary>
             Восстанавлявать дочерние элементы
             </summary>

@@ -1,4 +1,5 @@
-﻿using System;
+using QA.Engine.Administration.WebApp.Core.Annotations;
+using System;
 
 namespace QA.Engine.Administration.WebApp.Core.Models
 {
@@ -26,6 +27,7 @@ namespace QA.Engine.Administration.WebApp.Core.Models
         }
     }
 
+    [TypeScriptType]
     public class ApiResult<T>
     {
         public T Data { get; set; }

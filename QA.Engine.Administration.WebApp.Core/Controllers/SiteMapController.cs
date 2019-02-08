@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using QA.Engine.Administration.Services.Core.Interfaces;
 using QA.Engine.Administration.Services.Core.Models;
+using QA.Engine.Administration.WebApp.Core.Annotations;
 using QA.Engine.Administration.WebApp.Core.Auth;
 using QA.Engine.Administration.WebApp.Core.Models;
 using System;
@@ -14,15 +15,15 @@ using System.Linq;
 namespace QA.Engine.Administration.WebApp.Core.Controllers
 {
     /// <summary>
-    /// Api карты сайта
+    /// Api получения карты сайта
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
+    [TypeScriptController]
     public class SiteMapController : ControllerBase
     {
         private readonly ISiteMapService _siteMapService;
         private readonly ISiteMapModifyService _siteMapModifyService;
-        private readonly IItemDifinitionService _itemDifinitionService;
         private readonly IMapper _mapper;
         private readonly ILogger<SiteMapController> _logger;
         
@@ -35,12 +36,11 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// Конструктор
         /// </summary>
         public SiteMapController(
-            ISiteMapService siteMapService, ISiteMapModifyService siteMapModifyService, IItemDifinitionService itemDifinitionService,
+            ISiteMapService siteMapService, ISiteMapModifyService siteMapModifyService,
             IOptions<EnvironmentConfiguration> options, IWebAppQpHelper webAppQpHelper, IMapper mapper, ILogger<SiteMapController> logger)
         {
             _siteMapService = siteMapService;
             _siteMapModifyService = siteMapModifyService;
-            _itemDifinitionService = itemDifinitionService;
             _mapper = mapper;
             _logger = logger;
 
@@ -54,8 +54,8 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// Возвращает полное дерево карты сайта
         /// </summary>
         /// <returns></returns>
-        [HttpGet("getAllItems")]
-        public ApiResult<List<PageViewModel>> GetSiteMap([FromQuery]int[] regionIds = null)
+        [HttpGet("getSiteMapTree")]
+        public ApiResult<List<PageViewModel>> GetSiteMapTree([FromQuery]int[] regionIds = null)
         {
             var siteMap = _siteMapService.GetSiteMapStructure(_siteId, regionIds, _useHierarchyRegionFilter);
             var result = _mapper.Map<List<PageViewModel>>(siteMap);
@@ -66,12 +66,12 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// Возвращает полную структуру архива
         /// </summary>
         /// <returns></returns>
-        [HttpGet("getAllArchiveItems")]
-        public ApiResult<Models.ArchiveViewModel> GetAllArchiveItems()
+        [HttpGet("getArchiveTree")]
+        public ApiResult<ArchiveViewModel> GetArchiveTree()
         {
             var archive = _siteMapService.GetArchiveStructure(_siteId);
-            var result = _mapper.Map<Models.ArchiveViewModel>(archive);
-            return ApiResult<Models.ArchiveViewModel>.Success(result);
+            var result = _mapper.Map<ArchiveViewModel>(archive);
+            return ApiResult<ArchiveViewModel>.Success(result);
         }
 
         /// <summary>
@@ -82,9 +82,9 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// <param name="regionIds">Id регионов</param>
         /// <returns></returns>
         [HttpGet("getPageTree")]
-        public ApiResult<List<PageViewModel>> GetPageTree(int? parentId, bool? isArchive, [FromQuery]int[] regionIds = null)
+        public ApiResult<List<PageViewModel>> GetPageTree(bool isArchive, int? parentId, [FromQuery]int[] regionIds = null)
         {
-            var siteMap = _siteMapService.GetSiteMapItems(_siteId, isArchive ?? false, parentId, regionIds, _useHierarchyRegionFilter);
+            var siteMap = _siteMapService.GetSiteMapItems(_siteId, isArchive, parentId, regionIds, _useHierarchyRegionFilter);
             var result = _mapper.Map<List<PageViewModel>>(siteMap);
             return ApiResult<List<PageViewModel>>.Success(result);
         }
@@ -97,23 +97,11 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// <param name="regionIds">Id регионов</param>
         /// <returns></returns>
         [HttpGet("getWidgetTree")]
-        public ApiResult<List<WidgetViewModel>> GetWidgetTree(int parentId, bool? isArchive, [FromQuery]int[] regionIds = null)
+        public ApiResult<List<WidgetViewModel>> GetWidgetTree(bool isArchive, int parentId, [FromQuery]int[] regionIds = null)
         {
-            var widgets = _siteMapService.GetWidgetItems(_siteId, isArchive ?? false, parentId, regionIds, _useHierarchyRegionFilter);
+            var widgets = _siteMapService.GetWidgetItems(_siteId, isArchive, parentId, regionIds, _useHierarchyRegionFilter);
             var result = _mapper.Map<List<WidgetViewModel>>(widgets);
             return ApiResult<List<WidgetViewModel>>.Success(result);
-        }
-
-        /// <summary>
-        /// Возвращает типы контента
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet("getDefinitions")]
-        public ApiResult<List<DiscriminatorViewModel>> GetDescriminators()
-        {
-            var discriminators = _itemDifinitionService.GetAllItemDefinitions(_siteId).ToArray();
-            var result = _mapper.Map<List<DiscriminatorViewModel>>(discriminators);
-            return ApiResult<List<DiscriminatorViewModel>>.Success(result);
         }
 
         /// <summary>

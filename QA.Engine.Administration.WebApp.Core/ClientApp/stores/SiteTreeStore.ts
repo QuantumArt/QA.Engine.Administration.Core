@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { action, observable } from 'mobx';
-import SiteTreeService from 'services/SiteTreeService';
 import { IconName, ITreeNode } from '@blueprintjs/core';
 import ContextMenu from 'components/SiteTree/ContextMenu';
+import SiteMapService from 'services/SiteMapService';
 
 enum TreeState {
     NONE,
@@ -56,11 +56,15 @@ export default class SiteTreeStore {
     public async fetchSiteTree() {
         this.siteTreeState = TreeState.PENDING;
         try {
-            const res: PageViewModel[] = await SiteTreeService.getSiteTree();
-            this.siteTreeState = TreeState.SUCCESS;
-            this.convertTree(res);
+            const response: ApiResult<PageViewModel[]> = await SiteMapService.getSiteMapTree();
+            if (response.isSuccess) {
+                this.siteTreeState = TreeState.SUCCESS;
+                this.convertTree(response.data);
+            } else {
+                throw response.error;
+            }
         } catch (e) {
-            console.log(e);
+            console.error(e);
             this.siteTreeState = TreeState.ERROR;
         }
     }

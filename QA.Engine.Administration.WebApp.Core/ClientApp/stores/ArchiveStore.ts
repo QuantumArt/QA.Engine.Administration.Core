@@ -1,6 +1,5 @@
 import { action } from 'mobx';
-import ArchiveService from 'services/ArchiveService';
-import RemoveService from 'services/RemoveService';
+import SiteMapService from 'services/SiteMapService';
 
 export default class ArchiveStore {
     public archive: ArchiveViewModel;
@@ -8,9 +7,13 @@ export default class ArchiveStore {
     @action
     public async fetchSiteTree() {
         try {
-            const result: ArchiveViewModel = await ArchiveService.getArchive();
-            this.archive = result;
-            console.log(result);
+            const response: ApiResult<ArchiveViewModel> = await SiteMapService.getArchiveTree();
+            if (response.isSuccess) {
+                this.archive = response.data;
+                console.log(response);
+            } else {
+                throw response.error;
+            }
         } catch (e) {
             console.error(e);
         }
@@ -19,7 +22,13 @@ export default class ArchiveStore {
     @action
     public async fetchTest() {
         try {
-            const result: boolean = await RemoveService.remove(741210);
+            const model = <RemoveModel>{
+                itemId: 741210,
+                isDeleteAllVersions: true,
+                isDeleteContentVersions: true,
+                contentVersionId: null,
+            };
+            const result: boolean = await SiteMapService.remove(model);
             console.log(result);
         } catch (e) {
             console.error(e);

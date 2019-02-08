@@ -13,10 +13,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="ClientApp\services\archiveService.ts" />
-    <None Remove="ClientApp\services\httpService.ts" />
-    <None Remove="ClientApp\services\moveService.ts" />
-    <None Remove="ClientApp\services\removeService.ts" />
     <None Remove="ClientApp\stores\ArchiveStore.ts" />
   </ItemGroup>
 
@@ -36,16 +32,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <TypeScriptCompile Include="ClientApp\services\archiveService.ts" />
-    <TypeScriptCompile Include="ClientApp\services\httpService.ts" />
-    <TypeScriptCompile Include="ClientApp\services\removeService.ts" />
-    <TypeScriptCompile Include="ClientApp\services\moveService.ts" />
     <TypeScriptCompile Include="ClientApp\stores\ArchiveStore.ts" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="ClientApp\types\ArchiveModel.d.ts">
-      <CustomToolNamespace>Models\ArchiveModel.cs</CustomToolNamespace>
+    <None Update="ClientApp\services\DictionaryService.ts">
+      <CustomToolNamespace>Controllers\DictionaryController.cs</CustomToolNamespace>
+    </None>
+    <None Update="ClientApp\services\SiteMapService.ts">
+      <CustomToolNamespace>Controllers\SiteMapController.cs</CustomToolNamespace>
+    </None>
+    <None Update="ClientApp\types\ApiResult.d.ts">
+      <CustomToolNamespace>Models\ApiResult.cs</CustomToolNamespace>
     </None>
     <None Update="ClientApp\types\ArchiveViewModel.d.ts">
       <CustomToolNamespace>Models\ArchiveViewModel.cs</CustomToolNamespace>
