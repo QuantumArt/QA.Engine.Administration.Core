@@ -13,12 +13,14 @@ import TabsContainer from 'components/TabsContainer';
 import SiteTreeStore from 'stores/SiteTreeStore';
 import TabsStore from 'stores/TabsStore';
 import ArchiveStore from 'stores/ArchiveStore';
+import QpIntegrationStore from 'stores/QpIntegrationStore';
 
 const app = hot(module)(() => (
     <Provider
         siteTreeStore={SiteTreeStore}
         archiveStore={ArchiveStore}
         tabsStore={TabsStore}
+        qpIntegrationStore={QpIntegrationStore}
     >
         <div className="layout">
             <Navbar fixedToTop>

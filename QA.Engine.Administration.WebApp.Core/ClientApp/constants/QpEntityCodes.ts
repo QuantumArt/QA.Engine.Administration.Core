@@ -1,0 +1,43 @@
+// tslint:disable:variable-name
+export default class QpEntityCodes {
+    static readonly db: string = 'db';
+    static readonly site: string = 'site';
+    static readonly content_group: string = 'content_group';
+    static readonly content: string = 'content';
+    static readonly virtual_content: string = 'virtual_content';
+    static readonly article: string = 'article';
+    static readonly archive_article: string = 'archive_article';
+    static readonly field: string = 'field';
+    static readonly virtual_field: string = 'virtual_field';
+    static readonly virtual_article: string = 'virtual_article';
+    static readonly notification: string = 'notification';
+    static readonly content_folder: string = 'content_folder';
+    static readonly site_folder: string = 'site_folder';
+    static readonly workflow: string = 'workflow';
+    static readonly status_type: string = 'status_type';
+    static readonly style: string = 'style';
+    static readonly snippet: string = 'snippet';
+    static readonly user: string = 'user';
+    static readonly user_group: string = 'user_group';
+    static readonly template: string = 'template';
+    static readonly page: string = 'page';
+    static readonly template_object: string = 'template_object';
+    static readonly page_object: string = 'page_object';
+    static readonly template_object_format: string = 'template_object_format';
+    static readonly page_object_format: string = 'page_object_format';
+    static readonly template_object_format_version: string = 'template_object_format_version';
+    static readonly page_object_format_version: string = 'page_object_format_version';
+    static readonly article_version: string = 'article_version';
+    static readonly site_file: string = 'site_file';
+    static readonly content_file: string = 'content_file';
+    static readonly custom_action: string = 'custom_action';
+    static readonly site_permission: string = 'site_permission';
+    static readonly content_permission: string = 'content_permission';
+    static readonly article_permission: string = 'article_permission';
+    static readonly workflow_permission: string = 'workflow_permission';
+    static readonly site_folder_permission: string = 'site_folder_permission';
+    static readonly entity_type_permission: string = 'entity_type_permission';
+    static readonly action_permission: string = 'action_permission';
+    static readonly visual_editor_plugin: string = 'visual_editor_plugin';
+    static readonly visual_editor_style: string = 'visual_editor_style';
+}

@@ -20,9 +20,10 @@ export default class ContextMenu extends React.Component<Props> {
 
     render() {
         const { node } = this.props;
+        const elementMenu = <ElementMenu itemId={+node.id} />;
         return node.isSelected ?
             <Popover
-                content={<ElementMenu />}
+                content={elementMenu}
                 position={Position.RIGHT}
                 autoFocus={false}
                 isOpen={node.isContextMenuActive}

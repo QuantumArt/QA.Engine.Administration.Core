@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * pmrpc 0.7.1 - Inter-widget remote procedure call library based on HTML5
  *               postMessage API and JSON-RPC. https://github.com/izuzak/pmrpc
@@ -17,7 +18,7 @@
  * limitations under the License.
  */
 
-pmrpc = self.pmrpc = (function() {
+pmrpc = self.pmrpc =  function() {
   // check if JSON library is available
   if (typeof JSON === "undefined" || typeof JSON.stringify === "undefined" ||
       typeof JSON.parse === "undefined") {
@@ -206,7 +207,7 @@ pmrpc = self.pmrpc = (function() {
     var isWorkerComm = typeof eventSource !== "undefined" && eventSource !== null;
 
     // if the message is not for pmrpc, ignore it.
-    if (typeof serviceCallEvent.data !== "string" || serviceCallEvent.data.source === "react-devtools-detector" || serviceCallEvent.data.indexOf("pmrpc.") !== 0) {
+    if (typeof serviceCallEvent.data !== "string" || serviceCallEvent.data.indexOf("pmrpc.") !== 0) {
       return;
     } else {
       var message = decode(serviceCallEvent.data);
@@ -687,9 +688,9 @@ pmrpc = self.pmrpc = (function() {
     call : call,
     discover : discover
   };
-}());
+}();
 
-// AMD suppport
-if (typeof define === 'function' && define.amd) {
-  define(pmrpc);
+//AMD suppport
+if (typeof define == 'function' && define.amd) {
+	define(pmrpc);
 }

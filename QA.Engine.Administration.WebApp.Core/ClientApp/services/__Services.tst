@@ -59,6 +59,12 @@ ${
         return ResolvedName(method.Type);
     }
 
+    public string ReturnType1(Method method)
+    {
+        var excluded = TypeIsExcluded(method.Type);
+        return $"{method.Type.Name} is excluded: {excluded}";
+    }
+
     public bool HasBody(Method method)
     {
         string httpMethod = method.HttpMethod();

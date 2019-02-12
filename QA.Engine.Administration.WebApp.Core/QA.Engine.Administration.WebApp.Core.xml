@@ -137,9 +137,15 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.DictionaryController.GetTreeRegions">
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.DictionaryController.GetRegionTree">
             <summary>
             Возвращает дерево регионов
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.DictionaryController.GetQpContent(System.String)">
+            <summary>
+            Возвращает контент qp с полями
             </summary>
             <returns></returns>
         </member>
@@ -290,6 +296,36 @@
         <member name="P:QA.Engine.Administration.WebApp.Core.Models.MoveModel.NewParentId">
             <summary>
             Id нового родительского элемента
+            </summary>
+        </member>
+        <member name="T:QA.Engine.Administration.WebApp.Core.Models.QpContentViewModel">
+            <summary>
+            Модель QP контента с его полями
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.QpContentViewModel.Id">
+            <summary>
+            Идентификатор контента
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.QpContentViewModel.Fields">
+            <summary>
+            Поля контента
+            </summary>
+        </member>
+        <member name="T:QA.Engine.Administration.WebApp.Core.Models.QpFieldViewModel">
+            <summary>
+            Модель с полями контента
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.QpFieldViewModel.FieldId">
+            <summary>
+            Идентификатор поля контента
+            </summary>
+        </member>
+        <member name="P:QA.Engine.Administration.WebApp.Core.Models.QpFieldViewModel.Name">
+            <summary>
+            Название контента
             </summary>
         </member>
         <member name="T:QA.Engine.Administration.WebApp.Core.Models.RemoveModel">

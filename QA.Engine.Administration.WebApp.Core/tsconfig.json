@@ -12,10 +12,12 @@
     "importHelpers": true,
     "paths": {
       "components/*": ["ClientApp/components/*"],
+      "constants/*": ["ClientApp/constants/*"],
       "enums/*": ["ClientApp/enums/*"],
       "services/*": ["ClientApp/services/*"],
       "stores/*": ["ClientApp/stores/*"],
-      "assets/*": ["ClientApp/assets/*"]
+      "assets/*": ["ClientApp/assets/*"],
+      "qp/*": ["ClientApp/qp/*"]
     },
     "outDir": "wwwroot/built"
   },

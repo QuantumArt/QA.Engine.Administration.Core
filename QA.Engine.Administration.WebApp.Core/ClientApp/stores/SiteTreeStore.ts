@@ -5,6 +5,7 @@ import ContextMenu from 'components/SiteTree/ContextMenu';
 import TreeState from 'enums/TreeState';
 import SiteMapService from 'services/SiteMapService';
 import TabsStore from './TabsStore';
+import { element } from 'prop-types';
 
 export interface ITreeElement extends ITreeNode {
     childNodes: ITreeElement[];
@@ -20,6 +21,7 @@ export class SiteTreeState {
 
     @observable public siteTreeState: TreeState = TreeState.NONE;
     @observable public tree: ITreeElement[];
+    private origTree: PageViewModel[];
 
     @action
     public handleNodeExpand = (nodeData: ITreeElement) => {
@@ -60,6 +62,7 @@ export class SiteTreeState {
             const response: ApiResult<PageViewModel[]> = await SiteMapService.getSiteMapTree();
             if (response.isSuccess) {
                 this.siteTreeState = TreeState.SUCCESS;
+                this.origTree = response.data;
                 this.convertTree(response.data);
             } else {
                 throw response.error;
@@ -68,6 +71,24 @@ export class SiteTreeState {
             console.error(e);
             this.siteTreeState = TreeState.ERROR;
         }
+    }
+
+    public getNodeById(id: number): PageViewModel {
+        let elements = this.origTree;
+        let loop = true;
+        while (loop) {
+            loop = false;
+            const children: PageViewModel[] = [];
+            if (elements.filter(x => x.id === id)[0] != null) {
+                return elements.filter(x => x.id === id)[0];
+            }
+            elements.filter(x => x.hasChildren).forEach((x) => {
+                x.children.forEach(y => children.push(y));
+            });
+            loop = children.length > 0;
+            elements = children;
+        }
+        return null;
     }
 
     private convertTree(data: PageViewModel[]): void {

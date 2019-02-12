@@ -13,8 +13,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="ClientApp\constants\QpAbstractItemFields.ts" />
+    <None Remove="ClientApp\constants\QpActionCodes.ts" />
     <None Remove="ClientApp\enums\TreeState.ts" />
     <None Remove="ClientApp\stores\ArchiveStore.ts" />
+    <None Remove="ClientApp\stores\QpContentStore.ts" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,6 +26,7 @@
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.0" />
+    <PackageReference Include="QP8BackendApi.Interaction" Version="1.1.1" />
     <PackageReference Include="Quantumart.AspNetCore" Version="3.3.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
   </ItemGroup>
@@ -33,8 +37,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\constants\QpAbstractItemFields.ts" />
+    <TypeScriptCompile Include="ClientApp\constants\QpActionCodes.ts" />
     <TypeScriptCompile Include="ClientApp\enums\TreeState.ts" />
     <TypeScriptCompile Include="ClientApp\stores\ArchiveStore.ts" />
+    <TypeScriptCompile Include="ClientApp\stores\QpContentStore.ts" />
   </ItemGroup>
 
   <ItemGroup>
@@ -64,6 +71,12 @@
     </None>
     <None Update="ClientApp\types\PageViewModel.d.ts">
       <CustomToolNamespace>Models\PageViewModel.cs</CustomToolNamespace>
+    </None>
+    <None Update="ClientApp\types\QpContentViewModel.d.ts">
+      <CustomToolNamespace>Models\QpContentViewModel.cs</CustomToolNamespace>
+    </None>
+    <None Update="ClientApp\types\QpFieldViewModel.d.ts">
+      <CustomToolNamespace>Models\QpFieldViewModel.cs</CustomToolNamespace>
     </None>
     <None Update="ClientApp\types\RegionViewModel.d.ts">
       <CustomToolNamespace>Models\RegionViewModel.cs</CustomToolNamespace>

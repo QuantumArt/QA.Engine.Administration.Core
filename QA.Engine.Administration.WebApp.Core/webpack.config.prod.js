@@ -19,9 +19,12 @@ module.exports = {
         modules: ['node_modules'],
         alias: {
             components: path.resolve(__dirname, 'ClientApp/components/'),
+            constants: path.resolve(__dirname, 'ClientApp/constants/'),
+            enums: path.resolve(__dirname, 'ClientApp/enums/'),
             services: path.resolve(__dirname, 'ClientApp/services/'),
             stores: path.resolve(__dirname, 'ClientApp/stores/'),
             assets: path.resolve(__dirname, 'ClientApp/assets/'),
+            qp: path.resolve(__dirname, 'ClientApp/qp/'),
         }
     },
     module: {

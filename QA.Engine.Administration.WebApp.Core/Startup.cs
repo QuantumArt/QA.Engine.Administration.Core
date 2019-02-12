@@ -88,6 +88,7 @@ namespace QA.Engine.Administration.WebApp.Core
             services.AddScoped<ISiteMapModifyService, SiteMapModifyService>();
             services.AddScoped<IItemDifinitionService, ItemDifinitionService>();
             services.AddScoped<IRegionService, RegionService>();
+            services.AddScoped<IContentService, ContentService>();
 
             services.AddDistributedMemoryCache();
 

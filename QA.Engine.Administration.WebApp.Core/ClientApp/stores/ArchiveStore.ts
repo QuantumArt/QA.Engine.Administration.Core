@@ -22,22 +22,6 @@ export class ArchiveState {
             console.error(e);
         }
     }
-
-    @action
-    public async fetchTest() {
-        try {
-            const model = <RemoveModel>{
-                itemId: 741210,
-                isDeleteAllVersions: true,
-                isDeleteContentVersions: true,
-                contentVersionId: null,
-            };
-            const result: boolean = await SiteMapService.remove(model);
-            console.log(result);
-        } catch (e) {
-            console.error(e);
-        }
-    }
 }
 
 const archiveStore = new ArchiveState();

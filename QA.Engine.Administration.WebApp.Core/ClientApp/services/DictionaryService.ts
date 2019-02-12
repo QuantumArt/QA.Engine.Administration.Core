@@ -46,9 +46,9 @@ class DictionaryService {
     }
 
     /** Возвращает дерево регионов */
-    public async getTreeRegions(): Promise<ApiResult<RegionViewModel[]>> {
+    public async getRegionTree(): Promise<ApiResult<RegionViewModel[]>> {
 
-        const path = '/api/Dictionary/getTreeRegion';
+        const path = '/api/Dictionary/getRegionTree';
         const headers = new Headers();
         headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
         const init = {
@@ -60,6 +60,29 @@ class DictionaryService {
         const response = await fetch(path, init);
 
         const result = await <Promise<ApiResult<RegionViewModel[]>>>response.json();
+        console.log(`%cresult api get '${path}'`, 'color: blue;', result);
+
+        return result;
+    }
+
+    /** Возвращает контент qp с полями */
+    public async getQpContent(contentName: string): Promise<ApiResult<QpContentViewModel>> {
+
+        let urlparams = '';
+        urlparams += Array.isArray(contentName) && contentName.length === 0 ? '' : `&contentName=${contentName} `;
+        urlparams = urlparams.length > 0 ? `?${urlparams.slice(1)}` : '';
+        const path = `api/Dictionary/getQpContent${urlparams}`;
+        const headers = new Headers();
+        headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
+        const init = {
+            headers,
+            method: 'get',
+        };
+
+        console.debug(`%cstart api request get '${path}'`, 'color: green;');
+        const response = await fetch(path, init);
+
+        const result = await <Promise<ApiResult<QpContentViewModel>>>response.json();
         console.log(`%cresult api get '${path}'`, 'color: blue;', result);
 
         return result;

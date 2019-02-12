@@ -21,16 +21,18 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
     {
         private readonly IItemDifinitionService _itemDifinitionService;
         private readonly IRegionService _regionService;
+        private readonly IContentService _contentService;
         private readonly IMapper _mapper;
         private readonly ILogger<SiteMapController> _logger;
         private readonly int _siteId;
 
         public DictionaryController(
-            IItemDifinitionService itemDifinitionService, IRegionService regionService,
+            IItemDifinitionService itemDifinitionService, IRegionService regionService, IContentService contentService,
             IOptions<EnvironmentConfiguration> options, IWebAppQpHelper webAppQpHelper, IMapper mapper, ILogger<SiteMapController> logger)
         {
             _itemDifinitionService = itemDifinitionService;
             _regionService = regionService;
+            _contentService = contentService;
             _mapper = mapper;
             _logger = logger;
 
@@ -81,8 +83,8 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// Возвращает дерево регионов
         /// </summary>
         /// <returns></returns>
-        [HttpGet("getTreeRegion")]
-        public ApiResult<List<RegionViewModel>> GetTreeRegions()
+        [HttpGet("getRegionTree")]
+        public ApiResult<List<RegionViewModel>> GetRegionTree()
         {
             try
             {
@@ -92,8 +94,28 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "GetTreeRegions error");
+                _logger.LogError(e, "GetRegionTree error");
                 return ApiResult<List<RegionViewModel>>.Fail(e);
+            }
+        }
+
+        /// <summary>
+        /// Возвращает контент qp с полями
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("getQpContent")]
+        public ApiResult<QpContentViewModel> GetQpContent(string contentName)
+        {
+            try
+            {
+                var content = _contentService.GetQpContent(_siteId, contentName);
+                var result = _mapper.Map<QpContentViewModel>(content);
+                return ApiResult<QpContentViewModel>.Success(result);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "GetQpContent error");
+                return ApiResult<QpContentViewModel>.Fail(e);
             }
         }
     }

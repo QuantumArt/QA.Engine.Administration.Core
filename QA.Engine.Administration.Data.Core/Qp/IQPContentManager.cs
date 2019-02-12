@@ -160,6 +160,12 @@ namespace QA.Engine.Administration.Data.Core.Qp
         QpContentResult Get();
 
         /// <summary>
+        /// Возвращает результат запроса
+        /// </summary>
+        /// <returns></returns>
+        QpContentResult GetRealData();
+
+        /// <summary>
         /// Отправляет элементы в архив
         /// </summary>
         /// <param name="userId"></param>
