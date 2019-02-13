@@ -25,6 +25,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         private readonly IMapper _mapper;
         private readonly ILogger<SiteMapController> _logger;
         private readonly int _siteId;
+        private readonly int _userId;
 
         public DictionaryController(
             IItemDifinitionService itemDifinitionService, IRegionService regionService, IContentService contentService,
@@ -37,6 +38,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
             _logger = logger;
 
             _siteId = webAppQpHelper.SiteId;
+            _userId = webAppQpHelper.UserId;
         }
 
         /// <summary>
@@ -48,6 +50,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         {
             try
             {
+                _logger.LogTrace($"getDefinitions userId={_userId}");
                 var discriminators = _itemDifinitionService.GetAllItemDefinitions(_siteId).ToArray();
                 var result = _mapper.Map<List<DiscriminatorViewModel>>(discriminators);
                 return ApiResult<List<DiscriminatorViewModel>>.Success(result);
@@ -68,6 +71,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         {
             try
             {
+                _logger.LogTrace($"getFlatRegions userId={_userId}");
                 var discriminators = _regionService.GetRegions(_siteId).ToArray();
                 var result = _mapper.Map<List<RegionViewModel>>(discriminators);
                 return ApiResult<List<RegionViewModel>>.Success(result);
@@ -88,6 +92,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         {
             try
             {
+                _logger.LogTrace($"getRegionTree userId={_userId}");
                 var discriminators = _regionService.GetRegionStructure(_siteId).ToArray();
                 var result = _mapper.Map<List<RegionViewModel>>(discriminators);
                 return ApiResult<List<RegionViewModel>>.Success(result);
@@ -108,6 +113,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         {
             try
             {
+                _logger.LogTrace($"getRegionTree contentName={contentName}, userId={_userId}");
                 var content = _contentService.GetQpContent(_siteId, contentName);
                 var result = _mapper.Map<QpContentViewModel>(content);
                 return ApiResult<QpContentViewModel>.Success(result);

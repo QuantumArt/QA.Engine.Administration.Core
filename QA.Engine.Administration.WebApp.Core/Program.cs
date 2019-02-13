@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using QA.Engine.Administration.Logger.Core;
+using QA.Engine.Administration.Logger.Core.Models;
 
 namespace QA.Engine.Administration.WebApp.Core
 {
@@ -21,12 +23,13 @@ namespace QA.Engine.Administration.WebApp.Core
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .ConfigureLogging((hostingContext, logging) =>
+                .UseStartup<Startup>()
+                .AddJsonLogger(new LoggerConfig
                 {
-                    //logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
-                    logging.AddConsole();
-                    //logging.AddDebug();
+                    LogFields = new[] {
+                            new JsonField("ip", "${aspnet-request-ip}")
+                        }
                 })
-                .UseStartup<Startup>();
+                .SuppressStatusMessages(true);
     }
 }
