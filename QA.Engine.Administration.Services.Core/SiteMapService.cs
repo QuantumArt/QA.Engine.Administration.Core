@@ -107,22 +107,16 @@ namespace QA.Engine.Administration.Services.Core
             return pageStructure;
         }
 
-        public ArchiveModel GetArchiveStructure(int siteId)
+        public List<ArchiveModel> GetArchiveStructure(int siteId)
         {
             var useRegion = _settingsProvider.HasRegion(siteId);
             var abstractItems = _siteMapProvider.GetAllItems(siteId, true, useRegion);
 
-            var pages = abstractItems.Where(x => x.IsPage).Select(x => _mapper.Map<PageModel>(x)).OrderBy(x => x.IndexOrder).ToList();
-            var widgets = abstractItems.Where(x => !x.IsPage).Select(x => _mapper.Map<WidgetModel>(x)).OrderBy(x => x.IndexOrder).ToList();
+            var archives = _mapper.Map<List<ArchiveModel>>(abstractItems).OrderBy(x => x.IndexOrder).ToList();
 
-            var pageStructure = SiteMapStructureBuilder.GetPageStructure(pages, widgets);
-            var widgetStructure = SiteMapStructureBuilder.GetWidgetStructure(null, widgets);
+            var archiveStructure = SiteMapStructureBuilder.GetArchiveStructure(archives);
 
-            return new ArchiveModel
-            {
-                Pages = pageStructure,
-                Widgets = widgetStructure
-            };
+            return archiveStructure;
         }
     }
 }

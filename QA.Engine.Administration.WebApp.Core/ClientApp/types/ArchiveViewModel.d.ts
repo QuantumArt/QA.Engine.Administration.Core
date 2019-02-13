@@ -4,9 +4,26 @@
 
 /** Структура архива */
 declare interface ArchiveViewModel {
-  /** Архивные страницы */
-  pages: PageViewModel[];
-  /** Архивные виджеты */
-  widgets: WidgetViewModel[];
+  id: number;
+  isArchive: boolean;
+  parentId?: null | number; // number 
+  alias: string;
+  title: string;
+  zoneName: string;
+  extensionId?: null | number; // number 
+  indexOrder?: null | number; // number 
+  isVisible?: null | boolean; // boolean 
+  versionOfId?: null | number; // number 
+  published: boolean;
+  isInSiteMap?: null | boolean; // boolean 
+  isPage: boolean;
+  discriminator: string;
+  discriminatorId: number;
+  discriminatorTitle: string;
+  iconUrl: string;
+  children: ArchiveViewModel[];
+  regions: RegionViewModel[];
+  hasChildren: boolean;
+  hasRegions: boolean;
 }
 

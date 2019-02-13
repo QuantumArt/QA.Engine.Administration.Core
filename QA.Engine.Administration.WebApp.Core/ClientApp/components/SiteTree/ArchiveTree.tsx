@@ -3,26 +3,27 @@ import { inject, observer } from 'mobx-react';
 import { Card, Tree, Spinner } from '@blueprintjs/core';
 import Scrollbars from 'react-custom-scrollbars';
 import { SiteTreeState } from 'stores/SiteTreeStore';
+import { ArchiveState } from 'stores/ArchiveStore';
 import TreeState from 'enums/TreeState';
 
 @observer
 class TreeR extends Tree {}
 
 interface Props {
-    siteTreeStore?: SiteTreeState;
+    archiveStore?: ArchiveState;
 }
 
 // TODO: Finish scrollbar style
 interface InternalStyle extends JSX.IntrinsicAttributes, React.ClassAttributes<HTMLDivElement>, React.HTMLAttributes<HTMLDivElement> {}
 interface InternalRestProps extends JSX.IntrinsicAttributes, React.ClassAttributes<HTMLDivElement>, React.HTMLAttributes<HTMLDivElement> {}
 
-@inject('siteTreeStore')
+@inject('archiveStore')
 @observer
-export default class SiteTree extends React.Component<Props> {
+export default class ArchiveTree extends React.Component<Props> {
     render() {
-        const { siteTreeStore } = this.props;
-        siteTreeStore.loadData();
-        const isLoading = siteTreeStore.treeState === TreeState.NONE || siteTreeStore.treeState === TreeState.PENDING;
+        const { archiveStore } = this.props;
+        archiveStore.loadData();
+        const isLoading = archiveStore.treeState === TreeState.NONE || archiveStore.treeState === TreeState.PENDING;
         return (
             <Card className="tree-pane">
                 {isLoading ?
@@ -48,11 +49,11 @@ export default class SiteTree extends React.Component<Props> {
                         }
                     >
                         <TreeR
-                            contents={siteTreeStore.tree}
+                            contents={archiveStore.tree}
                             className="site-tree"
-                            onNodeCollapse={siteTreeStore.handleNodeCollapse}
-                            onNodeExpand={siteTreeStore.handleNodeExpand}
-                            onNodeClick={siteTreeStore.handleNodeClick}
+                            onNodeCollapse={archiveStore.handleNodeCollapse}
+                            onNodeExpand={archiveStore.handleNodeExpand}
+                            onNodeClick={archiveStore.handleNodeClick}
                         />
                     </Scrollbars>
                 }

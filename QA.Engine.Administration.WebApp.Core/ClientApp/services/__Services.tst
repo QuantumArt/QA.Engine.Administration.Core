@@ -102,7 +102,7 @@ ${
         var idx = url.IndexOf("?");
         if (idx < 0)
             return $"const path = '/{url}';";
-        url = $"const path = `{url.Substring(0, idx)}${{urlparams}}`;";
+        url = $"const path = `/{url.Substring(0, idx)}${{urlparams}}`;";
         return url;
     }
 

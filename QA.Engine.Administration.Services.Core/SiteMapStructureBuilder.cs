@@ -23,7 +23,7 @@ namespace QA.Engine.Administration.Services.Core
             return result;
         }
 
-        public static List<PageModel> GetCurrentPageStructure(int topLevelId, List<PageModel> pages, List<WidgetModel> widgets)
+        public static List<PageModel> GetPageStructureSubtree(int topLevelId, List<PageModel> pages, List<WidgetModel> widgets)
         {
             var pageStructure = pages
                 .Where(x => x.Id == topLevelId)
@@ -51,7 +51,7 @@ namespace QA.Engine.Administration.Services.Core
             return result;
         }
 
-        public static List<WidgetModel> GetCurrentWidgetStructure(int topLevelId, List<WidgetModel> widgets)
+        public static List<WidgetModel> GetWidgetStructureSubtree(int topLevelId, List<WidgetModel> widgets)
         {
             var widgetStructure = widgets
                 .Where(x => topLevelId == x.Id)
@@ -60,6 +60,17 @@ namespace QA.Engine.Administration.Services.Core
             widgetStructure.ForEach(x => widgets.Remove(x));
 
             var result = GetWidgetTree(widgetStructure, widgets);
+
+            return result;
+        }
+
+        public static List<ArchiveModel> GetArchiveStructure(List<ArchiveModel> archives)
+        {
+            var archiveStructure = archives.Where(x => !archives.Any(y => y.Id == (x.ParentId ?? x.VersionOfId))).ToList();
+
+            archiveStructure.ForEach(x => archives.Remove(x));
+
+            var result = GetArchiveTree(archiveStructure, archives);
 
             return result;
         }
@@ -125,6 +136,33 @@ namespace QA.Engine.Administration.Services.Core
             }
 
             return widgetStructure;
+        }
+
+        private static List<ArchiveModel> GetArchiveTree(List<ArchiveModel> archiveStructure, List<ArchiveModel> archives)
+        {
+            var elements = archiveStructure;
+            var makeTree = true;
+            while (makeTree)
+            {
+                makeTree = false;
+                var tmp = new List<ArchiveModel>();
+                foreach (var el in elements)
+                {
+                    el.Children = archives.Where(x => (x.ParentId ?? x.VersionOfId) == el.Id).ToList();
+
+                    if (el.HasChildren)
+                    {
+                        makeTree = true;
+                        tmp.AddRange(el.Children);
+                        el.Children.ForEach(x => archives.Remove(x));
+                    }
+                    else
+                        tmp.Add(el);
+                }
+                elements = tmp;
+            }
+
+            return archiveStructure;
         }
 
         #endregion

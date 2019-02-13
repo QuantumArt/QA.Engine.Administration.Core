@@ -8,6 +8,6 @@ namespace QA.Engine.Administration.Services.Core.Interfaces
         List<PageModel> GetSiteMapItems(int siteId, bool isArchive, int? parentId, int[] regionIds = null, bool? useHierarchyRegionFilter = null);
         List<WidgetModel> GetWidgetItems(int siteId, bool isArchive, int parentId, int[] regionIds = null, bool? useHierarchyRegionFilter = null);
         List<PageModel> GetSiteMapStructure(int siteId, int[] regionIds = null, bool? useHierarchyRegionFilter = null);
-        ArchiveModel GetArchiveStructure(int siteId);
+        List<ArchiveModel> GetArchiveStructure(int siteId);
     }
 }

@@ -5,9 +5,9 @@ import { QpIntegrationState } from 'stores/QpIntegrationStore';
 import { SiteTreeState } from 'stores/SiteTreeStore';
 
 interface Props {
-    qpIntegrationStore?: QpIntegrationState,
-    siteTreeStore?: SiteTreeState,
-    itemId: number,
+    qpIntegrationStore?: QpIntegrationState;
+    siteTreeStore?: SiteTreeState;
+    itemId: number;
 }
 
 @inject('qpIntegrationStore', 'siteTreeStore')
@@ -38,7 +38,6 @@ export default class ElementMenu extends React.Component<Props> {
 
     private handleClick = (e: React.MouseEvent<HTMLElement>, cb: () => void) => {
         e.stopPropagation();
-        console.log('props', this.props);
         cb();
     }
 

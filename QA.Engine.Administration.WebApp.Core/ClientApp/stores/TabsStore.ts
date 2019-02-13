@@ -1,5 +1,5 @@
 import { action, observable } from 'mobx';
-import { ITreeElement } from './SiteTreeStore';
+import { ITreeElement } from 'stores/BaseTreeStore';
 
 export enum TabTypes {
     NONE,

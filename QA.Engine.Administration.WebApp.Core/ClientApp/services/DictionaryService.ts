@@ -71,7 +71,7 @@ class DictionaryService {
         let urlparams = '';
         urlparams += Array.isArray(contentName) && contentName.length === 0 ? '' : `&contentName=${contentName} `;
         urlparams = urlparams.length > 0 ? `?${urlparams.slice(1)}` : '';
-        const path = `api/Dictionary/getQpContent${urlparams}`;
+        const path = `/api/Dictionary/getQpContent${urlparams}`;
         const headers = new Headers();
         headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
         const init = {

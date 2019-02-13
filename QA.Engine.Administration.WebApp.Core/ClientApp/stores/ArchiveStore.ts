@@ -1,26 +1,13 @@
-import { action } from 'mobx';
 import SiteMapService from 'services/SiteMapService';
+import { BaseTreeState } from 'stores/BaseTreeStore';
 
-export class ArchiveState {
+export class ArchiveState extends BaseTreeState<ArchiveViewModel> {
     constructor() {
-        // this.fetchSiteTree();
+        super();
     }
 
-    public archive: ArchiveViewModel;
-
-    @action
-    public async fetchSiteTree() {
-        try {
-            const response: ApiResult<ArchiveViewModel> = await SiteMapService.getArchiveTree();
-            if (response.isSuccess) {
-                this.archive = response.data;
-                console.log(response);
-            } else {
-                throw response.error;
-            }
-        } catch (e) {
-            console.error(e);
-        }
+    async getTree(): Promise<ApiResult<ArchiveViewModel[]>> {
+        return await SiteMapService.getArchiveTree();
     }
 }
 

@@ -17,7 +17,7 @@
     <None Remove="ClientApp\constants\QpActionCodes.ts" />
     <None Remove="ClientApp\enums\TreeState.ts" />
     <None Remove="ClientApp\stores\ArchiveStore.ts" />
-    <None Remove="ClientApp\stores\QpContentStore.ts" />
+    <None Remove="ClientApp\stores\QpIntegrationStore.ts" />
   </ItemGroup>
 
   <ItemGroup>
@@ -41,7 +41,7 @@
     <TypeScriptCompile Include="ClientApp\constants\QpActionCodes.ts" />
     <TypeScriptCompile Include="ClientApp\enums\TreeState.ts" />
     <TypeScriptCompile Include="ClientApp\stores\ArchiveStore.ts" />
-    <TypeScriptCompile Include="ClientApp\stores\QpContentStore.ts" />
+    <TypeScriptCompile Include="ClientApp\stores\QpIntegrationStore.ts" />
   </ItemGroup>
 
   <ItemGroup>
@@ -56,6 +56,9 @@
     </None>
     <None Update="ClientApp\types\ArchiveViewModel.d.ts">
       <CustomToolNamespace>Models\ArchiveViewModel.cs</CustomToolNamespace>
+    </None>
+    <None Update="ClientApp\types\BaseTreeItemViewModel.d.ts">
+      <CustomToolNamespace>Models\BaseTreeItemViewModel.cs</CustomToolNamespace>
     </None>
     <None Update="ClientApp\types\DeleteModel.d.ts">
       <CustomToolNamespace>Models\DeleteModel.cs</CustomToolNamespace>

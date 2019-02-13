@@ -243,16 +243,6 @@
             Структура архива
             </summary>
         </member>
-        <member name="P:QA.Engine.Administration.WebApp.Core.Models.ArchiveViewModel.Pages">
-            <summary>
-            Архивные страницы
-            </summary>
-        </member>
-        <member name="P:QA.Engine.Administration.WebApp.Core.Models.ArchiveViewModel.Widgets">
-            <summary>
-            Архивные виджеты
-            </summary>
-        </member>
         <member name="T:QA.Engine.Administration.WebApp.Core.Models.DeleteModel">
             <summary>
             Модель для окончательного удаления элемента

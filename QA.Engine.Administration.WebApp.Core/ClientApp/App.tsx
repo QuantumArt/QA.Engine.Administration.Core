@@ -9,6 +9,7 @@ import 'normalize.css/normalize.css';
 
 import 'assets/style.css';
 import SiteTree from 'components/SiteTree';
+import ArchiveTree from 'components/SiteTree/ArchiveTree';
 import TabsContainer from 'components/TabsContainer';
 import SiteTreeStore from 'stores/SiteTreeStore';
 import TabsStore from 'stores/TabsStore';
@@ -31,6 +32,7 @@ const app = hot(module)(() => (
                 </NavbarGroup>
             </Navbar>
             <SiteTree />
+            {/* <ArchiveTree /> */}
             <TabsContainer />
             <DevTools />
         </div>

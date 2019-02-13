@@ -11,7 +11,7 @@ class SiteMapService {
         let urlparams = '';
         urlparams += Array.isArray(regionIds) && regionIds.length === 0 ? '' : (regionIds == null ? '' : `&regionIds=${regionIds} `);
         urlparams = urlparams.length > 0 ? `?${urlparams.slice(1)}` : '';
-        const path = `api/SiteMap/getSiteMapTree${urlparams}`;
+        const path = `/api/SiteMap/getSiteMapTree${urlparams}`;
         const headers = new Headers();
         headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
         const init = {
@@ -29,7 +29,7 @@ class SiteMapService {
     }
 
     /** Возвращает полную структуру архива */
-    public async getArchiveTree(): Promise<ApiResult<ArchiveViewModel>> {
+    public async getArchiveTree(): Promise<ApiResult<ArchiveViewModel[]>> {
 
         const path = '/api/SiteMap/getArchiveTree';
         const headers = new Headers();
@@ -42,7 +42,7 @@ class SiteMapService {
         console.debug(`%cstart api request get '${path}'`, 'color: green;');
         const response = await fetch(path, init);
 
-        const result = await <Promise<ApiResult<ArchiveViewModel>>>response.json();
+        const result = await <Promise<ApiResult<ArchiveViewModel[]>>>response.json();
         console.log(`%cresult api get '${path}'`, 'color: blue;', result);
 
         return result;
@@ -56,7 +56,7 @@ class SiteMapService {
         urlparams += Array.isArray(parentId) && parentId.length === 0 ? '' : (parentId == null ? '' : `&regionIds=${parentId} `);
         urlparams += Array.isArray(regionIds) && regionIds.length === 0 ? '' : (regionIds == null ? '' : `&regionIds=${regionIds} `);
         urlparams = urlparams.length > 0 ? `?${urlparams.slice(1)}` : '';
-        const path = `api/SiteMap/getPageTree${urlparams}`;
+        const path = `/api/SiteMap/getPageTree${urlparams}`;
         const headers = new Headers();
         headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
         const init = {
@@ -81,7 +81,7 @@ class SiteMapService {
         urlparams += Array.isArray(parentId) && parentId.length === 0 ? '' : `&parentId=${parentId} `;
         urlparams += Array.isArray(regionIds) && regionIds.length === 0 ? '' : (regionIds == null ? '' : `&regionIds=${regionIds} `);
         urlparams = urlparams.length > 0 ? `?${urlparams.slice(1)}` : '';
-        const path = `api/SiteMap/getWidgetTree${urlparams}`;
+        const path = `/api/SiteMap/getWidgetTree${urlparams}`;
         const headers = new Headers();
         headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
         const init = {

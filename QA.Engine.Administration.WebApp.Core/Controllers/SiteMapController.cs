@@ -67,11 +67,11 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("getArchiveTree")]
-        public ApiResult<ArchiveViewModel> GetArchiveTree()
+        public ApiResult<List<ArchiveViewModel>> GetArchiveTree()
         {
             var archive = _siteMapService.GetArchiveStructure(_siteId);
-            var result = _mapper.Map<ArchiveViewModel>(archive);
-            return ApiResult<ArchiveViewModel>.Success(result);
+            var result = _mapper.Map<List<ArchiveViewModel>>(archive);
+            return ApiResult<List<ArchiveViewModel>>.Success(result);
         }
 
         /// <summary>
