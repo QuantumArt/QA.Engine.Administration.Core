@@ -13,15 +13,6 @@ export interface ITreeElement extends ITreeNode {
     label: string;
 }
 
-interface ITree {
-    id: number;
-    parentId?: number;
-    versionOfId?: number;
-    title: string;
-    children: ITree[];
-    hasChildren: boolean;
-}
-
 export abstract class BaseTreeState<T extends {
     id: number;
     parentId?: null | number;
@@ -99,7 +90,46 @@ export abstract class BaseTreeState<T extends {
         }
     }
 
+    @action
+    public async updateSubTree(id: number): Promise<any> {
+        this.treeState = TreeState.PENDING;
+        try {
+            const response: ApiResult<T> = await this.getSubTree(id);
+            if (response.isSuccess) {
+                const expanded = this.getExpandedIds();
+                const node = this.getNodeById(id);
+                const parentNode = this.getNodeById(node.parentId);
+
+                if (parentNode == null) {
+                    for (let i = 0; i < this.origTree.length; i += 1) {
+                        if (this.origTree[i].id === response.data.id) {
+                            this.origTree[i] = response.data;
+                            break;
+                        }
+                    }
+                } else {
+                    for (let i = 0; i < parentNode.children.length; i += 1) {
+                        if (parentNode.children[i].id === id) {
+                            parentNode.children[i] = response.data;
+                            break;
+                        }
+                    }
+                }
+                this.convertTree(this.origTree);
+                this.restoreExpandedByIds(expanded);
+                this.treeState = TreeState.SUCCESS;
+            } else {
+                this.treeState = TreeState.ERROR;
+                throw response.error;
+            }
+        } catch (e) {
+            this.treeState = TreeState.ERROR;
+            console.error(e);
+        }
+    }
+
     abstract async getTree(): Promise<ApiResult<T[]>>;
+    abstract async getSubTree(id: number): Promise<ApiResult<T>>;
 
     public getNodeById(id: number): T {
         let elements = this.origTree;
@@ -117,6 +147,41 @@ export abstract class BaseTreeState<T extends {
             elements = children;
         }
         return null;
+    }
+
+    private getExpandedIds(): number[] {
+        let elements = this.tree;
+        let loop = true;
+        const result: number[] = [];
+        while (loop) {
+            loop = false;
+            const children: ITreeElement[] = [];
+            elements.filter(x => x.childNodes.length > 0).forEach((x) => {
+                if (x.isExpanded) {
+                    result.push(+x.id);
+                }
+                x.childNodes.forEach(y => children.push(y));
+            });
+            loop = children.length > 0;
+            elements = children;
+        }
+        return result;
+    }
+    private restoreExpandedByIds(ids: number[]) {
+        let elements = this.tree;
+        let loop = true;
+        while (loop) {
+            loop = false;
+            const children: ITreeElement[] = [];
+            elements.filter(x => x.childNodes.length > 0).forEach((x) => {
+                if (ids.indexOf(+x.id) > -1) {
+                    x.isExpanded = true;
+                }
+                x.childNodes.forEach(y => children.push(y));
+            });
+            loop = children.length > 0;
+            elements = children;
+        }
     }
 
     protected convertTree(data: T[]): void {

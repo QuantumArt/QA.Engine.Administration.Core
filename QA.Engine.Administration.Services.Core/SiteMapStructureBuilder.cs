@@ -1,85 +1,98 @@
 ﻿using QA.Engine.Administration.Services.Core.Models;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace QA.Engine.Administration.Services.Core
 {
     public class SiteMapStructureBuilder
     {
-        public static List<PageModel> GetPageStructure(List<PageModel> pages, List<WidgetModel> widgets)
+        public static List<PageModel> GetPageTree(List<PageModel> pages, List<WidgetModel> widgets)
         {
-            var pageStructure = pages
+            var pageTree = pages
                 .Where(x => x.ParentId == null && x.VersionOfId == null)
                 .ToList();
-            if (!pageStructure.Any())
-                pageStructure = pages.Where(x => !pages.Any(y => y.Id == (x.ParentId ?? x.VersionOfId))).ToList();
+            if (!pageTree.Any())
+                pageTree = pages.Where(x => !pages.Any(y => y.Id == (x.ParentId ?? x.VersionOfId))).ToList();
 
-            pageStructure.ForEach(x => pages.Remove(x));
+            pageTree.ForEach(x => pages.Remove(x));
 
-            var result = GetPageTree(pageStructure, pages, widgets);
+            var result = GetPageTreeInternal(pageTree, pages, widgets);
 
             return result;
         }
 
-        public static List<PageModel> GetPageStructureSubtree(int topLevelId, List<PageModel> pages, List<WidgetModel> widgets)
+        public static List<PageModel> GetPageSubTree(int topLevelId, List<PageModel> pages, List<WidgetModel> widgets)
         {
-            var pageStructure = pages
+            var pageTree = pages
                 .Where(x => x.Id == topLevelId)
                 .ToList();
 
-            pageStructure.ForEach(x => pages.Remove(x));
+            pageTree.ForEach(x => pages.Remove(x));
 
-            var result = GetPageTree(pageStructure, pages, widgets);
+            var result = GetPageTreeInternal(pageTree, pages, widgets);
 
             return result;
         }
 
-        public static List<WidgetModel> GetWidgetStructure(PageModel page, List<WidgetModel> widgets)
+        public static List<WidgetModel> GetWidgetTree(PageModel page, List<WidgetModel> widgets)
         {
-            var widgetStructure = widgets
+            var widgetTree = widgets
                 .Where(x => x.ParentId == page?.Id)
                 .ToList();
-            if (!widgetStructure.Any() && page == null)
-                widgetStructure = widgets.Where(x => !widgets.Any(y => y.Id == x.ParentId)).ToList();
+            if (!widgetTree.Any() && page == null)
+                widgetTree = widgets.Where(x => !widgets.Any(y => y.Id == x.ParentId)).ToList();
 
-            widgetStructure.ForEach(x => widgets.Remove(x));
+            widgetTree.ForEach(x => widgets.Remove(x));
 
-            var result = GetWidgetTree(widgetStructure, widgets);
+            var result = GetWidgetTreeInternal(widgetTree, widgets);
 
             return result;
         }
 
-        public static List<WidgetModel> GetWidgetStructureSubtree(int topLevelId, List<WidgetModel> widgets)
+        public static List<WidgetModel> GetWidgetSubTree(int topLevelId, List<WidgetModel> widgets)
         {
-            var widgetStructure = widgets
+            var widgetTree = widgets
                 .Where(x => topLevelId == x.Id)
                 .ToList();
 
-            widgetStructure.ForEach(x => widgets.Remove(x));
+            widgetTree.ForEach(x => widgets.Remove(x));
 
-            var result = GetWidgetTree(widgetStructure, widgets);
+            var result = GetWidgetTreeInternal(widgetTree, widgets);
 
             return result;
         }
 
-        public static List<ArchiveModel> GetArchiveStructure(List<ArchiveModel> archives)
+        public static List<ArchiveModel> GetArchiveTree(List<ArchiveModel> archives)
         {
-            var archiveStructure = archives.Where(x => !archives.Any(y => y.Id == (x.ParentId ?? x.VersionOfId))).ToList();
+            var archiveTree = archives
+                .Where(x => !archives.Any(y => y.Id == (x.ParentId ?? x.VersionOfId)))
+                .ToList();
 
-            archiveStructure.ForEach(x => archives.Remove(x));
+            archiveTree.ForEach(x => archives.Remove(x));
 
-            var result = GetArchiveTree(archiveStructure, archives);
+            var result = GetArchiveTreeInternal(archiveTree, archives);
+
+            return result;
+        }
+
+        public static List<ArchiveModel> GetArchiveSubTree(int topLevelId, List<ArchiveModel> archives)
+        {
+            var archiveTree = archives
+                .Where(x => topLevelId == x.Id)
+                .ToList();
+
+            archiveTree.ForEach(x => archives.Remove(x));
+
+            var result = GetArchiveTreeInternal(archiveTree, archives);
 
             return result;
         }
 
         #region private methods
 
-        private static List<PageModel> GetPageTree(List<PageModel> pageStructure, List<PageModel> pages, List<WidgetModel> widgets)
+        private static List<PageModel> GetPageTreeInternal(List<PageModel> pageTree, List<PageModel> pages, List<WidgetModel> widgets)
         {
-            var elements = pageStructure;
+            var elements = pageTree;
             var makeTree = true;
             while (makeTree)
             {
@@ -103,17 +116,17 @@ namespace QA.Engine.Administration.Services.Core
                         el.ContentVersions.ForEach(x => pages.Remove(x));
                     }
 
-                    el.Widgets = GetWidgetStructure(el, widgets);
+                    el.Widgets = GetWidgetTree(el, widgets);
                 }
                 elements = tmp;
             }
 
-            return pageStructure;
+            return pageTree;
         }
 
-        private static List<WidgetModel> GetWidgetTree(List<WidgetModel> widgetStructure, List<WidgetModel> widgets)
+        private static List<WidgetModel> GetWidgetTreeInternal(List<WidgetModel> widgetTree, List<WidgetModel> widgets)
         {
-            var elements = widgetStructure;
+            var elements = widgetTree;
             var makeTree = true;
             while (makeTree)
             {
@@ -135,12 +148,12 @@ namespace QA.Engine.Administration.Services.Core
                 elements = tmp;
             }
 
-            return widgetStructure;
+            return widgetTree;
         }
 
-        private static List<ArchiveModel> GetArchiveTree(List<ArchiveModel> archiveStructure, List<ArchiveModel> archives)
+        private static List<ArchiveModel> GetArchiveTreeInternal(List<ArchiveModel> archiveTree, List<ArchiveModel> archives)
         {
-            var elements = archiveStructure;
+            var elements = archiveTree;
             var makeTree = true;
             while (makeTree)
             {
@@ -162,7 +175,7 @@ namespace QA.Engine.Administration.Services.Core
                 elements = tmp;
             }
 
-            return archiveStructure;
+            return archiveTree;
         }
 
         #endregion

@@ -28,7 +28,31 @@ class SiteMapService {
         return result;
     }
 
-    /** Возвращает полную структуру архива */
+    /** Возвращает дерево карты сайта от элемента */
+    public async getSiteMapSubTree(id: number, regionIds: number[] = null): Promise<ApiResult<PageViewModel>> {
+
+        let urlparams = '';
+        urlparams += Array.isArray(id) && id.length === 0 ? '' : `&id=${id} `;
+        urlparams += Array.isArray(regionIds) && regionIds.length === 0 ? '' : (regionIds == null ? '' : `&regionIds=${regionIds} `);
+        urlparams = urlparams.length > 0 ? `?${urlparams.slice(1)}` : '';
+        const path = `/api/SiteMap/getSiteMapSubTree${urlparams}`;
+        const headers = new Headers();
+        headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
+        const init = {
+            headers,
+            method: 'get',
+        };
+
+        console.debug(`%cstart api request get '${path}'`, 'color: green;');
+        const response = await fetch(path, init);
+
+        const result = await <Promise<ApiResult<PageViewModel>>>response.json();
+        console.log(`%cresult api get '${path}'`, 'color: blue;', result);
+
+        return result;
+    }
+
+    /** Возвращает полное дерево архива */
     public async getArchiveTree(): Promise<ApiResult<ArchiveViewModel[]>> {
 
         const path = '/api/SiteMap/getArchiveTree';
@@ -43,6 +67,29 @@ class SiteMapService {
         const response = await fetch(path, init);
 
         const result = await <Promise<ApiResult<ArchiveViewModel[]>>>response.json();
+        console.log(`%cresult api get '${path}'`, 'color: blue;', result);
+
+        return result;
+    }
+
+    /** Возвращает дерево архива от элемента */
+    public async getArchiveSubTree(id: number): Promise<ApiResult<ArchiveViewModel>> {
+
+        let urlparams = '';
+        urlparams += Array.isArray(id) && id.length === 0 ? '' : `&id=${id} `;
+        urlparams = urlparams.length > 0 ? `?${urlparams.slice(1)}` : '';
+        const path = `/api/SiteMap/getArchiveSubTree${urlparams}`;
+        const headers = new Headers();
+        headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
+        const init = {
+            headers,
+            method: 'get',
+        };
+
+        console.debug(`%cstart api request get '${path}'`, 'color: green;');
+        const response = await fetch(path, init);
+
+        const result = await <Promise<ApiResult<ArchiveViewModel>>>response.json();
         console.log(`%cresult api get '${path}'`, 'color: blue;', result);
 
         return result;

@@ -87,7 +87,7 @@ namespace QA.Engine.Administration.Services.Core
             return items;
         }
 
-        public List<PageModel> GetSiteMapStructure(int siteId, int[] regionIds = null, bool? useHierarchyRegionFilter = null)
+        public List<PageModel> GetSiteMapTree(int siteId, int[] regionIds = null, bool? useHierarchyRegionFilter = null)
         {
             _logger.LogTrace($"GetSiteMapStructure siteId={siteId}, regionIds={string.Join(", ", regionIds)}, useHierarchyRegionFilter={useHierarchyRegionFilter}");
             Func<AbstractItemData, bool> regionFilter = x => true;
@@ -112,12 +112,42 @@ namespace QA.Engine.Administration.Services.Core
             var pages = abstractItems.Where(x => x.IsPage).Select(x => _mapper.Map<PageModel>(x)).OrderBy(x => x.IndexOrder).ToList();
             var widgets = abstractItems.Where(x => !x.IsPage).Select(x => _mapper.Map<WidgetModel>(x)).OrderBy(x => x.IndexOrder).ToList();
 
-            var pageStructure = SiteMapStructureBuilder.GetPageStructure(pages, widgets);
+            var result = SiteMapStructureBuilder.GetPageTree(pages, widgets);
 
-            return pageStructure;
+            return result;
         }
 
-        public List<ArchiveModel> GetArchiveStructure(int siteId)
+        public PageModel GetSiteMapSubTree(int siteId, int itemId, int[] regionIds = null, bool? useHierarchyRegionFilter = null)
+        {
+            _logger.LogTrace($"GetSiteMapStructure siteId={siteId}, regionIds={string.Join(", ", regionIds)}, useHierarchyRegionFilter={useHierarchyRegionFilter}");
+            Func<AbstractItemData, bool> regionFilter = x => true;
+            var useRegion = _settingsProvider.HasRegion(siteId);
+            if (useRegion)
+            {
+                _logger.LogInformation("Use region filter");
+                var rootPage = _siteMapProvider.GetRootPage(siteId);
+                var regions = _dictionaryProvider.GetAllRegions(siteId);
+                var filter = RegionFilterFactory.Create(rootPage, regions, useHierarchyRegionFilter ?? false);
+                regionFilter = filter.GetFilter(regionIds);
+            }
+
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            var abstractItems = _siteMapProvider.GetAllItems(siteId, false, useRegion)
+                .Where(regionFilter)
+                .ToList();
+            stopwatch.Stop();
+            _logger.LogTrace($"get all abstract items {stopwatch.ElapsedMilliseconds}ms");
+
+            var pages = abstractItems.Where(x => x.IsPage).Select(x => _mapper.Map<PageModel>(x)).OrderBy(x => x.IndexOrder).ToList();
+            var widgets = abstractItems.Where(x => !x.IsPage).Select(x => _mapper.Map<WidgetModel>(x)).OrderBy(x => x.IndexOrder).ToList();
+
+            var result = SiteMapStructureBuilder.GetPageSubTree(itemId, pages, widgets);
+
+            return result.FirstOrDefault();
+        }
+
+        public List<ArchiveModel> GetArchiveTree(int siteId)
         {
             _logger.LogTrace($"GetSiteMapStructure siteId={siteId}");
             var useRegion = _settingsProvider.HasRegion(siteId);
@@ -130,9 +160,27 @@ namespace QA.Engine.Administration.Services.Core
 
             var archives = _mapper.Map<List<ArchiveModel>>(abstractItems).OrderBy(x => x.IndexOrder).ToList();
 
-            var archiveStructure = SiteMapStructureBuilder.GetArchiveStructure(archives);
+            var result = SiteMapStructureBuilder.GetArchiveTree(archives);
 
-            return archiveStructure;
+            return result;
+        }
+
+        public ArchiveModel GetArchiveSubTree(int siteId, int itemId)
+        {
+            _logger.LogTrace($"GetSiteMapStructure siteId={siteId}");
+            var useRegion = _settingsProvider.HasRegion(siteId);
+
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            var abstractItems = _siteMapProvider.GetAllItems(siteId, true, useRegion);
+            stopwatch.Stop();
+            _logger.LogTrace($"get all archive abstract items {stopwatch.ElapsedMilliseconds}ms");
+
+            var archives = _mapper.Map<List<ArchiveModel>>(abstractItems).OrderBy(x => x.IndexOrder).ToList();
+
+            var result = SiteMapStructureBuilder.GetArchiveSubTree(itemId, archives);
+
+            return result.FirstOrDefault();
         }
     }
 }

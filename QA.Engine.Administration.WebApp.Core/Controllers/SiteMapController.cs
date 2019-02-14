@@ -60,7 +60,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
             try
             {
                 _logger.LogTrace($"getSiteMapTree regionIds={string.Join(", ", regionIds)}, userId={_userId}");
-                var siteMap = _siteMapService.GetSiteMapStructure(_siteId, regionIds, _useHierarchyRegionFilter);
+                var siteMap = _siteMapService.GetSiteMapTree(_siteId, regionIds, _useHierarchyRegionFilter);
                 var result = _mapper.Map<List<PageViewModel>>(siteMap);
                 return ApiResult<List<PageViewModel>>.Success(result);
             }
@@ -72,7 +72,28 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         }
 
         /// <summary>
-        /// Возвращает полную структуру архива
+        /// Возвращает дерево карты сайта от элемента
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("getSiteMapSubTree")]
+        public ApiResult<PageViewModel> GetSiteMapSubTree(int id, [FromQuery]int[] regionIds = null)
+        {
+            try
+            {
+                _logger.LogTrace($"getSiteMapSubTree id={id}, regionIds={string.Join(", ", regionIds)}, userId={_userId}");
+                var siteMap = _siteMapService.GetSiteMapSubTree(_siteId, id, regionIds, _useHierarchyRegionFilter);
+                var result = _mapper.Map<PageViewModel>(siteMap);
+                return ApiResult<PageViewModel>.Success(result);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "GetSiteMapSubTree error");
+                return ApiResult<PageViewModel>.Fail(e);
+            }
+        }
+
+        /// <summary>
+        /// Возвращает полное дерево архива
         /// </summary>
         /// <returns></returns>
         [HttpGet("getArchiveTree")]
@@ -81,7 +102,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
             try
             {
                 _logger.LogTrace($"getArchiveTree userId={_userId}");
-                var archive = _siteMapService.GetArchiveStructure(_siteId);
+                var archive = _siteMapService.GetArchiveTree(_siteId);
                 var result = _mapper.Map<List<ArchiveViewModel>>(archive);
                 return ApiResult<List<ArchiveViewModel>>.Success(result);
             }
@@ -89,6 +110,27 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
             {
                 _logger.LogError(e, "GetSiteMapTree error");
                 return ApiResult<List<ArchiveViewModel>>.Fail(e);
+            }
+        }
+
+        /// <summary>
+        /// Возвращает дерево архива от элемента
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("getArchiveSubTree")]
+        public ApiResult<ArchiveViewModel> GetArchiveSubTree(int id)
+        {
+            try
+            {
+                _logger.LogTrace($"getArchiveSubTree id={id}, userId={_userId}");
+                var archive = _siteMapService.GetArchiveSubTree(_siteId, id);
+                var result = _mapper.Map<ArchiveViewModel>(archive);
+                return ApiResult<ArchiveViewModel>.Success(result);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "GetSiteMapSubTree error");
+                return ApiResult<ArchiveViewModel>.Fail(e);
             }
         }
 

@@ -165,9 +165,21 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.GetSiteMapSubTree(System.Int32,System.Int32[])">
+            <summary>
+            Возвращает дерево карты сайта от элемента
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.GetArchiveTree">
             <summary>
-            Возвращает полную структуру архива
+            Возвращает полное дерево архива
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.GetArchiveSubTree(System.Int32)">
+            <summary>
+            Возвращает дерево архива от элемента
             </summary>
             <returns></returns>
         </member>

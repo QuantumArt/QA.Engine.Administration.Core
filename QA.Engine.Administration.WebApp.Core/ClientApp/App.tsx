@@ -32,7 +32,7 @@ const app = hot(module)(() => (
                 </NavbarGroup>
             </Navbar>
             <SiteTree />
-            {/* <ArchiveTree /> */}
+            <ArchiveTree />
             <TabsContainer />
             <DevTools />
         </div>

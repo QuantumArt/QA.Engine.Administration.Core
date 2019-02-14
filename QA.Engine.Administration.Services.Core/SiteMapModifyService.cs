@@ -140,8 +140,8 @@ namespace QA.Engine.Administration.Services.Core
             var allItems = _siteMapProvider.GetAllItems(siteId, false, false);
             var pages = allItems.Where(x => x.IsPage).Select(x => _mapper.Map<PageModel>(x)).OrderBy(x => x.IndexOrder).ToList();
             var widgets = allItems.Where(x => !x.IsPage).Select(x => _mapper.Map<WidgetModel>(x)).OrderBy(x => x.IndexOrder).ToList();
-            var pageStructure = item.IsPage ? SiteMapStructureBuilder.GetPageStructureSubtree(itemId, pages, widgets) : new List<PageModel>();
-            var widgetStructure = !item.IsPage ? SiteMapStructureBuilder.GetWidgetStructureSubtree(itemId, widgets) : new List<WidgetModel>();
+            var pageStructure = item.IsPage ? SiteMapStructureBuilder.GetPageSubTree(itemId, pages, widgets) : new List<PageModel>();
+            var widgetStructure = !item.IsPage ? SiteMapStructureBuilder.GetWidgetSubTree(itemId, widgets) : new List<WidgetModel>();
 
             void funcWidgets(List<WidgetModel> items)
             {
@@ -191,7 +191,7 @@ namespace QA.Engine.Administration.Services.Core
                 {
                     if (!structuralVersion.IsPage)
                         continue;
-                    var structuralVersionPageStructure = SiteMapStructureBuilder.GetPageStructureSubtree(structuralVersion.Id, pages, widgets);
+                    var structuralVersionPageStructure = SiteMapStructureBuilder.GetPageSubTree(structuralVersion.Id, pages, widgets);
                     func(structuralVersionPageStructure);
                 }
             }
@@ -201,10 +201,7 @@ namespace QA.Engine.Administration.Services.Core
 
             var contentId = _settingsProvider.GetContentId(siteId);
 
-            if (itemsToArchive.Any())
-                _qpDataProvider.Remove(siteId, contentId, userId, itemsToArchive);
-            if (moveContentVersion != null)
-                _qpDataProvider.MoveUpContentVersion(siteId, contentId, userId, moveContentVersion);
+            _qpDataProvider.Remove(siteId, contentId, userId, itemsToArchive, moveContentVersion);
         }
 
         public void RestoreSiteMapItems(
@@ -230,8 +227,8 @@ namespace QA.Engine.Administration.Services.Core
             var allItems = _siteMapProvider.GetAllItems(siteId, true, false);
             var pages = allItems.Where(x => x.IsPage).Select(x => _mapper.Map<PageModel>(x)).OrderBy(x => x.IndexOrder).ToList();
             var widgets = allItems.Where(x => !x.IsPage).Select(x => _mapper.Map<WidgetModel>(x)).OrderBy(x => x.IndexOrder).ToList();
-            var pageStructure = item.IsPage ? SiteMapStructureBuilder.GetPageStructureSubtree(itemId, pages, widgets) : new List<PageModel>();
-            var widgetStructure = !item.IsPage ? SiteMapStructureBuilder.GetWidgetStructureSubtree(itemId, widgets) : new List<WidgetModel>();
+            var pageStructure = item.IsPage ? SiteMapStructureBuilder.GetPageSubTree(itemId, pages, widgets) : new List<PageModel>();
+            var widgetStructure = !item.IsPage ? SiteMapStructureBuilder.GetWidgetSubTree(itemId, widgets) : new List<WidgetModel>();
 
             void funcWidgets(List<WidgetModel> items)
             {
@@ -268,7 +265,7 @@ namespace QA.Engine.Administration.Services.Core
                 {
                     if (!structuralVersion.IsPage)
                         continue;
-                    var structuralVersionPageStructure = SiteMapStructureBuilder.GetPageStructureSubtree(structuralVersion.Id, pages, widgets);
+                    var structuralVersionPageStructure = SiteMapStructureBuilder.GetPageSubTree(structuralVersion.Id, pages, widgets);
                     func(structuralVersionPageStructure);
                 }
             }
@@ -302,8 +299,8 @@ namespace QA.Engine.Administration.Services.Core
             var allItems = _siteMapProvider.GetAllItems(siteId, true, false);
             var pages = allItems.Where(x => x.IsPage).Select(x => _mapper.Map<PageModel>(x)).OrderBy(x => x.IndexOrder).ToList();
             var widgets = allItems.Where(x => !x.IsPage).Select(x => _mapper.Map<WidgetModel>(x)).OrderBy(x => x.IndexOrder).ToList();
-            var pageStructure = item.IsPage ? SiteMapStructureBuilder.GetPageStructureSubtree(itemId, pages, widgets) : new List<PageModel>();
-            var widgetStructure = !item.IsPage ? SiteMapStructureBuilder.GetWidgetStructureSubtree(itemId, widgets) : new List<WidgetModel>();
+            var pageStructure = item.IsPage ? SiteMapStructureBuilder.GetPageSubTree(itemId, pages, widgets) : new List<PageModel>();
+            var widgetStructure = !item.IsPage ? SiteMapStructureBuilder.GetWidgetSubTree(itemId, widgets) : new List<WidgetModel>();
 
             void funcWidgets(List<WidgetModel> items)
             {
@@ -340,7 +337,7 @@ namespace QA.Engine.Administration.Services.Core
                 {
                     if (!structuralVersion.IsPage)
                         continue;
-                    var structuralVersionPageStructure = SiteMapStructureBuilder.GetPageStructureSubtree(structuralVersion.Id, pages, widgets);
+                    var structuralVersionPageStructure = SiteMapStructureBuilder.GetPageSubTree(structuralVersion.Id, pages, widgets);
                     func(structuralVersionPageStructure);
                 }
             }

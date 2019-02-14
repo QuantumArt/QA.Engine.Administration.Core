@@ -37,8 +37,8 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
 
         public ActionResult Index()
         {
-            var model = _siteMapService.GetSiteMapStructure(_siteId);
-            var archive = _siteMapService.GetArchiveStructure(_siteId);
+            var model = _siteMapService.GetSiteMapTree(_siteId);
+            var archive = _siteMapService.GetArchiveTree(_siteId);
             ViewData["model"] = model;
             ViewData["archive"] = archive;
             ViewData["userId"] = _webAppQpHelper.UserId;
@@ -47,8 +47,8 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
 
         public ActionResult Dev()
         {
-            var model = _siteMapService.GetSiteMapStructure(_siteId, new[] { 98082 }, _useHierarchyRegionFilter);
-            var archive = _siteMapService.GetArchiveStructure(_siteId);
+            var model = _siteMapService.GetSiteMapTree(_siteId, new[] { 98082 }, _useHierarchyRegionFilter);
+            var archive = _siteMapService.GetArchiveTree(_siteId);
             var regions = _regionService.GetRegionStructure(_siteId);
             ViewData["model"] = model;
             ViewData["archive"] = archive;

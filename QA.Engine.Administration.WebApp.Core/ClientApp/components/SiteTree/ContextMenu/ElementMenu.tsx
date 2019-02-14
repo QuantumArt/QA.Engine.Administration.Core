@@ -3,14 +3,16 @@ import { Intent, Menu, MenuDivider, MenuItem } from '@blueprintjs/core';
 import { observer, inject } from 'mobx-react';
 import { QpIntegrationState } from 'stores/QpIntegrationStore';
 import { SiteTreeState } from 'stores/SiteTreeStore';
+import { ArchiveState } from 'stores/ArchiveStore';
 
 interface Props {
     qpIntegrationStore?: QpIntegrationState;
     siteTreeStore?: SiteTreeState;
+    archiveStore?: ArchiveState;
     itemId: number;
 }
 
-@inject('qpIntegrationStore', 'siteTreeStore')
+@inject('qpIntegrationStore', 'siteTreeStore', 'archiveStore')
 @observer
 export default class ElementMenu extends React.Component<Props> {
 
@@ -22,18 +24,63 @@ export default class ElementMenu extends React.Component<Props> {
     private addClick = () => {
         const { qpIntegrationStore, siteTreeStore, itemId } = this.props;
         const node = siteTreeStore.getNodeById(itemId);
-        qpIntegrationStore.add(node, null);
+        qpIntegrationStore.add(node, null, `test_page_${Date.now()}`, `test page ${Date.now()}`, 741035, 0);
     }
 
     private addVersionClick = () => {
         const { qpIntegrationStore, siteTreeStore, itemId } = this.props;
         const node = siteTreeStore.getNodeById(itemId);
-        qpIntegrationStore.add(node, 'Structural');
+        qpIntegrationStore.add(node, 'Structural', node.alias, `${node.title} (struct v.)`, 741035, 0);
     }
 
     private historyClick = () => {
         const { qpIntegrationStore, itemId } = this.props;
         qpIntegrationStore.history(itemId);
+    }
+
+    private publishClick = () => {
+        const { siteTreeStore, itemId } = this.props;
+        siteTreeStore.publish([itemId]);
+    }
+
+    private removeClick = () => {
+        const { siteTreeStore, itemId } = this.props;
+        const model: RemoveModel = {
+            itemId,
+            isDeleteAllVersions: true,
+            isDeleteContentVersions: true,
+            contentVersionId: null,
+        };
+        siteTreeStore.remove(model);
+        siteTreeStore.updateSubTree(itemId);
+    }
+
+    private updateClick = () => {
+        const { siteTreeStore, itemId } = this.props;
+        siteTreeStore.updateSubTree(itemId);
+    }
+
+    private restoreClick = () => {
+        const { archiveStore, itemId } = this.props;
+        const model: RestoreModel = {
+            itemId,
+            isRestoreAllVersions: true,
+            isRestoreWidgets: true,
+            isRestoreContentVersions: true,
+            isRestoreChildren: true,
+        };
+        archiveStore.restore(model);
+        archiveStore.updateSubTree(itemId);
+    }
+
+    private deleteClick = () => {
+        const { archiveStore, itemId } = this.props;
+        const model: DeleteModel = {
+            itemId,
+            isDeleteAllVersions: true,
+        };
+        archiveStore.delete(model);
+        archiveStore.updateSubTree(itemId);
     }
 
     private handleClick = (e: React.MouseEvent<HTMLElement>, cb: () => void) => {
@@ -47,10 +94,32 @@ export default class ElementMenu extends React.Component<Props> {
     }
 
     render() {
+        const { archiveStore, itemId } = this.props;
+        let isArchive = false;
+        if (archiveStore.getNodeById(itemId) != null) {
+            isArchive = true;
+        }
+        if (isArchive === true) {
+            return (
+                <Menu>
+                    <MenuItem
+                        onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.restoreClick)}
+                        icon="swap-horizontal"
+                        text="Восстановить"/>
+                    <MenuDivider/>
+                    <MenuItem
+                        onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.deleteClick)}
+                        icon="delete"
+                        text="Удалить"
+                        intent={Intent.DANGER}/>
+                </Menu>
+            );
+        }
+
         return (
             <Menu>
                 <MenuItem
-                    onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.handlerExample)}
+                    onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.updateClick)}
                     icon="refresh"
                     text="Обновить"
                 />
@@ -66,7 +135,7 @@ export default class ElementMenu extends React.Component<Props> {
                 />
                 <MenuDivider/>
                 <MenuItem
-                    onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.handlerExample)}
+                    onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.publishClick)}
                     icon="confirm"
                     text="Публиковать"
                     intent={Intent.SUCCESS}
@@ -89,7 +158,7 @@ export default class ElementMenu extends React.Component<Props> {
                     intent={Intent.PRIMARY}/>
                 <MenuDivider/>
                 <MenuItem
-                    onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.handlerExample)}
+                    onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.removeClick)}
                     icon="box"
                     text="Архивировать"
                     intent={Intent.DANGER}/>

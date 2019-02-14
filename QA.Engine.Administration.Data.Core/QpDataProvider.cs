@@ -125,40 +125,48 @@ namespace QA.Engine.Administration.Data.Core
             _qpDbConnector.DbConnector.MassUpdate(contentId, new[] { values }, userId);
         }
 
-        public void Remove(int siteId, int contentId, int userId, IEnumerable<AbstractItemData> items)
+        public void Remove(int siteId, int contentId, int userId, IEnumerable<AbstractItemData> items, AbstractItemData moveContentVersion)
         {
             var siteName = _qpMetadataManager.GetSiteName(siteId);
+            var columnNames = GetColumnNamesByNetNames(siteId, new List<string> { "Name", "Parent", "VersionOf", "IsPage" });
 
             _qpDbConnector.BeginTransaction(IsolationLevel.Serializable);
 
             try
             {
-                // update content
-                var values = items.Select(x => new Dictionary<string, string>
+                if (items.Any())
                 {
-                    { ContentItemIdFieldName, x.Id.ToString(CultureInfo.InvariantCulture) },
-                    { ArchiveFieldName, "1" }
-                });
-                _qpDbConnector.DbConnector.MassUpdate(contentId, values, userId);
+                    // update content
+                    var values = items.Select(x => new Dictionary<string, string>
+                    {
+                        { ContentItemIdFieldName, x.Id.ToString(CultureInfo.InvariantCulture) },
+                        { ArchiveFieldName, "1" }
+                    });
+                    _qpDbConnector.DbConnector.MassUpdate(contentId, values, userId);
 
-                //update extantion
-                var extantionValues = items
-                    .Where(x => x.ExtensionId.HasValue)
-                    .GroupBy(x => x.ExtensionId.Value, x => x.Id);
-                foreach (var item in extantionValues)
-                {
-                    var contentName = _qpMetadataManager.GetContentName(item.Key);
-                    _qpContentManager
-                        .Connect()
-                        .SiteName(siteName)
-                        .IsIncludeArchive(true)
-                        .IsShowSplittedArticle(true)
-                        .StatusName(_statusNames)
-                        .ContentId(item.Key)
-                        .ContentName(contentName)
-                        .Where($"ItemId in ({string.Join(",", item.Select(x => x))})")
-                        .Archive(userId);
+                    //update extantion
+                    var extantionValues = items
+                        .Where(x => x.ExtensionId.HasValue)
+                        .GroupBy(x => x.ExtensionId.Value, x => x.Id);
+                    foreach (var item in extantionValues)
+                    {
+                        var contentName = _qpMetadataManager.GetContentName(item.Key);
+                        _qpContentManager
+                            .Connect()
+                            .SiteName(siteName)
+                            .IsIncludeArchive(true)
+                            .IsShowSplittedArticle(true)
+                            .StatusName(_statusNames)
+                            .ContentId(item.Key)
+                            .ContentName(contentName)
+                            .Where($"ItemId in ({string.Join(",", item.Select(x => x))})")
+                            .Archive(userId);
+                    }
                 }
+
+                if (moveContentVersion != null)
+                    MoveUpContentVersion(siteId, contentId, userId, moveContentVersion, columnNames);
+
                 _qpDbConnector.CommitTransaction();
             }
             catch (Exception e)
@@ -166,34 +174,6 @@ namespace QA.Engine.Administration.Data.Core
                 _qpDbConnector.RollbackTransaction();
                 throw e;
             }
-        }
-
-        public void MoveUpContentVersion(int siteId, int contentId, int userId, AbstractItemData item)
-        {
-            var columnNames = GetColumnNamesByNetNames(siteId, new List<string> { "Name", "Parent", "VersionOf", "IsPage" });
-
-            var value = new Dictionary<string, string> { { ContentItemIdFieldName, item.Id.ToString(CultureInfo.InvariantCulture) } };
-            foreach (var x in columnNames)
-            {
-                switch(x.Key)
-                {
-                    case "Name":
-                        value.Add(x.Value, item.Alias);
-                        break;
-                    case "Parent":
-                        value.Add(x.Value, item.ParentId.ToString());
-                        break;
-                    case "VersionOf":
-                        value.Add(x.Value, null);
-                        break;
-                    case "IsPage":
-                        value.Add(x.Value, "1");
-                        break;
-                    default:
-                        break;
-                }
-            }
-            _qpDbConnector.DbConnector.MassUpdate(contentId, new[] { value }, userId);
         }
 
         public void Restore(int siteId, int contentId, int userId, IEnumerable<AbstractItemData> items)
@@ -285,6 +265,32 @@ namespace QA.Engine.Administration.Data.Core
                 _qpDbConnector.RollbackTransaction();
                 throw e;
             }
+        }
+
+        private void MoveUpContentVersion(int siteId, int contentId, int userId, AbstractItemData item, Dictionary<string, string> columnNames)
+        {
+            var value = new Dictionary<string, string> { { ContentItemIdFieldName, item.Id.ToString(CultureInfo.InvariantCulture) } };
+            foreach (var x in columnNames)
+            {
+                switch (x.Key)
+                {
+                    case "Name":
+                        value.Add(x.Value, item.Alias);
+                        break;
+                    case "Parent":
+                        value.Add(x.Value, item.ParentId.ToString());
+                        break;
+                    case "VersionOf":
+                        value.Add(x.Value, null);
+                        break;
+                    case "IsPage":
+                        value.Add(x.Value, "1");
+                        break;
+                    default:
+                        break;
+                }
+            }
+            _qpDbConnector.DbConnector.MassUpdate(contentId, new[] { value }, userId);
         }
 
         private string GetColumnNameByNetName(int siteId, string columnNetName)

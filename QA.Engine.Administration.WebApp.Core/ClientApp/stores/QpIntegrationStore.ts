@@ -4,6 +4,7 @@ import QpActionCodes from 'constants/QpActionCodes';
 import QpCallbackProcNames from 'constants/QpCallbackProcNames';
 import QpEntityCodes from 'constants/QpEntityCodes';
 import { BackendEventObserver, executeBackendAction, ArticleFormState, ExecuteActionOptions, InitFieldValue } from 'qp/QP8BackendApi.Interaction';
+import siteTreeStore from './SiteTreeStore';
 
 export class QpIntegrationState {
     constructor() {
@@ -12,7 +13,7 @@ export class QpIntegrationState {
     private qpContent: QpContentViewModel;
     private qpAbstractItem: string = 'QPAbstractItem';
 
-    public async fetchQPAbstractItemFields() {
+    private async fetchQPAbstractItemFields() {
         try {
             const response: ApiResult<QpContentViewModel> = await DictionaryService.getQpContent(this.qpAbstractItem);
             if (response.isSuccess) {
@@ -26,13 +27,22 @@ export class QpIntegrationState {
         }
     }
 
+    private async updateSiteMapSubTree(id: number) {
+        try {
+            siteTreeStore.updateSubTree(id);
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
     public async edit(id: number) {
 
         if (this.qpContent == null || this.qpContent.fields == null || this.qpContent.fields!.length === 0) {
             await this.fetchQPAbstractItemFields();
         }
 
-        new BackendEventObserver(QpCallbackProcNames.editCode, this.updateCallback);
+        const func = (eventType: number, args: any) => this.updateCallback(eventType, args, id);
+        new BackendEventObserver(QpCallbackProcNames.editCode, func);
 
         const executeOptions = QpIntegrationUtils.initOptions(QpCallbackProcNames.editCode, QpActionCodes.edit_article, id, this.qpContent.id);
 
@@ -58,7 +68,8 @@ export class QpIntegrationState {
             await this.fetchQPAbstractItemFields();
         }
 
-        new BackendEventObserver(QpCallbackProcNames.addCode, this.addCallback);
+        const func = (eventType: number, args: any) => this.addCallback(eventType, args, node.id);
+        new BackendEventObserver(QpCallbackProcNames.addCode, func);
 
         const executeOptions = QpIntegrationUtils.initOptions(QpCallbackProcNames.addCode, QpActionCodes.new_article, 0, this.qpContent.id);
 
@@ -126,7 +137,7 @@ export class QpIntegrationState {
         executeBackendAction(executeOptions, QpIntegrationUtils.hostUID(), window.parent);
     }
 
-    private updateCallback = (eventType: number, args: any) => {
+    private updateCallback = (eventType: number, args: any, id: number) => {
         if (BackendEventObserver.EventType.SelectWindowClosed === eventType) {
             return;
         }
@@ -134,12 +145,13 @@ export class QpIntegrationState {
         if (BackendEventObserver.EventType.ActionExecuted === eventType) {
             if (args.actionCode === QpActionCodes.update_article || args.actionCode === QpActionCodes.update_article_and_up) {
                 console.log('%cupdateCallback', 'color: magenta;', args);
+                this.updateSiteMapSubTree(id);
                 return;
             }
         }
     }
 
-    private addCallback = (eventType: number, args: any) => {
+    private addCallback = (eventType: number, args: any, id: number) => {
         if (BackendEventObserver.EventType.HostUnbinded === eventType) {
             return;
         }
@@ -148,10 +160,12 @@ export class QpIntegrationState {
             if (args.actionCode === QpActionCodes.save_article || args.actionCode === QpActionCodes.save_article_and_up) {
                 // todo: update tree
                 console.log('%caddCallback', 'color: magenta;', args);
+                this.updateSiteMapSubTree(id);
                 return;
             }  if (args.actionCode === QpActionCodes.update_article || args.actionCode === QpActionCodes.update_article_and_up) {
                 // todo: update tree
                 console.log('%caddCallback', 'color: magenta;', args);
+                this.updateSiteMapSubTree(id);
                 return;
             }
         }
