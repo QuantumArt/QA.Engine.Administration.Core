@@ -15,6 +15,7 @@ import SiteTreeStore from 'stores/SiteTreeStore';
 import TabsStore from 'stores/TabsStore';
 import ArchiveStore from 'stores/ArchiveStore';
 import QpIntegrationStore from 'stores/QpIntegrationStore';
+import ExtensionFieldsStore from 'stores/ExtensionFieldsStore';
 
 const app = hot(module)(() => (
     <Provider
@@ -22,6 +23,7 @@ const app = hot(module)(() => (
         archiveStore={ArchiveStore}
         tabsStore={TabsStore}
         qpIntegrationStore={QpIntegrationStore}
+        extensionFieldsStore={ExtensionFieldsStore}
     >
         <div className="layout">
             <Navbar fixedToTop>

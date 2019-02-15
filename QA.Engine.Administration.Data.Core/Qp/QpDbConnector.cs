@@ -109,6 +109,8 @@ namespace QA.Engine.Administration.Data.Core.Qp
         {
             if (_transaction != null)
                 _transaction.Rollback();
+            if (_connection.State != ConnectionState.Open)
+                _connection.Open();
             _transaction = _connection.BeginTransaction(isolationLevel);
             DbConnector.ExternalTransaction = _transaction;
         }

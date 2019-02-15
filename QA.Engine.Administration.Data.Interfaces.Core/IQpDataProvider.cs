@@ -8,7 +8,7 @@ namespace QA.Engine.Administration.Data.Interfaces.Core
         /// <summary>
         /// Редактировать элемент
         /// </summary>
-        void Edit(int siteId, int contentId, int userId, int itemId, string title);
+        void Edit(int siteId, int contentId, int userId, EditData editData);
         /// <summary>
         /// Изменить статус публикации
         /// </summary>

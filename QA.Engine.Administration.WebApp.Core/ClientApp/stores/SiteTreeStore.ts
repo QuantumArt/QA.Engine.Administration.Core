@@ -1,48 +1,63 @@
 import SiteMapService from 'services/SiteMapService';
 import { BaseTreeState } from 'stores/BaseTreeStore';
-import TreeState from 'enums/TreeState';
+import OperationState from 'enums/OperationState';
 
-export class SiteTreeState extends BaseTreeState<PageViewModel> {
+export class SiteTreeState extends BaseTreeState<PageModel> {
     constructor() {
         super();
     }
 
-    async getTree(): Promise<ApiResult<PageViewModel[]>> {
+    async getTree(): Promise<ApiResult<PageModel[]>> {
         return await SiteMapService.getSiteMapTree();
     }
 
-    async getSubTree(id: number): Promise<ApiResult<PageViewModel>> {
+    async getSubTree(id: number): Promise<ApiResult<PageModel>> {
         return await SiteMapService.getSiteMapSubTree(id);
     }
 
     async publish(itemIds: number[]): Promise<any> {
-        this.treeState = TreeState.PENDING;
+        this.treeState = OperationState.PENDING;
         try {
             const response: ApiResult<any> = await SiteMapService.publish(itemIds);
             if (response.isSuccess) {
-                this.treeState = TreeState.SUCCESS;
+                this.treeState = OperationState.SUCCESS;
             } else {
-                this.treeState = TreeState.ERROR;
                 throw response.error;
             }
         } catch (e) {
-            this.treeState = TreeState.ERROR;
+            this.treeState = OperationState.ERROR;
             console.error(e);
         }
     }
 
     async remove(model: RemoveModel): Promise<any> {
-        this.treeState = TreeState.PENDING;
+        this.treeState = OperationState.PENDING;
         try {
             const response: ApiResult<any> = await SiteMapService.remove(model);
             if (response.isSuccess) {
-                this.treeState = TreeState.SUCCESS;
+                await this.updateSubTreeInternal(model.itemId);
+                this.treeState = OperationState.SUCCESS;
             } else {
-                this.treeState = TreeState.ERROR;
                 throw response.error;
             }
         } catch (e) {
-            this.treeState = TreeState.ERROR;
+            this.treeState = OperationState.ERROR;
+            console.error(e);
+        }
+    }
+
+    async edit(model: EditModel): Promise<any> {
+        this.treeState = OperationState.PENDING;
+        try {
+            const response: ApiResult<any> = await SiteMapService.edit(model);
+            if (response.isSuccess) {
+                await this.updateSubTreeInternal(model.itemId);
+                this.treeState = OperationState.SUCCESS;
+            } else {
+                throw response.error;
+            }
+        } catch (e) {
+            this.treeState = OperationState.ERROR;
             console.error(e);
         }
     }

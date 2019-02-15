@@ -6,7 +6,7 @@
 class DictionaryService {
 
     /** Возвращает типы контента */
-    public async getDescriminators(): Promise<ApiResult<DiscriminatorViewModel[]>> {
+    public async getDescriminators(): Promise<ApiResult<DiscriminatorModel[]>> {
 
         const path = '/api/Dictionary/getDefinitions';
         const headers = new Headers();
@@ -19,14 +19,14 @@ class DictionaryService {
         console.debug(`%cstart api request get '${path}'`, 'color: green;');
         const response = await fetch(path, init);
 
-        const result = await <Promise<ApiResult<DiscriminatorViewModel[]>>>response.json();
+        const result = await <Promise<ApiResult<DiscriminatorModel[]>>>response.json();
         console.log(`%cresult api get '${path}'`, 'color: blue;', result);
 
         return result;
     }
 
     /** Возвращает регионы списком */
-    public async getFlatRegions(): Promise<ApiResult<RegionViewModel[]>> {
+    public async getFlatRegions(): Promise<ApiResult<RegionModel[]>> {
 
         const path = '/api/Dictionary/getFlatRegions';
         const headers = new Headers();
@@ -39,14 +39,14 @@ class DictionaryService {
         console.debug(`%cstart api request get '${path}'`, 'color: green;');
         const response = await fetch(path, init);
 
-        const result = await <Promise<ApiResult<RegionViewModel[]>>>response.json();
+        const result = await <Promise<ApiResult<RegionModel[]>>>response.json();
         console.log(`%cresult api get '${path}'`, 'color: blue;', result);
 
         return result;
     }
 
     /** Возвращает дерево регионов */
-    public async getRegionTree(): Promise<ApiResult<RegionViewModel[]>> {
+    public async getRegionTree(): Promise<ApiResult<RegionModel[]>> {
 
         const path = '/api/Dictionary/getRegionTree';
         const headers = new Headers();
@@ -59,14 +59,14 @@ class DictionaryService {
         console.debug(`%cstart api request get '${path}'`, 'color: green;');
         const response = await fetch(path, init);
 
-        const result = await <Promise<ApiResult<RegionViewModel[]>>>response.json();
+        const result = await <Promise<ApiResult<RegionModel[]>>>response.json();
         console.log(`%cresult api get '${path}'`, 'color: blue;', result);
 
         return result;
     }
 
     /** Возвращает контент qp с полями */
-    public async getQpContent(contentName: string): Promise<ApiResult<QpContentViewModel>> {
+    public async getQpContent(contentName: string): Promise<ApiResult<QpContentModel>> {
 
         let urlparams = '';
         urlparams += Array.isArray(contentName) && contentName.length === 0 ? '' : `&contentName=${contentName} `;
@@ -82,7 +82,7 @@ class DictionaryService {
         console.debug(`%cstart api request get '${path}'`, 'color: green;');
         const response = await fetch(path, init);
 
-        const result = await <Promise<ApiResult<QpContentViewModel>>>response.json();
+        const result = await <Promise<ApiResult<QpContentModel>>>response.json();
         console.log(`%cresult api get '${path}'`, 'color: blue;', result);
 
         return result;

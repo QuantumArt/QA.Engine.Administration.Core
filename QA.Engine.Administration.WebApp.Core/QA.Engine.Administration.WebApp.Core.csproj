@@ -55,8 +55,8 @@
     <None Update="ClientApp\types\ApiResult.d.ts">
       <CustomToolNamespace>Models\ApiResult.cs</CustomToolNamespace>
     </None>
-    <None Update="ClientApp\types\ArchiveViewModel.d.ts">
-      <CustomToolNamespace>Models\ArchiveViewModel.cs</CustomToolNamespace>
+    <None Update="ClientApp\types\ArchiveModel.d.ts">
+      <CustomToolNamespace>..\QA.Engine.Administration.Services.Core\Models\ArchiveModel.cs</CustomToolNamespace>
     </None>
     <None Update="ClientApp\types\BaseTreeItemViewModel.d.ts">
       <CustomToolNamespace>Models\BaseTreeItemViewModel.cs</CustomToolNamespace>
@@ -64,26 +64,29 @@
     <None Update="ClientApp\types\DeleteModel.d.ts">
       <CustomToolNamespace>Models\DeleteModel.cs</CustomToolNamespace>
     </None>
-    <None Update="ClientApp\types\DiscriminatorViewModel.d.ts">
-      <CustomToolNamespace>Models\DiscriminatorViewModel.cs</CustomToolNamespace>
+    <None Update="ClientApp\types\DiscriminatorModel.d.ts">
+      <CustomToolNamespace>..\QA.Engine.Administration.Services.Core\Models\DiscriminatorModel.cs</CustomToolNamespace>
     </None>
     <None Update="ClientApp\types\EditModel.d.ts">
-      <CustomToolNamespace>Models\EditModel.cs</CustomToolNamespace>
+      <CustomToolNamespace>..\QA.Engine.Administration.Services.Core\Models\EditModel.cs</CustomToolNamespace>
+    </None>
+    <None Update="ClientApp\types\ExtensionFieldModel.d.ts">
+      <CustomToolNamespace>..\QA.Engine.Administration.Services.Core\Models\ExtensionFieldModel.cs</CustomToolNamespace>
     </None>
     <None Update="ClientApp\types\MoveModel.d.ts">
       <CustomToolNamespace>Models\MoveModel.cs</CustomToolNamespace>
     </None>
-    <None Update="ClientApp\types\PageViewModel.d.ts">
-      <CustomToolNamespace>Models\PageViewModel.cs</CustomToolNamespace>
+    <None Update="ClientApp\types\PageModel.d.ts">
+      <CustomToolNamespace>..\QA.Engine.Administration.Services.Core\Models\PageModel.cs</CustomToolNamespace>
     </None>
-    <None Update="ClientApp\types\QpContentViewModel.d.ts">
-      <CustomToolNamespace>Models\QpContentViewModel.cs</CustomToolNamespace>
+    <None Update="ClientApp\types\QpContentModel.d.ts">
+      <CustomToolNamespace>..\QA.Engine.Administration.Services.Core\Models\QpContentModel.cs</CustomToolNamespace>
     </None>
-    <None Update="ClientApp\types\QpFieldViewModel.d.ts">
-      <CustomToolNamespace>Models\QpFieldViewModel.cs</CustomToolNamespace>
+    <None Update="ClientApp\types\QpFieldModel.d.ts">
+      <CustomToolNamespace>..\QA.Engine.Administration.Services.Core\Models\QpFieldModel.cs</CustomToolNamespace>
     </None>
-    <None Update="ClientApp\types\RegionViewModel.d.ts">
-      <CustomToolNamespace>Models\RegionViewModel.cs</CustomToolNamespace>
+    <None Update="ClientApp\types\RegionModel.d.ts">
+      <CustomToolNamespace>..\QA.Engine.Administration.Services.Core\Models\RegionModel.cs</CustomToolNamespace>
     </None>
     <None Update="ClientApp\types\RemoveModel.d.ts">
       <CustomToolNamespace>Models\RemoveModel.cs</CustomToolNamespace>
@@ -94,8 +97,8 @@
     <None Update="ClientApp\types\RestoreModel.d.ts">
       <CustomToolNamespace>Models\RestoreModel.cs</CustomToolNamespace>
     </None>
-    <None Update="ClientApp\types\WidgetViewModel.d.ts">
-      <CustomToolNamespace>Models\WidgetViewModel.cs</CustomToolNamespace>
+    <None Update="ClientApp\types\WidgetModel.d.ts">
+      <CustomToolNamespace>..\QA.Engine.Administration.Services.Core\Models\WidgetModel.cs</CustomToolNamespace>
     </None>
   </ItemGroup>
 </Project>

@@ -1,16 +1,14 @@
 using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using QA.Engine.Administration.Services.Core.Annotations;
 using QA.Engine.Administration.Services.Core.Interfaces;
 using QA.Engine.Administration.Services.Core.Models;
-using QA.Engine.Administration.WebApp.Core.Annotations;
 using QA.Engine.Administration.WebApp.Core.Auth;
 using QA.Engine.Administration.WebApp.Core.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace QA.Engine.Administration.WebApp.Core.Controllers
 {
@@ -55,19 +53,18 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("getSiteMapTree")]
-        public ApiResult<List<PageViewModel>> GetSiteMapTree([FromQuery]int[] regionIds = null)
+        public ApiResult<List<PageModel>> GetSiteMapTree([FromQuery]int[] regionIds = null)
         {
             try
             {
                 _logger.LogTrace($"getSiteMapTree regionIds={string.Join(", ", regionIds)}, userId={_userId}");
                 var siteMap = _siteMapService.GetSiteMapTree(_siteId, regionIds, _useHierarchyRegionFilter);
-                var result = _mapper.Map<List<PageViewModel>>(siteMap);
-                return ApiResult<List<PageViewModel>>.Success(result);
+                return ApiResult<List<PageModel>>.Success(siteMap);
             }
             catch(Exception e)
             {
                 _logger.LogError(e, "GetSiteMapTree error");
-                return ApiResult<List<PageViewModel>>.Fail(e);
+                return ApiResult<List<PageModel>>.Fail(e);
             }
         }
 
@@ -76,19 +73,18 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("getSiteMapSubTree")]
-        public ApiResult<PageViewModel> GetSiteMapSubTree(int id, [FromQuery]int[] regionIds = null)
+        public ApiResult<PageModel> GetSiteMapSubTree(int id, [FromQuery]int[] regionIds = null)
         {
             try
             {
                 _logger.LogTrace($"getSiteMapSubTree id={id}, regionIds={string.Join(", ", regionIds)}, userId={_userId}");
                 var siteMap = _siteMapService.GetSiteMapSubTree(_siteId, id, regionIds, _useHierarchyRegionFilter);
-                var result = _mapper.Map<PageViewModel>(siteMap);
-                return ApiResult<PageViewModel>.Success(result);
+                return ApiResult<PageModel>.Success(siteMap);
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "GetSiteMapSubTree error");
-                return ApiResult<PageViewModel>.Fail(e);
+                return ApiResult<PageModel>.Fail(e);
             }
         }
 
@@ -97,19 +93,18 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("getArchiveTree")]
-        public ApiResult<List<ArchiveViewModel>> GetArchiveTree()
+        public ApiResult<List<ArchiveModel>> GetArchiveTree()
         {
             try
             {
                 _logger.LogTrace($"getArchiveTree userId={_userId}");
                 var archive = _siteMapService.GetArchiveTree(_siteId);
-                var result = _mapper.Map<List<ArchiveViewModel>>(archive);
-                return ApiResult<List<ArchiveViewModel>>.Success(result);
+                return ApiResult<List<ArchiveModel>>.Success(archive);
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "GetSiteMapTree error");
-                return ApiResult<List<ArchiveViewModel>>.Fail(e);
+                return ApiResult<List<ArchiveModel>>.Fail(e);
             }
         }
 
@@ -118,19 +113,18 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("getArchiveSubTree")]
-        public ApiResult<ArchiveViewModel> GetArchiveSubTree(int id)
+        public ApiResult<ArchiveModel> GetArchiveSubTree(int id)
         {
             try
             {
                 _logger.LogTrace($"getArchiveSubTree id={id}, userId={_userId}");
                 var archive = _siteMapService.GetArchiveSubTree(_siteId, id);
-                var result = _mapper.Map<ArchiveViewModel>(archive);
-                return ApiResult<ArchiveViewModel>.Success(result);
+                return ApiResult<ArchiveModel>.Success(archive);
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "GetSiteMapSubTree error");
-                return ApiResult<ArchiveViewModel>.Fail(e);
+                return ApiResult<ArchiveModel>.Fail(e);
             }
         }
 
@@ -142,19 +136,18 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// <param name="regionIds">Id регионов</param>
         /// <returns></returns>
         [HttpGet("getPageTree")]
-        public ApiResult<List<PageViewModel>> GetPageTree(bool isArchive, int? parentId, [FromQuery]int[] regionIds = null)
+        public ApiResult<List<PageModel>> GetPageTree(bool isArchive, int? parentId, [FromQuery]int[] regionIds = null)
         {
             try
             {
                 _logger.LogTrace($"getPageTree isArchive={isArchive}, parentId={parentId}, regionIds={string.Join(", ", regionIds)}, userId={_userId}");
                 var siteMap = _siteMapService.GetSiteMapItems(_siteId, isArchive, parentId, regionIds, _useHierarchyRegionFilter);
-                var result = _mapper.Map<List<PageViewModel>>(siteMap);
-                return ApiResult<List<PageViewModel>>.Success(result);
+                return ApiResult<List<PageModel>>.Success(siteMap);
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "GetSiteMapTree error");
-                return ApiResult<List<PageViewModel>>.Fail(e);
+                return ApiResult<List<PageModel>>.Fail(e);
             }
         }
 
@@ -166,19 +159,39 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// <param name="regionIds">Id регионов</param>
         /// <returns></returns>
         [HttpGet("getWidgetTree")]
-        public ApiResult<List<WidgetViewModel>> GetWidgetTree(bool isArchive, int parentId, [FromQuery]int[] regionIds = null)
+        public ApiResult<List<WidgetModel>> GetWidgetTree(bool isArchive, int parentId, [FromQuery]int[] regionIds = null)
         {
             try
             {
                 _logger.LogTrace($"getWidgetTree isArchive={isArchive}, parentId={parentId}, regionIds={string.Join(", ", regionIds)}, userId={_userId}");
                 var widgets = _siteMapService.GetWidgetItems(_siteId, isArchive, parentId, regionIds, _useHierarchyRegionFilter);
-                var result = _mapper.Map<List<WidgetViewModel>>(widgets);
-                return ApiResult<List<WidgetViewModel>>.Success(result);
+                return ApiResult<List<WidgetModel>>.Success(widgets);
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "GetSiteMapTree error");
-                return ApiResult<List<WidgetViewModel>>.Fail(e);
+                return ApiResult<List<WidgetModel>>.Fail(e);
+            }
+        }
+
+        /// <summary>
+        /// Возвращает поля расширения для статьи контента
+        /// </summary>
+        /// <param name="id">Id статьи</param>
+        /// <param name="extantionId">Id расширения</param>
+        /// <returns></returns>
+        [HttpGet("getExtantionFields")]
+        public ApiResult<List<ExtensionFieldModel>> GetExtantionFields(int id, int extantionId)
+        {
+            try
+            {
+                var fields = _siteMapService.GetItemExtantionFields(_siteId, id, extantionId);
+                return ApiResult<List<ExtensionFieldModel>>.Success(fields);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "GetExtantionFields error");
+                return ApiResult<List<ExtensionFieldModel>>.Fail(e);
             }
         }
 
@@ -256,7 +269,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
             try
             {
                 _logger.LogTrace($"publish edit={Newtonsoft.Json.JsonConvert.SerializeObject(model)}, userId={_userId}");
-                _siteMapModifyService.EditSiteMapItem(_siteId, _userId, model.ItemId, model.Title);
+                _siteMapModifyService.EditSiteMapItem(_siteId, _userId, model);
                 return ApiResult.Success();
             }
             catch (Exception e)

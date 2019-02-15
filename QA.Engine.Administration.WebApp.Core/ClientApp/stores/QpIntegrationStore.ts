@@ -10,12 +10,12 @@ export class QpIntegrationState {
     constructor() {
     }
 
-    private qpContent: QpContentViewModel;
+    private qpContent: QpContentModel;
     private qpAbstractItem: string = 'QPAbstractItem';
 
     private async fetchQPAbstractItemFields() {
         try {
-            const response: ApiResult<QpContentViewModel> = await DictionaryService.getQpContent(this.qpAbstractItem);
+            const response: ApiResult<QpContentModel> = await DictionaryService.getQpContent(this.qpAbstractItem);
             if (response.isSuccess) {
                 this.qpContent = response.data;
                 console.log(response);
@@ -62,7 +62,7 @@ export class QpIntegrationState {
         this.executeWindow(executeOptions);
     }
 
-    public async add(node: PageViewModel, versionType?: 'Content' | 'Structural' | null, name?: string, title?: string, discriminatorId?: number, extantionId?: number) {
+    public async add(node: PageModel, versionType?: 'Content' | 'Structural' | null, name?: string, title?: string, discriminatorId?: number, extantionId?: number) {
 
         if (this.qpContent == null || this.qpContent.fields == null || this.qpContent.fields!.length === 0) {
             await this.fetchQPAbstractItemFields();
@@ -192,7 +192,7 @@ class QpIntegrationUtils {
         return executeOptions;
     }
 
-    static getDefaultDisabledFields = (qpfields: QpFieldViewModel[], fields: string[] = []): string[] => {
+    static getDefaultDisabledFields = (qpfields: QpFieldModel[], fields: string[] = []): string[] => {
         const result = [
             QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.parent),
             QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.discriminator),
@@ -206,7 +206,7 @@ class QpIntegrationUtils {
         return result;
     }
 
-    static getDefaultHideFields = (qpfields: QpFieldViewModel[], fields: string[] = []): string[] => {
+    static getDefaultHideFields = (qpfields: QpFieldModel[], fields: string[] = []): string[] => {
         const result = [
             QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.zoneName),
             QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.indexOrder),
@@ -225,7 +225,7 @@ class QpIntegrationUtils {
         return result;
     }
 
-    static getFieldValues = (qpfields: QpFieldViewModel[], model: FieldValueModel, fieldValues: InitFieldValue[] = []): InitFieldValue[] => {
+    static getFieldValues = (qpfields: QpFieldModel[], model: FieldValueModel, fieldValues: InitFieldValue[] = []): InitFieldValue[] => {
         const result = [
             { fieldName: QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.parent), value: model.parentId },
             { fieldName: QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.discriminator), value: model.discriminatorId === 0 ? null : model.discriminatorId },
@@ -239,7 +239,7 @@ class QpIntegrationUtils {
         return result;
     }
 
-    private static getField = (fields: QpFieldViewModel[], fieldName: string) => {
+    private static getField = (fields: QpFieldModel[], fieldName: string) => {
         const field = fields.filter(x => x.name === fieldName)[0];
         return field == null ? fieldName : field.fieldId;
     }

@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using QA.Engine.Administration.Services.Core.Annotations;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace QA.Engine.Administration.Services.Core.Models
 {
+    [TypeScriptType]
     public class PageModel
     {
         public int Id { get; set; }

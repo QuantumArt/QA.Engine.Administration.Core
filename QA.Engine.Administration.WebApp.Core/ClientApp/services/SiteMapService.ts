@@ -6,7 +6,7 @@
 class SiteMapService {
 
     /** Возвращает полное дерево карты сайта */
-    public async getSiteMapTree(regionIds: number[] = null): Promise<ApiResult<PageViewModel[]>> {
+    public async getSiteMapTree(regionIds: number[] = null): Promise<ApiResult<PageModel[]>> {
 
         let urlparams = '';
         urlparams += Array.isArray(regionIds) && regionIds.length === 0 ? '' : (regionIds == null ? '' : `&regionIds=${regionIds} `);
@@ -22,14 +22,14 @@ class SiteMapService {
         console.debug(`%cstart api request get '${path}'`, 'color: green;');
         const response = await fetch(path, init);
 
-        const result = await <Promise<ApiResult<PageViewModel[]>>>response.json();
+        const result = await <Promise<ApiResult<PageModel[]>>>response.json();
         console.log(`%cresult api get '${path}'`, 'color: blue;', result);
 
         return result;
     }
 
     /** Возвращает дерево карты сайта от элемента */
-    public async getSiteMapSubTree(id: number, regionIds: number[] = null): Promise<ApiResult<PageViewModel>> {
+    public async getSiteMapSubTree(id: number, regionIds: number[] = null): Promise<ApiResult<PageModel>> {
 
         let urlparams = '';
         urlparams += Array.isArray(id) && id.length === 0 ? '' : `&id=${id} `;
@@ -46,14 +46,14 @@ class SiteMapService {
         console.debug(`%cstart api request get '${path}'`, 'color: green;');
         const response = await fetch(path, init);
 
-        const result = await <Promise<ApiResult<PageViewModel>>>response.json();
+        const result = await <Promise<ApiResult<PageModel>>>response.json();
         console.log(`%cresult api get '${path}'`, 'color: blue;', result);
 
         return result;
     }
 
     /** Возвращает полное дерево архива */
-    public async getArchiveTree(): Promise<ApiResult<ArchiveViewModel[]>> {
+    public async getArchiveTree(): Promise<ApiResult<ArchiveModel[]>> {
 
         const path = '/api/SiteMap/getArchiveTree';
         const headers = new Headers();
@@ -66,14 +66,14 @@ class SiteMapService {
         console.debug(`%cstart api request get '${path}'`, 'color: green;');
         const response = await fetch(path, init);
 
-        const result = await <Promise<ApiResult<ArchiveViewModel[]>>>response.json();
+        const result = await <Promise<ApiResult<ArchiveModel[]>>>response.json();
         console.log(`%cresult api get '${path}'`, 'color: blue;', result);
 
         return result;
     }
 
     /** Возвращает дерево архива от элемента */
-    public async getArchiveSubTree(id: number): Promise<ApiResult<ArchiveViewModel>> {
+    public async getArchiveSubTree(id: number): Promise<ApiResult<ArchiveModel>> {
 
         let urlparams = '';
         urlparams += Array.isArray(id) && id.length === 0 ? '' : `&id=${id} `;
@@ -89,14 +89,14 @@ class SiteMapService {
         console.debug(`%cstart api request get '${path}'`, 'color: green;');
         const response = await fetch(path, init);
 
-        const result = await <Promise<ApiResult<ArchiveViewModel>>>response.json();
+        const result = await <Promise<ApiResult<ArchiveModel>>>response.json();
         console.log(`%cresult api get '${path}'`, 'color: blue;', result);
 
         return result;
     }
 
     /** Возвращает дочерние страницы родительского элемента (страницы) */
-    public async getPageTree(isArchive: boolean, parentId?: number, regionIds: number[] = null): Promise<ApiResult<PageViewModel[]>> {
+    public async getPageTree(isArchive: boolean, parentId?: number, regionIds: number[] = null): Promise<ApiResult<PageModel[]>> {
 
         let urlparams = '';
         urlparams += Array.isArray(isArchive) && isArchive.length === 0 ? '' : `&isArchive=${isArchive} `;
@@ -114,14 +114,14 @@ class SiteMapService {
         console.debug(`%cstart api request get '${path}'`, 'color: green;');
         const response = await fetch(path, init);
 
-        const result = await <Promise<ApiResult<PageViewModel[]>>>response.json();
+        const result = await <Promise<ApiResult<PageModel[]>>>response.json();
         console.log(`%cresult api get '${path}'`, 'color: blue;', result);
 
         return result;
     }
 
     /** Возвращает дочерние виджеты у родительского элемента (страницы или виджета) */
-    public async getWidgetTree(isArchive: boolean, parentId: number, regionIds: number[] = null): Promise<ApiResult<WidgetViewModel[]>> {
+    public async getWidgetTree(isArchive: boolean, parentId: number, regionIds: number[] = null): Promise<ApiResult<WidgetModel[]>> {
 
         let urlparams = '';
         urlparams += Array.isArray(isArchive) && isArchive.length === 0 ? '' : `&isArchive=${isArchive} `;
@@ -139,7 +139,31 @@ class SiteMapService {
         console.debug(`%cstart api request get '${path}'`, 'color: green;');
         const response = await fetch(path, init);
 
-        const result = await <Promise<ApiResult<WidgetViewModel[]>>>response.json();
+        const result = await <Promise<ApiResult<WidgetModel[]>>>response.json();
+        console.log(`%cresult api get '${path}'`, 'color: blue;', result);
+
+        return result;
+    }
+
+    /** Возвращает поля расширения для статьи контента */
+    public async getExtantionFields(id: number, extantionId: number): Promise<ApiResult<ExtensionFieldModel[]>> {
+
+        let urlparams = '';
+        urlparams += Array.isArray(id) && id.length === 0 ? '' : `&id=${id} `;
+        urlparams += Array.isArray(extantionId) && extantionId.length === 0 ? '' : `&extantionId=${extantionId} `;
+        urlparams = urlparams.length > 0 ? `?${urlparams.slice(1)}` : '';
+        const path = `/api/SiteMap/getExtantionFields${urlparams}`;
+        const headers = new Headers();
+        headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
+        const init = {
+            headers,
+            method: 'get',
+        };
+
+        console.debug(`%cstart api request get '${path}'`, 'color: green;');
+        const response = await fetch(path, init);
+
+        const result = await <Promise<ApiResult<ExtensionFieldModel[]>>>response.json();
         console.log(`%cresult api get '${path}'`, 'color: blue;', result);
 
         return result;

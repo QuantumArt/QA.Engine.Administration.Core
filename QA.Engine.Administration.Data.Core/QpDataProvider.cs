@@ -40,18 +40,44 @@ namespace QA.Engine.Administration.Data.Core
             _metaInfoRepository = metaInfoRepository;
         }
 
-        public void Edit(int siteId, int contentId, int userId, int itemId, string title)
+        public void Edit(int siteId, int contentId, int userId, EditData editData)
         {
             var columnName = GetColumnNameByNetName(siteId, "Title");
             if (string.IsNullOrEmpty(columnName))
                 throw new Exception("NetName для поля Title не найдено.");
 
+            _qpDbConnector.BeginTransaction(IsolationLevel.Serializable);
+
             var value = new Dictionary<string, string>
             {
-                { ContentItemIdFieldName, itemId.ToString(CultureInfo.InvariantCulture) },
-                { columnName, title }
+                { ContentItemIdFieldName, editData.ItemId.ToString(CultureInfo.InvariantCulture) },
+                { columnName, editData.Title }
             };
+
             _qpDbConnector.DbConnector.MassUpdate(contentId, new[] { value }, userId);
+
+            if (editData.ExtensionId.HasValue && editData.Fields.Any())
+            {
+                var siteName = _qpMetadataManager.GetSiteName(siteId);
+                var extentionContent = _qpContentManager
+                      .Connect()
+                      .SiteName(siteName)
+                      .ContentName($"content_{editData.ExtensionId.Value}_united")
+                      .Fields($"{ContentItemIdFieldName}")
+                      .Where($"[ItemId] = '{editData.ItemId}'")
+                      .GetRealData();
+                var extensionContentId = extentionContent.PrimaryContent.Select().Select(x => x[ContentItemIdFieldName].ToString()).FirstOrDefault();
+
+                var extensionValue = new Dictionary<string, string>
+                {
+                    { ContentItemIdFieldName, extensionContentId }
+                };
+                foreach (var field in editData.Fields)
+                    extensionValue.Add(field.FieldName, field.Value.ToString());
+
+                _qpDbConnector.DbConnector.MassUpdate(editData.ExtensionId.Value, new[] { extensionValue }, userId);
+            }
+            _qpDbConnector.CommitTransaction();
         }
 
         public void Publish(int siteId, int contentId, int userId, IEnumerable<AbstractItemData> items, int statusId)

@@ -13,5 +13,7 @@ namespace QA.Engine.Administration.Services.Core.Interfaces
 
         List<ArchiveModel> GetArchiveTree(int siteId);
         ArchiveModel GetArchiveSubTree(int siteId, int itemId);
+
+        List<ExtensionFieldModel> GetItemExtantionFields(int siteId, int id, int extensionId);
     }
 }

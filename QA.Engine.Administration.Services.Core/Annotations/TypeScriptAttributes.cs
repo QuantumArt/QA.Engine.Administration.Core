@@ -1,9 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System;
 
-namespace QA.Engine.Administration.WebApp.Core.Annotations
+namespace QA.Engine.Administration.Services.Core.Annotations
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Enum)]
     public sealed class TypeScriptType : Attribute

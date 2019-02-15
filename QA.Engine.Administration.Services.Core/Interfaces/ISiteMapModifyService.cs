@@ -1,12 +1,11 @@
-﻿using System;
+﻿using QA.Engine.Administration.Services.Core.Models;
 using System.Collections.Generic;
-using System.Text;
 
 namespace QA.Engine.Administration.Services.Core.Interfaces
 {
     public interface ISiteMapModifyService
     {
-        void EditSiteMapItem(int siteId, int userId, int itemId, string title);
+        void EditSiteMapItem(int siteId, int userId, EditModel editModel);
         void PublishSiteMapItems(int siteId, int userId, List<int> itemIds);
         void ReorderSiteMapItems(int siteId, int userId, int itemId, int relatedItemId, bool isInsertBefore, int step);
         void MoveSiteMapItem(int siteId, int userId, int itemId, int newParentId);

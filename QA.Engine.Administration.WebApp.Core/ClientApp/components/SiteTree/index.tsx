@@ -3,7 +3,7 @@ import { inject, observer } from 'mobx-react';
 import { Card, Tree, Spinner } from '@blueprintjs/core';
 import Scrollbars from 'react-custom-scrollbars';
 import { SiteTreeState } from 'stores/SiteTreeStore';
-import TreeState from 'enums/TreeState';
+import OperationState from 'enums/OperationState';
 
 @observer
 class TreeR extends Tree {}
@@ -22,7 +22,7 @@ export default class SiteTree extends React.Component<Props> {
     render() {
         const { siteTreeStore } = this.props;
         siteTreeStore.loadData();
-        const isLoading = siteTreeStore.treeState === TreeState.NONE || siteTreeStore.treeState === TreeState.PENDING;
+        const isLoading = siteTreeStore.treeState === OperationState.NONE || siteTreeStore.treeState === OperationState.PENDING;
         return (
             <Card className="tree-pane">
                 {isLoading ?

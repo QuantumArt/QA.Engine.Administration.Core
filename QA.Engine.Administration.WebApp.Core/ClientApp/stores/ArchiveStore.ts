@@ -1,48 +1,50 @@
 import SiteMapService from 'services/SiteMapService';
 import { BaseTreeState } from 'stores/BaseTreeStore';
-import TreeState from 'enums/TreeState';
+import OperationState from 'enums/OperationState';
 
-export class ArchiveState extends BaseTreeState<ArchiveViewModel> {
+export class ArchiveState extends BaseTreeState<ArchiveModel> {
     constructor() {
         super();
     }
 
-    async getTree(): Promise<ApiResult<ArchiveViewModel[]>> {
+    async getTree(): Promise<ApiResult<ArchiveModel[]>> {
         return await SiteMapService.getArchiveTree();
     }
 
-    async getSubTree(id: number): Promise<ApiResult<ArchiveViewModel>> {
+    async getSubTree(id: number): Promise<ApiResult<ArchiveModel>> {
         return await SiteMapService.getArchiveSubTree(id);
     }
 
     async restore(model: RestoreModel): Promise<any> {
-        this.treeState = TreeState.PENDING;
+        this.treeState = OperationState.PENDING;
         try {
             const response: ApiResult<any> = await SiteMapService.restore(model);
             if (response.isSuccess) {
-                this.treeState = TreeState.SUCCESS;
+                await this.updateSubTreeInternal(model.itemId);
+                this.treeState = OperationState.SUCCESS;
             } else {
-                this.treeState = TreeState.ERROR;
+                this.treeState = OperationState.ERROR;
                 throw response.error;
             }
         } catch (e) {
-            this.treeState = TreeState.ERROR;
+            this.treeState = OperationState.ERROR;
             console.error(e);
         }
     }
 
     async delete(model: DeleteModel): Promise<any> {
-        this.treeState = TreeState.PENDING;
+        this.treeState = OperationState.PENDING;
         try {
             const response: ApiResult<any> = await SiteMapService.delete(model);
             if (response.isSuccess) {
-                this.treeState = TreeState.SUCCESS;
+                await this.updateSubTreeInternal(model.itemId);
+                this.treeState = OperationState.SUCCESS;
             } else {
-                this.treeState = TreeState.ERROR;
+                this.treeState = OperationState.ERROR;
                 throw response.error;
             }
         } catch (e) {
-            this.treeState = TreeState.ERROR;
+            this.treeState = OperationState.ERROR;
             console.error(e);
         }
     }

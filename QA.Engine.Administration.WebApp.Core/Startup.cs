@@ -79,6 +79,7 @@ namespace QA.Engine.Administration.WebApp.Core
             services.AddScoped<IDictionaryProvider, DictionaryProvider>();
             services.AddScoped<IQpDataProvider, QpDataProvider>();
             services.AddScoped<ISettingsProvider, SettingsProvider>();
+            services.AddScoped<IItemExtensionProvider, ItemExtensionProvider>();
 
             services.AddScoped<IQpDbConnector, QpDbConnector>(sp => new QpDbConnector(GetConnectionString(sp)));
             services.AddScoped<IQpMetadataManager, QpMetadataManager>();

@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using QA.Engine.Administration.Services.Core.Annotations;
+using System.Collections.Generic;
 
 namespace QA.Engine.Administration.Services.Core.Models
 {
+    [TypeScriptType]
     public class QpContentModel
     {
         public int Id { get; set; }

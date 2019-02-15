@@ -18,17 +18,20 @@ namespace QA.Engine.Administration.Services.Core
         private readonly IWidgetProvider _widgetProvider;
         private readonly IDictionaryProvider _dictionaryProvider;
         private readonly ISettingsProvider _settingsProvider;
+        private readonly IItemExtensionProvider _itemExtensionProvider;
         private readonly IMapper _mapper;
         private readonly ILogger<SiteMapService> _logger;
 
         public SiteMapService(
             ISiteMapProvider siteMapProvider, IWidgetProvider widgetProvider, 
-            IDictionaryProvider dictionaryProvider, ISettingsProvider settingsProvider, IMapper mapper, ILogger<SiteMapService> logger)
+            IDictionaryProvider dictionaryProvider, ISettingsProvider settingsProvider,
+            IItemExtensionProvider itemExtensionProvider, IMapper mapper, ILogger<SiteMapService> logger)
         {
             _siteMapProvider = siteMapProvider;
             _widgetProvider = widgetProvider;
             _dictionaryProvider = dictionaryProvider;
             _settingsProvider = settingsProvider;
+            _itemExtensionProvider = itemExtensionProvider;
             _mapper = mapper;
             _logger = logger;
         }
@@ -181,6 +184,13 @@ namespace QA.Engine.Administration.Services.Core
             var result = SiteMapStructureBuilder.GetArchiveSubTree(itemId, archives);
 
             return result.FirstOrDefault();
+        }
+
+        public List<ExtensionFieldModel> GetItemExtantionFields(int siteId, int id, int extensionId)
+        {
+            var fields = _itemExtensionProvider.GetItemExtensionFields(siteId, id, extensionId);
+            var result = _mapper.Map<List<ExtensionFieldModel>>(fields);
+            return result;
         }
     }
 }

@@ -52,7 +52,6 @@ export default class ElementMenu extends React.Component<Props> {
             contentVersionId: null,
         };
         siteTreeStore.remove(model);
-        siteTreeStore.updateSubTree(itemId);
     }
 
     private updateClick = () => {
@@ -70,7 +69,6 @@ export default class ElementMenu extends React.Component<Props> {
             isRestoreChildren: true,
         };
         archiveStore.restore(model);
-        archiveStore.updateSubTree(itemId);
     }
 
     private deleteClick = () => {
@@ -80,7 +78,6 @@ export default class ElementMenu extends React.Component<Props> {
             isDeleteAllVersions: true,
         };
         archiveStore.delete(model);
-        archiveStore.updateSubTree(itemId);
     }
 
     private handleClick = (e: React.MouseEvent<HTMLElement>, cb: () => void) => {

@@ -4,7 +4,7 @@ import { Card, Tree, Spinner } from '@blueprintjs/core';
 import Scrollbars from 'react-custom-scrollbars';
 import { SiteTreeState } from 'stores/SiteTreeStore';
 import { ArchiveState } from 'stores/ArchiveStore';
-import TreeState from 'enums/TreeState';
+import OperationState from 'enums/OperationState';
 
 @observer
 class TreeR extends Tree {}
@@ -23,7 +23,7 @@ export default class ArchiveTree extends React.Component<Props> {
     render() {
         const { archiveStore } = this.props;
         archiveStore.loadData();
-        const isLoading = archiveStore.treeState === TreeState.NONE || archiveStore.treeState === TreeState.PENDING;
+        const isLoading = archiveStore.treeState === OperationState.NONE || archiveStore.treeState === OperationState.PENDING;
         return (
             <Card className="tree-pane">
                 {isLoading ?

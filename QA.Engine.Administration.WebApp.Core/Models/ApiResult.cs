@@ -1,4 +1,4 @@
-using QA.Engine.Administration.WebApp.Core.Annotations;
+using QA.Engine.Administration.Services.Core.Annotations;
 using System;
 
 namespace QA.Engine.Administration.WebApp.Core.Models
@@ -13,7 +13,7 @@ namespace QA.Engine.Administration.WebApp.Core.Models
             return new ApiResult
             {
                 IsSuccess = false,
-                Error = e.ToString()
+                Error = e.Message
             };
         }
 
@@ -40,7 +40,7 @@ namespace QA.Engine.Administration.WebApp.Core.Models
             {
                 IsSuccess = false,
                 Data = default(T),
-                Error = e.ToString()
+                Error = e.Message
             };
         }
 

@@ -29,18 +29,22 @@ namespace QA.Engine.Administration.Services.Core
             _mapper = mapper;
         }
 
-        public void EditSiteMapItem(int siteId, int userId, int itemId, string title)
+        public void EditSiteMapItem(int siteId, int userId, EditModel editModel)
         {
-            if (itemId <= 0)
+            if (editModel.ItemId <= 0)
                 throw new ArgumentException("itemId <= 0");
 
-            var item = _siteMapProvider.GetByIds(siteId, false, new[] { itemId })?.FirstOrDefault();
+            var item = _siteMapProvider.GetByIds(siteId, false, new[] { editModel.ItemId })?.FirstOrDefault();
             if (item == null)
                 throw new InvalidOperationException("Элемент не найден.");
 
+            if (editModel.ExtensionId.HasValue && editModel.ExtensionId != item.ExtensionId)
+                throw new InvalidOperationException("Неверно задано расширение для контента.");
+
             var contentId = _settingsProvider.GetContentId(siteId);
 
-            _qpDataProvider.Edit(siteId, contentId, userId, itemId, title);
+            var model = _mapper.Map<EditData>(editModel);
+            _qpDataProvider.Edit(siteId, contentId, userId, model);
         }
 
         public void PublishSiteMapItems(int siteId, int userId, List<int> itemIds)
