@@ -13,7 +13,6 @@ interface Props {
     archiveStore?: ArchiveState;
 }
 
-// TODO: Finish scrollbar style
 interface InternalStyle extends JSX.IntrinsicAttributes, React.ClassAttributes<HTMLDivElement>, React.HTMLAttributes<HTMLDivElement> {}
 interface InternalRestProps extends JSX.IntrinsicAttributes, React.ClassAttributes<HTMLDivElement>, React.HTMLAttributes<HTMLDivElement> {}
 
