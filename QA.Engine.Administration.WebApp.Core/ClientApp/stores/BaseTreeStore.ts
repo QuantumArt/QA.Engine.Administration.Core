@@ -22,8 +22,8 @@ export abstract class BaseTreeState<T extends {
     hasChildren: boolean;
 }> {
 
-    constructor() {
-        // this.fetchTree();
+    protected constructor() {
+        this.fetchTree();
     }
 
     @observable public treeState: OperationState = OperationState.NONE;

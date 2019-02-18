@@ -2,15 +2,15 @@ import * as React from 'react';
 import { Provider } from 'mobx-react';
 import DevTools from 'mobx-react-devtools'; // tslint:disable-line
 import { hot } from 'react-hot-loader';
-import { Alignment, Button, Classes, Navbar, NavbarGroup, NavbarHeading } from '@blueprintjs/core';
 import '@blueprintjs/core/lib/css/blueprint.css';
 import '@blueprintjs/icons/lib/css/blueprint-icons.css';
 import 'normalize.css/normalize.css';
 
 import 'assets/style.css';
 import SiteTree from 'components/SiteTree';
-import ArchiveTree from 'components/SiteTree/ArchiveTree';
 import TabsContainer from 'components/TabsContainer';
+import NavigationBar from 'components/NavigationBar';
+import NavigationStore from 'stores/NavigationStore';
 import SiteTreeStore from 'stores/SiteTreeStore';
 import TabsStore from 'stores/TabsStore';
 import ArchiveStore from 'stores/ArchiveStore';
@@ -24,19 +24,13 @@ const app = hot(module)(() => (
         tabsStore={TabsStore}
         qpIntegrationStore={QpIntegrationStore}
         extensionFieldsStore={ExtensionFieldsStore}
+        navigationStore={NavigationStore}
     >
         <div className="layout">
-            <Navbar fixedToTop>
-                <NavbarGroup align={Alignment.LEFT}>
-                    <NavbarHeading>Manage Site</NavbarHeading>
-                    <Button className={Classes.MINIMAL} icon="diagram-tree" text="Sitemap"/>
-                    <Button className={Classes.MINIMAL} icon="box" text="Archive"/>
-                </NavbarGroup>
-            </Navbar>
-            <SiteTree />
-            <ArchiveTree />
-            <TabsContainer />
-            <DevTools />
+            <NavigationBar />
+            <SiteTree/>
+            <TabsContainer/>
+            <DevTools/>
         </div>
     </Provider>
 ));

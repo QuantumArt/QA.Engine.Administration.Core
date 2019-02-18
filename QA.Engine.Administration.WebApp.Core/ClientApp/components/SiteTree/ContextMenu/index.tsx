@@ -25,9 +25,10 @@ export default class ContextMenu extends React.Component<Props> {
         return node.isSelected ?
             <Popover
                 content={elementMenu}
-                position={Position.RIGHT_BOTTOM}
+                position={Position.RIGHT}
                 autoFocus={false}
                 isOpen={node.isContextMenuActive}
+                boundary="viewport"
             >
                 <Button
                     icon="cog"
