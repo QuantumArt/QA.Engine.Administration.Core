@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { action, observable, computed } from 'mobx';
+import { action, observable } from 'mobx';
 import { IconName, ITreeNode } from '@blueprintjs/core';
 import ContextMenu from 'components/SiteTree/ContextMenu';
 import OperationState from 'enums/OperationState';
@@ -21,19 +21,12 @@ export abstract class BaseTreeState<T extends {
     children: T[];
     hasChildren: boolean;
 }> {
-
-    protected constructor() {
-        this.fetchTree();
-    }
-
     @observable public treeState: OperationState = OperationState.NONE;
     @observable public tree: ITreeElement[];
 
-    abstract async getTree(): Promise<ApiResult<T[]>>;
-    abstract async getSubTree(id: number): Promise<ApiResult<T>>;
-
     private selectedNodeId?: string | number;
     private startLoad: boolean = true;
+
     public loadData() {
         if (this.startLoad) {
             this.startLoad = false;
@@ -74,25 +67,6 @@ export abstract class BaseTreeState<T extends {
     @action
     public handleContextMenu = (nodeData: ITreeElement) => {
         nodeData.isContextMenuActive = !nodeData.isContextMenuActive;
-    }
-
-    @action
-    public async fetchTree(): Promise<any> {
-        this.treeState = OperationState.PENDING;
-        try {
-            const response: ApiResult<T[]> = await this.getTree();
-            if (response.isSuccess) {
-                this.treeState = OperationState.SUCCESS;
-                this.origTree = response.data;
-                this.convertTree(response.data);
-            } else {
-                this.treeState = OperationState.ERROR;
-                throw response.error;
-            }
-        } catch (e) {
-            this.treeState = OperationState.ERROR;
-            console.error(e);
-        }
     }
 
     @action
@@ -165,6 +139,28 @@ export abstract class BaseTreeState<T extends {
                 });
         } else {
             throw response.error;
+        }
+    }
+
+    protected abstract async getTree(): Promise<ApiResult<T[]>>;
+    protected abstract async getSubTree(id: number): Promise<ApiResult<T>>;
+
+    @action
+    private async fetchTree(): Promise<any> {
+        this.treeState = OperationState.PENDING;
+        try {
+            const response: ApiResult<T[]> = await this.getTree();
+            if (response.isSuccess) {
+                this.treeState = OperationState.SUCCESS;
+                this.origTree = response.data;
+                this.convertTree(response.data);
+            } else {
+                this.treeState = OperationState.ERROR;
+                throw response.error;
+            }
+        } catch (e) {
+            this.treeState = OperationState.ERROR;
+            console.error(e);
         }
     }
 

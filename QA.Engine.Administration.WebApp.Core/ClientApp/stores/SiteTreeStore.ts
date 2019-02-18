@@ -7,11 +7,11 @@ export class SiteTreeState extends BaseTreeState<PageModel> {
         super();
     }
 
-    async getTree(): Promise<ApiResult<PageModel[]>> {
+    protected async getTree(): Promise<ApiResult<PageModel[]>> {
         return await SiteMapService.getSiteMapTree();
     }
 
-    async getSubTree(id: number): Promise<ApiResult<PageModel>> {
+    protected async getSubTree(id: number): Promise<ApiResult<PageModel>> {
         return await SiteMapService.getSiteMapSubTree(id);
     }
 

@@ -3,15 +3,15 @@ import { BaseTreeState } from 'stores/BaseTreeStore';
 import OperationState from 'enums/OperationState';
 
 export class ArchiveState extends BaseTreeState<ArchiveModel> {
-    constructor() {
-        super();
-    }
+    // constructor() {
+    //     super();
+    // }
 
-    async getTree(): Promise<ApiResult<ArchiveModel[]>> {
+    protected async getTree(): Promise<ApiResult<ArchiveModel[]>> {
         return await SiteMapService.getArchiveTree();
     }
 
-    async getSubTree(id: number): Promise<ApiResult<ArchiveModel>> {
+    protected async getSubTree(id: number): Promise<ApiResult<ArchiveModel>> {
         return await SiteMapService.getArchiveSubTree(id);
     }
 
