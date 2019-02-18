@@ -32,6 +32,7 @@ export abstract class BaseTreeState<T extends {
     abstract async getTree(): Promise<ApiResult<T[]>>;
     abstract async getSubTree(id: number): Promise<ApiResult<T>>;
 
+    private selectedNodeId?: string | number;
     private startLoad: boolean = true;
     public loadData() {
         if (this.startLoad) {
@@ -60,8 +61,9 @@ export abstract class BaseTreeState<T extends {
 
     @action
     public handleNodeClick = (nodeData: ITreeElement) => {
+        this.selectedNodeId = nodeData.id;
         const originallySelected = nodeData.isSelected;
-        this.forEachNode(this.tree, (n) => {
+        this.forEachNode(null, (n) => {
             n.isSelected = false;
             n.isContextMenuActive = false;
         });
@@ -126,7 +128,12 @@ export abstract class BaseTreeState<T extends {
     protected async updateSubTreeInternal(id: number): Promise<any> {
         const response: ApiResult<T> = await this.getSubTree(id);
         if (response.isSuccess) {
-            const expanded = this.getExpandedIds();
+            const expanded: number[] = [];
+            this.forEachNode((x) => {
+                if (x.isExpanded) {
+                    expanded.push(+x.id);
+                }
+            });
             const node = this.getNodeById(id);
             const parentNode = this.getNodeById(node.parentId);
             if (parentNode == null) {
@@ -145,45 +152,19 @@ export abstract class BaseTreeState<T extends {
                 }
             }
             this.convertTree(this.origTree);
-            this.restoreExpandedByIds(expanded);
+            this.forEachNode(
+                (x) => {
+                    if (expanded.indexOf(+x.id) > -1) {
+                        x.isExpanded = true;
+                    }
+                },
+                (x) => {
+                    if (this.selectedNodeId === x.id) {
+                        x.isSelected = true;
+                    }
+                });
         } else {
             throw response.error;
-        }
-    }
-
-    private getExpandedIds(): number[] {
-        let elements = this.tree;
-        let loop = true;
-        const result: number[] = [];
-        while (loop) {
-            loop = false;
-            const children: ITreeElement[] = [];
-            elements.filter(x => x.childNodes.length > 0).forEach((x) => {
-                if (x.isExpanded) {
-                    result.push(+x.id);
-                }
-                x.childNodes.forEach(y => children.push(y));
-            });
-            loop = children.length > 0;
-            elements = children;
-        }
-        return result;
-    }
-
-    private restoreExpandedByIds(ids: number[]) {
-        let elements = this.tree;
-        let loop = true;
-        while (loop) {
-            loop = false;
-            const children: ITreeElement[] = [];
-            elements.filter(x => x.childNodes.length > 0).forEach((x) => {
-                if (ids.indexOf(+x.id) > -1) {
-                    x.isExpanded = true;
-                }
-                x.childNodes.forEach(y => children.push(y));
-            });
-            loop = children.length > 0;
-            elements = children;
         }
     }
 
@@ -219,15 +200,19 @@ export abstract class BaseTreeState<T extends {
 
             return treeElement;
         };
-        const mapSubtree = (elements: T[]): void => {
-            elements.forEach((el: T) => {
-                if (el.hasChildren) {
-                    hMap.set(el.id, mapElement(el));
-                    mapSubtree(<T[]>el.children);
-                } else {
-                    hMap.set(el.id, mapElement(el));
-                }
-            });
+        const mapSubtree = (data: T[]): void => {
+            let elements = data;
+            let loop = true;
+            while (loop) {
+                loop = false;
+                const children: T[] = [];
+                elements.forEach(x => hMap.set(x.id, mapElement(x)));
+                elements.filter(x => x.hasChildren).forEach((x) => {
+                    x.children.forEach(y => children.push(<T>y));
+                });
+                loop = children.length > 0;
+                elements = children;
+            }
         };
         mapSubtree(data);
         hMap.forEach((el, key, map) => el.parentId && map.get(el.parentId) != null && map.get(el.parentId).childNodes.push(el));
@@ -239,13 +224,25 @@ export abstract class BaseTreeState<T extends {
         this.tree = tree;
     }
 
-    private forEachNode(nodes: ITreeElement[], cb: (node: ITreeElement) => void): void {
-        if (nodes === null) {
-            return;
-        }
-        for (const node of nodes) {
-            cb(node);
-            this.forEachNode(node.childNodes, cb);
+    private forEachNode(childFunc: (node: ITreeElement) => void = null, eachFunc: (node: ITreeElement) => void = null): void {
+        let elements = this.tree;
+        let loop = true;
+        while (loop) {
+            loop = false;
+            const children: ITreeElement[] = [];
+            elements.forEach((x) => {
+                if (eachFunc != null) {
+                    eachFunc(x);
+                }
+            });
+            elements.filter(x => x.childNodes.length > 0).forEach((x) => {
+                if (childFunc != null) {
+                    childFunc(x);
+                }
+                x.childNodes.forEach(y => children.push(y));
+            });
+            loop = children.length > 0;
+            elements = children;
         }
     }
 }

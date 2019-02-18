@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { inject, observer } from 'mobx-react';
-import { Spinner, AnchorButton } from '@blueprintjs/core';
+import { Spinner, AnchorButton, InputGroup } from '@blueprintjs/core';
 import { ExtensionFieldsState } from 'stores/ExtensionFieldsStore';
 import OperationState from 'enums/OperationState';
 
@@ -77,16 +77,16 @@ export default class ExtantionCard extends React.Component<Props, State> {
         return (
             <div>
                 {
-                    fields.map((field, i) => (<p key={i}>
+                    fields.map((field, i) => (<div key={i}>
                         <span>{field.fieldName}</span>(<small>{field.typeName}</small>)
                         { isEditMode
-                        ? (<input
+                        ? (<InputGroup
                             value={field.value == null ? '' : field.value}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.change(e, field)}
                         />)
-                        : field.value
+                        : (<div className="bp3-input-group">{field.value}</div>)
                         }
-                    </p>))
+                    </div>))
                 }
             </div>
         );

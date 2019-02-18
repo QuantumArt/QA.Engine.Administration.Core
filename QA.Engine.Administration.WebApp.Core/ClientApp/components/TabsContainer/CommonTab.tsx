@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { observer, inject } from 'mobx-react';
-import { Button, Navbar, NavbarGroup, H5, Intent, Spinner } from '@blueprintjs/core';
+import { Button, Navbar, NavbarGroup, H5, Intent, Spinner, InputGroup } from '@blueprintjs/core';
 import { ITabData } from 'stores/TabsStore';
 import { SiteTreeState } from 'stores/SiteTreeStore';
 import ExtantionCard from './ExtensionCard';
@@ -30,7 +30,7 @@ export default class CommonTab extends React.Component<Props, State> {
     componentWillReceiveProps(nextProps: Props) {
         const { siteTreeStore, data } = nextProps;
         const node: PageModel | ArchiveModel = data == null ? null : siteTreeStore.getNodeById(+data.id);
-        this.setState({ title: node.title, isEditMode: false });
+        this.setState({ title: node == null ? null : node.title, isEditMode: false });
     }
 
     private refreshClick = () => {
@@ -88,7 +88,7 @@ export default class CommonTab extends React.Component<Props, State> {
                         </div>
                         <div className="tab-entity">
                             <H5>Title</H5>
-                            <p>{isEditMode ? (<input type="text" value={title} onChange={this.changeTitle} />) : title}</p>
+                            {isEditMode ? (<InputGroup value={title} onChange={this.changeTitle} />) : (<p>{title}</p>)}
                         </div>
                         <div className="tab-entity">
                             <H5>Type Name</H5>
