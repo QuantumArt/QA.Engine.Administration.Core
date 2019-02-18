@@ -5,6 +5,7 @@ import { QpIntegrationState } from 'stores/QpIntegrationStore';
 import { SiteTreeState } from 'stores/SiteTreeStore';
 import { ArchiveState } from 'stores/ArchiveStore';
 import { PopupState } from 'stores/PopupStore';
+import PopupType from 'enums/PopupType';
 
 interface Props {
     qpIntegrationStore?: QpIntegrationState;
@@ -25,14 +26,16 @@ export default class ElementMenu extends React.Component<Props> {
 
     private addClick = () => {
         const { popupStore, itemId } = this.props;
+        popupStore.type = PopupType.ADD;
         popupStore.itemId = itemId;
         popupStore.show('Добавить раздел');
     }
 
     private addVersionClick = () => {
-        const { qpIntegrationStore, siteTreeStore, itemId } = this.props;
-        const node = siteTreeStore.getNodeById(itemId);
-        qpIntegrationStore.add(node, 'Structural', node.alias, `${node.title} (struct v.)`, 741035, 0);
+        const { popupStore, itemId } = this.props;
+        popupStore.type = PopupType.ADDVERSION;
+        popupStore.itemId = itemId;
+        popupStore.show('Добавить раздел');
     }
 
     private historyClick = () => {

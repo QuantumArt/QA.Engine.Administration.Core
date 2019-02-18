@@ -1,10 +1,12 @@
 import { observable, action } from 'mobx';
 import DictionaryService from 'services/DictionaryService';
 import OperationState from 'enums/OperationState';
+import PopupType from 'enums/PopupType';
 
 export class PopupState {
     @observable state: OperationState = OperationState.NONE;
     @observable showPopup: boolean = false;
+    @observable type: PopupType;
 
     discriminators: DiscriminatorModel[];
     itemId: number;

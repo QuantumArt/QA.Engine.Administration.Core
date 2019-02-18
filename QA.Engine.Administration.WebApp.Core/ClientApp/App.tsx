@@ -19,6 +19,7 @@ import ExtensionFieldsStore from 'stores/ExtensionFieldsStore';
 import Popup from 'components/Popup/popup';
 import PopupStore from 'stores/PopupStore';
 import AddPopup from 'components/Popup/add';
+import AddVersionPopup from 'components/Popup/addVersion';
 
 const app = hot(module)(() => (
     <Provider
@@ -36,6 +37,7 @@ const app = hot(module)(() => (
             <TabsContainer />
             <Popup>
                 <AddPopup />
+                <AddVersionPopup />
             </Popup>
             <DevTools/>
         </div>

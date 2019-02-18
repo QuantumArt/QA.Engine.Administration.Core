@@ -6,6 +6,11 @@ import QpEntityCodes from 'constants/QpEntityCodes';
 import { BackendEventObserver, executeBackendAction, ArticleFormState, ExecuteActionOptions, InitFieldValue } from 'qp/QP8BackendApi.Interaction';
 import siteTreeStore from './SiteTreeStore';
 
+export enum VersionType {
+    Content = 'Content',
+    Structural = 'Structural',
+}
+
 export class QpIntegrationState {
     constructor() {
     }
@@ -62,7 +67,7 @@ export class QpIntegrationState {
         this.executeWindow(executeOptions);
     }
 
-    public async add(node: PageModel, versionType?: 'Content' | 'Structural' | null, name?: string, title?: string, discriminatorId?: number, extantionId?: number) {
+    public async add(node: PageModel, versionType?: VersionType | null, name?: string, title?: string, discriminatorId?: number, extantionId?: number) {
 
         if (this.qpContent == null || this.qpContent.fields == null || this.qpContent.fields!.length === 0) {
             await this.fetchQPAbstractItemFields();
@@ -93,14 +98,15 @@ export class QpIntegrationState {
             executeOptions.options.initFieldValues = QpIntegrationUtils.getFieldValues(this.qpContent.fields, model);
         } else {
             switch (versionType) {
-            case 'Structural':
+            case VersionType.Structural:
                 executeOptions.options.disabledFields = QpIntegrationUtils.getDefaultDisabledFields(this.qpContent.fields, [
                     QpAbstractItemFields.name,
                 ]);
                 executeOptions.options.initFieldValues = QpIntegrationUtils.getFieldValues(
-                        this.qpContent.fields,
-                        new FieldValueModel(node.parentId, discriminatorId, node.alias, node.title, extantionId));
-            case 'Content':
+                    this.qpContent.fields,
+                    new FieldValueModel(node.parentId, discriminatorId, node.alias, node.title, extantionId));
+                break;
+            case VersionType.Content:
                 executeOptions.options.hideFields = QpIntegrationUtils.getDefaultHideFields(this.qpContent.fields);
                 executeOptions.options.initFieldValues = QpIntegrationUtils.getFieldValues(
                     this.qpContent.fields,
@@ -108,6 +114,7 @@ export class QpIntegrationState {
                     [
                         { fieldName: QpAbstractItemFields.versionOf, value: node.id },
                     ]);
+                break;
             }
         }
 

@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { Card, Spinner, Button, FormGroup, InputGroup } from '@blueprintjs/core';
+import { Card, Spinner, Button, FormGroup, InputGroup, RadioGroup, Radio } from '@blueprintjs/core';
 import { observer, inject } from 'mobx-react';
-import { QpIntegrationState } from 'stores/QpIntegrationStore';
+import { QpIntegrationState, VersionType } from 'stores/QpIntegrationStore';
 import { PopupState } from 'stores/PopupStore';
 import OperationState from 'enums/OperationState';
 import DiscriminatorSelect from 'components/Select/DiscriminatorSelect';
@@ -16,21 +16,23 @@ interface Props {
 
 interface State {
     discriminator: DiscriminatorModel;
-    name: string;
-    title: string;
+    version: VersionType;
 }
 
 @inject('qpIntegrationStore', 'siteTreeStore', 'popupStore')
 @observer
-export default class AddPopup extends React.Component<Props, State> {
+export default class AddVersionPopup extends React.Component<Props, State> {
 
-    state = { discriminator: null as DiscriminatorModel, name: '', title: '' };
+    state = {
+        discriminator: null as DiscriminatorModel,
+        version: null as VersionType,
+    };
 
     private addClick = () => {
         const { popupStore, qpIntegrationStore, siteTreeStore } = this.props;
-        const { discriminator, name, title } = this.state;
+        const { discriminator, version } = this.state;
         const node = siteTreeStore.getNodeById(popupStore.itemId);
-        qpIntegrationStore.add(node, null, name, title, discriminator.id, 0);
+        qpIntegrationStore.add(node, version, node.alias, node.title, discriminator.id, 0);
     }
 
     private cancelClick = () => {
@@ -41,17 +43,14 @@ export default class AddPopup extends React.Component<Props, State> {
     private changeDiscriminator = (e: DiscriminatorModel) =>
         this.setState({ discriminator: e })
 
-    private changeTitle = (e: React.ChangeEvent<HTMLInputElement>) =>
-        this.setState({ title: e.target.value })
-
-    private changeName = (e: React.ChangeEvent<HTMLInputElement>) =>
-        this.setState({ name: e.target.value })
+    private changeVersion = (version: React.ChangeEvent<HTMLInputElement>) =>
+        this.setState({ version: version.target.value as VersionType })
 
     render() {
         const { popupStore } = this.props;
-        const { name, title } = this.state;
+        const { version } = this.state;
 
-        if (popupStore.type !== PopupType.ADD) {
+        if (popupStore.type !== PopupType.ADDVERSION) {
             return null;
         }
 
@@ -61,12 +60,10 @@ export default class AddPopup extends React.Component<Props, State> {
 
         return (
             <Card>
-                <FormGroup label="Title">
-                    <InputGroup placeholder="Название раздела" value={title} onChange={this.changeTitle}></InputGroup>
-                </FormGroup>
-                <FormGroup label="Name">
-                    <InputGroup placeholder="alias" value={name} onChange={this.changeName}></InputGroup>
-                </FormGroup>
+                <RadioGroup label="Title" selectedValue={version} onChange={this.changeVersion}>
+                    <Radio label="Content" value={VersionType.Content}></Radio>
+                    <Radio label="Structural" value={VersionType.Structural}></Radio>
+                </RadioGroup>
                 <div>
                     <DiscriminatorSelect items={popupStore.discriminators} onChange={this.changeDiscriminator} />
                 </div>
