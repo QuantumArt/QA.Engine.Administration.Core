@@ -4,15 +4,17 @@ import { observer, inject } from 'mobx-react';
 import { QpIntegrationState } from 'stores/QpIntegrationStore';
 import { SiteTreeState } from 'stores/SiteTreeStore';
 import { ArchiveState } from 'stores/ArchiveStore';
+import { PopupState } from 'stores/PopupStore';
 
 interface Props {
     qpIntegrationStore?: QpIntegrationState;
     siteTreeStore?: SiteTreeState;
     archiveStore?: ArchiveState;
+    popupStore?: PopupState;
     itemId: number;
 }
 
-@inject('qpIntegrationStore', 'siteTreeStore', 'archiveStore')
+@inject('qpIntegrationStore', 'siteTreeStore', 'archiveStore', 'popupStore')
 @observer
 export default class ElementMenu extends React.Component<Props> {
 
@@ -22,9 +24,9 @@ export default class ElementMenu extends React.Component<Props> {
     }
 
     private addClick = () => {
-        const { qpIntegrationStore, siteTreeStore, itemId } = this.props;
-        const node = siteTreeStore.getNodeById(itemId);
-        qpIntegrationStore.add(node, null, `test_page_${Date.now()}`, `test page ${Date.now()}`, 741035, 0);
+        const { popupStore, itemId } = this.props;
+        popupStore.itemId = itemId;
+        popupStore.show('Добавить раздел');
     }
 
     private addVersionClick = () => {

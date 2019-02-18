@@ -125,7 +125,7 @@
             Api справочников
             </summary>
         </member>
-        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.DictionaryController.GetDescriminators">
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.DictionaryController.GetDiscriminators">
             <summary>
             Возвращает типы контента
             </summary>

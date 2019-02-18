@@ -46,8 +46,8 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// Возвращает типы контента
         /// </summary>
         /// <returns></returns>
-        [HttpGet("getDefinitions")]
-        public ApiResult<List<DiscriminatorModel>> GetDescriminators()
+        [HttpGet("getDiscriminators")]
+        public ApiResult<List<DiscriminatorModel>> GetDiscriminators()
         {
             try
             {

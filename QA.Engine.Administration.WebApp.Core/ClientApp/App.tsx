@@ -16,6 +16,9 @@ import TabsStore from 'stores/TabsStore';
 import ArchiveStore from 'stores/ArchiveStore';
 import QpIntegrationStore from 'stores/QpIntegrationStore';
 import ExtensionFieldsStore from 'stores/ExtensionFieldsStore';
+import Popup from 'components/Popup/popup';
+import PopupStore from 'stores/PopupStore';
+import AddPopup from 'components/Popup/add';
 
 const app = hot(module)(() => (
     <Provider
@@ -24,6 +27,7 @@ const app = hot(module)(() => (
         tabsStore={TabsStore}
         qpIntegrationStore={QpIntegrationStore}
         extensionFieldsStore={ExtensionFieldsStore}
+        popupStore={PopupStore}
     >
         <div className="layout">
             <Navbar fixedToTop>
@@ -36,6 +40,9 @@ const app = hot(module)(() => (
             <SiteTree />
             <ArchiveTree />
             <TabsContainer />
+            <Popup>
+                <AddPopup />
+            </Popup>
             <DevTools />
         </div>
     </Provider>

@@ -6,38 +6,62 @@ import { SiteTreeState } from 'stores/SiteTreeStore';
 import ExtantionCard from './ExtensionCard';
 import { ExtensionFieldsState } from 'stores/ExtensionFieldsStore';
 import OperationState from 'enums/OperationState';
+import { ArchiveState } from 'stores/ArchiveStore';
 
 interface Props {
     data: ITabData;
     siteTreeStore?: SiteTreeState;
+    archiveStore?: ArchiveState;
     extensionFieldsStore?: ExtensionFieldsState;
 }
 
+interface ICommonTabState {
+    value: PageModel | ArchiveModel;
+}
 interface State {
     isEditMode: boolean;
     title: string;
+    node: ICommonTabState;
 }
 
-@inject('siteTreeStore', 'extensionFieldsStore')
+@inject('siteTreeStore', 'archiveStore', 'extensionFieldsStore')
 @observer
 export default class CommonTab extends React.Component<Props, State> {
 
-    constructor(props: Props, state: State) {
-        super(props);
-        this.state = { isEditMode: false, title: '' };
+    state = { isEditMode: false, title: '', node: { value: null } as ICommonTabState };
+
+    private getNodeData = (id: number): PageModel | ArchiveModel => {
+        const { siteTreeStore, archiveStore } = this.props;
+        if (id == null) {
+            return null;
+        }
+        let node: PageModel | ArchiveModel;
+        node = siteTreeStore.getNodeById(id);
+        if (node == null) {
+            node = archiveStore.getNodeById(id);
+        }
+        return node;
     }
 
     componentWillReceiveProps(nextProps: Props) {
-        const { siteTreeStore, data } = nextProps;
-        const node: PageModel | ArchiveModel = data == null ? null : siteTreeStore.getNodeById(+data.id);
-        this.setState({ title: node == null ? null : node.title, isEditMode: false });
+        const getId = (data: ITabData) => (data || {} as ITabData).id;
+        const id = getId(nextProps.data);
+        if (id == null) {
+            return;
+        }
+        if (getId(this.props.data) === getId(nextProps.data)) {
+            this.setState({ isEditMode: false, node: { value: null } });
+        } else {
+            const node: PageModel | ArchiveModel = this.getNodeData(+id);
+            this.setState({ title: node == null ? null : node.title, isEditMode: false, node: { value: node } });
+        }
     }
 
     private refreshClick = () => {
         const { siteTreeStore, data } = this.props;
         siteTreeStore.updateSubTree(+data.id).then(() => {
-            const node: PageModel | ArchiveModel = data == null ? null : siteTreeStore.getNodeById(+data.id);
-            this.setState({ title: node.title, isEditMode: false });
+            const node: PageModel | ArchiveModel = this.getNodeData(+data.id);
+            this.setState({ title: node.title, isEditMode: false, node: { value: node } });
         });
     }
 
@@ -47,12 +71,11 @@ export default class CommonTab extends React.Component<Props, State> {
 
     private saveClick = () => {
         const { siteTreeStore, extensionFieldsStore, data } = this.props;
-        const { title } = this.state;
-        const node: PageModel | ArchiveModel = data == null ? null : siteTreeStore.getNodeById(+data.id);
+        const { title, node } = this.state;
         const model: EditModel = {
             title,
             itemId: +data.id,
-            extensionId: node.extensionId,
+            extensionId: node.value.extensionId,
             fields: extensionFieldsStore.changedFields,
         };
         siteTreeStore.edit(model).then(() => {
@@ -65,13 +88,12 @@ export default class CommonTab extends React.Component<Props, State> {
     }
 
     render() {
-        const { siteTreeStore, data } = this.props;
-        const { isEditMode, title } = this.state;
-        const node: PageModel | ArchiveModel = data == null ? null : siteTreeStore.getNodeById(+data.id);
+        const { siteTreeStore } = this.props;
+        const { isEditMode, title, node } = this.state;
         if (siteTreeStore.treeState === OperationState.NONE || siteTreeStore.treeState === OperationState.PENDING) {
             return (<Spinner size={60} />);
         }
-        if (data !== null) {
+        if (node !== null && node.value != null) {
             return (
                 <div className="tab">
                     <Navbar className="tab-navbar">
@@ -84,7 +106,7 @@ export default class CommonTab extends React.Component<Props, State> {
                     <div className="tab-content">
                         <div className="tab-entity">
                             <H5>ID</H5>
-                            <p>{data.id}</p>
+                            <p>{node.value.id}</p>
                         </div>
                         <div className="tab-entity">
                             <H5>Title</H5>
@@ -92,25 +114,25 @@ export default class CommonTab extends React.Component<Props, State> {
                         </div>
                         <div className="tab-entity">
                             <H5>Type Name</H5>
-                            <p>{node.discriminatorTitle}</p>
+                            <p>{node.value.discriminatorTitle}</p>
                         </div>
                         <div className="tab-entity">
                             <H5>Alias</H5>
-                            <p>{node.alias}</p>
+                            <p>{node.value.alias}</p>
                         </div>
                         <div className="tab-entity">
                             <H5>Status</H5>
-                            <p>{node.published ? 'Published' : 'Not published'}</p>
+                            <p>{node.value.published ? 'Published' : 'Not published'}</p>
                         </div>
                         <div className="tab-entity">
                             <H5>View in the site map</H5>
-                            <p>{node.isInSiteMap ? 'Yes' : 'No'}</p>
+                            <p>{node.value.isInSiteMap ? 'Yes' : 'No'}</p>
                         </div>
                         <div className="tab-entity">
                             <H5>Visible</H5>
-                            <p>{node.isVisible ? 'Yes' : 'No'}</p>
+                            <p>{node.value.isVisible ? 'Yes' : 'No'}</p>
                         </div>
-                        <ExtantionCard node={node} isEditMode={isEditMode} />
+                        <ExtantionCard node={node.value} isEditMode={isEditMode} />
                     </div>
                 </div>
             );

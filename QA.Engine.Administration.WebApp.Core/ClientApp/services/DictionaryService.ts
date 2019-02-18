@@ -6,9 +6,9 @@
 class DictionaryService {
 
     /** Возвращает типы контента */
-    public async getDescriminators(): Promise<ApiResult<DiscriminatorModel[]>> {
+    public async getDiscriminators(): Promise<ApiResult<DiscriminatorModel[]>> {
 
-        const path = '/api/Dictionary/getDefinitions';
+        const path = '/api/Dictionary/getDiscriminators';
         const headers = new Headers();
         headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
         const init = {
