@@ -33,11 +33,11 @@ export default class TabsContainer extends React.Component<Props> {
                 >
                     {navigationStore.currentPage === Pages.SITEMAP ?
                         [
-                            <Tab id={TabTypes.COMMON} title="Common" panel={<CommonTab data={tabsStore.tabData}/>} />,
-                            <Tab id ={TabTypes.WIDGETS} title="Widgets" panel={<WidgetsTab />} />,
+                            <Tab key={TabTypes.COMMON} id={TabTypes.COMMON} title="Common" panel={<CommonTab data={tabsStore.tabData}/>} />,
+                            <Tab key={TabTypes.WIDGETS} id={TabTypes.WIDGETS} title="Widgets" panel={<WidgetsTab />} />,
                         ] :
                         [
-                            <Tab id={TabTypes.COMMON} title="Common" panel={<CommonTab data={tabsStore.tabData}/>} />,
+                            <Tab key={TabTypes.COMMON} id={TabTypes.COMMON} title="Common" panel={<CommonTab data={tabsStore.tabData}/>} />,
                         ]
                     }
                 </Tabs>
