@@ -22,6 +22,7 @@ import AddPopup from 'components/Popup/add';
 import AddVersionPopup from 'components/Popup/addVersion';
 import ArchivePopup from 'components/Popup/archive';
 import DeletePopup from 'components/Popup/delete';
+import RestorePopup from 'components/Popup/restore';
 
 const app = hot(module)(() => (
     <Provider
@@ -42,6 +43,7 @@ const app = hot(module)(() => (
                 <AddVersionPopup />
                 <ArchivePopup />
                 <DeletePopup />
+                <RestorePopup />
             </Popup>
             <DevTools/>
         </div>

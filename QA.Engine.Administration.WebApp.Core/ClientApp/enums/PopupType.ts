@@ -3,6 +3,7 @@ enum PopupType {
     ADDVERSION = 1,
     ARCHIVE = 2,
     DELETE = 3,
+    RESTORE = 4,
 }
 
 export default PopupType;

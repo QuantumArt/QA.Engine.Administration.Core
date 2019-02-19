@@ -28,16 +28,12 @@ export default class ElementMenu extends React.Component<Props> {
 
     private addClick = () => {
         const { popupStore, itemId } = this.props;
-        popupStore.type = PopupType.ADD;
-        popupStore.itemId = itemId;
-        popupStore.show('Добавить раздел');
+        popupStore.show(itemId, PopupType.ADD, 'Добавить раздел');
     }
 
     private addVersionClick = () => {
         const { popupStore, itemId } = this.props;
-        popupStore.type = PopupType.ADDVERSION;
-        popupStore.itemId = itemId;
-        popupStore.show('Добавить раздел');
+        popupStore.show(itemId, PopupType.ADDVERSION, 'Добавить раздел');
     }
 
     private historyClick = () => {
@@ -52,9 +48,7 @@ export default class ElementMenu extends React.Component<Props> {
 
     private archiveClick = () => {
         const { popupStore, itemId } = this.props;
-        popupStore.type = PopupType.ARCHIVE;
-        popupStore.itemId = itemId;
-        popupStore.show('Отправить в архив');
+        popupStore.show(itemId, PopupType.ARCHIVE, 'Отправить в архив');
     }
 
     private updateClick = () => {
@@ -62,23 +56,19 @@ export default class ElementMenu extends React.Component<Props> {
         siteTreeStore.updateSubTree(itemId);
     }
 
-    private restoreClick = () => {
+    private updateArchiveClick = () => {
         const { archiveStore, itemId } = this.props;
-        const model: RestoreModel = {
-            itemId,
-            isRestoreAllVersions: true,
-            isRestoreWidgets: true,
-            isRestoreContentVersions: true,
-            isRestoreChildren: true,
-        };
-        archiveStore.restore(model);
+        archiveStore.updateSubTree(itemId);
+    }
+
+    private restoreClick = () => {
+        const { popupStore, itemId } = this.props;
+        popupStore.show(itemId, PopupType.RESTORE, 'Восстановить раздел');
     }
 
     private deleteClick = () => {
         const { popupStore, itemId } = this.props;
-        popupStore.type = PopupType.DELETE;
-        popupStore.itemId = itemId;
-        popupStore.show('Удалить из архива');
+        popupStore.show(itemId, PopupType.DELETE, 'Удалить из архива');
     }
 
     private handleClick = (e: React.MouseEvent<HTMLElement>, cb: () => void) => {
@@ -101,6 +91,11 @@ export default class ElementMenu extends React.Component<Props> {
         if (isArchive === true) {
             return (
                 <Menu>
+                    <MenuItem
+                        onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.updateArchiveClick)}
+                        icon="refresh"
+                        text="Обновить"
+                    />
                     <MenuItem
                         onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.restoreClick)}
                         icon="swap-horizontal"

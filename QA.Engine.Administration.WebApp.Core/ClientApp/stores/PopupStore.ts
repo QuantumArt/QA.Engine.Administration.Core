@@ -15,14 +15,16 @@ export class PopupState {
     title: string;
 
     @action
-    public show(title: string = '') {
+    public show(itemId: number, type: PopupType, title: string) {
         const useDiscriminators = [PopupType.ADD, PopupType.ADDVERSION];
-        if (useDiscriminators.indexOf(this.type) > -1) {
+        if (useDiscriminators.indexOf(type) > -1) {
             this.getDiscriminators();
         }
-        if (this.type === PopupType.ARCHIVE && this.itemId != null) {
-            this.getContentVersions(this.itemId);
+        if (type === PopupType.ARCHIVE && itemId != null) {
+            this.getContentVersions(itemId);
         }
+        this.itemId = itemId;
+        this.type = type;
         this.title = title;
         this.showPopup = true;
     }
