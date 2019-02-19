@@ -3,19 +3,15 @@ import { BaseTreeState } from 'stores/BaseTreeStore';
 import OperationState from 'enums/OperationState';
 
 export class ArchiveState extends BaseTreeState<ArchiveModel> {
-    // constructor() {
-    //     super();
-    // }
-
     protected async getTree(): Promise<ApiResult<ArchiveModel[]>> {
         return await SiteMapService.getArchiveTree();
     }
 
-    protected async getSubTree(id: number): Promise<ApiResult<ArchiveModel>> {
-        return await SiteMapService.getArchiveSubTree(id);
+    protected getSubTree(id: number): Promise<ApiResult<ArchiveModel>> {
+        return SiteMapService.getArchiveSubTree(id);
     }
 
-    async restore(model: RestoreModel): Promise<any> {
+    async restore(model: RestoreModel): Promise<void> {
         this.treeState = OperationState.PENDING;
         try {
             const response: ApiResult<any> = await SiteMapService.restore(model);
@@ -32,7 +28,7 @@ export class ArchiveState extends BaseTreeState<ArchiveModel> {
         }
     }
 
-    async delete(model: DeleteModel): Promise<any> {
+    async delete(model: DeleteModel): Promise<void> {
         this.treeState = OperationState.PENDING;
         try {
             const response: ApiResult<any> = await SiteMapService.delete(model);

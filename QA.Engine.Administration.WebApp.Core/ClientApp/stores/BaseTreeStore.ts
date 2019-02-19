@@ -24,13 +24,22 @@ export abstract class BaseTreeState<T extends {
     @observable public treeState: OperationState = OperationState.NONE;
     @observable public tree: ITreeElement[];
 
-    private selectedNodeId?: string | number;
-    private startLoad: boolean = true;
-
-    public loadData() {
-        if (this.startLoad) {
-            this.startLoad = false;
-            this.fetchTree();
+    @action
+    public async fetchTree(): Promise<void> {
+        this.treeState = OperationState.PENDING;
+        try {
+            const response: ApiResult<T[]> = await this.getTree();
+            if (response.isSuccess) {
+                this.treeState = OperationState.SUCCESS;
+                this.origTree = response.data;
+                this.convertTree(response.data);
+            } else {
+                this.treeState = OperationState.ERROR;
+                throw response.error;
+            }
+        } catch (e) {
+            this.treeState = OperationState.ERROR;
+            console.error(e);
         }
     }
 
@@ -143,26 +152,10 @@ export abstract class BaseTreeState<T extends {
     }
 
     protected abstract async getTree(): Promise<ApiResult<T[]>>;
+
     protected abstract async getSubTree(id: number): Promise<ApiResult<T>>;
 
-    @action
-    private async fetchTree(): Promise<any> {
-        this.treeState = OperationState.PENDING;
-        try {
-            const response: ApiResult<T[]> = await this.getTree();
-            if (response.isSuccess) {
-                this.treeState = OperationState.SUCCESS;
-                this.origTree = response.data;
-                this.convertTree(response.data);
-            } else {
-                this.treeState = OperationState.ERROR;
-                throw response.error;
-            }
-        } catch (e) {
-            this.treeState = OperationState.ERROR;
-            console.error(e);
-        }
-    }
+    private selectedNodeId?: string | number;
 
     private convertTree(data: T[]): void {
         const hMap = new Map<number, ITreeElement>();

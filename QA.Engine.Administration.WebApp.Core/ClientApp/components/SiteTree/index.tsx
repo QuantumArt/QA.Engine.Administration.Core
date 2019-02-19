@@ -17,10 +17,6 @@ interface Props {
     navigationStore?: NavigationState;
 }
 
-interface State {
-    renderLoading: false,
-}
-
 interface InternalStyle extends JSX.IntrinsicAttributes, React.ClassAttributes<HTMLDivElement>, React.HTMLAttributes<HTMLDivElement> {
 }
 
@@ -29,32 +25,23 @@ interface InternalRestProps extends JSX.IntrinsicAttributes, React.ClassAttribut
 
 @inject('siteTreeStore', 'archiveStore', 'navigationStore')
 @observer
-export default class SiteTree extends React.Component<Props, State> {
-    state = {
-
-    }
-
-    getSnapshotBeforeUpdate(prevProps, prevState) {
-
-    }
-
-    componentDidUpdate(prevProps, prevState, snapshot) {
-
+export default class SiteTree extends React.Component<Props> {
+    private checkLoading = (): boolean => {
+        const { siteTreeStore, archiveStore, navigationStore } = this.props;
+        if (navigationStore.currentPage === Pages.SITEMAP) {
+            return siteTreeStore.treeState === OperationState.NONE || siteTreeStore.treeState === OperationState.PENDING;
+        }
+        return archiveStore.treeState === OperationState.NONE || archiveStore.treeState === OperationState.PENDING;
     }
 
     render() {
         const { siteTreeStore, archiveStore, navigationStore } = this.props;
         const isSiteTree = navigationStore.currentPage === Pages.SITEMAP;
-        const isLoading = (): boolean => {
-            if (isSiteTree) {
-                return siteTreeStore.treeState === OperationState.NONE || siteTreeStore.treeState === OperationState.PENDING;
-            }
-            return archiveStore.treeState === OperationState.NONE || archiveStore.treeState === OperationState.PENDING;
-        };
+        const isLoading = this.checkLoading();
 
         return (
             <Card className="tree-pane">
-                {isLoading() ?
+                {isLoading ?
                     <Spinner size={30}/> :
                     <Scrollbars
                         autoHeight

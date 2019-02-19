@@ -22,6 +22,12 @@ export class TabsState {
     }
 
     @action
+    resetTab = () => {
+        this.currentTab = TabTypes.NONE;
+        this.tabData = null;
+    }
+
+    @action
     setTabData = (nodeData: ITreeElement) => {
         if (nodeData.isSelected) {
             this.tabData = this.extractData(nodeData);
