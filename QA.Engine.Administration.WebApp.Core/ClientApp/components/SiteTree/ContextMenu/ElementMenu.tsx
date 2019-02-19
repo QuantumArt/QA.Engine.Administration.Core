@@ -83,12 +83,8 @@ export default class ElementMenu extends React.Component<Props> {
     }
 
     render() {
-        const { archiveStore, itemId } = this.props;
-        let isArchive = false;
-        if (archiveStore.getNodeById(itemId) != null) {
-            isArchive = true;
-        }
-        if (isArchive === true) {
+        const { node } = this.props;
+        if (node.isArchive === true) {
             return (
                 <Menu>
                     <MenuItem

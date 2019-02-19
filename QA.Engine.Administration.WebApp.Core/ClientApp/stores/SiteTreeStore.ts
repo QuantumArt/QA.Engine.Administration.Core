@@ -3,6 +3,7 @@ import { BaseTreeState } from 'stores/BaseTreeStore';
 import OperationState from 'enums/OperationState';
 
 export class SiteTreeState extends BaseTreeState<PageModel> {
+
     protected async getTree(): Promise<ApiResult<PageModel[]>> {
         return await SiteMapService.getSiteMapTree();
     }

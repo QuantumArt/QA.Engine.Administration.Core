@@ -21,7 +21,6 @@ interface InternalRestProps extends JSX.IntrinsicAttributes, React.ClassAttribut
 export default class ArchiveTree extends React.Component<Props> {
     render() {
         const { archiveStore } = this.props;
-        archiveStore.loadData();
         const isLoading = archiveStore.treeState === OperationState.NONE || archiveStore.treeState === OperationState.PENDING;
         return (
             <Card className="tree-pane">

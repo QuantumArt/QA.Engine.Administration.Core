@@ -11,6 +11,7 @@ export interface ITreeElement extends ITreeNode {
     versionOfId?: number;
     isContextMenuActive: boolean;
     label: string;
+    isArchive: boolean;
 }
 
 export abstract class BaseTreeState<T extends {
@@ -20,6 +21,7 @@ export abstract class BaseTreeState<T extends {
     title: string;
     children: T[];
     hasChildren: boolean;
+    isArchive: boolean;
 }> {
     @observable public treeState: OperationState = OperationState.NONE;
     @observable public tree: ITreeElement[];
@@ -177,6 +179,7 @@ export abstract class BaseTreeState<T extends {
                 icon: getIcon(),
                 hasCaret: hasChildren,
                 isContextMenuActive: false,
+                isArchive: el.isArchive,
             });
             treeElement.secondaryLabel = React.createElement(ContextMenu, {
                 node: treeElement,
