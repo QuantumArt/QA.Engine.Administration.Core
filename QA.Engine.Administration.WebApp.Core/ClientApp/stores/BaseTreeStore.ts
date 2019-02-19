@@ -169,7 +169,6 @@ export abstract class BaseTreeState<T extends {
     }
 
     private convertTree(data: T[]): void {
-        const hMap = new Map<number, ITreeElement>();
         const mapElement = (el: T): ITreeElement => {
             const hasChildren = el.hasChildren;
             const isRootNode = el.parentId === null;
@@ -200,27 +199,35 @@ export abstract class BaseTreeState<T extends {
 
             return treeElement;
         };
-        const mapSubtree = (data: T[]): void => {
-            let elements = data;
-            let loop = true;
-            while (loop) {
-                loop = false;
-                const children: T[] = [];
-                elements.forEach(x => hMap.set(x.id, mapElement(x)));
-                elements.filter(x => x.hasChildren).forEach((x) => {
-                    x.children.forEach(y => children.push(<T>y));
-                });
-                loop = children.length > 0;
-                elements = children;
-            }
-        };
-        mapSubtree(data);
-        hMap.forEach((el, key, map) => el.parentId && map.get(el.parentId) != null && map.get(el.parentId).childNodes.push(el));
 
-        const tree: ITreeElement[] = [];
-        hMap.forEach(el =>
-            (el.parentId === null && el.versionOfId != null || !hMap.has(el.parentId == null ? el.versionOfId : el.parentId))
-            && tree.push(el));
+        let treeElements: ITreeElement[] = [];
+        let elements = data;
+        let loop = true;
+
+        elements.forEach(x => treeElements.push(mapElement(x)));
+        const tree: ITreeElement[] = treeElements;
+
+        while (loop) {
+            loop = false;
+            const childNodes: ITreeElement[] = [];
+            const children: T[] = [];
+            elements.filter(x => x.hasChildren).forEach(x => x.children.forEach(e => children.push(e)));
+            children.forEach((x) => {
+                loop = true;
+                const el = mapElement(x);
+                const treeEl = treeElements.filter(e => e.id === (el.parentId == null ? el.versionOfId : el.parentId))[0];
+                if (treeEl != null) {
+                    treeEl.childNodes.push(el);
+                    childNodes.push(el);
+                }
+            });
+            if (childNodes.length !== children.length) {
+                loop = false;
+                throw 'error tree convert';
+            }
+            treeElements = childNodes;
+            elements = children;
+        }
         this.tree = tree;
     }
 

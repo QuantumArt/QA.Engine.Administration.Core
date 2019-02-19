@@ -258,9 +258,9 @@ class SiteMapService {
     }
 
     /** Удаление элементов в архив */
-    public async remove(model: RemoveModel): Promise<any> {
+    public async archive(model: RemoveModel): Promise<any> {
 
-        const path = '/api/SiteMap/remove';
+        const path = '/api/SiteMap/archive';
         const headers = new Headers();
         headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
         headers.append('Content-Type', 'application/json');

@@ -6,6 +6,7 @@ import { SiteTreeState } from 'stores/SiteTreeStore';
 import { ArchiveState } from 'stores/ArchiveStore';
 import { PopupState } from 'stores/PopupStore';
 import PopupType from 'enums/PopupType';
+import { ITreeElement } from 'stores/BaseTreeStore';
 
 interface Props {
     qpIntegrationStore?: QpIntegrationState;
@@ -13,6 +14,7 @@ interface Props {
     archiveStore?: ArchiveState;
     popupStore?: PopupState;
     itemId: number;
+    node: ITreeElement;
 }
 
 @inject('qpIntegrationStore', 'siteTreeStore', 'archiveStore', 'popupStore')
@@ -48,15 +50,11 @@ export default class ElementMenu extends React.Component<Props> {
         siteTreeStore.publish([itemId]);
     }
 
-    private removeClick = () => {
-        const { siteTreeStore, itemId } = this.props;
-        const model: RemoveModel = {
-            itemId,
-            isDeleteAllVersions: true,
-            isDeleteContentVersions: true,
-            contentVersionId: null,
-        };
-        siteTreeStore.remove(model);
+    private archiveClick = () => {
+        const { popupStore, itemId } = this.props;
+        popupStore.type = PopupType.ARCHIVE;
+        popupStore.itemId = itemId;
+        popupStore.show('Отправить в архив');
     }
 
     private updateClick = () => {
@@ -87,6 +85,7 @@ export default class ElementMenu extends React.Component<Props> {
 
     private handleClick = (e: React.MouseEvent<HTMLElement>, cb: () => void) => {
         e.stopPropagation();
+        this.props.node.isContextMenuActive = false;
         cb();
     }
 
@@ -160,7 +159,7 @@ export default class ElementMenu extends React.Component<Props> {
                     intent={Intent.PRIMARY}/>
                 <MenuDivider/>
                 <MenuItem
-                    onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.removeClick)}
+                    onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.archiveClick)}
                     icon="box"
                     text="Архивировать"
                     intent={Intent.DANGER}/>

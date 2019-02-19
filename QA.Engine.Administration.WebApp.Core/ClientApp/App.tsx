@@ -20,6 +20,7 @@ import Popup from 'components/Popup/popup';
 import PopupStore from 'stores/PopupStore';
 import AddPopup from 'components/Popup/add';
 import AddVersionPopup from 'components/Popup/addVersion';
+import ArchivePopup from 'components/Popup/archive';
 
 const app = hot(module)(() => (
     <Provider
@@ -38,6 +39,7 @@ const app = hot(module)(() => (
             <Popup>
                 <AddPopup />
                 <AddVersionPopup />
+                <ArchivePopup />
             </Popup>
             <DevTools/>
         </div>

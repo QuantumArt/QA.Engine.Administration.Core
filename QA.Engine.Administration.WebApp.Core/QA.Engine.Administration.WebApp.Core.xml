@@ -237,7 +237,7 @@
             <param name="model"></param>
             <returns></returns>
         </member>
-        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.Remove(QA.Engine.Administration.WebApp.Core.Models.RemoveModel)">
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.Archive(QA.Engine.Administration.WebApp.Core.Models.RemoveModel)">
             <summary>
             Удаление элементов в архив
             </summary>

@@ -284,8 +284,8 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        [HttpPost("remove")]
-        public ApiResult Remove([FromBody]RemoveModel model)
+        [HttpPost("archive")]
+        public ApiResult Archive([FromBody]RemoveModel model)
         {
             try
             {

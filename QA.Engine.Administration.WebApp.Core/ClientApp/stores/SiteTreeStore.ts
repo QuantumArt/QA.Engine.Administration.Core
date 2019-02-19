@@ -30,10 +30,10 @@ export class SiteTreeState extends BaseTreeState<PageModel> {
         }
     }
 
-    async remove(model: RemoveModel): Promise<any> {
+    async archive(model: RemoveModel): Promise<any> {
         this.treeState = OperationState.PENDING;
         try {
-            const response: ApiResult<any> = await SiteMapService.remove(model);
+            const response: ApiResult<any> = await SiteMapService.archive(model);
             if (response.isSuccess) {
                 await this.updateSubTreeInternal(model.itemId);
                 this.treeState = OperationState.SUCCESS;

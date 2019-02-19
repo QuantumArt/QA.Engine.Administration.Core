@@ -21,7 +21,7 @@ export default class ContextMenu extends React.Component<Props> {
 
     render() {
         const { node } = this.props;
-        const elementMenu = <ElementMenu itemId={+node.id} />;
+        const elementMenu = <ElementMenu itemId={+node.id} node={node} />;
         return node.isSelected ?
             <Popover
                 content={elementMenu}
