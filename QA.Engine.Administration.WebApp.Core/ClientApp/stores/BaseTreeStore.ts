@@ -134,23 +134,19 @@ export abstract class BaseTreeState<T extends {
                     expanded.push(+x.id);
                 }
             });
+
             const node = this.getNodeById(id);
-            const parentNode = this.getNodeById(node.parentId);
-            if (parentNode == null) {
-                for (let i = 0; i < this.origTree.length; i += 1) {
-                    if (this.origTree[i].id === response.data.id) {
-                        this.origTree[i] = response.data;
-                        break;
-                    }
-                }
-            } else {
-                for (let i = 0; i < parentNode.children.length; i += 1) {
-                    if (parentNode.children[i].id === id) {
-                        parentNode.children[i] = response.data;
-                        break;
-                    }
+            const parentNode = this.getNodeById(node.parentId == null ? node.versionOfId : node.parentId);
+            const elements = parentNode == null ? this.origTree : parentNode.children;
+            for (let i = 0; i < elements.length; i += 1) {
+                if (response.data == null && elements[i].id === id) {
+                    elements.splice(i, 1);
+                    break;
+                } else if (response.data != null && elements[i].id === response.data.id) {
+                    elements[i] = response.data;
                 }
             }
+
             this.convertTree(this.origTree);
             this.forEachNode(
                 (x) => {

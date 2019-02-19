@@ -33,6 +33,7 @@ export default class AddVersionPopup extends React.Component<Props, State> {
         const { discriminator, version } = this.state;
         const node = siteTreeStore.getNodeById(popupStore.itemId);
         qpIntegrationStore.add(node, version, node.alias, node.title, discriminator.id, 0);
+        popupStore.close();
     }
 
     private cancelClick = () => {
@@ -58,6 +59,8 @@ export default class AddVersionPopup extends React.Component<Props, State> {
             return (<Spinner size={30} />);
         }
 
+        const discriminators = popupStore.discriminators.filter(x => x.isPage === true);
+
         return (
             <Card>
                 <RadioGroup label="Title" selectedValue={version} onChange={this.changeVersion}>
@@ -65,7 +68,7 @@ export default class AddVersionPopup extends React.Component<Props, State> {
                     <Radio label="Structural" value={VersionType.Structural}></Radio>
                 </RadioGroup>
                 <div>
-                    <DiscriminatorSelect items={popupStore.discriminators} onChange={this.changeDiscriminator} />
+                    <DiscriminatorSelect items={discriminators} onChange={this.changeDiscriminator} />
                 </div>
                 <div>
                     <Button text="add" onClick={this.addClick} />

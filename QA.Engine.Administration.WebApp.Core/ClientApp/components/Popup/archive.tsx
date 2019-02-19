@@ -36,7 +36,6 @@ export default class ArchivePopup extends React.Component<Props, State> {
     private archiveClick = () => {
         const { popupStore, siteTreeStore } = this.props;
         const { deleteAllVersions, deleteContentVersions, contentVersionId } = this.state;
-        const node = siteTreeStore.getNodeById(popupStore.itemId);
         const model: RemoveModel = {
             contentVersionId,
             itemId: popupStore.itemId,
@@ -44,6 +43,7 @@ export default class ArchivePopup extends React.Component<Props, State> {
             isDeleteContentVersions: deleteContentVersions === ContentVersionOperations.archive,
         };
         siteTreeStore.archive(model);
+        popupStore.close();
     }
 
     private cancelClick = () => this.props.popupStore.close();

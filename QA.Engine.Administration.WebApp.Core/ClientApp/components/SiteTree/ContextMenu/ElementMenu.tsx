@@ -75,12 +75,10 @@ export default class ElementMenu extends React.Component<Props> {
     }
 
     private deleteClick = () => {
-        const { archiveStore, itemId } = this.props;
-        const model: DeleteModel = {
-            itemId,
-            isDeleteAllVersions: true,
-        };
-        archiveStore.delete(model);
+        const { popupStore, itemId } = this.props;
+        popupStore.type = PopupType.DELETE;
+        popupStore.itemId = itemId;
+        popupStore.show('Удалить из архива');
     }
 
     private handleClick = (e: React.MouseEvent<HTMLElement>, cb: () => void) => {

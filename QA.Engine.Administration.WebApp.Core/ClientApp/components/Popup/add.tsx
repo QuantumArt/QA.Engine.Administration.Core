@@ -31,6 +31,7 @@ export default class AddPopup extends React.Component<Props, State> {
         const { discriminator, name, title } = this.state;
         const node = siteTreeStore.getNodeById(popupStore.itemId);
         qpIntegrationStore.add(node, null, name, title, discriminator.id, 0);
+        popupStore.close();
     }
 
     private cancelClick = () => {
@@ -59,6 +60,8 @@ export default class AddPopup extends React.Component<Props, State> {
             return (<Spinner size={30} />);
         }
 
+        const discriminators = popupStore.discriminators.filter(x => x.isPage === true);
+
         return (
             <Card>
                 <FormGroup label="Title">
@@ -68,7 +71,7 @@ export default class AddPopup extends React.Component<Props, State> {
                     <InputGroup placeholder="alias" value={name} onChange={this.changeName}></InputGroup>
                 </FormGroup>
                 <div>
-                    <DiscriminatorSelect items={popupStore.discriminators} onChange={this.changeDiscriminator} />
+                    <DiscriminatorSelect items={discriminators} onChange={this.changeDiscriminator} />
                 </div>
                 <div>
                     <Button text="add" onClick={this.addClick} />

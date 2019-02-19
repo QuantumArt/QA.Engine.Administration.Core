@@ -100,7 +100,7 @@ export class QpIntegrationState {
             switch (versionType) {
             case VersionType.Structural:
                 executeOptions.options.disabledFields = QpIntegrationUtils.getDefaultDisabledFields(this.qpContent.fields, [
-                    QpAbstractItemFields.name,
+                    QpAbstractItemFields.contentName,
                 ]);
                 executeOptions.options.initFieldValues = QpIntegrationUtils.getFieldValues(
                     this.qpContent.fields,
@@ -236,7 +236,7 @@ class QpIntegrationUtils {
         const result = [
             { fieldName: QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.parent), value: model.parentId },
             { fieldName: QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.discriminator), value: model.discriminatorId === 0 ? null : model.discriminatorId },
-            { fieldName: QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.name), value: model.name },
+            { fieldName: QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.contentName), value: model.name },
             { fieldName: QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.title), value: model.title },
             { fieldName: QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.isPage), value: true },
             { fieldName: 'Data.Schedule.ScheduleType', value: 'Visible' },
