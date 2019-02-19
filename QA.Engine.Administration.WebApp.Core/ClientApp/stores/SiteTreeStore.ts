@@ -3,19 +3,15 @@ import { BaseTreeState } from 'stores/BaseTreeStore';
 import OperationState from 'enums/OperationState';
 
 export class SiteTreeState extends BaseTreeState<PageModel> {
-    constructor() {
-        super();
-    }
-
-    async getTree(): Promise<ApiResult<PageModel[]>> {
+    protected async getTree(): Promise<ApiResult<PageModel[]>> {
         return await SiteMapService.getSiteMapTree();
     }
 
-    async getSubTree(id: number): Promise<ApiResult<PageModel>> {
-        return await SiteMapService.getSiteMapSubTree(id);
+    protected getSubTree(id: number): Promise<ApiResult<PageModel>> {
+        return SiteMapService.getSiteMapSubTree(id);
     }
 
-    async publish(itemIds: number[]): Promise<any> {
+    async publish(itemIds: number[]): Promise<void> {
         this.treeState = OperationState.PENDING;
         try {
             const response: ApiResult<any> = await SiteMapService.publish(itemIds);
@@ -30,7 +26,7 @@ export class SiteTreeState extends BaseTreeState<PageModel> {
         }
     }
 
-    async archive(model: RemoveModel): Promise<any> {
+    async archive(model: RemoveModel): Promise<void> {
         this.treeState = OperationState.PENDING;
         try {
             const response: ApiResult<any> = await SiteMapService.archive(model);
@@ -46,7 +42,7 @@ export class SiteTreeState extends BaseTreeState<PageModel> {
         }
     }
 
-    async edit(model: EditModel): Promise<any> {
+    async edit(model: EditModel): Promise<void> {
         this.treeState = OperationState.PENDING;
         try {
             const response: ApiResult<any> = await SiteMapService.edit(model);

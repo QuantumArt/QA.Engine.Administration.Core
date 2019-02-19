@@ -1,6 +1,4 @@
 import { action, observable } from 'mobx';
-// import SiteTreeStore from './SiteTreeStore';
-// import ArchiveStore from './ArchiveStore';
 
 export enum Pages {
     SITEMAP,
@@ -11,7 +9,7 @@ export class NavigationState {
     @observable public currentPage: Pages = Pages.SITEMAP;
 
     @action
-    changePage = (page: Pages) => {
+    changePage(page: Pages) {
         this.currentPage = page;
     }
 }
