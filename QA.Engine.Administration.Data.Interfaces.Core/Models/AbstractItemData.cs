@@ -21,6 +21,6 @@ namespace QA.Engine.Administration.Data.Interfaces.Core.Models
         public int DiscriminatorId { get; set; }
         public string DiscriminatorTitle { get; set; }
         public string IconUrl { get; set; }
-        public List<RegionData> Regions { get; set; }
+        public List<int> RegionIds { get; set; }
     }
 }

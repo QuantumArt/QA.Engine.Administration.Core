@@ -18,7 +18,7 @@ namespace QA.Engine.Administration.Services.Core.Filters
                 return x => true;
 
             var filteredRegions = GetRegionIds(regionIds, Regions);
-            return x => x.Id == RootPage.Id || x.Regions.Any(y => filteredRegions.Contains(y.Id)) || !x.Regions.Any();
+            return x => x.Id == RootPage.Id || x.RegionIds.Any(y => filteredRegions.Contains(y)) || !x.RegionIds.Any();
         }
 
         private static List<int> GetRegionIds(int[] regionIds, List<RegionData> regions)

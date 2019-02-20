@@ -17,7 +17,7 @@ namespace QA.Engine.Administration.Services.Core.Filters
             if (regionIds == null || !regionIds.Any())
                 return x => true;
 
-            return x => x.Id == RootPage.Id || x.Regions.Any(y => regionIds.Contains(y.Id)) || !x.Regions.Any();
+            return x => x.Id == RootPage.Id || x.RegionIds.Any(y => regionIds.Contains(y)) || !x.RegionIds.Any();
         }
     }
 }
