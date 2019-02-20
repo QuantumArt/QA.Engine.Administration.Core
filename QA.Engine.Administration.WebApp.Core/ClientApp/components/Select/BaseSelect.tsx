@@ -69,7 +69,7 @@ export default abstract class BaseSelect<T extends { id: number, title: string }
 
     selectElement = Select.ofType<T>();
 
-    constructor(props: any) {
+    constructor(props: Props<T>) {
         super(props);
         this.state = { page: null };
     }
@@ -90,12 +90,12 @@ export default abstract class BaseSelect<T extends { id: number, title: string }
                 itemPredicate={(query, item) => item.title.indexOf(query.toLowerCase()) >= 0}
                 filterable={false}
                 onItemSelect={this.selectItemClick}
-                disabled={!!disabled}
+                disabled={disabled}
             >
                 <Button
                     rightIcon="caret-down"
-                    fill={true}
-                    text={page == null ? '(No selection)' : page.title}
+                    text={page === null ? '(No selection)' : page.title}
+                    disabled={disabled}
                 />
             </this.selectElement>
         );

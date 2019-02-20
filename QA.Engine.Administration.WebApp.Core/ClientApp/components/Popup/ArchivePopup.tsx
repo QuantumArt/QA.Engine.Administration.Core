@@ -1,8 +1,7 @@
 import * as React from 'react';
-import { Card, Spinner, Button, Checkbox, RadioGroup, Radio } from '@blueprintjs/core';
-import { observer, inject } from 'mobx-react';
+import { Button, ButtonGroup, Card, Checkbox, FormGroup, Intent, Radio, RadioGroup } from '@blueprintjs/core';
+import { inject, observer } from 'mobx-react';
 import { PopupState } from 'stores/PopupStore';
-import OperationState from 'enums/OperationState';
 import PageSelect from 'components/Select/PageSelect';
 import PopupType from 'enums/PopupType';
 import TreeStore from 'stores/TreeStore';
@@ -61,50 +60,46 @@ export default class ArchivePopup extends React.Component<Props, State> {
     render() {
         const { popupStore } = this.props;
         const { deleteAllVersions, deleteContentVersions } = this.state;
-
         if (popupStore.type !== PopupType.ARCHIVE) {
             return null;
         }
 
-        if (popupStore.state === OperationState.NONE || popupStore.state === OperationState.PENDING) {
-            return (<Spinner size={30} />);
-        }
-
         return (
             <Card>
-                <Checkbox
-                    checked={deleteAllVersions}
-                    onChange={this.changeDeleteAllVersions}
-                >
-                    Archive versions
-                </Checkbox>
-                <RadioGroup
-                    label="Action on content versions"
-                    inline={true}
-                    selectedValue={deleteContentVersions}
-                    onChange={this.changeDeleteContentVersions}
-                    disabled={deleteAllVersions}
-                >
-                    <Radio
-                        label="Archive content versions"
-                        value={ContentVersionOperations.archive}
-                    />
-                    <Radio
-                        label="Move to another version"
-                        value={ContentVersionOperations.move}
-                    />
-                </RadioGroup>
-                <div>
+                <FormGroup>
+                    <Checkbox checked={deleteAllVersions} onChange={this.changeDeleteAllVersions}>
+                        Архивировать все версии
+                    </Checkbox>
+                </FormGroup>
+                <FormGroup>
+                    <RadioGroup
+                        label="Тип действия"
+                        inline={true}
+                        selectedValue={deleteContentVersions}
+                        onChange={this.changeDeleteContentVersions}
+                        disabled={deleteAllVersions}
+                    >
+                        <Radio
+                            label="Архивировать"
+                            value={ContentVersionOperations.archive}
+                        />
+                        <Radio
+                            label="Сменить версию"
+                            value={ContentVersionOperations.move}
+                        />
+                    </RadioGroup>
+                </FormGroup>
+                <FormGroup>
                     <PageSelect
                         items={popupStore.contentVersions}
                         onChange={this.changeContentVersion}
                         disabled={deleteAllVersions || deleteContentVersions === ContentVersionOperations.archive}
                     />
-                </div>
-                <div>
-                    <Button text="archive" onClick={this.archiveClick} />
-                    <Button text="cancel" onClick={this.cancelClick} />
-                </div>
+                </FormGroup>
+                <ButtonGroup className="dialog-button-group">
+                    <Button text="Архивировать" icon="box" onClick={this.archiveClick} intent={Intent.DANGER} />
+                    <Button text="Отмена" icon="undo" onClick={this.cancelClick} />
+                </ButtonGroup>
             </Card>
         );
     }

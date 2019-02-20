@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Card, Button, Checkbox } from '@blueprintjs/core';
+import { Card, Button, Checkbox, ButtonGroup, Intent, FormGroup } from '@blueprintjs/core';
 import { observer, inject } from 'mobx-react';
 import { PopupState } from 'stores/PopupStore';
 import PopupType from 'enums/PopupType';
@@ -49,23 +49,21 @@ export default class DeletePopup extends React.Component<Props, State> {
     render() {
         const { popupStore } = this.props;
         const { deleteAllVersions } = this.state;
-
         if (popupStore.type !== PopupType.DELETE) {
             return null;
         }
 
         return (
             <Card>
-                <Checkbox
-                    checked={deleteAllVersions}
-                    onChange={this.changeDeleteAllVersions}
-                >
-                    Remove versions
-                </Checkbox>
-                <div>
-                    <Button text="delete" onClick={this.deleteClick} />
-                    <Button text="cancel" onClick={this.cancelClick} />
-                </div>
+                <FormGroup>
+                    <Checkbox checked={deleteAllVersions} onChange={this.changeDeleteAllVersions}>
+                        Удалить все версии
+                    </Checkbox>
+                </FormGroup>
+                <ButtonGroup className="dialog-button-group">
+                    <Button text="Удалить" icon="delete" onClick={this.deleteClick} intent={Intent.DANGER} />
+                    <Button text="Отмена" icon="undo" onClick={this.cancelClick} />
+                </ButtonGroup>
             </Card>
         );
     }
