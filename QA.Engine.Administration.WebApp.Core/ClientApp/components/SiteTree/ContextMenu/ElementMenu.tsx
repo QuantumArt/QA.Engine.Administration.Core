@@ -7,17 +7,17 @@ import { ArchiveState } from 'stores/ArchiveStore';
 import { PopupState } from 'stores/PopupStore';
 import PopupType from 'enums/PopupType';
 import { ITreeElement } from 'stores/BaseTreeStore';
+import { NavigationState, Pages } from 'stores/NavigationStore';
 
 interface Props {
     qpIntegrationStore?: QpIntegrationState;
-    siteTreeStore?: SiteTreeState;
-    archiveStore?: ArchiveState;
+    navigationStore?: NavigationState;
     popupStore?: PopupState;
     itemId: number;
     node: ITreeElement;
 }
 
-@inject('qpIntegrationStore', 'siteTreeStore', 'archiveStore', 'popupStore')
+@inject('qpIntegrationStore', 'navigationStore', 'popupStore')
 @observer
 export default class ElementMenu extends React.Component<Props> {
 
@@ -42,8 +42,9 @@ export default class ElementMenu extends React.Component<Props> {
     }
 
     private publishClick = () => {
-        const { siteTreeStore, itemId } = this.props;
-        siteTreeStore.publish([itemId]);
+        const { navigationStore, itemId } = this.props;
+        const treeStore = navigationStore.resolveTreeStore() as SiteTreeState;
+        treeStore.publish([itemId]);
     }
 
     private archiveClick = () => {
@@ -52,13 +53,15 @@ export default class ElementMenu extends React.Component<Props> {
     }
 
     private updateClick = () => {
-        const { siteTreeStore, itemId } = this.props;
-        siteTreeStore.updateSubTree(itemId);
+        const { navigationStore, itemId } = this.props;
+        const treeStore = navigationStore.resolveTreeStore() as SiteTreeState;
+        treeStore.updateSubTree(itemId);
     }
 
     private updateArchiveClick = () => {
-        const { archiveStore, itemId } = this.props;
-        archiveStore.updateSubTree(itemId);
+        const { navigationStore, itemId } = this.props;
+        const treeStore = navigationStore.resolveTreeStore() as ArchiveState;
+        treeStore.updateSubTree(itemId);
     }
 
     private restoreClick = () => {
@@ -83,8 +86,8 @@ export default class ElementMenu extends React.Component<Props> {
     }
 
     render() {
-        const { node } = this.props;
-        if (node.isArchive === true) {
+        const { navigationStore } = this.props;
+        if (navigationStore.currentPage === Pages.ARCHIVE) {
             return (
                 <Menu>
                     <MenuItem

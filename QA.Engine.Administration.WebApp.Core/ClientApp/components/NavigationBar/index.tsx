@@ -2,18 +2,12 @@ import * as React from 'react';
 import { inject, observer } from 'mobx-react';
 import { Alignment, Button, Classes, Intent, Navbar, NavbarGroup, NavbarHeading } from '@blueprintjs/core';
 import { NavigationState, Pages } from 'stores/NavigationStore';
-import { SiteTreeState } from 'stores/SiteTreeStore';
-import { ArchiveState } from 'stores/ArchiveStore';
-import { TabsState } from 'stores/TabsStore';
 
 interface Props {
     navigationStore?: NavigationState;
-    siteTreeStore?: SiteTreeState;
-    archiveStore?: ArchiveState;
-    tabsStore?: TabsState;
 }
 
-@inject('navigationStore', 'siteTreeStore', 'archiveStore', 'tabsStore')
+@inject('navigationStore')
 @observer
 export default class NavigationBar extends React.Component<Props> {
     componentDidMount() {
@@ -21,19 +15,16 @@ export default class NavigationBar extends React.Component<Props> {
     }
 
     private handleClick = (pageId: Pages) => async () => {
-        const { tabsStore } = this.props;
+        const { navigationStore } = this.props;
         await this.changePage(pageId);
-        tabsStore.resetTab();
+        navigationStore.resetTab();
     }
 
     private changePage = async (pageId: Pages) => {
-        const { siteTreeStore , archiveStore, navigationStore } = this.props;
+        const { navigationStore } = this.props;
+        const treeStore = navigationStore.resolveTreeStore();
         navigationStore.changePage(pageId);
-        if (pageId === Pages.SITEMAP) {
-            await siteTreeStore.fetchTree();
-        } else if (pageId === Pages.ARCHIVE) {
-            await archiveStore.fetchTree();
-        }
+        treeStore.fetchTree();
     }
 
     render() {

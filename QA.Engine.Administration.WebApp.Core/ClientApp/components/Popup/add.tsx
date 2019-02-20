@@ -29,7 +29,7 @@ export default class AddPopup extends React.Component<Props, State> {
     private addClick = () => {
         const { popupStore, qpIntegrationStore, siteTreeStore } = this.props;
         const { discriminator, name, title } = this.state;
-        const node = siteTreeStore.getNodeById(popupStore.itemId);
+        const node = siteTreeStore.selectedNode;
         qpIntegrationStore.add(node, null, name, title, discriminator.id, 0);
         popupStore.close();
     }

@@ -23,7 +23,6 @@ export class QpIntegrationState {
             const response: ApiResult<QpContentModel> = await DictionaryService.getQpContent(this.qpAbstractItem);
             if (response.isSuccess) {
                 this.qpContent = response.data;
-                console.log(response);
             } else {
                 throw response.error;
             }

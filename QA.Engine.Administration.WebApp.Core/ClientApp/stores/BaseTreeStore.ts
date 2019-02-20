@@ -3,7 +3,6 @@ import { action, observable } from 'mobx';
 import { IconName, ITreeNode } from '@blueprintjs/core';
 import ContextMenu from 'components/SiteTree/ContextMenu';
 import OperationState from 'enums/OperationState';
-import TabsStore from './TabsStore';
 
 export interface ITreeElement extends ITreeNode {
     childNodes: ITreeElement[];
@@ -25,6 +24,7 @@ export abstract class BaseTreeState<T extends {
 }> {
     @observable public treeState: OperationState = OperationState.NONE;
     @observable public tree: ITreeElement[];
+    @observable public selectedNode: T;
 
     @action
     public async fetchTree(): Promise<void> {
@@ -65,14 +65,13 @@ export abstract class BaseTreeState<T extends {
 
     @action
     public handleNodeClick = (nodeData: ITreeElement) => {
-        this.selectedNodeId = nodeData.id;
+        this.selectedNode = this.getNodeById(+nodeData.id);
         const originallySelected = nodeData.isSelected;
         this.forEachNode(null, (n) => {
             n.isSelected = false;
             n.isContextMenuActive = false;
         });
         nodeData.isSelected = originallySelected == null ? true : !originallySelected;
-        TabsStore.setTabData(nodeData);
     }
 
     @action
@@ -98,8 +97,9 @@ export abstract class BaseTreeState<T extends {
         while (loop) {
             loop = false;
             const children: T[] = [];
-            if (elements.filter(x => x.id === id)[0] != null) {
-                return elements.filter(x => x.id === id)[0];
+            const node = elements.filter(x => x.id === id)[0];
+            if (node != null) {
+                return node;
             }
             elements.filter(x => x.hasChildren).forEach((x) => {
                 x.children.forEach(y => children.push(<T>y));
@@ -140,7 +140,7 @@ export abstract class BaseTreeState<T extends {
                     }
                 },
                 (x) => {
-                    if (this.selectedNodeId === x.id) {
+                    if (this.selectedNode.id === +x.id) {
                         x.isSelected = true;
                     }
                 });
@@ -152,8 +152,6 @@ export abstract class BaseTreeState<T extends {
     protected abstract async getTree(): Promise<ApiResult<T[]>>;
 
     protected abstract async getSubTree(id: number): Promise<ApiResult<T>>;
-
-    private selectedNodeId?: string | number;
 
     private convertTree(data: T[]): void {
         const mapElement = (el: T): ITreeElement => {

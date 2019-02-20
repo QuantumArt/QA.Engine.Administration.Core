@@ -12,10 +12,8 @@ import TabsContainer from 'components/TabsContainer';
 import NavigationBar from 'components/NavigationBar';
 import NavigationStore from 'stores/NavigationStore';
 import SiteTreeStore from 'stores/SiteTreeStore';
-import TabsStore from 'stores/TabsStore';
 import ArchiveStore from 'stores/ArchiveStore';
 import QpIntegrationStore from 'stores/QpIntegrationStore';
-import ExtensionFieldsStore from 'stores/ExtensionFieldsStore';
 import Popup from 'components/Popup/popup';
 import PopupStore from 'stores/PopupStore';
 import AddPopup from 'components/Popup/add';
@@ -23,16 +21,16 @@ import AddVersionPopup from 'components/Popup/addVersion';
 import ArchivePopup from 'components/Popup/archive';
 import DeletePopup from 'components/Popup/delete';
 import RestorePopup from 'components/Popup/restore';
+import EditArticleStore from 'stores/EditArticleStore';
 
 const app = hot(module)(() => (
     <Provider
         siteTreeStore={SiteTreeStore}
         archiveStore={ArchiveStore}
-        tabsStore={TabsStore}
         qpIntegrationStore={QpIntegrationStore}
-        extensionFieldsStore={ExtensionFieldsStore}
         navigationStore={NavigationStore}
         popupStore={PopupStore}
+        editArticleStore={EditArticleStore}
     >
         <div className="layout">
             <NavigationBar />

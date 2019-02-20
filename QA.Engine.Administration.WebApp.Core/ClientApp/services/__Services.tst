@@ -137,7 +137,7 @@ $DocComment[    /** $Summary */]
             body: JSON.stringify($RequestData),]
         };
 
-        console.debug(`%cstart api request $HttpMethod '${path}'`, 'color: green;');
+        console.debug(`%cstart api request $HttpMethod '${path}'`, 'color: green;'$HasBody[, $RequestData]);
         const response = await fetch(path, init);
 
         const result = await <Promise<$ReturnType>>response.json();

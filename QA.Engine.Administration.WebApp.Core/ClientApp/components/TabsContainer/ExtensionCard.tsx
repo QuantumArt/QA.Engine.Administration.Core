@@ -1,66 +1,38 @@
 import * as React from 'react';
 import { inject, observer } from 'mobx-react';
-import { Spinner, AnchorButton, InputGroup } from '@blueprintjs/core';
-import { ExtensionFieldsState } from 'stores/ExtensionFieldsStore';
+import { AnchorButton, InputGroup } from '@blueprintjs/core';
 import OperationState from 'enums/OperationState';
+import { EditArticleState } from 'stores/EditArticleStore';
 
 interface Props {
-    node: PageModel | ArchiveModel;
-    isEditMode: boolean;
-    extensionFieldsStore?: ExtensionFieldsState;
+    editArticleStore?: EditArticleState;
 }
 
 interface State {
     showItem: boolean;
-    itemId?: number;
-    fields: ExtensionFieldModel[];
 }
 
-@inject('extensionFieldsStore')
+@inject('editArticleStore')
 @observer
 export default class ExtantionCard extends React.Component<Props, State> {
-    constructor(props: any) {
-        super(props);
-        this.state = { showItem: false, itemId: null, fields: [] };
-    }
 
-    componentWillReceiveProps(nextProps: Props) {
-        const { itemId, showItem } = this.state;
-        const { extensionFieldsStore, node, isEditMode } = nextProps;
-
-        if (itemId !== node.id) {
-            extensionFieldsStore.state = OperationState.NONE;
-            this.setState({ showItem: false, itemId: null, fields: [] });
-        }
-        if (showItem === true && isEditMode === false) {
-            this.setState({ showItem: false, fields: extensionFieldsStore.fields.map(x => Object.assign({}, x)) });
-        }
-    }
+    state = { showItem: false };
 
     private showClick = () => {
-        const { extensionFieldsStore, node } = this.props;
-
-        this.setState({ showItem: true, itemId: node.id });
-        extensionFieldsStore.fetchExtantionFields(node.id, node.extensionId).then(() => {
-            this.setState({ fields: extensionFieldsStore.fields.map(x => Object.assign({}, x)) });
-        });
+        const { editArticleStore } = this.props;
+        this.setState({ showItem: true });
+        editArticleStore.fetchExtantionFields();
     }
 
     private change = (e: React.ChangeEvent<HTMLInputElement>, field: ExtensionFieldModel) => {
-        const { fields } = this.state;
-        const { extensionFieldsStore } = this.props;
-
         field.value = e.target.value;
-        extensionFieldsStore.changedFields = fields.filter(x =>
-            extensionFieldsStore.fields.filter(y =>
-                y.fieldName === x.fieldName && y.value !== x.value).length > 0);
-        this.setState({ fields });
     }
 
     render() {
-        const { showItem, fields } = this.state;
-        const { extensionFieldsStore, isEditMode } = this.props;
-        const isLoading = extensionFieldsStore.state === OperationState.NONE || extensionFieldsStore.state === OperationState.PENDING;
+        console.log('ExtantionCard render');
+        const { showItem } = this.state;
+        const { editArticleStore } = this.props;
+        const isLoading = editArticleStore.state === OperationState.NONE || editArticleStore.state === OperationState.PENDING;
 
         if (!showItem) {
             return (
@@ -77,15 +49,12 @@ export default class ExtantionCard extends React.Component<Props, State> {
         return (
             <div>
                 {
-                    fields.map((field, i) => (<div key={i}>
+                    editArticleStore.fields.map((field, i) => (<div key={i}>
                         <span>{field.fieldName}</span>(<small>{field.typeName}</small>)
-                        { isEditMode
-                        ? (<InputGroup
+                        <InputGroup
                             value={field.value == null ? '' : field.value}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.change(e, field)}
-                        />)
-                        : (<div className="bp3-input-group">{field.value}</div>)
-                        }
+                        />
                     </div>))
                 }
             </div>

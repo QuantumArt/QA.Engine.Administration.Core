@@ -182,7 +182,7 @@ class SiteMapService {
             body: JSON.stringify(itemIds),
         };
 
-        console.debug(`%cstart api request post '${path}'`, 'color: green;');
+        console.debug(`%cstart api request post '${path}'`, 'color: green;', itemIds);
         const response = await fetch(path, init);
 
         const result = await <Promise<any>>response.json();
@@ -204,7 +204,7 @@ class SiteMapService {
             body: JSON.stringify(model),
         };
 
-        console.debug(`%cstart api request post '${path}'`, 'color: green;');
+        console.debug(`%cstart api request post '${path}'`, 'color: green;', model);
         const response = await fetch(path, init);
 
         const result = await <Promise<any>>response.json();
@@ -226,7 +226,7 @@ class SiteMapService {
             body: JSON.stringify(model),
         };
 
-        console.debug(`%cstart api request post '${path}'`, 'color: green;');
+        console.debug(`%cstart api request post '${path}'`, 'color: green;', model);
         const response = await fetch(path, init);
 
         const result = await <Promise<any>>response.json();
@@ -248,7 +248,7 @@ class SiteMapService {
             body: JSON.stringify(model),
         };
 
-        console.debug(`%cstart api request post '${path}'`, 'color: green;');
+        console.debug(`%cstart api request post '${path}'`, 'color: green;', model);
         const response = await fetch(path, init);
 
         const result = await <Promise<any>>response.json();
@@ -270,7 +270,7 @@ class SiteMapService {
             body: JSON.stringify(model),
         };
 
-        console.debug(`%cstart api request post '${path}'`, 'color: green;');
+        console.debug(`%cstart api request post '${path}'`, 'color: green;', model);
         const response = await fetch(path, init);
 
         const result = await <Promise<any>>response.json();
@@ -292,7 +292,7 @@ class SiteMapService {
             body: JSON.stringify(model),
         };
 
-        console.debug(`%cstart api request post '${path}'`, 'color: green;');
+        console.debug(`%cstart api request post '${path}'`, 'color: green;', model);
         const response = await fetch(path, init);
 
         const result = await <Promise<any>>response.json();
@@ -314,7 +314,7 @@ class SiteMapService {
             body: JSON.stringify(model),
         };
 
-        console.debug(`%cstart api request post '${path}'`, 'color: green;');
+        console.debug(`%cstart api request post '${path}'`, 'color: green;', model);
         const response = await fetch(path, init);
 
         const result = await <Promise<any>>response.json();
