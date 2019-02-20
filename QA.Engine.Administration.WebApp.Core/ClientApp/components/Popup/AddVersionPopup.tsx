@@ -1,9 +1,8 @@
 import * as React from 'react';
-import { Card, Spinner, Button, FormGroup, InputGroup, RadioGroup, Radio } from '@blueprintjs/core';
-import { observer, inject } from 'mobx-react';
+import { Button, ButtonGroup, Card, FormGroup, Intent, Radio, RadioGroup } from '@blueprintjs/core';
+import { inject, observer } from 'mobx-react';
 import { QpIntegrationState, VersionType } from 'stores/QpIntegrationStore';
 import { PopupState } from 'stores/PopupStore';
-import OperationState from 'enums/OperationState';
 import DiscriminatorSelect from 'components/Select/DiscriminatorSelect';
 import { SiteTreeState } from 'stores/SiteTreeStore';
 import PopupType from 'enums/PopupType';
@@ -50,30 +49,26 @@ export default class AddVersionPopup extends React.Component<Props, State> {
     render() {
         const { popupStore } = this.props;
         const { version } = this.state;
-
         if (popupStore.type !== PopupType.ADDVERSION) {
             return null;
         }
-
-        if (popupStore.state === OperationState.NONE || popupStore.state === OperationState.PENDING) {
-            return (<Spinner size={30} />);
-        }
-
         const discriminators = popupStore.discriminators.filter(x => x.isPage === true);
 
         return (
             <Card>
-                <RadioGroup label="Title" selectedValue={version} onChange={this.changeVersion}>
-                    <Radio label="Content" value={VersionType.Content}></Radio>
-                    <Radio label="Structural" value={VersionType.Structural}></Radio>
-                </RadioGroup>
-                <div>
-                    <DiscriminatorSelect items={discriminators} onChange={this.changeDiscriminator} />
-                </div>
-                <div>
-                    <Button text="add" onClick={this.addClick} />
-                    <Button text="cancel" onClick={this.cancelClick} />
-                </div>
+                <FormGroup>
+                    <RadioGroup label="Версия" selectedValue={version} onChange={this.changeVersion}>
+                        <Radio label="Контентная" value={VersionType.Content}/>
+                        <Radio label="Структурная" value={VersionType.Structural}/>
+                    </RadioGroup>
+                </FormGroup>
+                <FormGroup>
+                    <DiscriminatorSelect items={discriminators} onChange={this.changeDiscriminator}/>
+                </FormGroup>
+                <ButtonGroup className="dialog-button-group">
+                    <Button text="Добавить" icon="add" onClick={this.addClick} intent={Intent.SUCCESS}/>
+                    <Button text="Отмена" icon="undo" onClick={this.cancelClick}/>
+                </ButtonGroup>
             </Card>
         );
     }

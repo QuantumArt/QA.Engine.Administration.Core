@@ -16,13 +16,13 @@ import TabsStore from 'stores/TabsStore';
 import ArchiveStore from 'stores/ArchiveStore';
 import QpIntegrationStore from 'stores/QpIntegrationStore';
 import ExtensionFieldsStore from 'stores/ExtensionFieldsStore';
-import Popup from 'components/Popup/popup';
 import PopupStore from 'stores/PopupStore';
-import AddPopup from 'components/Popup/add';
-import AddVersionPopup from 'components/Popup/addVersion';
-import ArchivePopup from 'components/Popup/archive';
-import DeletePopup from 'components/Popup/delete';
-import RestorePopup from 'components/Popup/restore';
+import Popup from 'components/Popup';
+import AddPopup from 'components/Popup/AddPopup';
+import AddVersionPopup from 'components/Popup/AddVersionPopup';
+import ArchivePopup from 'components/Popup/ArchivePopup';
+import DeletePopup from 'components/Popup/DeletePopup';
+import RestorePopup from 'components/Popup/RestorePopup';
 
 const app = hot(module)(() => (
     <Provider

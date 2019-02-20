@@ -28,6 +28,7 @@ export abstract class BaseTreeState<T extends {
 
     @action
     public async fetchTree(): Promise<void> {
+        this.tree = [];
         this.treeState = OperationState.PENDING;
         try {
             const response: ApiResult<T[]> = await this.getTree();

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Card, Button, Checkbox } from '@blueprintjs/core';
+import { Card, Button, Checkbox, ButtonGroup, Intent, FormGroup } from '@blueprintjs/core';
 import { observer, inject } from 'mobx-react';
 import { PopupState } from 'stores/PopupStore';
 import PopupType from 'enums/PopupType';
@@ -15,11 +15,6 @@ interface State {
     restoreChildren: boolean;
     restoreContentVersions: boolean;
     restoreWidgets: boolean;
-}
-
-enum ContentVersionOperations {
-    archive = 'archive',
-    move = 'move',
 }
 
 @inject('archiveStore', 'popupStore')
@@ -64,29 +59,30 @@ export default class RestorePopup extends React.Component<Props, State> {
     render() {
         const { popupStore } = this.props;
         const { restoreAllVersions, restoreChildren, restoreContentVersions, restoreWidgets } = this.state;
-
         if (popupStore.type !== PopupType.RESTORE) {
             return null;
         }
 
         return (
             <Card>
-                <Checkbox checked={restoreAllVersions} onChange={this.changeRestoreAllVersions}>
-                    Restore versions
-                </Checkbox>
-                <Checkbox checked={restoreChildren} onChange={this.changeRestoreChildren}>
-                    Restore children
-                </Checkbox>
-                <Checkbox checked={restoreWidgets} onChange={this.changeRestoreWidgets}>
-                    Restore widgets
-                </Checkbox>
-                <Checkbox checked={restoreContentVersions} onChange={this.changeRestoreContentVersions}>
-                    Restore content versions
-                </Checkbox>
-                <div>
-                    <Button text="restore" onClick={this.restoreClick} />
-                    <Button text="cancel" onClick={this.cancelClick} />
-                </div>
+                <FormGroup>
+                    <Checkbox checked={restoreAllVersions} onChange={this.changeRestoreAllVersions}>
+                        Восстановить версии
+                    </Checkbox>
+                    <Checkbox checked={restoreChildren} onChange={this.changeRestoreChildren}>
+                        Восстановить вложенные страницы
+                    </Checkbox>
+                    <Checkbox checked={restoreWidgets} onChange={this.changeRestoreWidgets}>
+                        Восстановить виджеты
+                    </Checkbox>
+                    <Checkbox checked={restoreContentVersions} onChange={this.changeRestoreContentVersions}>
+                        Восстановить контентные версии
+                    </Checkbox>
+                </FormGroup>
+                <ButtonGroup className="dialog-button-group">
+                    <Button text="Восстановить" icon="swap-horizontal" onClick={this.restoreClick} intent={Intent.SUCCESS} />
+                    <Button text="cancel" icon="undo" onClick={this.cancelClick} />
+                </ButtonGroup>
             </Card>
         );
     }

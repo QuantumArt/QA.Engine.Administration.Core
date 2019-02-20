@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Card, Spinner, Button, FormGroup, InputGroup } from '@blueprintjs/core';
+import { Card, Spinner, Button, FormGroup, InputGroup, ButtonGroup, Intent } from '@blueprintjs/core';
 import { observer, inject } from 'mobx-react';
 import { QpIntegrationState } from 'stores/QpIntegrationStore';
 import { PopupState } from 'stores/PopupStore';
@@ -51,32 +51,26 @@ export default class AddPopup extends React.Component<Props, State> {
     render() {
         const { popupStore } = this.props;
         const { name, title } = this.state;
-
         if (popupStore.type !== PopupType.ADD) {
             return null;
         }
-
-        if (popupStore.state === OperationState.NONE || popupStore.state === OperationState.PENDING) {
-            return (<Spinner size={30} />);
-        }
-
         const discriminators = popupStore.discriminators.filter(x => x.isPage === true);
 
         return (
             <Card>
                 <FormGroup label="Title">
-                    <InputGroup placeholder="Название раздела" value={title} onChange={this.changeTitle}></InputGroup>
+                    <InputGroup placeholder="Название раздела" value={title} onChange={this.changeTitle} />
                 </FormGroup>
                 <FormGroup label="Name">
-                    <InputGroup placeholder="alias" value={name} onChange={this.changeName}></InputGroup>
+                    <InputGroup placeholder="alias" value={name} onChange={this.changeName} />
                 </FormGroup>
-                <div>
+                <FormGroup label="Type">
                     <DiscriminatorSelect items={discriminators} onChange={this.changeDiscriminator} />
-                </div>
-                <div>
-                    <Button text="add" onClick={this.addClick} />
-                    <Button text="cancel" onClick={this.cancelClick} />
-                </div>
+                </FormGroup>
+                <ButtonGroup className="dialog-button-group">
+                    <Button text="Добавить" icon="new-object" onClick={this.addClick} intent={Intent.SUCCESS} />
+                    <Button text="Отмена" icon="undo" onClick={this.cancelClick} />
+                </ButtonGroup>
             </Card>
         );
     }
