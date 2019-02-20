@@ -3,10 +3,11 @@ import { Card, Button, Checkbox } from '@blueprintjs/core';
 import { observer, inject } from 'mobx-react';
 import { PopupState } from 'stores/PopupStore';
 import PopupType from 'enums/PopupType';
+import TreeStore from 'stores/TreeStore';
 import { ArchiveState } from 'stores/ArchiveStore';
 
 interface Props {
-    archiveStore?: ArchiveState;
+    treeStore?: TreeStore;
     popupStore?: PopupState;
 }
 
@@ -19,7 +20,7 @@ enum ContentVersionOperations {
     move = 'move',
 }
 
-@inject('archiveStore', 'popupStore')
+@inject('treeStore', 'popupStore')
 @observer
 export default class DeletePopup extends React.Component<Props, State> {
 
@@ -30,13 +31,13 @@ export default class DeletePopup extends React.Component<Props, State> {
     };
 
     private deleteClick = () => {
-        const { popupStore, archiveStore } = this.props;
+        const { popupStore, treeStore } = this.props;
         const { deleteAllVersions } = this.state;
         const model: DeleteModel = {
             itemId: popupStore.itemId,
             isDeleteAllVersions: deleteAllVersions,
         };
-        archiveStore.delete(model);
+        (treeStore.resolveTreeStore() as ArchiveState).delete(model);
         popupStore.close();
     }
 

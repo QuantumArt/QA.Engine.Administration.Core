@@ -4,11 +4,12 @@ import { observer, inject } from 'mobx-react';
 import { PopupState } from 'stores/PopupStore';
 import OperationState from 'enums/OperationState';
 import PageSelect from 'components/Select/PageSelect';
-import { SiteTreeState } from 'stores/SiteTreeStore';
 import PopupType from 'enums/PopupType';
+import TreeStore from 'stores/TreeStore';
+import { SiteTreeState } from 'stores/SiteTreeStore';
 
 interface Props {
-    siteTreeStore?: SiteTreeState;
+    treeStore?: TreeStore;
     popupStore?: PopupState;
 }
 
@@ -23,7 +24,7 @@ enum ContentVersionOperations {
     move = 'move',
 }
 
-@inject('siteTreeStore', 'popupStore')
+@inject('treeStore', 'popupStore')
 @observer
 export default class ArchivePopup extends React.Component<Props, State> {
 
@@ -34,7 +35,7 @@ export default class ArchivePopup extends React.Component<Props, State> {
     };
 
     private archiveClick = () => {
-        const { popupStore, siteTreeStore } = this.props;
+        const { popupStore, treeStore } = this.props;
         const { deleteAllVersions, deleteContentVersions, contentVersionId } = this.state;
         const model: RemoveModel = {
             contentVersionId,
@@ -42,7 +43,7 @@ export default class ArchivePopup extends React.Component<Props, State> {
             isDeleteAllVersions: deleteAllVersions,
             isDeleteContentVersions: deleteContentVersions === ContentVersionOperations.archive,
         };
-        siteTreeStore.archive(model);
+        (treeStore.resolveTreeStore() as SiteTreeState).archive(model);
         popupStore.close();
     }
 

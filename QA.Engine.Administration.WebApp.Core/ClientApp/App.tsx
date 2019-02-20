@@ -22,11 +22,13 @@ import ArchivePopup from 'components/Popup/archive';
 import DeletePopup from 'components/Popup/delete';
 import RestorePopup from 'components/Popup/restore';
 import EditArticleStore from 'stores/EditArticleStore';
+import TreeStore from 'stores/TreeStore';
+
+const treeStore = new TreeStore(SiteTreeStore, ArchiveStore, NavigationStore);
 
 const app = hot(module)(() => (
     <Provider
-        siteTreeStore={SiteTreeStore}
-        archiveStore={ArchiveStore}
+        treeStore={treeStore}
         qpIntegrationStore={QpIntegrationStore}
         navigationStore={NavigationStore}
         popupStore={PopupStore}

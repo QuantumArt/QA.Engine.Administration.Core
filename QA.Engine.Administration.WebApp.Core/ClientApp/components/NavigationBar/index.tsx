@@ -2,12 +2,14 @@ import * as React from 'react';
 import { inject, observer } from 'mobx-react';
 import { Alignment, Button, Classes, Intent, Navbar, NavbarGroup, NavbarHeading } from '@blueprintjs/core';
 import { NavigationState, Pages } from 'stores/NavigationStore';
+import TreeStore from 'stores/TreeStore';
 
 interface Props {
     navigationStore?: NavigationState;
+    treeStore?: TreeStore;
 }
 
-@inject('navigationStore')
+@inject('navigationStore', 'treeStore')
 @observer
 export default class NavigationBar extends React.Component<Props> {
     componentDidMount() {
@@ -21,10 +23,9 @@ export default class NavigationBar extends React.Component<Props> {
     }
 
     private changePage = async (pageId: Pages) => {
-        const { navigationStore } = this.props;
-        const treeStore = navigationStore.resolveTreeStore();
+        const { navigationStore, treeStore } = this.props;
         navigationStore.changePage(pageId);
-        treeStore.fetchTree();
+        treeStore.resolveTreeStore().fetchTree();
     }
 
     render() {

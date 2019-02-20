@@ -3,21 +3,20 @@ import { inject, observer } from 'mobx-react';
 import { Button, Popover, Position } from '@blueprintjs/core';
 import { ITreeElement } from 'stores/BaseTreeStore';
 import ElementMenu from './ElementMenu';
-import { NavigationState } from 'stores/NavigationStore';
+import TreeStore from 'stores/TreeStore';
 
 interface Props {
-    navigationStore?: NavigationState;
+    treeStore?: TreeStore;
     node: ITreeElement;
 }
 
-@inject('navigationStore')
+@inject('treeStore')
 @observer
 export default class ContextMenu extends React.Component<Props> {
     private handleClick = (e: React.MouseEvent<HTMLElement>) => {
         e.stopPropagation();
-        const { navigationStore, node } = this.props;
-        const treeStore = navigationStore.resolveTreeStore();
-        treeStore.handleContextMenu(node);
+        const { treeStore, node } = this.props;
+        treeStore.resolveTreeStore().handleContextMenu(node);
     }
 
     render() {

@@ -7,6 +7,7 @@ export class EditArticleState {
     @observable public title: string;
     @observable public state: OperationState = OperationState.NONE;
     @observable public fields: ExtensionFieldModel[];
+    @observable public isShowExtensionFields: boolean = false;
     public node: PageModel | ArchiveModel;
     private extensionFieldsJson: string;
 
@@ -22,11 +23,17 @@ export class EditArticleState {
     init(node: PageModel | ArchiveModel) {
         this.node = node;
         this.title = node.title;
+        this.isShowExtensionFields = false;
     }
 
     @action
     setTitle(title: string) {
         this.title = title;
+    }
+
+    @action
+    showExtensionFields() {
+        this.isShowExtensionFields = true;
     }
 
     @action

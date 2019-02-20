@@ -8,16 +8,18 @@ import { PopupState } from 'stores/PopupStore';
 import PopupType from 'enums/PopupType';
 import { ITreeElement } from 'stores/BaseTreeStore';
 import { NavigationState, Pages } from 'stores/NavigationStore';
+import TreeStore from 'stores/TreeStore';
 
 interface Props {
     qpIntegrationStore?: QpIntegrationState;
     navigationStore?: NavigationState;
     popupStore?: PopupState;
+    treeStore?: TreeStore;
     itemId: number;
     node: ITreeElement;
 }
 
-@inject('qpIntegrationStore', 'navigationStore', 'popupStore')
+@inject('qpIntegrationStore', 'navigationStore', 'popupStore', 'treeStore')
 @observer
 export default class ElementMenu extends React.Component<Props> {
 
@@ -42,9 +44,8 @@ export default class ElementMenu extends React.Component<Props> {
     }
 
     private publishClick = () => {
-        const { navigationStore, itemId } = this.props;
-        const treeStore = navigationStore.resolveTreeStore() as SiteTreeState;
-        treeStore.publish([itemId]);
+        const { itemId, treeStore } = this.props;
+        (treeStore.resolveTreeStore() as SiteTreeState).publish([itemId]);
     }
 
     private archiveClick = () => {
@@ -53,15 +54,13 @@ export default class ElementMenu extends React.Component<Props> {
     }
 
     private updateClick = () => {
-        const { navigationStore, itemId } = this.props;
-        const treeStore = navigationStore.resolveTreeStore() as SiteTreeState;
-        treeStore.updateSubTree(itemId);
+        const { treeStore, itemId } = this.props;
+        (treeStore.resolveTreeStore() as SiteTreeState).updateSubTree(itemId);
     }
 
     private updateArchiveClick = () => {
-        const { navigationStore, itemId } = this.props;
-        const treeStore = navigationStore.resolveTreeStore() as ArchiveState;
-        treeStore.updateSubTree(itemId);
+        const { treeStore, itemId } = this.props;
+        (treeStore.resolveTreeStore() as ArchiveState).updateSubTree(itemId);
     }
 
     private restoreClick = () => {

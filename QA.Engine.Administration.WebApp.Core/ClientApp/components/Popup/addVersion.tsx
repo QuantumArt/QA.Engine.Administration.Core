@@ -5,12 +5,12 @@ import { QpIntegrationState, VersionType } from 'stores/QpIntegrationStore';
 import { PopupState } from 'stores/PopupStore';
 import OperationState from 'enums/OperationState';
 import DiscriminatorSelect from 'components/Select/DiscriminatorSelect';
-import { SiteTreeState } from 'stores/SiteTreeStore';
 import PopupType from 'enums/PopupType';
+import TreeStore from 'stores/TreeStore';
 
 interface Props {
     qpIntegrationStore?: QpIntegrationState;
-    siteTreeStore?: SiteTreeState;
+    treeStore?: TreeStore;
     popupStore?: PopupState;
 }
 
@@ -19,7 +19,7 @@ interface State {
     version: VersionType;
 }
 
-@inject('qpIntegrationStore', 'siteTreeStore', 'popupStore')
+@inject('qpIntegrationStore', 'treeStore', 'popupStore')
 @observer
 export default class AddVersionPopup extends React.Component<Props, State> {
 
@@ -29,9 +29,9 @@ export default class AddVersionPopup extends React.Component<Props, State> {
     };
 
     private addClick = () => {
-        const { popupStore, qpIntegrationStore, siteTreeStore } = this.props;
+        const { popupStore, qpIntegrationStore, treeStore } = this.props;
         const { discriminator, version } = this.state;
-        const node = siteTreeStore.selectedNode;
+        const node = treeStore.resolveTreeStore().selectedNode as PageModel;
         qpIntegrationStore.add(node, version, node.alias, node.title, discriminator.id, 0);
         popupStore.close();
     }

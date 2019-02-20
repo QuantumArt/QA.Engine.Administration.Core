@@ -6,6 +6,7 @@ import { NavigationState } from 'stores/NavigationStore';
 import OperationState from 'enums/OperationState';
 import { ITreeElement } from 'stores/BaseTreeStore';
 import { EditArticleState } from 'stores/EditArticleStore';
+import TreeStore from 'stores/TreeStore';
 
 @observer
 class TreeR extends Tree {
@@ -14,6 +15,7 @@ class TreeR extends Tree {
 interface Props {
     navigationStore?: NavigationState;
     editArticleStore?: EditArticleState;
+    treeStore?: TreeStore;
 }
 
 interface InternalStyle extends JSX.IntrinsicAttributes, React.ClassAttributes<HTMLDivElement>, React.HTMLAttributes<HTMLDivElement> {
@@ -22,21 +24,21 @@ interface InternalStyle extends JSX.IntrinsicAttributes, React.ClassAttributes<H
 interface InternalRestProps extends JSX.IntrinsicAttributes, React.ClassAttributes<HTMLDivElement>, React.HTMLAttributes<HTMLDivElement> {
 }
 
-@inject('navigationStore', 'editArticleStore')
+@inject('navigationStore', 'editArticleStore', 'treeStore')
 @observer
 export default class SiteTree extends React.Component<Props> {
     private handleNodeClick = (e: ITreeElement) => {
-        const { navigationStore, editArticleStore } = this.props;
-        const treeStore = navigationStore.resolveTreeStore();
-        treeStore.handleNodeClick(e);
+        const { navigationStore, editArticleStore, treeStore } = this.props;
+        const tree = treeStore.resolveTreeStore();
+        tree.handleNodeClick(e);
         navigationStore.setDefaultTab(e.isSelected);
-        editArticleStore.init(treeStore.selectedNode);
+        editArticleStore.init(tree.selectedNode);
     }
 
     render() {
-        const { navigationStore } = this.props;
-        const treeStore = navigationStore.resolveTreeStore();
-        const isLoading = treeStore.treeState === OperationState.NONE || treeStore.treeState === OperationState.PENDING;
+        const { treeStore } = this.props;
+        const tree = treeStore.resolveTreeStore();
+        const isLoading = tree.treeState === OperationState.NONE || tree.treeState === OperationState.PENDING;
 
         return (
             <Card className="tree-pane">
@@ -63,9 +65,9 @@ export default class SiteTree extends React.Component<Props> {
                     >
                         <TreeR
                             className="site-tree"
-                            contents={treeStore.tree}
-                            onNodeCollapse={treeStore.handleNodeCollapse}
-                            onNodeExpand={treeStore.handleNodeExpand}
+                            contents={tree.tree}
+                            onNodeCollapse={tree.handleNodeCollapse}
+                            onNodeExpand={tree.handleNodeExpand}
                             onNodeClick={this.handleNodeClick}
                         />
                     </Scrollbars>

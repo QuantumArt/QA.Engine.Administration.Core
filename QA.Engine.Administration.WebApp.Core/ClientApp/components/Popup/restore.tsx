@@ -3,10 +3,11 @@ import { Card, Button, Checkbox } from '@blueprintjs/core';
 import { observer, inject } from 'mobx-react';
 import { PopupState } from 'stores/PopupStore';
 import PopupType from 'enums/PopupType';
+import TreeStore from 'stores/TreeStore';
 import { ArchiveState } from 'stores/ArchiveStore';
 
 interface Props {
-    archiveStore?: ArchiveState;
+    treeStore?: TreeStore;
     popupStore?: PopupState;
 }
 
@@ -17,12 +18,7 @@ interface State {
     restoreWidgets: boolean;
 }
 
-enum ContentVersionOperations {
-    archive = 'archive',
-    move = 'move',
-}
-
-@inject('archiveStore', 'popupStore')
+@inject('treeStore', 'popupStore')
 @observer
 export default class RestorePopup extends React.Component<Props, State> {
 
@@ -34,7 +30,7 @@ export default class RestorePopup extends React.Component<Props, State> {
     };
 
     private restoreClick = () => {
-        const { popupStore, archiveStore } = this.props;
+        const { popupStore, treeStore } = this.props;
         const { restoreAllVersions, restoreChildren, restoreContentVersions, restoreWidgets } = this.state;
         const model: RestoreModel = {
             itemId: popupStore.itemId,
@@ -43,7 +39,7 @@ export default class RestorePopup extends React.Component<Props, State> {
             isRestoreContentVersions: restoreContentVersions,
             isRestoreWidgets: restoreWidgets,
         };
-        archiveStore.restore(model);
+        (treeStore.resolveTreeStore() as ArchiveState).restore(model);
         popupStore.close();
     }
 

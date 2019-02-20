@@ -37,10 +37,6 @@ export class NavigationState {
     resetTab = () => {
         this.currentTab = TabTypes.NONE;
     }
-
-    public resolveTreeStore(): BaseTreeState<ArchiveModel> | BaseTreeState<PageModel> {
-        return this.currentPage === Pages.ARCHIVE ? archiveStore as BaseTreeState<ArchiveModel> : siteTreeStore as BaseTreeState<PageModel>;
-    }
 }
 
 const navigationStore = new NavigationState();

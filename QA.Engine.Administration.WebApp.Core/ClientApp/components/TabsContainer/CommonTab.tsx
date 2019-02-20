@@ -8,41 +8,43 @@ import { SiteTreeState } from 'stores/SiteTreeStore';
 import { QpIntegrationState } from 'stores/QpIntegrationStore';
 import { EditArticleState } from 'stores/EditArticleStore';
 import { observable } from 'mobx';
+import TreeStore from 'stores/TreeStore';
 
 interface Props {
     navigationStore?: NavigationState;
     qpIntegrationStore?: QpIntegrationState;
     editArticleStore?: EditArticleState;
+    treeStore?: TreeStore;
 }
 
-@inject('navigationStore', 'qpIntegrationStore', 'editArticleStore')
+@inject('navigationStore', 'qpIntegrationStore', 'editArticleStore', 'treeStore')
 @observer
 export default class CommonTab extends React.Component<Props> {
 
     private refreshClick = () => {
-        const { navigationStore } = this.props;
-        const treeStore = navigationStore.resolveTreeStore();
-        treeStore.updateSubTree(treeStore.selectedNode.id);
+        const { treeStore } = this.props;
+        const tree = treeStore.resolveTreeStore();
+        tree.updateSubTree(tree.selectedNode.id);
     }
 
     private editClick = () => {
-        const { navigationStore, qpIntegrationStore } = this.props;
-        const treeStore = navigationStore.resolveTreeStore();
-        qpIntegrationStore.edit(treeStore.selectedNode.id);
+        const { treeStore, qpIntegrationStore } = this.props;
+        const tree = treeStore.resolveTreeStore();
+        qpIntegrationStore.edit(tree.selectedNode.id);
     }
 
     private saveClick = () => {
-        const { navigationStore, editArticleStore } = this.props;
-        const treeStore = navigationStore.resolveTreeStore();
+        const { treeStore, editArticleStore } = this.props;
+        const tree = treeStore.resolveTreeStore();
         const model: EditModel = {
-            itemId: treeStore.selectedNode.id,
+            itemId: tree.selectedNode.id,
             title: editArticleStore.title,
-            extensionId: treeStore.selectedNode.extensionId,
+            extensionId: tree.selectedNode.extensionId,
             fields: editArticleStore.changedFields,
         };
-        if (treeStore instanceof SiteTreeState) {
-            treeStore as SiteTreeState;
-            treeStore.edit(model);
+        if (tree instanceof SiteTreeState) {
+            tree as SiteTreeState;
+            tree.edit(model);
         }
     }
 
@@ -52,16 +54,16 @@ export default class CommonTab extends React.Component<Props> {
     }
 
     render() {
-        const { navigationStore, editArticleStore } = this.props;
+        const { treeStore, editArticleStore } = this.props;
         const title = editArticleStore.title;
-        const treeStore = navigationStore.resolveTreeStore();
-        if (treeStore.selectedNode == null) {
+        const tree = treeStore.resolveTreeStore();
+        if (tree.selectedNode == null) {
             return null;
         }
-        if (treeStore.treeState === OperationState.NONE || treeStore.treeState === OperationState.PENDING) {
+        if (tree.treeState === OperationState.NONE || tree.treeState === OperationState.PENDING) {
             return (<Spinner size={60} />);
         }
-        const selectedNode = treeStore.selectedNode;
+        const selectedNode = tree.selectedNode;
         if (selectedNode != null) {
             return (
                 <div className="tab">

@@ -5,12 +5,12 @@ import { QpIntegrationState } from 'stores/QpIntegrationStore';
 import { PopupState } from 'stores/PopupStore';
 import OperationState from 'enums/OperationState';
 import DiscriminatorSelect from 'components/Select/DiscriminatorSelect';
-import { SiteTreeState } from 'stores/SiteTreeStore';
 import PopupType from 'enums/PopupType';
+import TreeStore from 'stores/TreeStore';
 
 interface Props {
     qpIntegrationStore?: QpIntegrationState;
-    siteTreeStore?: SiteTreeState;
+    treeStore?: TreeStore;
     popupStore?: PopupState;
 }
 
@@ -20,16 +20,16 @@ interface State {
     title: string;
 }
 
-@inject('qpIntegrationStore', 'siteTreeStore', 'popupStore')
+@inject('qpIntegrationStore', 'treeStore', 'popupStore')
 @observer
 export default class AddPopup extends React.Component<Props, State> {
 
     state = { discriminator: null as DiscriminatorModel, name: '', title: '' };
 
     private addClick = () => {
-        const { popupStore, qpIntegrationStore, siteTreeStore } = this.props;
+        const { popupStore, qpIntegrationStore, treeStore } = this.props;
         const { discriminator, name, title } = this.state;
-        const node = siteTreeStore.selectedNode;
+        const node = treeStore.resolveTreeStore().selectedNode as PageModel;
         qpIntegrationStore.add(node, null, name, title, discriminator.id, 0);
         popupStore.close();
     }

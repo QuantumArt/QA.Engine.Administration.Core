@@ -8,19 +8,15 @@ interface Props {
     editArticleStore?: EditArticleState;
 }
 
-interface State {
-    showItem: boolean;
-}
-
 @inject('editArticleStore')
 @observer
-export default class ExtantionCard extends React.Component<Props, State> {
+export default class ExtantionCard extends React.Component<Props> {
 
     state = { showItem: false };
 
     private showClick = () => {
         const { editArticleStore } = this.props;
-        this.setState({ showItem: true });
+        editArticleStore.showExtensionFields();
         editArticleStore.fetchExtantionFields();
     }
 
@@ -30,11 +26,10 @@ export default class ExtantionCard extends React.Component<Props, State> {
 
     render() {
         console.log('ExtantionCard render');
-        const { showItem } = this.state;
         const { editArticleStore } = this.props;
         const isLoading = editArticleStore.state === OperationState.NONE || editArticleStore.state === OperationState.PENDING;
 
-        if (!showItem) {
+        if (!editArticleStore.isShowExtensionFields) {
             return (
                 <AnchorButton text="show extension fields" icon="eye-on" onClick={this.showClick} />
             );
