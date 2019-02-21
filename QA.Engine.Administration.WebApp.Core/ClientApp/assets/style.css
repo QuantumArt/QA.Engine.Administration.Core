@@ -59,6 +59,23 @@ body {
     height: 61px;
 }
 
+.action-dialog {
+    padding-bottom: 0;
+}
+
+.action-dialog .bp3-dialog-header {
+    text-align: center;
+}
+
+.dialog-button-group {
+    width: 100%;
+    justify-content: center;
+}
+
+.dialog-spinner {
+    padding: 50px 0;
+}
+
 .hidden {
     display: none !important;
 }

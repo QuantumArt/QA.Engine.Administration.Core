@@ -14,15 +14,15 @@ import NavigationStore from 'stores/NavigationStore';
 import SiteTreeStore from 'stores/SiteTreeStore';
 import ArchiveStore from 'stores/ArchiveStore';
 import QpIntegrationStore from 'stores/QpIntegrationStore';
-import Popup from 'components/Popup/popup';
 import PopupStore from 'stores/PopupStore';
-import AddPopup from 'components/Popup/add';
-import AddVersionPopup from 'components/Popup/addVersion';
-import ArchivePopup from 'components/Popup/archive';
-import DeletePopup from 'components/Popup/delete';
-import RestorePopup from 'components/Popup/restore';
-import EditArticleStore from 'stores/EditArticleStore';
 import TreeStore from 'stores/TreeStore';
+import EditArticleStore from 'stores/EditArticleStore';
+import Popup from 'components/Popup';
+import AddPopup from 'components/Popup/AddPopup';
+import AddVersionPopup from 'components/Popup/AddVersionPopup';
+import ArchivePopup from 'components/Popup/ArchivePopup';
+import DeletePopup from 'components/Popup/DeletePopup';
+import RestorePopup from 'components/Popup/RestorePopup';
 
 const treeStore = new TreeStore(SiteTreeStore, ArchiveStore, NavigationStore);
 
