@@ -2,17 +2,15 @@ import * as React from 'react';
 import { inject, observer } from 'mobx-react';
 import { AnchorButton, InputGroup } from '@blueprintjs/core';
 import OperationState from 'enums/OperationState';
-import { EditArticleState } from 'stores/EditArticleStore';
+import EditArticleStore from 'stores/EditArticleStore';
 
 interface Props {
-    editArticleStore?: EditArticleState;
+    editArticleStore?: EditArticleStore;
 }
 
 @inject('editArticleStore')
 @observer
-export default class ExtantionCard extends React.Component<Props> {
-
-    state = { showItem: false };
+export default class ExtentionCard extends React.Component<Props> {
 
     private showClick = () => {
         const { editArticleStore } = this.props;
@@ -25,7 +23,7 @@ export default class ExtantionCard extends React.Component<Props> {
     }
 
     render() {
-        console.log('ExtantionCard render');
+        console.log('ExtentionCard render');
         const { editArticleStore } = this.props;
         const isLoading = editArticleStore.state === OperationState.NONE || editArticleStore.state === OperationState.PENDING;
 
@@ -43,15 +41,15 @@ export default class ExtantionCard extends React.Component<Props> {
 
         return (
             <div>
-                {
-                    editArticleStore.fields.map((field, i) => (<div key={i}>
+                {editArticleStore.fields.map((field, i) => (
+                    <div key={i}>
                         <span>{field.fieldName}</span>(<small>{field.typeName}</small>)
                         <InputGroup
                             value={field.value == null ? '' : field.value}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.change(e, field)}
                         />
-                    </div>))
-                }
+                    </div>),
+                )}
             </div>
         );
     }

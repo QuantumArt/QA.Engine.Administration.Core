@@ -3,7 +3,6 @@ import { action, observable, computed } from 'mobx';
 import { IconName, ITreeNode } from '@blueprintjs/core';
 import ContextMenu from 'components/SiteTree/ContextMenu';
 import OperationState from 'enums/OperationState';
-import { number } from 'prop-types';
 
 export interface ITreeElement extends ITreeNode {
     childNodes: ITreeElement[];
@@ -12,6 +11,9 @@ export interface ITreeElement extends ITreeNode {
     isContextMenuActive: boolean;
 }
 
+/**
+ * @description Base class for tree manipulations
+ */
 export abstract class BaseTreeState<T extends {
     id: number;
     parentId?: null | number;

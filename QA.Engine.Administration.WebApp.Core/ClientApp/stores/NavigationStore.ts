@@ -1,7 +1,4 @@
 import { action, observable } from 'mobx';
-import { BaseTreeState } from 'stores/BaseTreeStore';
-import siteTreeStore from 'stores/SiteTreeStore';
-import archiveStore from 'stores/ArchiveStore';
 
 export enum Pages {
     SITEMAP,
@@ -14,7 +11,7 @@ export enum TabTypes {
     WIDGETS,
 }
 
-export class NavigationState {
+export default class NavigationStore {
     @observable public currentPage: Pages = Pages.SITEMAP;
     @observable public currentTab: TabTypes = TabTypes.NONE;
 
@@ -38,6 +35,3 @@ export class NavigationState {
         this.currentTab = TabTypes.NONE;
     }
 }
-
-const navigationStore = new NavigationState();
-export default navigationStore;

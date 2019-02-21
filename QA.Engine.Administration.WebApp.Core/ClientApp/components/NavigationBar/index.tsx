@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { inject, observer } from 'mobx-react';
 import { Alignment, Button, Classes, Intent, Navbar, NavbarGroup, NavbarHeading } from '@blueprintjs/core';
-import { NavigationState, Pages } from 'stores/NavigationStore';
+import NavigationStore, { Pages } from 'stores/NavigationStore';
 import TreeStore from 'stores/TreeStore';
 
 interface Props {
-    navigationStore?: NavigationState;
+    navigationStore?: NavigationStore;
     treeStore?: TreeStore;
 }
 

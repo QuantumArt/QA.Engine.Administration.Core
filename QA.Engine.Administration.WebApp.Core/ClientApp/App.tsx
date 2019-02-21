@@ -11,8 +11,6 @@ import SiteTree from 'components/SiteTree';
 import TabsContainer from 'components/TabsContainer';
 import NavigationBar from 'components/NavigationBar';
 import NavigationStore from 'stores/NavigationStore';
-import SiteTreeStore from 'stores/SiteTreeStore';
-import ArchiveStore from 'stores/ArchiveStore';
 import QpIntegrationStore from 'stores/QpIntegrationStore';
 import PopupStore from 'stores/PopupStore';
 import TreeStore from 'stores/TreeStore';
@@ -24,30 +22,33 @@ import ArchivePopup from 'components/Popup/ArchivePopup';
 import DeletePopup from 'components/Popup/DeletePopup';
 import RestorePopup from 'components/Popup/RestorePopup';
 
-const treeStore = new TreeStore(SiteTreeStore, ArchiveStore, NavigationStore);
+const app = hot(module)(() => {
+    const navigationStoreInstance = new NavigationStore();
+    const treeStoreInstance = new TreeStore(navigationStoreInstance);
 
-const app = hot(module)(() => (
-    <Provider
-        treeStore={treeStore}
-        qpIntegrationStore={QpIntegrationStore}
-        navigationStore={NavigationStore}
-        popupStore={PopupStore}
-        editArticleStore={EditArticleStore}
-    >
+    return (
+        <Provider
+            treeStore={treeStoreInstance}
+            qpIntegrationStore={new QpIntegrationStore(treeStoreInstance)}
+            navigationStore={navigationStoreInstance}
+            popupStore={new PopupStore()}
+            editArticleStore={new EditArticleStore()}
+        >
         <div className="layout">
-            <NavigationBar />
+            <NavigationBar/>
             <SiteTree/>
-            <TabsContainer />
+            <TabsContainer/>
             <Popup>
-                <AddPopup />
-                <AddVersionPopup />
-                <ArchivePopup />
-                <DeletePopup />
-                <RestorePopup />
+                <AddPopup/>
+                <AddVersionPopup/>
+                <ArchivePopup/>
+                <DeletePopup/>
+                <RestorePopup/>
             </Popup>
             <DevTools/>
         </div>
     </Provider>
-));
+    );
+});
 
 export default app;
