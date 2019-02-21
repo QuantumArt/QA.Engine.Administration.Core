@@ -28,12 +28,12 @@ const app = hot(module)(() => {
 
     return (
         <Provider
-        treeStore={treeStoreInstance}
-        qpIntegrationStore={new QpIntegrationStore(treeStoreInstance)}
-        navigationStore={navigationStoreInstance}
-        popupStore={new PopupStore()}
-        editArticleStore={new EditArticleStore()}
-    >
+            treeStore={treeStoreInstance}
+            qpIntegrationStore={new QpIntegrationStore(treeStoreInstance)}
+            navigationStore={navigationStoreInstance}
+            popupStore={new PopupStore()}
+            editArticleStore={new EditArticleStore()}
+        >
         <div className="layout">
             <NavigationBar/>
             <SiteTree/>

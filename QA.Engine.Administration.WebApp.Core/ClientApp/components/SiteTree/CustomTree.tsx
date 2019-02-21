@@ -2,7 +2,7 @@ import classnames from 'classnames';
 import * as React from 'react';
 
 import { CustomTreeNode } from 'components/SiteTree/CustomTreeNode';
-import { ITreeNode, TreeNode, ITreeProps, TreeEventHandler, Tree } from '@blueprintjs/core';
+import { ITreeNode, TreeNode, ITreeProps, TreeEventHandler } from '@blueprintjs/core';
 import { isFunction } from 'util';
 
 const DISPLAYNAME_PREFIX = 'Blueprint3';

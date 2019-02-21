@@ -2,7 +2,7 @@ import { action, observable, computed } from 'mobx';
 import OperationState from 'enums/OperationState';
 import SiteMapService from 'services/SiteMapService';
 
-export default class EditArticleState {
+export default class EditArticleStore {
 
     @observable public title: string;
     @observable public state: OperationState = OperationState.NONE;
@@ -13,6 +13,7 @@ export default class EditArticleState {
 
     @computed
     get changedFields(): ExtensionFieldModel[] {
+        console.log(this.extensionFieldsJson);
         const orig: ExtensionFieldModel[] = JSON.parse(this.extensionFieldsJson);
         return this.fields.filter(x =>
             orig.filter(y =>
