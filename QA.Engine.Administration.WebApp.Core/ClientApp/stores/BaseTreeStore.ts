@@ -1,16 +1,15 @@
 import * as React from 'react';
-import { action, observable } from 'mobx';
+import { action, observable, computed } from 'mobx';
 import { IconName, ITreeNode } from '@blueprintjs/core';
 import ContextMenu from 'components/SiteTree/ContextMenu';
 import OperationState from 'enums/OperationState';
+import { number } from 'prop-types';
 
 export interface ITreeElement extends ITreeNode {
     childNodes: ITreeElement[];
     parentId: number;
     versionOfId?: number;
     isContextMenuActive: boolean;
-    label: string;
-    isArchive: boolean;
 }
 
 export abstract class BaseTreeState<T extends {
@@ -23,8 +22,13 @@ export abstract class BaseTreeState<T extends {
     isArchive: boolean;
 }> {
     @observable public treeState: OperationState = OperationState.NONE;
-    @observable public tree: ITreeElement[];
     @observable public selectedNode: T;
+
+    private treeInternal: ITreeElement[];
+    @computed
+    get tree(): ITreeElement[] {
+        return this.treeInternal;
+    }
 
     @action
     public async fetchTree(): Promise<void> {
@@ -32,9 +36,9 @@ export abstract class BaseTreeState<T extends {
         try {
             const response: ApiResult<T[]> = await this.getTree();
             if (response.isSuccess) {
-                this.treeState = OperationState.SUCCESS;
                 this.origTree = response.data;
                 this.convertTree(response.data);
+                this.treeState = OperationState.SUCCESS;
             } else {
                 this.treeState = OperationState.ERROR;
                 throw response.error;
@@ -154,6 +158,7 @@ export abstract class BaseTreeState<T extends {
     protected abstract async getSubTree(id: number): Promise<ApiResult<T>>;
 
     private convertTree(data: T[]): void {
+        const start = Date.now();
         const mapElement = (el: T): ITreeElement => {
             const hasChildren = el.hasChildren;
             const isRootNode = el.parentId === null;
@@ -177,7 +182,6 @@ export abstract class BaseTreeState<T extends {
                 icon: getIcon(),
                 hasCaret: hasChildren,
                 isContextMenuActive: false,
-                isArchive: el.isArchive,
             });
             treeElement.secondaryLabel = React.createElement(ContextMenu, {
                 node: treeElement,
@@ -186,35 +190,44 @@ export abstract class BaseTreeState<T extends {
             return treeElement;
         };
 
-        let treeElements: ITreeElement[] = [];
         let elements = data;
         let loop = true;
 
-        elements.forEach(x => treeElements.push(mapElement(x)));
-        const tree: ITreeElement[] = treeElements;
+        let hMap = new Map<number, ITreeElement>();
+        elements.forEach(x => hMap.set(x.id, mapElement(x)));
+        const tree: ITreeElement[] = Array.from(hMap.values());
 
         while (loop) {
             loop = false;
-            const childNodes: ITreeElement[] = [];
-            const children: T[] = [];
-            elements.filter(x => x.hasChildren).forEach(x => x.children.forEach(e => children.push(e)));
+            const childNodes = new Map<number, ITreeElement>();
+            let children: T[] = [];
+            elements.forEach((x) => {
+                if (x.hasChildren) {
+                    children = children.concat(x.children);
+                }
+            });
             children.forEach((x) => {
                 loop = true;
                 const el = mapElement(x);
-                const treeEl = treeElements.filter(e => e.id === (el.parentId == null ? el.versionOfId : el.parentId))[0];
+                const parentId = el.parentId == null ? el.versionOfId : el.parentId;
+                const treeEl = hMap.get(parentId);
                 if (treeEl != null) {
                     treeEl.childNodes.push(el);
-                    childNodes.push(el);
+                    childNodes.set(+el.id, el);
                 }
             });
-            if (childNodes.length !== children.length) {
+            if (childNodes.size !== children.length) {
                 loop = false;
                 throw 'error tree convert';
             }
-            treeElements = childNodes;
+            hMap = childNodes;
             elements = children;
         }
-        this.tree = tree;
+        this.treeInternal = tree;
+
+        const end = Date.now();
+        const duration = end - start;
+        console.debug(`%cconvertTree duration ${duration} ms`, 'color: brown;');
     }
 
     private forEachNode(childFunc: (node: ITreeElement) => void = null, eachFunc: (node: ITreeElement) => void = null): void {

@@ -1,15 +1,16 @@
 import * as React from 'react';
 import { inject, observer } from 'mobx-react';
-import { Card, Spinner, Tree } from '@blueprintjs/core';
+import { Card, Spinner } from '@blueprintjs/core';
 import Scrollbars from 'react-custom-scrollbars';
 import { NavigationState } from 'stores/NavigationStore';
 import OperationState from 'enums/OperationState';
 import { ITreeElement } from 'stores/BaseTreeStore';
 import { EditArticleState } from 'stores/EditArticleStore';
 import TreeStore from 'stores/TreeStore';
+import { CustomTree } from 'components/SiteTree/CustomTree';
 
 @observer
-class TreeR extends Tree {
+class TreeR extends CustomTree {
 }
 
 interface Props {
