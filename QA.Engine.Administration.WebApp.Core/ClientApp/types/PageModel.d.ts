@@ -22,7 +22,7 @@ declare interface PageModel {
   widgets: WidgetModel[];
   children: PageModel[];
   contentVersions: PageModel[];
-  regions: RegionModel[];
+  regionIds: number[];
   hasWidgets: boolean;
   hasChildren: boolean;
   hasContentVersion: boolean;

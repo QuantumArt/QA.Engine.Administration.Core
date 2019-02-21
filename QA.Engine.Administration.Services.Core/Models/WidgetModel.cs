@@ -24,9 +24,9 @@ namespace QA.Engine.Administration.Services.Core.Models
         public string IconUrl { get; set; }
 
         public List<WidgetModel> Children { get; set; }
-        public List<RegionModel> Regions { get; set; }
+        public List<int> RegionIds { get; set; }
 
         public bool HasChildren { get { return Children?.Any() ?? false; } }
-        public bool HasRegions { get { return Regions?.Any() ?? false; } }
+        public bool HasRegions { get { return RegionIds?.Any() ?? false; } }
     }
 }

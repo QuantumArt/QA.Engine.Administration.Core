@@ -39,12 +39,13 @@
                 @foreach (var item in model)
                 {
                     <li>
-                        @ContentTypeAndStatus(item) [@item.Id] @item.Alias (@item.Title) order->@item.IndexOrder reg->@string.Join(",", item.Regions.Select(x => x.Alias))
+                        @ContentTypeAndStatus(item) [@item.Id] @item.Alias (@item.Title) order->@item.IndexOrder reg->
+                        @*@string.Join(",", item.Regions.Select(x => x.Alias))*@
                         <div>@Html.Raw(RenderWidgets(item.Widgets))</div>
                         <ul>
                             @foreach (var contentVersion in item.ContentVersions)
                             {
-                                <li>@ContentTypeAndStatus(contentVersion) [@contentVersion.Id] @contentVersion.Alias (@contentVersion.Title) order->@contentVersion.IndexOrder reg->@string.Join(",", item.Regions.Select(x => x.Alias))</li>
+                            <li>@ContentTypeAndStatus(contentVersion) [@contentVersion.Id] @contentVersion.Alias (@contentVersion.Title) order->@contentVersion.IndexOrder reg->@*@string.Join(",", item.Regions.Select(x => x.Alias))*@</li>
                             }
                         </ul>
                         <div>@Html.Raw(RenderItems(item.Children))</div>
@@ -55,11 +56,11 @@
         <div style="display:table-cell">
             <h5>archive</h5>
             <ul>
-                @foreach (var item in archive)
+                @foreach (var i in archive)
                 {
                     <li>
-                        @ContentTypeAndStatus(item) [@item.Id] @item.Alias (@item.Title) order->@item.IndexOrder reg->@string.Join(",", item.Regions.Select(x => x.Alias))
-                        <div>@Html.Raw(RenderArchives(item.Children))</div>
+                        @ContentTypeAndStatusArchive(i) [@i.Id] @i.Alias (@i.Title) order->@i.IndexOrder reg->@*@string.Join(",", item.Regions.Select(x => x.Alias))*@
+                        <div>@Html.Raw(RenderArchives(i.Children))</div>
                     </li>
                 }
             </ul>
@@ -76,12 +77,12 @@
         foreach (var item in models)
         {
             li += item.Children.Any()
-            ? $"<li>{ContentTypeAndStatus(item)} [{item.Id}] {item.Alias} ({item.Title}) order->{item.IndexOrder} reg->{string.Join(",", item.Regions.Select(x => x.Alias))}<div>{RenderItems(item.Children)}</div></li>"
-            : $"<li>{ContentTypeAndStatus(item)} [{item.Id}] {item.Alias} ({item.Title}) order->{item.IndexOrder} reg->{string.Join(",", item.Regions.Select(x => x.Alias))}</li>";
+            ? $"<li>{ContentTypeAndStatus(item)} [{item.Id}] {item.Alias} ({item.Title}) order->{item.IndexOrder} reg->{/*string.Join(",", item.Regions.Select(x => x.Alias))*/1}<div>{RenderItems(item.Children)}</div></li>"
+            : $"<li>{ContentTypeAndStatus(item)} [{item.Id}] {item.Alias} ({item.Title}) order->{item.IndexOrder} reg->{/*string.Join(",", item.Regions.Select(x => x.Alias))*/1}</li>";
             li += RenderWidgets(item.Widgets);
             foreach (var contentVersion in item.ContentVersions)
             {
-                li += $"<li>{ContentTypeAndStatus(contentVersion)} [{contentVersion.Id}] {contentVersion.Alias} ({contentVersion.Title}) order->{contentVersion.IndexOrder} reg->{string.Join(",", item.Regions.Select(x => x.Alias))}</li>";
+                li += $"<li>{ContentTypeAndStatus(contentVersion)} [{contentVersion.Id}] {contentVersion.Alias} ({contentVersion.Title}) order->{contentVersion.IndexOrder} reg->{/*string.Join(",", item.Regions.Select(x => x.Alias))*/1}</li>";
             }
         }
         var result = string.Format("<ul>{0}</ul>", li);
@@ -96,8 +97,8 @@
         {
             var status = item.Published ? "Published" : "New";
             li += item.Children.Any()
-                ? $"<li>(w) {status} [{item.Id}] {item.Alias} ({item.Title}) order->{item.IndexOrder} reg->{string.Join(",", item.Regions.Select(x => x.Alias))}<div>{RenderWidgets(item.Children)}</div></li>"
-                : $"<li>(w) {status} [{item.Id}] {item.Alias} ({item.Title}) order->{item.IndexOrder} reg->{string.Join(",", item.Regions.Select(x => x.Alias))}</li>";
+                ? $"<li>(w) {status} [{item.Id}] {item.Alias} ({item.Title}) order->{item.IndexOrder} reg->{/*string.Join(",", item.Regions.Select(x => x.Alias))*/1}<div>{RenderWidgets(item.Children)}</div></li>"
+                : $"<li>(w) {status} [{item.Id}] {item.Alias} ({item.Title}) order->{item.IndexOrder} reg->{/*string.Join(",", item.Regions.Select(x => x.Alias))*/1}</li>";
         }
         var result = string.Format("<ul>{0}</ul>", li);
         return result;
@@ -110,8 +111,8 @@
         foreach (var item in models)
         {
             li += item.Children.Any()
-            ? $"<li>{ContentTypeAndStatus(item)} [{item.Id}] {item.Alias} ({item.Title}) order->{item.IndexOrder} reg->{string.Join(",", item.Regions.Select(x => x.Alias))}<div>{RenderArchives(item.Children)}</div></li>"
-            : $"<li>{ContentTypeAndStatus(item)} [{item.Id}] {item.Alias} ({item.Title}) order->{item.IndexOrder} reg->{string.Join(",", item.Regions.Select(x => x.Alias))}</li>";
+            ? $"<li>{ContentTypeAndStatusArchive(item)} [{item.Id}] {item.Alias} ({item.Title}) order->{item.IndexOrder} reg->{/*string.Join(",", item.Regions.Select(x => x.Alias))*/1}<div>{RenderArchives(item.Children)}</div></li>"
+            : $"<li>{ContentTypeAndStatusArchive(item)} [{item.Id}] {item.Alias} ({item.Title}) order->{item.IndexOrder} reg->{/*string.Join(",", item.Regions.Select(x => x.Alias))*/1}</li>";
         }
         var result = string.Format("<ul>{0}</ul>", li);
         return result;
@@ -123,7 +124,7 @@
             return $"(cv) {status}";
         return $"(p) {status}";
     }
-    string ContentTypeAndStatus(ArchiveModel item)
+    string ContentTypeAndStatusArchive(ArchiveModel item)
     {
         var status = item.Published ? "P" : "N";
         if (item.ParentId == null && item.VersionOfId != null)

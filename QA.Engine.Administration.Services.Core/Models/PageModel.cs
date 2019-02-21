@@ -27,11 +27,11 @@ namespace QA.Engine.Administration.Services.Core.Models
         public List<WidgetModel> Widgets { get; set; }
         public List<PageModel> Children { get; set; }
         public List<PageModel> ContentVersions { get; set; }
-        public List<RegionModel> Regions { get; set; }
+        public List<int> RegionIds { get; set; }
 
         public bool HasWidgets { get { return Widgets?.Any() ?? false; } }
         public bool HasChildren { get { return Children?.Any() ?? false; } }
         public bool HasContentVersion { get { return ContentVersions?.Any() ?? false; } }
-        public bool HasRegions { get { return Regions?.Any() ?? false; } }
+        public bool HasRegions { get { return RegionIds?.Any() ?? false; } }
     }
 }

@@ -19,7 +19,7 @@ declare interface WidgetModel {
   discriminatorTitle: string;
   iconUrl: string;
   children: WidgetModel[];
-  regions: RegionModel[];
+  regionIds: number[];
   hasChildren: boolean;
   hasRegions: boolean;
 }

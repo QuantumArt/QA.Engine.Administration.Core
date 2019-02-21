@@ -21,7 +21,7 @@ declare interface ArchiveModel {
   discriminatorTitle: string;
   iconUrl: string;
   children: ArchiveModel[];
-  regions: RegionModel[];
+  regionIds: number[];
   hasChildren: boolean;
   hasRegions: boolean;
 }

@@ -302,9 +302,9 @@ ORDER BY ai.content_item_id";
                 foreach (var abstractItem in abstractItems)
                 {
                     if (links.TryGetValue(abstractItem.Id, out List<int> regionIds))
-                        abstractItem.Regions = regions.Where(x => regionIds.Contains(x.Id)).ToList();
+                        abstractItem.RegionIds = regions.Where(x => regionIds.Contains(x.Id)).Select(x => x.Id).ToList();
                     else
-                        abstractItem.Regions = new List<RegionData>();
+                        abstractItem.RegionIds = new List<int>();
                 }
 
                 return abstractItems;
