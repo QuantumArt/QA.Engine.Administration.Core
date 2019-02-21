@@ -15,18 +15,12 @@ interface State {
     deleteAllVersions: boolean;
 }
 
-enum ContentVersionOperations {
-    archive = 'archive',
-    move = 'move',
-}
-
 @inject('treeStore', 'popupStore')
 @observer
 export default class DeletePopup extends React.Component<Props, State> {
 
     state = {
         deleteAllVersions: false,
-        deleteContentVersions: ContentVersionOperations.archive,
         contentVersionId: null as number,
     };
 

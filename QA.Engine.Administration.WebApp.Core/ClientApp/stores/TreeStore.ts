@@ -4,9 +4,9 @@ import { NavigationState, Pages } from './NavigationStore';
 
 export default class TreeStore {
 
-    private siteTreeStore: SiteTreeState;
-    private archiveStore: ArchiveState;
-    private navigationStore: NavigationState;
+    private readonly siteTreeStore: SiteTreeState;
+    private readonly archiveStore: ArchiveState;
+    private readonly navigationStore: NavigationState;
 
     constructor(siteTreeStore: SiteTreeState, archiveStore: ArchiveState, navigationStore: NavigationState) {
         this.siteTreeStore = siteTreeStore;
