@@ -1,4 +1,4 @@
-import classNames from 'classnames';
+import classnames from 'classnames';
 import * as React from 'react';
 
 import { CustomTreeNode } from 'components/SiteTree/CustomTreeNode';
@@ -34,7 +34,7 @@ export class CustomTree<T = {}> extends React.Component<ITreeProps<T>, {}> {
     public render() {
         console.debug('render custom tree');
         return (
-            <div className={classNames(Classes.TREE, this.props.className)}>
+            <div className={classnames(Classes.TREE, this.props.className)}>
                 {this.renderNodes(this.props.contents, [], Classes.TREE_ROOT)}
             </div>
         );
@@ -76,7 +76,7 @@ export class CustomTree<T = {}> extends React.Component<ITreeProps<T>, {}> {
             ];
         });
 
-        return <ul className={classNames(Classes.TREE_NODE_LIST, className)}>{nodeItems}</ul>;
+        return <ul className={classnames(Classes.TREE_NODE_LIST, className)}>{nodeItems}</ul>;
     }
 
     private handleNodeCollapse = (node: TreeNode<T>, e: React.MouseEvent<HTMLElement>) => {
