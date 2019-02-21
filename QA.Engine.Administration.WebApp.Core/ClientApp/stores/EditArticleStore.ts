@@ -2,7 +2,7 @@ import { action, observable, computed } from 'mobx';
 import OperationState from 'enums/OperationState';
 import SiteMapService from 'services/SiteMapService';
 
-export class EditArticleState {
+export default class EditArticleState {
 
     @observable public title: string;
     @observable public state: OperationState = OperationState.NONE;
@@ -56,6 +56,3 @@ export class EditArticleState {
         }
     }
 }
-
-const editArticleStore = new EditArticleState();
-export default editArticleStore;

@@ -1,15 +1,15 @@
 import * as React from 'react';
 import { Button, ButtonGroup, Card, Checkbox, FormGroup, Intent, Radio, RadioGroup } from '@blueprintjs/core';
 import { inject, observer } from 'mobx-react';
-import { PopupState } from 'stores/PopupStore';
+import PopupStore from 'stores/PopupStore';
 import PageSelect from 'components/Select/PageSelect';
 import PopupType from 'enums/PopupType';
 import TreeStore from 'stores/TreeStore';
-import { SiteTreeState } from 'stores/SiteTreeStore';
+import SiteTreeStore from 'stores/TreeStore/SiteTreeStore';
 
 interface Props {
     treeStore?: TreeStore;
-    popupStore?: PopupState;
+    popupStore?: PopupStore;
 }
 
 interface State {
@@ -42,7 +42,7 @@ export default class ArchivePopup extends React.Component<Props, State> {
             isDeleteAllVersions: deleteAllVersions,
             isDeleteContentVersions: deleteContentVersions === ContentVersionOperations.archive,
         };
-        (treeStore.resolveTreeStore() as SiteTreeState).archive(model);
+        (treeStore.resolveTreeStore() as SiteTreeStore).archive(model);
         popupStore.close();
     }
 

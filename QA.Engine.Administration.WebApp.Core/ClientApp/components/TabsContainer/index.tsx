@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { inject, observer } from 'mobx-react';
 import { Card, Tab, TabId, Tabs } from '@blueprintjs/core';
-import { NavigationState, Pages, TabTypes } from 'stores/NavigationStore';
+import NavigationStore, { Pages, TabTypes } from 'stores/NavigationStore';
 import CommonTab from './CommonTab';
 import WidgetsTab from './WidgetsTab';
 
 interface Props {
-    navigationStore?: NavigationState;
+    navigationStore?: NavigationStore;
 }
 
 @inject('navigationStore')

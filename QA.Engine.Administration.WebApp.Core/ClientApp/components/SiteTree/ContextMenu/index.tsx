@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { inject, observer } from 'mobx-react';
 import { Button, Popover, Position } from '@blueprintjs/core';
-import { ITreeElement } from 'stores/BaseTreeStore';
+import { ITreeElement } from 'stores/TreeStore/BaseTreeStore';
 import ElementMenu from './ElementMenu';
 import TreeStore from 'stores/TreeStore';
 

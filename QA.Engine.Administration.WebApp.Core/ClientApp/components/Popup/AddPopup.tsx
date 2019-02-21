@@ -1,17 +1,16 @@
 import * as React from 'react';
-import { Card, Spinner, Button, FormGroup, InputGroup, ButtonGroup, Intent } from '@blueprintjs/core';
+import { Card, Button, FormGroup, InputGroup, ButtonGroup, Intent } from '@blueprintjs/core';
 import { observer, inject } from 'mobx-react';
-import { QpIntegrationState } from 'stores/QpIntegrationStore';
-import { PopupState } from 'stores/PopupStore';
-import OperationState from 'enums/OperationState';
+import QpIntegrationStore from 'stores/QpIntegrationStore';
+import PopupStore from 'stores/PopupStore';
 import DiscriminatorSelect from 'components/Select/DiscriminatorSelect';
 import PopupType from 'enums/PopupType';
 import TreeStore from 'stores/TreeStore';
 
 interface Props {
-    qpIntegrationStore?: QpIntegrationState;
+    qpIntegrationStore?: QpIntegrationStore;
     treeStore?: TreeStore;
-    popupStore?: PopupState;
+    popupStore?: PopupStore;
 }
 
 interface State {

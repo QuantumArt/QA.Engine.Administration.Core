@@ -4,19 +4,22 @@ import QpActionCodes from 'constants/QpActionCodes';
 import QpCallbackProcNames from 'constants/QpCallbackProcNames';
 import QpEntityCodes from 'constants/QpEntityCodes';
 import { BackendEventObserver, executeBackendAction, ArticleFormState, ExecuteActionOptions, InitFieldValue } from 'qp/QP8BackendApi.Interaction';
-import siteTreeStore from './SiteTreeStore';
+import TreeStore from 'stores/TreeStore';
+import SiteTreeStore from 'stores/TreeStore/SiteTreeStore';
 
 export enum VersionType {
     Content = 'Content',
     Structural = 'Structural',
 }
 
-export class QpIntegrationState {
-    constructor() {
+export default class QpIntegrationStore {
+    constructor(siteTreeStore: TreeStore) {
+        this.siteTreeStore = siteTreeStore;
     }
 
     private qpContent: QpContentModel;
     private qpAbstractItem: string = 'QPAbstractItem';
+    private readonly siteTreeStore: TreeStore;
 
     private async fetchQPAbstractItemFields() {
         try {
@@ -33,7 +36,10 @@ export class QpIntegrationState {
 
     private async updateSiteMapSubTree(id: number) {
         try {
-            siteTreeStore.updateSubTree(id);
+            const tree = this.siteTreeStore.resolveTreeStore();
+            if (tree instanceof SiteTreeStore) {
+                tree.updateSubTree(id);
+            }
         } catch (e) {
             console.error(e);
         }
@@ -269,6 +275,3 @@ class FieldValueModel {
     title?: string;
     extantionId?: number;
 }
-
-const qpIntegrationStore = new QpIntegrationState();
-export default qpIntegrationStore;

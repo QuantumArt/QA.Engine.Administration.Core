@@ -12,6 +12,9 @@ export interface ITreeElement extends ITreeNode {
     isContextMenuActive: boolean;
 }
 
+/**
+ * @description Base class for tree manipulations
+ */
 export abstract class BaseTreeState<T extends {
     id: number;
     parentId?: null | number;
