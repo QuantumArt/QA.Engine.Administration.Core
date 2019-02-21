@@ -15,7 +15,7 @@ export default class Popup extends React.Component<Props> {
 
     render() {
         const { popupStore, children } = this.props;
-        const isLoading = popupStore.state === OperationState.NONE || popupStore.state === OperationState.PENDING;
+        const isLoading = popupStore.state === OperationState.PENDING;
 
         return (
             <Dialog

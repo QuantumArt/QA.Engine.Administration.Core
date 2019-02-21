@@ -16,6 +16,7 @@ export class PopupState {
 
     @action
     public show(itemId: number, type: PopupType, title: string) {
+        this.state = OperationState.NONE;
         const useDiscriminators = [PopupType.ADD, PopupType.ADDVERSION];
         if (useDiscriminators.indexOf(type) > -1) {
             this.getDiscriminators();

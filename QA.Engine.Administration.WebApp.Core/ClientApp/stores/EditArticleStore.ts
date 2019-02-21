@@ -6,10 +6,10 @@ export class EditArticleState {
 
     @observable public title: string;
     @observable public state: OperationState = OperationState.NONE;
-    @observable public fields: ExtensionFieldModel[];
+    @observable public fields: ExtensionFieldModel[] = [];
     @observable public isShowExtensionFields: boolean = false;
     public node: PageModel | ArchiveModel;
-    private extensionFieldsJson: string;
+    private extensionFieldsJson: string = JSON.stringify([]);
 
     @computed
     get changedFields(): ExtensionFieldModel[] {
@@ -45,7 +45,7 @@ export class EditArticleState {
             const response: ApiResult<ExtensionFieldModel[]> = await SiteMapService.getExtantionFields(id, extantionId);
             if (response.isSuccess) {
                 this.fields = response.data;
-                this.extensionFieldsJson = JSON.stringify(this.fields);
+                this.extensionFieldsJson = JSON.stringify(this.fields.length > 0 ? this.fields : []);
                 this.state = OperationState.SUCCESS;
             } else {
                 throw response.error;

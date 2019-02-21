@@ -482,7 +482,8 @@ namespace QA.Engine.Administration.Data.Core.Qp
                 });
             }
 
-            _query.DbConnector.MassUpdate(_query.ContentId, values, userId);
+            if (values.Any())
+                _query.DbConnector.MassUpdate(_query.ContentId, values, userId);
         }
 
         /// <summary>
@@ -503,7 +504,8 @@ namespace QA.Engine.Administration.Data.Core.Qp
                 });
             }
 
-            _query.DbConnector.MassUpdate(_query.ContentId, values, userId);
+            if (values.Any())
+                _query.DbConnector.MassUpdate(_query.ContentId, values, userId);
         }
 
         /// <summary>
@@ -540,7 +542,8 @@ namespace QA.Engine.Administration.Data.Core.Qp
                 });
             }
 
-            _query.DbConnector.MassUpdate(_query.ContentId, values, userId);
+            if (values.Any())
+                _query.DbConnector.MassUpdate(_query.ContentId, values, userId);
         }
 
     }
