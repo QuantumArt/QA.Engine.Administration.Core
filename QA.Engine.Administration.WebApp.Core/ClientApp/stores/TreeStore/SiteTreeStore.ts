@@ -1,8 +1,8 @@
 import SiteMapService from 'services/SiteMapService';
-import { BaseTreeState } from 'stores/BaseTreeStore';
+import { BaseTreeState } from 'stores/TreeStore/BaseTreeStore';
 import OperationState from 'enums/OperationState';
 
-export class SiteTreeState extends BaseTreeState<PageModel> {
+export default class SiteTreeStore extends BaseTreeState<PageModel> {
 
     protected async getTree(): Promise<ApiResult<PageModel[]>> {
         return await SiteMapService.getSiteMapTree();
@@ -59,6 +59,3 @@ export class SiteTreeState extends BaseTreeState<PageModel> {
         }
     }
 }
-
-const siteTreeStore = new SiteTreeState();
-export default siteTreeStore;

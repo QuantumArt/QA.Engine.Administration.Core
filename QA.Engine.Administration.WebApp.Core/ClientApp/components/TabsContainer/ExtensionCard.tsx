@@ -2,10 +2,10 @@ import * as React from 'react';
 import { inject, observer } from 'mobx-react';
 import { AnchorButton, InputGroup } from '@blueprintjs/core';
 import OperationState from 'enums/OperationState';
-import { EditArticleState } from 'stores/EditArticleStore';
+import EditArticleStore from 'stores/EditArticleStore';
 
 interface Props {
-    editArticleStore?: EditArticleState;
+    editArticleStore?: EditArticleStore;
 }
 
 @inject('editArticleStore')

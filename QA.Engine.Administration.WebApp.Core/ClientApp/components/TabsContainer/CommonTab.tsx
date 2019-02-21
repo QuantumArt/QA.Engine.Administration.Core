@@ -1,19 +1,18 @@
 import * as React from 'react';
 import { observer, inject } from 'mobx-react';
 import { Button, Navbar, NavbarGroup, H5, Intent, Spinner, InputGroup } from '@blueprintjs/core';
-import ExtantionCard from './ExtensionCard';
+import ExtensionCard from './ExtensionCard';
 import OperationState from 'enums/OperationState';
-import { NavigationState } from 'stores/NavigationStore';
-import { SiteTreeState } from 'stores/SiteTreeStore';
-import { QpIntegrationState } from 'stores/QpIntegrationStore';
-import { EditArticleState } from 'stores/EditArticleStore';
-import { observable } from 'mobx';
+import NavigationStore from 'stores/NavigationStore';
+import SiteTreeStore from 'stores/TreeStore/SiteTreeStore';
 import TreeStore from 'stores/TreeStore';
+import QpIntegrationStore from 'stores/QpIntegrationStore';
+import EditArticleStore from 'stores/EditArticleStore';
 
 interface Props {
-    navigationStore?: NavigationState;
-    qpIntegrationStore?: QpIntegrationState;
-    editArticleStore?: EditArticleState;
+    navigationStore?: NavigationStore;
+    qpIntegrationStore?: QpIntegrationStore;
+    editArticleStore?: EditArticleStore;
     treeStore?: TreeStore;
 }
 
@@ -42,8 +41,7 @@ export default class CommonTab extends React.Component<Props> {
             extensionId: tree.selectedNode.extensionId,
             fields: editArticleStore.changedFields,
         };
-        if (tree instanceof SiteTreeState) {
-            tree as SiteTreeState;
+        if (tree instanceof SiteTreeStore) {
             tree.edit(model);
         }
     }
@@ -103,7 +101,7 @@ export default class CommonTab extends React.Component<Props> {
                             <H5>Visible</H5>
                             <p>{selectedNode.isVisible ? 'Yes' : 'No'}</p>
                         </div>
-                        <ExtantionCard />
+                        <ExtensionCard />
                     </div>
                 </div>
             );

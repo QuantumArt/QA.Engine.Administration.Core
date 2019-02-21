@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { inject, observer } from 'mobx-react';
 import { Card, Spinner, Tree } from '@blueprintjs/core';
-import Scrollbars from 'react-custom-scrollbars';
-import { NavigationState } from 'stores/NavigationStore';
+import Scrollbars from 'react-custom-scrollbars'; // tslint:disable-line
+import NavigationStore from 'stores/NavigationStore';
 import OperationState from 'enums/OperationState';
-import { ITreeElement } from 'stores/BaseTreeStore';
-import { EditArticleState } from 'stores/EditArticleStore';
+import { ITreeElement } from 'stores/TreeStore/BaseTreeStore';
+import EditArticleState from 'stores/EditArticleStore';
 import TreeStore from 'stores/TreeStore';
 
 @observer
@@ -13,7 +13,7 @@ class TreeR extends Tree {
 }
 
 interface Props {
-    navigationStore?: NavigationState;
+    navigationStore?: NavigationStore;
     editArticleStore?: EditArticleState;
     treeStore?: TreeStore;
 }

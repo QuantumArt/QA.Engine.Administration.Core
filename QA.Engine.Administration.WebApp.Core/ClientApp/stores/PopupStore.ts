@@ -4,7 +4,7 @@ import OperationState from 'enums/OperationState';
 import PopupType from 'enums/PopupType';
 import SiteMapService from 'services/SiteMapService';
 
-export class PopupState {
+export default class PopupStore {
     @observable state: OperationState = OperationState.NONE;
     @observable showPopup: boolean = false;
     @observable type: PopupType;
@@ -66,6 +66,3 @@ export class PopupState {
         }
     }
 }
-
-const popupStore = new PopupState();
-export default popupStore;

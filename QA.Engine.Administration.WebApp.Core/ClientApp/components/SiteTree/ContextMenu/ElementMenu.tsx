@@ -1,19 +1,19 @@
 import * as React from 'react';
 import { Intent, Menu, MenuDivider, MenuItem } from '@blueprintjs/core';
 import { observer, inject } from 'mobx-react';
-import { QpIntegrationState } from 'stores/QpIntegrationStore';
-import { SiteTreeState } from 'stores/SiteTreeStore';
-import { ArchiveState } from 'stores/ArchiveStore';
-import { PopupState } from 'stores/PopupStore';
+import QpIntegrationStore from 'stores/QpIntegrationStore';
+import SiteTreeStore from 'stores/TreeStore/SiteTreeStore';
+import ArchiveTreeStore from 'stores/TreeStore/ArchiveTreeStore';
+import PopupStore from 'stores/PopupStore';
 import PopupType from 'enums/PopupType';
-import { ITreeElement } from 'stores/BaseTreeStore';
-import { NavigationState, Pages } from 'stores/NavigationStore';
+import { ITreeElement } from 'stores/TreeStore/BaseTreeStore';
+import NavigationStore, { Pages } from 'stores/NavigationStore';
 import TreeStore from 'stores/TreeStore';
 
 interface Props {
-    qpIntegrationStore?: QpIntegrationState;
-    navigationStore?: NavigationState;
-    popupStore?: PopupState;
+    qpIntegrationStore?: QpIntegrationStore;
+    navigationStore?: NavigationStore;
+    popupStore?: PopupStore;
     treeStore?: TreeStore;
     itemId: number;
     node: ITreeElement;
@@ -45,7 +45,7 @@ export default class ElementMenu extends React.Component<Props> {
 
     private publishClick = () => {
         const { itemId, treeStore } = this.props;
-        (treeStore.resolveTreeStore() as SiteTreeState).publish([itemId]);
+        (treeStore.resolveTreeStore() as SiteTreeStore).publish([itemId]);
     }
 
     private archiveClick = () => {
@@ -55,12 +55,12 @@ export default class ElementMenu extends React.Component<Props> {
 
     private updateClick = () => {
         const { treeStore, itemId } = this.props;
-        (treeStore.resolveTreeStore() as SiteTreeState).updateSubTree(itemId);
+        (treeStore.resolveTreeStore() as SiteTreeStore).updateSubTree(itemId);
     }
 
     private updateArchiveClick = () => {
         const { treeStore, itemId } = this.props;
-        (treeStore.resolveTreeStore() as ArchiveState).updateSubTree(itemId);
+        (treeStore.resolveTreeStore() as ArchiveTreeStore).updateSubTree(itemId);
     }
 
     private restoreClick = () => {

@@ -1,14 +1,14 @@
 import * as React from 'react';
 import { Card, Button, Checkbox, ButtonGroup, Intent, FormGroup } from '@blueprintjs/core';
 import { observer, inject } from 'mobx-react';
-import { PopupState } from 'stores/PopupStore';
+import PopupStore from 'stores/PopupStore';
 import PopupType from 'enums/PopupType';
 import TreeStore from 'stores/TreeStore';
-import { ArchiveState } from 'stores/ArchiveStore';
+import ArchiveTreeStore  from 'stores/TreeStore/ArchiveTreeStore';
 
 interface Props {
     treeStore?: TreeStore;
-    popupStore?: PopupState;
+    popupStore?: PopupStore;
 }
 
 interface State {
@@ -31,7 +31,7 @@ export default class DeletePopup extends React.Component<Props, State> {
             itemId: popupStore.itemId,
             isDeleteAllVersions: deleteAllVersions,
         };
-        (treeStore.resolveTreeStore() as ArchiveState).delete(model);
+        (treeStore.resolveTreeStore() as ArchiveTreeStore).delete(model);
         popupStore.close();
     }
 
