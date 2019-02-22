@@ -52,7 +52,6 @@ export default class AddVersionPopup extends React.Component<Props, State> {
         if (popupStore.type !== PopupType.ADDVERSION) {
             return null;
         }
-        const discriminators = popupStore.discriminators.filter(x => x.isPage === true);
 
         return (
             <Card>
@@ -63,7 +62,7 @@ export default class AddVersionPopup extends React.Component<Props, State> {
                     </RadioGroup>
                 </FormGroup>
                 <FormGroup>
-                    <DiscriminatorSelect items={discriminators} onChange={this.changeDiscriminator}/>
+                    <DiscriminatorSelect items={popupStore.discriminators} onChange={this.changeDiscriminator}/>
                 </FormGroup>
                 <ButtonGroup className="dialog-button-group">
                     <Button text="Добавить" icon="add" onClick={this.addClick} intent={Intent.SUCCESS}/>

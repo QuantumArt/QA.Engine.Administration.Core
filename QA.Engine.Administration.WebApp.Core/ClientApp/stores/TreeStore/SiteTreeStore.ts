@@ -20,6 +20,7 @@ export default class SiteTreeStore extends BaseTreeState<PageModel> {
         try {
             const response: ApiResult<any> = await SiteMapService.publish(itemIds);
             if (response.isSuccess) {
+                await Promise.all(itemIds.map(itemId => this.updateSubTreeInternal(itemId)));
                 this.treeState = OperationState.SUCCESS;
             } else {
                 throw response.error;

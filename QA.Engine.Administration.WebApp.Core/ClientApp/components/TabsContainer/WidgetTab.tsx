@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { observer, inject } from 'mobx-react';
-import { Button, Navbar, NavbarGroup, H5, Intent, Spinner, InputGroup, Card } from '@blueprintjs/core';
-import OperationState from 'enums/OperationState';
 import PopupStore from 'stores/PopupStore';
 import TreeStore from 'stores/TreeStore';
-import ContentVersionTree from 'components/SiteTree/ContentVersionTree';
 import PopupType from 'enums/PopupType';
+import OperationState from 'enums/OperationState';
+import { Spinner, Card, H5, Navbar, NavbarGroup, Button, Intent } from '@blueprintjs/core';
+import WidgetTree from 'components/SiteTree/WidgetTree';
 
 interface Props {
     popupStore?: PopupStore;
@@ -14,12 +14,12 @@ interface Props {
 
 @inject('popupStore', 'treeStore')
 @observer
-export default class ContentVersionTab extends React.Component<Props> {
+export default class WidgetTab extends React.Component<Props> {
 
     private addClick = () => {
         const { treeStore, popupStore } = this.props;
         const tree = treeStore.resolveTreeStore();
-        popupStore.show(tree.selectedNode.id, PopupType.ADDVERSION, 'Добавить раздел');
+        popupStore.show(tree.selectedNode.id, PopupType.ADDWIDGET, 'Добавить виджет');
     }
 
     private refreshClick = () => {
@@ -35,7 +35,7 @@ export default class ContentVersionTab extends React.Component<Props> {
     render() {
 
         const { treeStore } = this.props;
-        const tree = treeStore.getContentVersionsStore();
+        const tree = treeStore.getWidgetStore();
         const selectedNode = tree.selectedNode;
 
         if (tree.treeState === OperationState.NONE || tree.treeState === OperationState.PENDING) {
@@ -82,7 +82,7 @@ export default class ContentVersionTab extends React.Component<Props> {
                         {/* <Button minimal icon="saved" text="Save" intent={Intent.SUCCESS} onClick={this.saveClick} /> */}
                     </NavbarGroup>
                 </Navbar>
-                <ContentVersionTree />
+                <WidgetTree />
                 {tab}
             </div>
         );

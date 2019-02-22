@@ -4,6 +4,7 @@ enum PopupType {
     ARCHIVE = 2,
     DELETE = 3,
     RESTORE = 4,
+    ADDWIDGET = 5,
 }
 
 export default PopupType;

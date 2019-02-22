@@ -2,7 +2,6 @@ import * as React from 'react';
 import { Intent, Menu, MenuDivider, MenuItem } from '@blueprintjs/core';
 import { observer, inject } from 'mobx-react';
 import QpIntegrationStore from 'stores/QpIntegrationStore';
-import SiteTreeStore from 'stores/TreeStore/SiteTreeStore';
 import PopupStore from 'stores/PopupStore';
 import PopupType from 'enums/PopupType';
 import { ITreeElement } from 'stores/TreeStore/BaseTreeStore';
@@ -18,21 +17,11 @@ interface Props {
 
 @inject('qpIntegrationStore', 'popupStore', 'treeStore')
 @observer
-export default class SiteTreeMenu extends React.Component<Props> {
+export default class WidgetTreeMenu extends React.Component<Props> {
 
     private editClick = () => {
         const { qpIntegrationStore, itemId } = this.props;
         qpIntegrationStore.edit(itemId);
-    }
-
-    private addClick = () => {
-        const { popupStore, itemId } = this.props;
-        popupStore.show(itemId, PopupType.ADD, 'Добавить раздел');
-    }
-
-    private addVersionClick = () => {
-        const { popupStore, itemId } = this.props;
-        popupStore.show(itemId, PopupType.ADDVERSION, 'Добавить раздел');
     }
 
     private historyClick = () => {
@@ -41,22 +30,13 @@ export default class SiteTreeMenu extends React.Component<Props> {
     }
 
     private publishClick = () => {
-        const { itemId, treeStore } = this.props;
-        (treeStore.resolveTreeStore() as SiteTreeStore).publish([itemId]);
+        const { treeStore, itemId } = this.props;
+        treeStore.getWidgetStore().publish([itemId]);
     }
 
     private archiveClick = () => {
         const { popupStore, itemId } = this.props;
         popupStore.show(itemId, PopupType.ARCHIVE, 'Отправить в архив');
-    }
-
-    private updateClick = () => {
-        const { treeStore, itemId } = this.props;
-        treeStore.resolveTreeStore().updateSubTree(itemId).then(() => {
-            const selectedNode = treeStore.resolveTreeStore().selectedNode;
-            [treeStore.getContentVersionsStore(), treeStore.getWidgetStore()]
-                    .forEach(x => x.init(selectedNode));
-        });
     }
 
     private handleClick = (e: React.MouseEvent<HTMLElement>, cb: () => void) => {
@@ -73,11 +53,6 @@ export default class SiteTreeMenu extends React.Component<Props> {
     render() {
         return (
             <Menu>
-                <MenuItem
-                    onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.updateClick)}
-                    icon="refresh"
-                    text="Обновить"
-                />
                 <MenuItem
                     onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.handlerExample)}
                     icon="eye-open"
@@ -96,16 +71,6 @@ export default class SiteTreeMenu extends React.Component<Props> {
                     intent={Intent.SUCCESS}
                 />
                 <MenuDivider/>
-                <MenuItem
-                    onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.addClick)}
-                    icon="new-object"
-                    text="Добавить подраздел"
-                    intent={Intent.PRIMARY}/>
-                <MenuItem
-                    onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.addVersionClick)}
-                    icon="add"
-                    text="Добавить версию"
-                    intent={Intent.PRIMARY}/>
                 <MenuItem
                     onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.editClick)}
                     icon="edit"

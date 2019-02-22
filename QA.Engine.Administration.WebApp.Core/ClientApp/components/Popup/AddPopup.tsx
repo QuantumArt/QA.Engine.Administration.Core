@@ -50,10 +50,9 @@ export default class AddPopup extends React.Component<Props, State> {
     render() {
         const { popupStore } = this.props;
         const { name, title } = this.state;
-        if (popupStore.type !== PopupType.ADD) {
+        if (popupStore.type !== PopupType.ADD && popupStore.type !== PopupType.ADDWIDGET) {
             return null;
         }
-        const discriminators = popupStore.discriminators.filter(x => x.isPage === true);
 
         return (
             <Card>
@@ -64,7 +63,7 @@ export default class AddPopup extends React.Component<Props, State> {
                     <InputGroup placeholder="alias" value={name} onChange={this.changeName} />
                 </FormGroup>
                 <FormGroup label="Type">
-                    <DiscriminatorSelect items={discriminators} onChange={this.changeDiscriminator} />
+                    <DiscriminatorSelect items={popupStore.discriminators} onChange={this.changeDiscriminator} />
                 </FormGroup>
                 <ButtonGroup className="dialog-button-group">
                     <Button text="Добавить" icon="new-object" onClick={this.addClick} intent={Intent.SUCCESS} />

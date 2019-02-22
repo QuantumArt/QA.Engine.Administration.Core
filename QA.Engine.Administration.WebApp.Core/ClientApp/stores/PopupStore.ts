@@ -17,9 +17,9 @@ export default class PopupStore {
     @action
     public show(itemId: number, type: PopupType, title: string) {
         this.state = OperationState.NONE;
-        const useDiscriminators = [PopupType.ADD, PopupType.ADDVERSION];
+        const useDiscriminators = [PopupType.ADD, PopupType.ADDVERSION, PopupType.ADDWIDGET];
         if (useDiscriminators.indexOf(type) > -1) {
-            this.getDiscriminators();
+            this.getDiscriminators(type !== PopupType.ADDWIDGET);
         }
         if (type === PopupType.ARCHIVE && itemId != null) {
             this.getContentVersions(itemId);
@@ -35,12 +35,12 @@ export default class PopupStore {
         this.showPopup = false;
     }
 
-    public async getDiscriminators() {
+    public async getDiscriminators(isPage: boolean) {
         this.state = OperationState.PENDING;
         try {
             const response: ApiResult<DiscriminatorModel[]> = await DictionaryService.getDiscriminators();
             if (response.isSuccess) {
-                this.discriminators = response.data;
+                this.discriminators = response.data.filter(x => x.isPage === isPage);
                 this.state = OperationState.SUCCESS;
             } else {
                 throw response.error;

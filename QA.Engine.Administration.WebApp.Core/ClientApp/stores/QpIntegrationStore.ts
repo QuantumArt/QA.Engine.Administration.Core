@@ -39,9 +39,9 @@ export default class QpIntegrationStore {
             const tree = this.treeStore.resolveTreeStore();
             if (tree instanceof SiteTreeStore) {
                 await tree.updateSubTree(id);
-                const contentVersionStore = this.treeStore.getContentVersionsStore();
                 const selectedNode = tree.selectedNode;
-                contentVersionStore.init(selectedNode);
+                [this.treeStore.getContentVersionsStore(), this.treeStore.getWidgetStore()]
+                    .forEach(x => x.init(selectedNode));
             }
         } catch (e) {
             console.error(e);

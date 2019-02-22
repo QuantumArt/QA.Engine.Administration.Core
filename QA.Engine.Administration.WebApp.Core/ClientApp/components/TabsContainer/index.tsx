@@ -3,7 +3,7 @@ import { inject, observer } from 'mobx-react';
 import { Card, Tab, TabId, Tabs } from '@blueprintjs/core';
 import NavigationStore, { Pages, TabTypes } from 'stores/NavigationStore';
 import CommonTab from './CommonTab';
-import WidgetsTab from './WidgetsTab';
+import WidgetTab from './WidgetTab';
 import ContentVersionTab from './ContentVersionTab';
 
 interface Props {
@@ -32,7 +32,7 @@ export default class TabsContainer extends React.Component<Props> {
                     {navigationStore.currentPage === Pages.SITEMAP ?
                         [
                             <Tab key={TabTypes.COMMON} id={TabTypes.COMMON} title="Common" panel={<CommonTab />} />,
-                            <Tab key={TabTypes.WIDGETS} id={TabTypes.WIDGETS} title="Widgets" panel={<WidgetsTab />} />,
+                            <Tab key={TabTypes.WIDGETS} id={TabTypes.WIDGETS} title="Widgets" panel={<WidgetTab />} />,
                             <Tab key={TabTypes.CONTENT_VERSIONS} id={TabTypes.CONTENT_VERSIONS} title="Content versions" panel={<ContentVersionTab />} />,
                         ] :
                         [
