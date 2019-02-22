@@ -18,11 +18,11 @@ export default class NavigationBar extends React.Component<Props> {
 
     private handleClick = (pageId: Pages) => async () => {
         const { navigationStore } = this.props;
-        await this.changePage(pageId);
+        this.changePage(pageId);
         navigationStore.resetTab();
     }
 
-    private changePage = async (pageId: Pages) => {
+    private changePage = (pageId: Pages) => {
         const { navigationStore, treeStore } = this.props;
         navigationStore.changePage(pageId);
         treeStore.resolveTreeStore().fetchTree();

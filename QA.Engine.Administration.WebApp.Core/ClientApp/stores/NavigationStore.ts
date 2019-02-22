@@ -9,6 +9,7 @@ export enum TabTypes {
     NONE,
     COMMON,
     WIDGETS,
+    CONTENT_VERSIONS,
 }
 
 export default class NavigationStore {
@@ -27,7 +28,11 @@ export default class NavigationStore {
 
     @action
     setDefaultTab = (isSelected: boolean) => {
-        this.currentTab = isSelected === true ? TabTypes.COMMON : TabTypes.NONE;
+        if (isSelected === false) {
+            this.currentTab = TabTypes.NONE;
+        } else if (this.currentTab === TabTypes.NONE) {
+            this.currentTab = TabTypes.COMMON;
+        }
     }
 
     @action

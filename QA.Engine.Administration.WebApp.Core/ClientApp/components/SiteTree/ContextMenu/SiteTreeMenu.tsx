@@ -3,25 +3,22 @@ import { Intent, Menu, MenuDivider, MenuItem } from '@blueprintjs/core';
 import { observer, inject } from 'mobx-react';
 import QpIntegrationStore from 'stores/QpIntegrationStore';
 import SiteTreeStore from 'stores/TreeStore/SiteTreeStore';
-import ArchiveTreeStore from 'stores/TreeStore/ArchiveTreeStore';
 import PopupStore from 'stores/PopupStore';
 import PopupType from 'enums/PopupType';
 import { ITreeElement } from 'stores/TreeStore/BaseTreeStore';
-import NavigationStore, { Pages } from 'stores/NavigationStore';
 import TreeStore from 'stores/TreeStore';
 
 interface Props {
     qpIntegrationStore?: QpIntegrationStore;
-    navigationStore?: NavigationStore;
     popupStore?: PopupStore;
     treeStore?: TreeStore;
     itemId: number;
     node: ITreeElement;
 }
 
-@inject('qpIntegrationStore', 'navigationStore', 'popupStore', 'treeStore')
+@inject('qpIntegrationStore', 'popupStore', 'treeStore')
 @observer
-export default class ElementMenu extends React.Component<Props> {
+export default class SiteTreeMenu extends React.Component<Props> {
 
     private editClick = () => {
         const { qpIntegrationStore, itemId } = this.props;
@@ -55,22 +52,11 @@ export default class ElementMenu extends React.Component<Props> {
 
     private updateClick = () => {
         const { treeStore, itemId } = this.props;
-        (treeStore.resolveTreeStore() as SiteTreeStore).updateSubTree(itemId);
-    }
-
-    private updateArchiveClick = () => {
-        const { treeStore, itemId } = this.props;
-        (treeStore.resolveTreeStore() as ArchiveTreeStore).updateSubTree(itemId);
-    }
-
-    private restoreClick = () => {
-        const { popupStore, itemId } = this.props;
-        popupStore.show(itemId, PopupType.RESTORE, 'Восстановить раздел');
-    }
-
-    private deleteClick = () => {
-        const { popupStore, itemId } = this.props;
-        popupStore.show(itemId, PopupType.DELETE, 'Удалить из архива');
+        treeStore.resolveTreeStore().updateSubTree(itemId).then(() => {
+            const contentVersionStore = treeStore.getContentVersionsStore();
+            const selectedNode = treeStore.resolveTreeStore().selectedNode;
+            contentVersionStore.init(selectedNode);
+        });
     }
 
     private handleClick = (e: React.MouseEvent<HTMLElement>, cb: () => void) => {
@@ -85,29 +71,6 @@ export default class ElementMenu extends React.Component<Props> {
     }
 
     render() {
-        const { navigationStore } = this.props;
-        if (navigationStore.currentPage === Pages.ARCHIVE) {
-            return (
-                <Menu>
-                    <MenuItem
-                        onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.updateArchiveClick)}
-                        icon="refresh"
-                        text="Обновить"
-                    />
-                    <MenuItem
-                        onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.restoreClick)}
-                        icon="swap-horizontal"
-                        text="Восстановить"/>
-                    <MenuDivider/>
-                    <MenuItem
-                        onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.deleteClick)}
-                        icon="delete"
-                        text="Удалить"
-                        intent={Intent.DANGER}/>
-                </Menu>
-            );
-        }
-
         return (
             <Menu>
                 <MenuItem

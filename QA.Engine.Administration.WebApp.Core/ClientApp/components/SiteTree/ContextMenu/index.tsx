@@ -2,8 +2,11 @@ import * as React from 'react';
 import { inject, observer } from 'mobx-react';
 import { Button, Popover, Position } from '@blueprintjs/core';
 import { ITreeElement } from 'stores/TreeStore/BaseTreeStore';
-import ElementMenu from './ElementMenu';
+import ContentVersionTreeMenu from './ContentVersionTreeMenu';
 import TreeStore from 'stores/TreeStore';
+import ContextMenuType from 'enums/ContextMenuType';
+import SiteTreeMenu from './SiteTreeMenu';
+import ArchiveTreeMenu from './ArchiveTreeMenu';
 
 interface Props {
     treeStore?: TreeStore;
@@ -21,7 +24,21 @@ export default class ContextMenu extends React.Component<Props> {
 
     render() {
         const { node } = this.props;
-        const elementMenu = <ElementMenu itemId={+node.id} node={node} />;
+        let elementMenu: JSX.Element;
+        switch (node.contextMenuType) {
+        case ContextMenuType.SITEMAP:
+            elementMenu = <SiteTreeMenu itemId={+node.id} node={node} />;
+            break;
+        case ContextMenuType.ARCHIVE:
+            elementMenu = <ArchiveTreeMenu itemId={+node.id} node={node} />;
+            break;
+        case ContextMenuType.CONTENTVERSION:
+            elementMenu = <ContentVersionTreeMenu itemId={+node.id} node={node} />;
+            break;
+        default:
+            break;
+        }
+
         return node.isSelected ?
             <Popover
                 content={elementMenu}

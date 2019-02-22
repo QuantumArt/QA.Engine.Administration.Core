@@ -3,12 +3,14 @@ import { action, observable, computed } from 'mobx';
 import { IconName, ITreeNode } from '@blueprintjs/core';
 import ContextMenu from 'components/SiteTree/ContextMenu';
 import OperationState from 'enums/OperationState';
+import ContextMenuType from 'enums/ContextMenuType';
 
 export interface ITreeElement extends ITreeNode {
     childNodes: ITreeElement[];
     parentId: number;
     versionOfId?: number;
     isContextMenuActive: boolean;
+    contextMenuType: ContextMenuType;
 }
 
 /**
@@ -21,35 +23,34 @@ export abstract class BaseTreeState<T extends {
     title: string;
     children: T[];
     hasChildren: boolean;
-    isArchive: boolean;
 }> {
     @observable public treeState: OperationState = OperationState.NONE;
     @observable public selectedNode: T;
 
     private treeInternal: ITreeElement[];
+
     @computed
     get tree(): ITreeElement[] {
         return this.treeInternal;
     }
 
     @action
-    public async fetchTree(): Promise<void> {
+    public fetchTree(): void {
         this.treeInternal = [];
         this.treeState = OperationState.PENDING;
-        try {
-            const response: ApiResult<T[]> = await this.getTree();
+        this.getTree().then((response) => {
             if (response.isSuccess) {
                 this.origTree = response.data;
                 this.convertTree(response.data);
                 this.treeState = OperationState.SUCCESS;
             } else {
                 this.treeState = OperationState.ERROR;
-                throw response.error;
+                console.error(response.error);
             }
-        } catch (e) {
+        }).catch((e) => {
             this.treeState = OperationState.ERROR;
             console.error(e);
-        }
+        });
     }
 
     protected origTree: T[];
@@ -136,6 +137,7 @@ export abstract class BaseTreeState<T extends {
                     break;
                 } else if (response.data != null && elements[i].id === response.data.id) {
                     elements[i] = response.data;
+                    this.selectedNode = response.data;
                 }
             }
 
@@ -159,6 +161,8 @@ export abstract class BaseTreeState<T extends {
     protected abstract async getTree(): Promise<ApiResult<T[]>>;
 
     protected abstract async getSubTree(id: number): Promise<ApiResult<T>>;
+
+    protected abstract contextMenuType: ContextMenuType;
 
     private convertTree(data: T[]): void {
         const start = Date.now();
@@ -185,6 +189,7 @@ export abstract class BaseTreeState<T extends {
                 icon: getIcon(),
                 hasCaret: hasChildren,
                 isContextMenuActive: false,
+                contextMenuType: this.contextMenuType,
             });
             treeElement.secondaryLabel = React.createElement(ContextMenu, {
                 node: treeElement,

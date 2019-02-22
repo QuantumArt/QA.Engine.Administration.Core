@@ -1,8 +1,11 @@
 import SiteMapService from 'services/SiteMapService';
 import { BaseTreeState } from 'stores/TreeStore/BaseTreeStore';
 import OperationState from 'enums/OperationState';
+import ContextMenuType from 'enums/ContextMenuType';
 
 export default class SiteTreeStore extends BaseTreeState<PageModel> {
+
+    protected contextMenuType: ContextMenuType = ContextMenuType.SITEMAP;
 
     protected async getTree(): Promise<ApiResult<PageModel[]>> {
         return await SiteMapService.getSiteMapTree();

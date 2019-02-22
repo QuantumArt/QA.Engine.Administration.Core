@@ -4,6 +4,7 @@ import { Card, Tab, TabId, Tabs } from '@blueprintjs/core';
 import NavigationStore, { Pages, TabTypes } from 'stores/NavigationStore';
 import CommonTab from './CommonTab';
 import WidgetsTab from './WidgetsTab';
+import ContentVersionTab from './ContentVersionTab';
 
 interface Props {
     navigationStore?: NavigationStore;
@@ -32,6 +33,7 @@ export default class TabsContainer extends React.Component<Props> {
                         [
                             <Tab key={TabTypes.COMMON} id={TabTypes.COMMON} title="Common" panel={<CommonTab />} />,
                             <Tab key={TabTypes.WIDGETS} id={TabTypes.WIDGETS} title="Widgets" panel={<WidgetsTab />} />,
+                            <Tab key={TabTypes.CONTENT_VERSIONS} id={TabTypes.CONTENT_VERSIONS} title="Content versions" panel={<ContentVersionTab />} />,
                         ] :
                         [
                             <Tab key={TabTypes.COMMON} id={TabTypes.COMMON} title="Common" panel={<CommonTab />} />,

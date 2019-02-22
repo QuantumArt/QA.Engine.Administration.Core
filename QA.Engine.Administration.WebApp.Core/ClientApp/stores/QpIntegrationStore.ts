@@ -13,13 +13,13 @@ export enum VersionType {
 }
 
 export default class QpIntegrationStore {
-    constructor(siteTreeStore: TreeStore) {
-        this.siteTreeStore = siteTreeStore;
+    constructor(treeStore: TreeStore) {
+        this.treeStore = treeStore;
     }
 
     private qpContent: QpContentModel;
     private qpAbstractItem: string = 'QPAbstractItem';
-    private readonly siteTreeStore: TreeStore;
+    private readonly treeStore: TreeStore;
 
     private async fetchQPAbstractItemFields() {
         try {
@@ -36,9 +36,12 @@ export default class QpIntegrationStore {
 
     private async updateSiteMapSubTree(id: number) {
         try {
-            const tree = this.siteTreeStore.resolveTreeStore();
+            const tree = this.treeStore.resolveTreeStore();
             if (tree instanceof SiteTreeStore) {
-                tree.updateSubTree(id);
+                await tree.updateSubTree(id);
+                const contentVersionStore = this.treeStore.getContentVersionsStore();
+                const selectedNode = tree.selectedNode;
+                contentVersionStore.init(selectedNode);
             }
         } catch (e) {
             console.error(e);
