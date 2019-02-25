@@ -4,7 +4,9 @@
     "jsRules": {},
     "rules": {
       "max-line-length": [true, {"limit": 120, "ignore-pattern": "^\\s*(.+)$"}],
-      "ter-indent": [true, 4]
+      "ter-indent": [true, 4, {
+        "SwitchCase": 1
+      }]
     },
     "rulesDirectory": []
 }
