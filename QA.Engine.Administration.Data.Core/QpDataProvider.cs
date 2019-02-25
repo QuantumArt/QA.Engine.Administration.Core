@@ -43,11 +43,11 @@ namespace QA.Engine.Administration.Data.Core
         public void Edit(int siteId, int contentId, int userId, EditData editData)
         {
             var columnNames = GetColumnNamesByNetNames(siteId, new List<string> { nameof(editData.Title), nameof(editData.IsVisible), nameof(editData.IsInSiteMap) });
-            if (columnNames.ContainsKey(nameof(editData.Title)))
+            if (!columnNames.ContainsKey(nameof(editData.Title)))
                 throw new Exception("NetName для поля Title не найдено.");
-            if (columnNames.ContainsKey(nameof(editData.IsVisible)))
+            if (!columnNames.ContainsKey(nameof(editData.IsVisible)))
                 throw new Exception("NetName для поля IsVisible не найдено.");
-            if (columnNames.ContainsKey(nameof(editData.IsInSiteMap)))
+            if (!columnNames.ContainsKey(nameof(editData.IsInSiteMap)))
                 throw new Exception("NetName для поля IsInSiteMap не найдено.");
 
             _qpDbConnector.BeginTransaction(IsolationLevel.Serializable);
@@ -56,8 +56,8 @@ namespace QA.Engine.Administration.Data.Core
             {
                 { ContentItemIdFieldName, editData.ItemId.ToString(CultureInfo.InvariantCulture) },
                 { columnNames[nameof(editData.Title)], editData.Title },
-                { columnNames[nameof(editData.IsVisible)], editData.IsVisible.ToString() },
-                { columnNames[nameof(editData.IsInSiteMap)], editData.IsInSiteMap.ToString() }
+                { columnNames[nameof(editData.IsVisible)], Convert.ToInt32(editData.IsVisible).ToString() },
+                { columnNames[nameof(editData.IsInSiteMap)], Convert.ToInt32(editData.IsInSiteMap).ToString() }
             };
 
             _qpDbConnector.DbConnector.MassUpdate(contentId, new[] { value }, userId);
