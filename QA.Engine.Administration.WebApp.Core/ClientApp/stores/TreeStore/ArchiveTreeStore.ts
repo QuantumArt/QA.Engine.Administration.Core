@@ -2,6 +2,7 @@ import SiteMapService from 'services/SiteMapService';
 import { BaseTreeState } from 'stores/TreeStore/BaseTreeStore';
 import OperationState from 'enums/OperationState';
 import ContextMenuType from 'enums/ContextMenuType';
+import TreeErrors from 'enums/TreeErrors';
 
 export default class ArchiveTreeStore extends BaseTreeState<ArchiveModel> {
 
@@ -28,7 +29,10 @@ export default class ArchiveTreeStore extends BaseTreeState<ArchiveModel> {
             }
         } catch (e) {
             this.treeState = OperationState.ERROR;
-            console.error(e);
+            this.treeErrors.push({
+                type: TreeErrors.restore,
+                data: model,
+            });
         }
     }
 
@@ -45,7 +49,10 @@ export default class ArchiveTreeStore extends BaseTreeState<ArchiveModel> {
             }
         } catch (e) {
             this.treeState = OperationState.ERROR;
-            console.error(e);
+            this.treeErrors.push({
+                type: TreeErrors.delete,
+                data: model,
+            });
         }
     }
 }
