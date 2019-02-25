@@ -50,10 +50,6 @@ export default class SiteTreeMenu extends React.Component<Props> {
         popupStore.show(itemId, PopupType.ARCHIVE, 'Отправить в архив');
     }
 
-    private updateClick = () => {
-        this.props.treeStore.updateSubTree();
-    }
-
     private handleClick = (e: React.MouseEvent<HTMLElement>, cb: () => void) => {
         e.stopPropagation();
         this.props.node.isContextMenuActive = false;
@@ -68,11 +64,6 @@ export default class SiteTreeMenu extends React.Component<Props> {
     render() {
         return (
             <Menu>
-                <MenuItem
-                    onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.updateClick)}
-                    icon="refresh"
-                    text="Обновить"
-                />
                 <MenuItem
                     onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.handlerExample)}
                     icon="eye-open"

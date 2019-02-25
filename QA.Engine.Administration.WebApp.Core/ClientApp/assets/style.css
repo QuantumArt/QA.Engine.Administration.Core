@@ -8,6 +8,10 @@ body {
     padding: 10px;
 }
 
+.input-short {
+    width: 250px;
+}
+
 .site-tree {
     margin-right: 6px;
     margin-left: 6px;
@@ -28,7 +32,27 @@ body {
 }
 
 .tab-content {
-    padding: 25px 10px 0;
+    padding: 25px 0 0;
+}
+
+.tab-entity {
+    margin-bottom: 15px;
+}
+
+.tab-entity:last-child {
+    margin-bottom: 0;
+}
+
+.tab-entity p {
+    margin-bottom: 0;
+}
+
+.tab-entity small {
+    font-style: italic;
+}
+
+.tab-entity .extension-header {
+    margin-bottom: 5px;
 }
 
 .context-button.bp3-button.bp3-minimal:active,

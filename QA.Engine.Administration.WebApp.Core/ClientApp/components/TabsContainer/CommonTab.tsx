@@ -90,11 +90,10 @@ export default class CommonTab extends React.Component<Props> {
                         </div>
                         <div className="tab-entity">
                             <H5>Title</H5>
-                            {isEditable ? (
-                                <InputGroup value={title} onChange={this.changeTitle} />
-                                ) : (
+                            {isEditable ?
+                                <InputGroup className="input-short" value={title} onChange={this.changeTitle} /> :
                                 <p>{title}</p>
-                            )}
+                            }
                         </div>
                         <div className="tab-entity">
                             <H5>Type Name</H5>
@@ -113,7 +112,7 @@ export default class CommonTab extends React.Component<Props> {
                         <div className="tab-entity">
                             <Checkbox checked={isVisible} onChange={this.changeIsVisible} disabled={!isEditable}>Visible</Checkbox>
                         </div>
-                        {isEditable ? (<ExtensionCard />) : null}
+                        {isEditable && <ExtensionCard />}
                     </div>
                 </div>
             );
