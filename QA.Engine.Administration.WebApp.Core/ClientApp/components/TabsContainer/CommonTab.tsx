@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { observer, inject } from 'mobx-react';
-import { Button, Navbar, NavbarGroup, H5, Intent, Spinner, InputGroup } from '@blueprintjs/core';
+import { Button, Navbar, NavbarGroup, H5, Intent, Spinner, InputGroup, Checkbox } from '@blueprintjs/core';
 import ExtensionCard from './ExtensionCard';
 import OperationState from 'enums/OperationState';
 import NavigationStore from 'stores/NavigationStore';
@@ -21,9 +21,7 @@ interface Props {
 export default class CommonTab extends React.Component<Props> {
 
     private refreshClick = () => {
-        const { treeStore } = this.props;
-        const tree = treeStore.resolveTreeStore();
-        tree.updateSubTree(tree.selectedNode.id);
+        this.props.treeStore.updateSubTree();
     }
 
     private editClick = () => {
@@ -38,6 +36,8 @@ export default class CommonTab extends React.Component<Props> {
         const model: EditModel = {
             itemId: tree.selectedNode.id,
             title: editArticleStore.title,
+            isVisible: editArticleStore.isVisible,
+            isInSiteMap: editArticleStore.isInSiteMap,
             extensionId: tree.selectedNode.extensionId,
             fields: editArticleStore.changedFields,
         };
@@ -51,9 +51,18 @@ export default class CommonTab extends React.Component<Props> {
         editArticleStore.setTitle(e.target.value);
     }
 
+    private changeIsVisible = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { editArticleStore } = this.props;
+        editArticleStore.setIsVisible(e.target.checked);
+    }
+
+    private changeIsInSiteMap = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { editArticleStore } = this.props;
+        editArticleStore.setIsInSiteMap(e.target.checked);
+    }
+
     render() {
-        const { treeStore, editArticleStore } = this.props;
-        const title = editArticleStore.title;
+        const { treeStore, editArticleStore: { title, isVisible, isInSiteMap, isEditable } } = this.props;
         const tree = treeStore.resolveTreeStore();
         if (tree.selectedNode == null) {
             return null;
@@ -68,8 +77,10 @@ export default class CommonTab extends React.Component<Props> {
                     <Navbar className="tab-navbar">
                         <NavbarGroup>
                             <Button minimal icon="refresh" text="Refresh" onClick={this.refreshClick}/>
-                            <Button minimal icon="edit" text="Edit" intent={Intent.PRIMARY} onClick={this.editClick} />
-                            <Button minimal icon="saved" text="Save" intent={Intent.SUCCESS} onClick={this.saveClick} />
+                            {isEditable ? [
+                                <Button key={1} minimal icon="edit" text="Edit" intent={Intent.PRIMARY} onClick={this.editClick} />,
+                                <Button key={2} minimal icon="saved" text="Save" intent={Intent.SUCCESS} onClick={this.saveClick} />,
+                            ] : null}
                         </NavbarGroup>
                     </Navbar>
                     <div className="tab-content">
@@ -79,7 +90,11 @@ export default class CommonTab extends React.Component<Props> {
                         </div>
                         <div className="tab-entity">
                             <H5>Title</H5>
-                            <InputGroup value={title} onChange={this.changeTitle} />
+                            {isEditable ? (
+                                <InputGroup value={title} onChange={this.changeTitle} />
+                                ) : (
+                                <p>{title}</p>
+                            )}
                         </div>
                         <div className="tab-entity">
                             <H5>Type Name</H5>
@@ -90,18 +105,15 @@ export default class CommonTab extends React.Component<Props> {
                             <p>{selectedNode.alias}</p>
                         </div>
                         <div className="tab-entity">
-                            <H5>Status</H5>
-                            <p>{selectedNode.published ? 'Published' : 'Not published'}</p>
+                            <Checkbox checked={selectedNode.published} disabled={true}>Published</Checkbox>
                         </div>
                         <div className="tab-entity">
-                            <H5>View in the site map</H5>
-                            <p>{selectedNode.isInSiteMap ? 'Yes' : 'No'}</p>
+                            <Checkbox checked={isInSiteMap} onChange={this.changeIsInSiteMap} disabled={!isEditable}>View in the site map</Checkbox>
                         </div>
                         <div className="tab-entity">
-                            <H5>Visible</H5>
-                            <p>{selectedNode.isVisible ? 'Yes' : 'No'}</p>
+                            <Checkbox checked={isVisible} onChange={this.changeIsVisible} disabled={!isEditable}>Visible</Checkbox>
                         </div>
-                        <ExtensionCard />
+                        {isEditable ? (<ExtensionCard />) : null}
                     </div>
                 </div>
             );

@@ -5,10 +5,14 @@ import SiteMapService from 'services/SiteMapService';
 export default class EditArticleStore {
 
     @observable public title: string;
+    @observable public isVisible: boolean;
+    @observable public isInSiteMap: boolean;
+
     @observable public state: OperationState = OperationState.NONE;
     @observable public fields: ExtensionFieldModel[] = [];
     @observable public isShowExtensionFields: boolean = false;
     public node: PageModel | ArchiveModel;
+    public isEditable: boolean;
     private extensionFieldsJson: string = JSON.stringify([]);
 
     @computed
@@ -24,12 +28,23 @@ export default class EditArticleStore {
     init(node: PageModel | ArchiveModel) {
         this.node = node;
         this.title = node.title;
+        this.isVisible = node.isVisible;
+        this.isInSiteMap = node.isInSiteMap;
         this.isShowExtensionFields = false;
+        this.isEditable = !node.isArchive;
     }
 
     @action
     setTitle(title: string) {
         this.title = title;
+    }
+    @action
+    setIsVisible(isVisible: boolean) {
+        this.isVisible = isVisible;
+    }
+    @action
+    setIsInSiteMap(isInSiteMap: boolean) {
+        this.isInSiteMap = isInSiteMap;
     }
 
     @action

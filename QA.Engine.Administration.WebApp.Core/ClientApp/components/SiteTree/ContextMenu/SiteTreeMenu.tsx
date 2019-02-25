@@ -51,12 +51,7 @@ export default class SiteTreeMenu extends React.Component<Props> {
     }
 
     private updateClick = () => {
-        const { treeStore, itemId } = this.props;
-        treeStore.resolveTreeStore().updateSubTree(itemId).then(() => {
-            const selectedNode = treeStore.resolveTreeStore().selectedNode;
-            [treeStore.getContentVersionsStore(), treeStore.getWidgetStore()]
-                    .forEach(x => x.init(selectedNode));
-        });
+        this.props.treeStore.updateSubTree();
     }
 
     private handleClick = (e: React.MouseEvent<HTMLElement>, cb: () => void) => {

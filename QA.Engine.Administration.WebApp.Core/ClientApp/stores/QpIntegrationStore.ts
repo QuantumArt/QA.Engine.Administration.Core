@@ -34,15 +34,9 @@ export default class QpIntegrationStore {
         }
     }
 
-    private async updateSiteMapSubTree(id: number) {
+    private updateSiteMapSubTree() {
         try {
-            const tree = this.treeStore.resolveTreeStore();
-            if (tree instanceof SiteTreeStore) {
-                await tree.updateSubTree(id);
-                const selectedNode = tree.selectedNode;
-                [this.treeStore.getContentVersionsStore(), this.treeStore.getWidgetStore()]
-                    .forEach(x => x.init(selectedNode));
-            }
+            this.treeStore.updateSubTree();
         } catch (e) {
             console.error(e);
         }
@@ -160,7 +154,7 @@ export default class QpIntegrationStore {
         if (BackendEventObserver.EventType.ActionExecuted === eventType) {
             if (args.actionCode === QpActionCodes.update_article || args.actionCode === QpActionCodes.update_article_and_up) {
                 console.log('%cupdateCallback', 'color: magenta;', args);
-                this.updateSiteMapSubTree(id);
+                this.updateSiteMapSubTree();
                 return;
             }
         }
@@ -175,12 +169,12 @@ export default class QpIntegrationStore {
             if (args.actionCode === QpActionCodes.save_article || args.actionCode === QpActionCodes.save_article_and_up) {
                 // todo: update tree
                 console.log('%caddCallback', 'color: magenta;', args);
-                this.updateSiteMapSubTree(id);
+                this.updateSiteMapSubTree();
                 return;
             }  if (args.actionCode === QpActionCodes.update_article || args.actionCode === QpActionCodes.update_article_and_up) {
                 // todo: update tree
                 console.log('%caddCallback', 'color: magenta;', args);
-                this.updateSiteMapSubTree(id);
+                this.updateSiteMapSubTree();
                 return;
             }
         }

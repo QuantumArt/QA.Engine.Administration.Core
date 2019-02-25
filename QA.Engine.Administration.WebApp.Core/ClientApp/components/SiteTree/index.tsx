@@ -33,9 +33,11 @@ export default class SiteTree extends React.Component<Props> {
         const tree = treeStore.resolveTreeStore();
         tree.handleNodeClick(e);
         navigationStore.setDefaultTab(e.isSelected);
-        editArticleStore.init(tree.selectedNode);
-        treeStore.getContentVersionsStore().init(tree.selectedNode);
-        treeStore.getWidgetStore().init(tree.selectedNode);
+        [
+            editArticleStore,
+            treeStore.getContentVersionsStore(),
+            treeStore.getWidgetStore(),
+        ].forEach(x => x.init(tree.selectedNode));
     }
 
     render() {

@@ -29,7 +29,21 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
             this.widgetTree = [];
         } else {
             const node = selectedNode as PageModel;
-            this.widgetTree = node.widgets;
+            this.widgetTree = node.widgets.sort((a, b) => {
+                if (a.zoneName < b.zoneName) {
+                    return -1;
+                }
+                if (a.zoneName > b.zoneName) {
+                    return 1;
+                }
+                if (a.indexOrder < b.indexOrder) {
+                    return -1;
+                }
+                if (a.indexOrder > b.indexOrder) {
+                    return 1;
+                }
+                return 0;
+            });
         }
         this.selectedNode = null;
         this.fetchTree();
@@ -48,5 +62,12 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
             this.treeState = OperationState.ERROR;
             console.error(e);
         }
+    }
+
+    protected getTreeNodeLabel(model: WidgetModel): string {
+        if (model.zoneName == null) {
+            return model.title;
+        }
+        return `${model.title} | ${model.zoneName}`;
     }
 }

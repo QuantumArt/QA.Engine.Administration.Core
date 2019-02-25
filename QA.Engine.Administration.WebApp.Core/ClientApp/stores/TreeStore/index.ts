@@ -38,4 +38,14 @@ export default class TreeStore {
     public getWidgetStore(): WidgetTreeStore {
         return this.widgetStore;
     }
+
+    public updateSubTree(): void {
+        const current = this.resolveTreeStore();
+        const selectedNode = current.selectedNode;
+        current.updateSubTree(selectedNode.id).then(() => {
+            if (current instanceof SiteTreeStore) {
+                [this.contentVersionsStore, this.widgetStore].forEach(x => x.init(selectedNode));
+            }
+        });
+    }
 }

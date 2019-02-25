@@ -99,25 +99,6 @@ export abstract class BaseTreeState<T extends {
         }
     }
 
-    public getNodeById(id: number): T {
-        let elements = this.origTree;
-        let loop = true;
-        while (loop) {
-            loop = false;
-            const children: T[] = [];
-            const node = elements.filter(x => x.id === id)[0];
-            if (node != null) {
-                return node;
-            }
-            elements.filter(x => x.hasChildren).forEach((x) => {
-                x.children.forEach(y => children.push(<T>y));
-            });
-            loop = children.length > 0;
-            elements = children;
-        }
-        return null;
-    }
-
     protected async updateSubTreeInternal(id: number): Promise<any> {
         const response: ApiResult<T> = await this.getSubTree(id);
         if (response.isSuccess) {
@@ -158,11 +139,34 @@ export abstract class BaseTreeState<T extends {
         }
     }
 
+    protected getTreeNodeLabel(model: T): string {
+        return model.title;
+    }
+
     protected abstract async getTree(): Promise<ApiResult<T[]>>;
 
     protected abstract async getSubTree(id: number): Promise<ApiResult<T>>;
 
     protected abstract contextMenuType: ContextMenuType;
+
+    private getNodeById(id: number): T {
+        let elements = this.origTree;
+        let loop = true;
+        while (loop) {
+            loop = false;
+            const children: T[] = [];
+            const node = elements.filter(x => x.id === id)[0];
+            if (node != null) {
+                return node;
+            }
+            elements.filter(x => x.hasChildren).forEach((x) => {
+                x.children.forEach(y => children.push(<T>y));
+            });
+            loop = children.length > 0;
+            elements = children;
+        }
+        return null;
+    }
 
     private convertTree(data: T[]): void {
         const start = Date.now();
@@ -184,7 +188,7 @@ export abstract class BaseTreeState<T extends {
                 parentId: el.parentId,
                 versionOfId: el.versionOfId,
                 childNodes: [],
-                label: el.title,
+                label: this.getTreeNodeLabel(el),
                 isExpanded: false,
                 icon: getIcon(),
                 hasCaret: hasChildren,

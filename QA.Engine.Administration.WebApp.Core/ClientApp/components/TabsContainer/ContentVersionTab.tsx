@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { observer, inject } from 'mobx-react';
-import { Button, Navbar, NavbarGroup, H5, Intent, Spinner, InputGroup, Card } from '@blueprintjs/core';
+import { Button, Navbar, NavbarGroup, H5, Intent, Spinner, InputGroup, Card, Checkbox } from '@blueprintjs/core';
 import OperationState from 'enums/OperationState';
 import PopupStore from 'stores/PopupStore';
 import TreeStore from 'stores/TreeStore';
@@ -23,13 +23,7 @@ export default class ContentVersionTab extends React.Component<Props> {
     }
 
     private refreshClick = () => {
-        const { treeStore } = this.props;
-        const tree = treeStore.resolveTreeStore();
-        tree.updateSubTree(tree.selectedNode.id).then(() => {
-            const selectedNode = tree.selectedNode;
-            [treeStore.getContentVersionsStore(), treeStore.getWidgetStore()]
-                    .forEach(x => x.init(selectedNode));
-        });
+        this.props.treeStore.updateSubTree();
     }
 
     render() {
@@ -62,12 +56,10 @@ export default class ContentVersionTab extends React.Component<Props> {
                         <p>{selectedNode.alias}</p>
                     </div>
                     <div className="tab-entity">
-                        <H5>Status</H5>
-                        <p>{selectedNode.published ? 'Published' : 'Not published'}</p>
+                        <Checkbox checked={selectedNode.published} disabled={true}>Published</Checkbox>
                     </div>
                     <div className="tab-entity">
-                        <H5>Visible</H5>
-                        <p>{selectedNode.isVisible ? 'Yes' : 'No'}</p>
+                        <Checkbox checked={selectedNode.isVisible} disabled={true}>Visible</Checkbox>
                     </div>
                 </div>
             </Card>

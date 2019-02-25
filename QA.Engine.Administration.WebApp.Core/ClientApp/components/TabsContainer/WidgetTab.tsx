@@ -4,7 +4,7 @@ import PopupStore from 'stores/PopupStore';
 import TreeStore from 'stores/TreeStore';
 import PopupType from 'enums/PopupType';
 import OperationState from 'enums/OperationState';
-import { Spinner, Card, H5, Navbar, NavbarGroup, Button, Intent } from '@blueprintjs/core';
+import { Spinner, Card, H5, Navbar, NavbarGroup, Button, Intent, Checkbox } from '@blueprintjs/core';
 import WidgetTree from 'components/SiteTree/WidgetTree';
 
 interface Props {
@@ -23,13 +23,7 @@ export default class WidgetTab extends React.Component<Props> {
     }
 
     private refreshClick = () => {
-        const { treeStore } = this.props;
-        const tree = treeStore.resolveTreeStore();
-        tree.updateSubTree(tree.selectedNode.id).then(() => {
-            const selectedNode = tree.selectedNode;
-            [treeStore.getContentVersionsStore(), treeStore.getWidgetStore()]
-                    .forEach(x => x.init(selectedNode));
-        });
+        this.props.treeStore.updateSubTree();
     }
 
     render() {
@@ -62,12 +56,10 @@ export default class WidgetTab extends React.Component<Props> {
                         <p>{selectedNode.alias}</p>
                     </div>
                     <div className="tab-entity">
-                        <H5>Status</H5>
-                        <p>{selectedNode.published ? 'Published' : 'Not published'}</p>
+                        <Checkbox checked={selectedNode.published} disabled={true}>Published</Checkbox>
                     </div>
                     <div className="tab-entity">
-                        <H5>Visible</H5>
-                        <p>{selectedNode.isVisible ? 'Yes' : 'No'}</p>
+                        <Checkbox checked={selectedNode.isVisible} disabled={true}>Visible</Checkbox>
                     </div>
                 </div>
             </Card>

@@ -7,6 +7,7 @@ import TreeStore from 'stores/TreeStore';
 import ContextMenuType from 'enums/ContextMenuType';
 import SiteTreeMenu from './SiteTreeMenu';
 import ArchiveTreeMenu from './ArchiveTreeMenu';
+import WidgetTreeMenu from './WidgetTreeMenu';
 
 interface Props {
     treeStore?: TreeStore;
@@ -35,6 +36,8 @@ export default class ContextMenu extends React.Component<Props> {
         case ContextMenuType.CONTENTVERSION:
             elementMenu = <ContentVersionTreeMenu itemId={+node.id} node={node} />;
             break;
+        case ContextMenuType.WIDGET:
+            elementMenu = <WidgetTreeMenu itemId={+node.id} node={node} />;
         default:
             break;
         }

@@ -18,8 +18,7 @@ interface Props {
 export default class ArchiveTreeMenu extends React.Component<Props> {
 
     private updateClick = () => {
-        const { treeStore, itemId } = this.props;
-        treeStore.resolveTreeStore().updateSubTree(itemId);
+        this.props.treeStore.updateSubTree();
     }
 
     private restoreClick = () => {
