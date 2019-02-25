@@ -27,19 +27,20 @@ export default class ContextMenu extends React.Component<Props> {
         const { node } = this.props;
         let elementMenu: JSX.Element;
         switch (node.contextMenuType) {
-        case ContextMenuType.SITEMAP:
-            elementMenu = <SiteTreeMenu itemId={+node.id} node={node} />;
-            break;
-        case ContextMenuType.ARCHIVE:
-            elementMenu = <ArchiveTreeMenu itemId={+node.id} node={node} />;
-            break;
-        case ContextMenuType.CONTENTVERSION:
-            elementMenu = <ContentVersionTreeMenu itemId={+node.id} node={node} />;
-            break;
-        case ContextMenuType.WIDGET:
-            elementMenu = <WidgetTreeMenu itemId={+node.id} node={node} />;
-        default:
-            break;
+            case ContextMenuType.SITEMAP:
+                elementMenu = <SiteTreeMenu itemId={+node.id} node={node} />;
+                break;
+            case ContextMenuType.ARCHIVE:
+                elementMenu = <ArchiveTreeMenu itemId={+node.id} node={node} />;
+                break;
+            case ContextMenuType.CONTENTVERSION:
+                elementMenu = <ContentVersionTreeMenu itemId={+node.id} node={node} />;
+                break;
+            case ContextMenuType.WIDGET:
+                elementMenu = <WidgetTreeMenu itemId={+node.id} node={node} />;
+                break;
+            default:
+                break;
         }
 
         return node.isSelected ?

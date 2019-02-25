@@ -16,6 +16,7 @@ export interface ITreeElement extends ITreeNode {
 
 export interface TreeErrorModel {
     type: TreeErrors;
+    message: string;
     data?: any;
 }
 
@@ -58,7 +59,7 @@ export abstract class BaseTreeState<T extends {
             }
         } catch (e) {
             this.treeState = OperationState.ERROR;
-            this.treeErrors.push({ type: TreeErrors.fetch });
+            this.treeErrors.push({ type: TreeErrors.fetch, message: e });
         }
     }
 
@@ -107,27 +108,9 @@ export abstract class BaseTreeState<T extends {
             this.treeErrors.push({
                 type: TreeErrors.update,
                 data: id,
+                message: e,
             });
         }
-    }
-
-    public getNodeById(id: number): T {
-        let elements = this.origTree;
-        let loop = true;
-        while (loop) {
-            loop = false;
-            const children: T[] = [];
-            const node = elements.filter(x => x.id === id)[0];
-            if (node != null) {
-                return node;
-            }
-            elements.filter(x => x.hasChildren).forEach((x) => {
-                x.children.forEach(y => children.push(<T>y));
-            });
-            loop = children.length > 0;
-            elements = children;
-        }
-        return null;
     }
 
     @action

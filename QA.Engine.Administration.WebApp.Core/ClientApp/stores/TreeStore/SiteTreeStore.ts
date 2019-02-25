@@ -32,6 +32,7 @@ export default class SiteTreeStore extends BaseTreeState<PageModel> {
             this.treeErrors.push({
                 type: TreeErrors.publish,
                 data: itemIds,
+                message: e,
             });
         }
     }
@@ -51,6 +52,7 @@ export default class SiteTreeStore extends BaseTreeState<PageModel> {
             this.treeErrors.push({
                 type: TreeErrors.archive,
                 data: model,
+                message: e,
             });
         }
     }
@@ -67,9 +69,11 @@ export default class SiteTreeStore extends BaseTreeState<PageModel> {
             }
         } catch (e) {
             this.treeState = OperationState.ERROR;
+            console.log(e);
             this.treeErrors.push({
                 type: TreeErrors.edit,
                 data: model,
+                message: e,
             });
         }
     }

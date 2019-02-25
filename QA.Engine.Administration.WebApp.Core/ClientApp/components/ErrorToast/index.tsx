@@ -75,7 +75,7 @@ export default class ErrorToast extends React.Component<Props> {
             <Toaster>
                 {tree.treeState === OperationState.ERROR && tree.treeErrors.map((e, i) => (
                     <Toast
-                        message={e.type}
+                        message={`${e.type}. ${e.message}`}
                         icon="warning-sign"
                         intent={Intent.DANGER}
                         action={{

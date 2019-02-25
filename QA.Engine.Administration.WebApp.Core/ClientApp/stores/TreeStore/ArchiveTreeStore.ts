@@ -32,6 +32,7 @@ export default class ArchiveTreeStore extends BaseTreeState<ArchiveModel> {
             this.treeErrors.push({
                 type: TreeErrors.restore,
                 data: model,
+                message: e,
             });
         }
     }
@@ -52,6 +53,7 @@ export default class ArchiveTreeStore extends BaseTreeState<ArchiveModel> {
             this.treeErrors.push({
                 type: TreeErrors.delete,
                 data: model,
+                message: e,
             });
         }
     }
