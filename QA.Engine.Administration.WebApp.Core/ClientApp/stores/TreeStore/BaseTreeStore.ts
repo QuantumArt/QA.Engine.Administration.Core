@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { action, observable, computed } from 'mobx';
+import v4 from 'uuid/v4';
 import { IconName, ITreeNode } from '@blueprintjs/core';
 import ContextMenu from 'components/SiteTree/ContextMenu';
 import OperationState from 'enums/OperationState';
@@ -18,6 +19,7 @@ export interface TreeErrorModel {
     type: TreeErrors;
     message: string;
     data?: any;
+    id: string;
 }
 
 /**
@@ -59,7 +61,11 @@ export abstract class BaseTreeState<T extends {
             }
         } catch (e) {
             this.treeState = OperationState.ERROR;
-            this.treeErrors.push({ type: TreeErrors.fetch, message: e });
+            this.treeErrors.push({
+                type: TreeErrors.fetch,
+                message: e,
+                id: v4(),
+            });
         }
     }
 
@@ -109,6 +115,7 @@ export abstract class BaseTreeState<T extends {
                 type: TreeErrors.update,
                 data: id,
                 message: e,
+                id: v4(),
             });
         }
     }

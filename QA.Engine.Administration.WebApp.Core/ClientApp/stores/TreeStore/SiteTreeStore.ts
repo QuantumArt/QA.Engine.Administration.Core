@@ -1,23 +1,13 @@
+import v4 from 'uuid/v4';
 import SiteMapService from 'services/SiteMapService';
 import { BaseTreeState } from 'stores/TreeStore/BaseTreeStore';
 import OperationState from 'enums/OperationState';
 import ContextMenuType from 'enums/ContextMenuType';
 import TreeErrors from 'enums/TreeErrors';
 
-
 export default class SiteTreeStore extends BaseTreeState<PageModel> {
 
-    protected contextMenuType: ContextMenuType = ContextMenuType.SITEMAP;
-
-    protected async getTree(): Promise<ApiResult<PageModel[]>> {
-        return await SiteMapService.getSiteMapTree();
-    }
-
-    protected getSubTree(id: number): Promise<ApiResult<PageModel>> {
-        return SiteMapService.getSiteMapSubTree(id);
-    }
-
-    async publish(itemIds: number[]): Promise<void> {
+    public async publish(itemIds: number[]): Promise<void> {
         this.treeState = OperationState.PENDING;
         try {
             const response: ApiResult<any> = await SiteMapService.publish(itemIds);
@@ -33,11 +23,12 @@ export default class SiteTreeStore extends BaseTreeState<PageModel> {
                 type: TreeErrors.publish,
                 data: itemIds,
                 message: e,
+                id: v4(),
             });
         }
     }
 
-    async archive(model: RemoveModel): Promise<void> {
+    public async archive(model: RemoveModel): Promise<void> {
         this.treeState = OperationState.PENDING;
         try {
             const response: ApiResult<any> = await SiteMapService.archive(model);
@@ -53,11 +44,12 @@ export default class SiteTreeStore extends BaseTreeState<PageModel> {
                 type: TreeErrors.archive,
                 data: model,
                 message: e,
+                id: v4(),
             });
         }
     }
 
-    async edit(model: EditModel): Promise<void> {
+    public async edit(model: EditModel): Promise<void> {
         this.treeState = OperationState.PENDING;
         try {
             const response: ApiResult<any> = await SiteMapService.edit(model);
@@ -69,12 +61,22 @@ export default class SiteTreeStore extends BaseTreeState<PageModel> {
             }
         } catch (e) {
             this.treeState = OperationState.ERROR;
-            console.log(e);
             this.treeErrors.push({
                 type: TreeErrors.edit,
                 data: model,
                 message: e,
+                id: v4(),
             });
         }
+    }
+
+    protected contextMenuType: ContextMenuType = ContextMenuType.SITEMAP;
+
+    protected async getTree(): Promise<ApiResult<PageModel[]>> {
+        return await SiteMapService.getSiteMapTree();
+    }
+
+    protected getSubTree(id: number): Promise<ApiResult<PageModel>> {
+        return SiteMapService.getSiteMapSubTree(id);
     }
 }

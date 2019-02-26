@@ -34,6 +34,7 @@ export default class WidgetTreeMenu extends React.Component<Props> {
 
     private publishClick = () => {
         const { treeStore, itemId } = this.props;
+        console.log(itemId, 'widgettree');
         treeStore.getWidgetStore().publish([itemId]);
     }
 
