@@ -69,7 +69,11 @@ export default class QpIntegrationStore {
         this.executeWindow(executeOptions);
     }
 
-    public async add(node: PageModel, versionType?: VersionType | null, name?: string, title?: string, discriminatorId?: number, extantionId?: number) {
+    public async add<T extends {
+        id: number,
+        parentId?: null | number,
+        alias: string,
+        title:string }>(node: T, versionType?: VersionType | null, name?: string, title?: string, discriminatorId?: number, extantionId?: number) {
 
         if (this.qpContent == null || this.qpContent.fields == null || this.qpContent.fields!.length === 0) {
             await this.fetchQPAbstractItemFields();
@@ -100,23 +104,22 @@ export default class QpIntegrationStore {
             executeOptions.options.initFieldValues = QpIntegrationUtils.getFieldValues(this.qpContent.fields, model);
         } else {
             switch (versionType) {
-            case VersionType.Structural:
-                executeOptions.options.disabledFields = QpIntegrationUtils.getDefaultDisabledFields(this.qpContent.fields, [
-                    QpAbstractItemFields.contentName,
-                ]);
-                executeOptions.options.initFieldValues = QpIntegrationUtils.getFieldValues(
+                case VersionType.Structural:
+                    executeOptions.options.disabledFields = QpIntegrationUtils.getDefaultDisabledFields(this.qpContent.fields, [
+                        QpAbstractItemFields.contentName,
+                    ]);
+                    executeOptions.options.initFieldValues = QpIntegrationUtils.getFieldValues(
                     this.qpContent.fields,
                     new FieldValueModel(node.parentId, discriminatorId, node.alias, node.title, extantionId));
-                break;
-            case VersionType.Content:
-                executeOptions.options.hideFields = QpIntegrationUtils.getDefaultHideFields(this.qpContent.fields);
-                executeOptions.options.initFieldValues = QpIntegrationUtils.getFieldValues(
+                    break;
+                case VersionType.Content:
+                    executeOptions.options.hideFields = QpIntegrationUtils.getDefaultHideFields(this.qpContent.fields);
+                    executeOptions.options.initFieldValues = QpIntegrationUtils.getFieldValues(
                     this.qpContent.fields,
-                    new FieldValueModel(null, discriminatorId, null, node.title, extantionId),
-                    [
+                    new FieldValueModel(null, discriminatorId, null, node.title, extantionId), [
                         { fieldName: QpAbstractItemFields.versionOf, value: node.id },
                     ]);
-                break;
+                    break;
             }
         }
 
@@ -206,7 +209,7 @@ class QpIntegrationUtils {
             QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.parent),
             QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.discriminator),
             QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.isPage),
-            QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.zoneName),
+            // QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.zoneName),
             QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.extensionId),
             QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.versionOf),
             QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.indexOrder),
@@ -217,7 +220,7 @@ class QpIntegrationUtils {
 
     static getDefaultHideFields = (qpfields: QpFieldModel[], fields: string[] = []): string[] => {
         const result = [
-            QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.zoneName),
+            // QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.zoneName),
             QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.indexOrder),
             QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.isPage),
         ];

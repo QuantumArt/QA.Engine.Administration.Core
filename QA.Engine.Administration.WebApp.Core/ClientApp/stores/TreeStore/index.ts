@@ -39,13 +39,15 @@ export default class TreeStore {
         return this.widgetStore;
     }
 
-    public updateSubTree(): void {
-        const current = this.resolveTreeStore();
-        const selectedNode = current.selectedNode;
-        current.updateSubTree(selectedNode.id).then(() => {
-            if (current instanceof SiteTreeStore) {
-                [this.contentVersionsStore, this.widgetStore].forEach(x => x.init(selectedNode));
-            }
-        });
+    public async updateSubTree(): Promise<any> {
+        let current = this.resolveTreeStore();
+        let selectedNode = current.selectedNode;
+        await current.updateSubTree(selectedNode.id);
+
+        current = this.resolveTreeStore();
+        if (current instanceof SiteTreeStore) {
+            selectedNode = current.selectedNode;
+            [this.contentVersionsStore, this.widgetStore].forEach(x => x.init(selectedNode));
+        }
     }
 }

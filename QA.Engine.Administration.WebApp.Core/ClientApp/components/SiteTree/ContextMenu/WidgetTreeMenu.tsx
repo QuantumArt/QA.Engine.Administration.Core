@@ -22,6 +22,11 @@ interface Props {
 @observer
 export default class WidgetTreeMenu extends React.Component<Props> {
 
+    private addClick = () => {
+        const { popupStore, itemId, textStore } = this.props;
+        popupStore.show(itemId, PopupType.ADDWIDGET, textStore.texts[Texts.popupAddWidgetTitle]);
+    }
+
     private editClick = () => {
         const { qpIntegrationStore, itemId } = this.props;
         qpIntegrationStore.edit(itemId);
@@ -75,6 +80,11 @@ export default class WidgetTreeMenu extends React.Component<Props> {
                     intent={Intent.SUCCESS}
                 />
                 <MenuDivider/>
+                <MenuItem
+                    onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.addClick)}
+                    icon="new-object"
+                    text={textStore.texts[Texts.addItem]}
+                    intent={Intent.PRIMARY}/>
                 <MenuItem
                     onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.editClick)}
                     icon="edit"

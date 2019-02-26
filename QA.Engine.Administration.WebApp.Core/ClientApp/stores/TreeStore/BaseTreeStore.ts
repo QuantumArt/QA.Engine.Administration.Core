@@ -36,7 +36,7 @@ export abstract class BaseTreeState<T extends {
     @observable public treeErrors: TreeErrorModel[] = [];
     @observable public selectedNode: T;
 
-    private treeInternal: ITreeElement[];
+    protected treeInternal: ITreeElement[];
 
     @computed
     get tree(): ITreeElement[] {
@@ -158,10 +158,6 @@ export abstract class BaseTreeState<T extends {
         }
     }
 
-    protected getTreeNodeLabel(model: T): string {
-        return model.title;
-    }
-
     protected abstract async getTree(): Promise<ApiResult<T[]>>;
 
     protected abstract async getSubTree(id: number): Promise<ApiResult<T>>;
@@ -187,44 +183,44 @@ export abstract class BaseTreeState<T extends {
         return null;
     }
 
-    private convertTree(data: T[]): void {
-        const mapElement = (el: T): ITreeElement => {
-            const hasChildren = el.hasChildren;
-            const isRootNode = el.parentId === null;
-            const getIcon = (): IconName => {
-                if (isRootNode) {
-                    return 'application';
-                }
-                if (!hasChildren) {
-                    return 'document';
-                }
-                return 'folder-close';
-            };
-
-            const treeElement = observable<ITreeElement>({
-                id: el.id,
-                parentId: el.parentId,
-                versionOfId: el.versionOfId,
-                childNodes: [],
-                label: this.getTreeNodeLabel(el),
-                isExpanded: false,
-                icon: getIcon(),
-                hasCaret: hasChildren,
-                isContextMenuActive: false,
-                contextMenuType: this.contextMenuType,
-            });
-            treeElement.secondaryLabel = React.createElement(ContextMenu, {
-                node: treeElement,
-            });
-
-            return treeElement;
+    protected mapElement(el: T): ITreeElement {
+        const hasChildren = el.hasChildren;
+        const isRootNode = el.parentId === null;
+        const getIcon = (): IconName => {
+            if (isRootNode) {
+                return 'application';
+            }
+            if (!hasChildren) {
+                return 'document';
+            }
+            return 'folder-close';
         };
 
+        const treeElement = observable<ITreeElement>({
+            id: el.id,
+            parentId: el.parentId,
+            versionOfId: el.versionOfId,
+            childNodes: [],
+            label: el.title,
+            isExpanded: false,
+            icon: getIcon(),
+            hasCaret: hasChildren,
+            isContextMenuActive: false,
+            contextMenuType: this.contextMenuType,
+        });
+        treeElement.secondaryLabel = React.createElement(ContextMenu, {
+            node: treeElement,
+        });
+
+        return treeElement;
+    }
+
+    protected convertTree(data: T[]): void {
         let elements = data;
         let loop = true;
 
         let hMap = new Map<number, ITreeElement>();
-        elements.forEach(x => hMap.set(x.id, mapElement(x)));
+        elements.forEach(x => hMap.set(x.id, this.mapElement(x)));
         const tree: ITreeElement[] = Array.from(hMap.values());
 
         while (loop) {
@@ -238,7 +234,7 @@ export abstract class BaseTreeState<T extends {
             });
             children.forEach((x) => {
                 loop = true;
-                const el = mapElement(x);
+                const el = this.mapElement(x);
                 const parentId = el.parentId == null ? el.versionOfId : el.parentId;
                 const treeEl = hMap.get(parentId);
                 if (treeEl != null) {

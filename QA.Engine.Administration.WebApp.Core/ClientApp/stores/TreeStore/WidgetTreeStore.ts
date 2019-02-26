@@ -1,5 +1,5 @@
 import SiteMapService from 'services/SiteMapService';
-import { BaseTreeState } from 'stores/TreeStore/BaseTreeStore';
+import { BaseTreeState, ITreeElement } from 'stores/TreeStore/BaseTreeStore';
 import ContextMenuType from 'enums/ContextMenuType';
 import OperationState from 'enums/OperationState';
 import { observable, action } from 'mobx';
@@ -10,7 +10,7 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
 
     private widgetTree: WidgetModel[];
 
-    protected contextMenuType: ContextMenuType = ContextMenuType.CONTENTVERSION;
+    protected contextMenuType: ContextMenuType = ContextMenuType.WIDGET;
 
     protected async getTree(): Promise<ApiResult<WidgetModel[]>> {
         return await new Promise<ApiResult<WidgetModel[]>>((resolve) => {
@@ -26,6 +26,12 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
     protected getSubTree(id: number): Promise<ApiResult<WidgetModel>> {
         return SiteMapService.getSiteMapSubTree(id);
     }
+
+    @action
+    public handleNodeExpand = (nodeData: ITreeElement) => nodeData.isExpanded = true
+
+    @action
+    public handleNodeCollapse = (nodeData: ITreeElement) => nodeData.isExpanded = false
 
     @action
     public init(selectedNode: any) {
@@ -69,10 +75,79 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
         }
     }
 
-    protected getTreeNodeLabel(model: WidgetModel): string {
-        if (model.zoneName == null) {
-            return model.title;
+    protected convertTree(data: WidgetModel[]): void {
+        let elements = data;
+        let loop = true;
+
+        let hMap = new Map<number, ITreeElement>();
+        const tree: ITreeElement[] = [];
+        elements.forEach((x) => {
+            const zoneItem = tree.find(t => t.label === x.zoneName);
+            const treeItem = this.mapElement(x);
+            hMap.set(x.id, treeItem);
+            if (zoneItem == null) {
+                const item = this.mapWidgetZoneElement(x);
+                item.childNodes.push(treeItem);
+                tree.push(item);
+            } else {
+                zoneItem.childNodes.push(treeItem);
+            }
+        });
+
+        while (loop) {
+            loop = false;
+            const childNodes = new Map<number, ITreeElement>();
+            let children: WidgetModel[] = [];
+            elements.forEach((x) => {
+                if (x.hasChildren) {
+                    children = children.concat(x.children);
+                }
+            });
+            children.forEach((x) => {
+                loop = true;
+                const zoneEl = this.mapWidgetZoneElement(x);
+                const el = this.mapElement(x);
+                const parentId = el.parentId == null ? el.versionOfId : el.parentId;
+                const treeEl = hMap.get(parentId);
+                if (treeEl != null) {
+                    const zone = treeEl.childNodes.find(t => t.label === x.zoneName);
+                    if (zone == null) {
+                        zoneEl.childNodes.push(el);
+                        treeEl.childNodes.push(zoneEl);
+                    } else {
+                        zone.childNodes.push(el);
+                    }
+                    childNodes.set(+el.id, el);
+                }
+            });
+            if (childNodes.size !== children.length) {
+                loop = false;
+                throw 'error tree convert';
+            }
+            hMap = childNodes;
+            elements = children;
         }
-        return `${model.title} | ${model.zoneName}`;
+        this.treeInternal = tree;
+    }
+
+    protected mapElement(el: WidgetModel): ITreeElement {
+        const treeElement = super.mapElement(el);
+        treeElement.icon = 'document';
+        return treeElement;
+    }
+
+    private mapWidgetZoneElement(x: WidgetModel): ITreeElement {
+        const treeElement = observable<ITreeElement>({
+            id: x.zoneName,
+            childNodes: [],
+            label: x.zoneName,
+            isExpanded: false,
+            icon: 'folder-close',
+            hasCaret: true,
+            isContextMenuActive: false,
+            parentId: x.parentId,
+            contextMenuType: null,
+        });
+        return treeElement;
     }
 }
