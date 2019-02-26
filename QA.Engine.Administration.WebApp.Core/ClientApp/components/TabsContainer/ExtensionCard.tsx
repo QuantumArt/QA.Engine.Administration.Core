@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { inject, observer } from 'mobx-react';
-import { AnchorButton, InputGroup } from '@blueprintjs/core';
+import { AnchorButton, H5, InputGroup, Spinner } from '@blueprintjs/core';
 import OperationState from 'enums/OperationState';
 import EditArticleStore from 'stores/EditArticleStore';
 import TextStore from 'stores/TextStore';
@@ -37,22 +37,23 @@ export default class ExtentionCard extends React.Component<Props> {
 
         if (isLoading) {
             return (
-                <AnchorButton text={textStore.texts[Texts.showExtensionField]} icon="eye-on" loading={isLoading} onClick={this.showClick} />
+                <Spinner size={30} />
             );
         }
 
         return (
-            <div>
+            <React.Fragment>
                 {editArticleStore.fields.map((field, i) => (
-                    <div key={i}>
-                        <span>{field.fieldName}</span>(<small>{field.typeName}</small>)
+                    <div className="tab-entity" key={i}>
+                        <H5 className="extension-header">{field.fieldName}</H5>
+                        <small>{field.typeName}</small>
                         <InputGroup
                             value={field.value == null ? '' : field.value}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.change(e, field)}
                         />
                     </div>),
                 )}
-            </div>
+            </React.Fragment>
         );
     }
 }

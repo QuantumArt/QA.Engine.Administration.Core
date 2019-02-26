@@ -21,9 +21,8 @@ import AddVersionPopup from 'components/Popup/AddVersionPopup';
 import ArchivePopup from 'components/Popup/ArchivePopup';
 import DeletePopup from 'components/Popup/DeletePopup';
 import RestorePopup from 'components/Popup/RestorePopup';
+import ErrorToast from 'components/ErrorToast';
 import TextStore from 'stores/TextStore';
-import OperationState from 'enums/OperationState';
-import { Spinner } from '@blueprintjs/core';
 
 const app = hot(module)(() => {
     const navigationStoreInstance = new NavigationStore();
@@ -50,6 +49,7 @@ const app = hot(module)(() => {
                 <DeletePopup/>
                 <RestorePopup/>
             </Popup>
+            <ErrorToast/>
             <DevTools/>
         </div>
     </Provider>

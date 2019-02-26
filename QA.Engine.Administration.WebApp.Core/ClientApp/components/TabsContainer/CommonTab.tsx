@@ -116,7 +116,7 @@ export default class CommonTab extends React.Component<Props> {
                         <div className="tab-entity">
                             <Checkbox checked={isVisible} onChange={this.changeIsVisible} disabled={!isEditable}>{textStore.texts[Texts.isVisible]}</Checkbox>
                         </div>
-                        {isEditable ? (<ExtensionCard />) : null}
+                        {isEditable && <ExtensionCard />}
                     </div>
                 </div>
             );

@@ -2,6 +2,8 @@ import SiteMapService from 'services/SiteMapService';
 import { BaseTreeState } from 'stores/TreeStore/BaseTreeStore';
 import OperationState from 'enums/OperationState';
 import ContextMenuType from 'enums/ContextMenuType';
+import TreeErrors from 'enums/TreeErrors';
+
 
 export default class SiteTreeStore extends BaseTreeState<PageModel> {
 
@@ -27,7 +29,11 @@ export default class SiteTreeStore extends BaseTreeState<PageModel> {
             }
         } catch (e) {
             this.treeState = OperationState.ERROR;
-            console.error(e);
+            this.treeErrors.push({
+                type: TreeErrors.publish,
+                data: itemIds,
+                message: e,
+            });
         }
     }
 
@@ -43,7 +49,11 @@ export default class SiteTreeStore extends BaseTreeState<PageModel> {
             }
         } catch (e) {
             this.treeState = OperationState.ERROR;
-            console.error(e);
+            this.treeErrors.push({
+                type: TreeErrors.archive,
+                data: model,
+                message: e,
+            });
         }
     }
 
@@ -59,7 +69,12 @@ export default class SiteTreeStore extends BaseTreeState<PageModel> {
             }
         } catch (e) {
             this.treeState = OperationState.ERROR;
-            console.error(e);
+            console.log(e);
+            this.treeErrors.push({
+                type: TreeErrors.edit,
+                data: model,
+                message: e,
+            });
         }
     }
 }

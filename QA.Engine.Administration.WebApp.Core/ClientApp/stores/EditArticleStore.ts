@@ -17,7 +17,6 @@ export default class EditArticleStore {
 
     @computed
     get changedFields(): ExtensionFieldModel[] {
-        console.log(this.extensionFieldsJson);
         const orig: ExtensionFieldModel[] = JSON.parse(this.extensionFieldsJson);
         return this.fields.filter(x =>
             orig.filter(y =>

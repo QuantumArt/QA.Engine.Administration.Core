@@ -4,6 +4,7 @@ import { IconName, ITreeNode } from '@blueprintjs/core';
 import ContextMenu from 'components/SiteTree/ContextMenu';
 import OperationState from 'enums/OperationState';
 import ContextMenuType from 'enums/ContextMenuType';
+import TreeErrors from 'enums/TreeErrors';
 
 export interface ITreeElement extends ITreeNode {
     childNodes: ITreeElement[];
@@ -11,6 +12,12 @@ export interface ITreeElement extends ITreeNode {
     versionOfId?: number;
     isContextMenuActive: boolean;
     contextMenuType: ContextMenuType;
+}
+
+export interface TreeErrorModel {
+    type: TreeErrors;
+    message: string;
+    data?: any;
 }
 
 /**
@@ -24,7 +31,9 @@ export abstract class BaseTreeState<T extends {
     children: T[];
     hasChildren: boolean;
 }> {
+
     @observable public treeState: OperationState = OperationState.NONE;
+    @observable public treeErrors: TreeErrorModel[] = [];
     @observable public selectedNode: T;
 
     private treeInternal: ITreeElement[];
@@ -35,22 +44,23 @@ export abstract class BaseTreeState<T extends {
     }
 
     @action
-    public fetchTree(): void {
+    public async fetchTree(): Promise<void> {
         this.treeInternal = [];
         this.treeState = OperationState.PENDING;
-        this.getTree().then((response) => {
+        try {
+            const response: ApiResult<T[]> = await this.getTree();
             if (response.isSuccess) {
                 this.origTree = response.data;
                 this.convertTree(response.data);
                 this.treeState = OperationState.SUCCESS;
             } else {
                 this.treeState = OperationState.ERROR;
-                console.error(response.error);
+                throw response.error;
             }
-        }).catch((e) => {
+        } catch (e) {
             this.treeState = OperationState.ERROR;
-            console.error(e);
-        });
+            this.treeErrors.push({ type: TreeErrors.fetch, message: e });
+        }
     }
 
     protected origTree: T[];
@@ -95,8 +105,17 @@ export abstract class BaseTreeState<T extends {
             this.treeState = OperationState.SUCCESS;
         } catch (e) {
             this.treeState = OperationState.ERROR;
-            console.error(e);
+            this.treeErrors.push({
+                type: TreeErrors.update,
+                data: id,
+                message: e,
+            });
         }
+    }
+
+    @action
+    public removeError = (i: number) => {
+        this.treeErrors.splice(i, 1);
     }
 
     protected async updateSubTreeInternal(id: number): Promise<any> {
@@ -169,7 +188,6 @@ export abstract class BaseTreeState<T extends {
     }
 
     private convertTree(data: T[]): void {
-        const start = Date.now();
         const mapElement = (el: T): ITreeElement => {
             const hasChildren = el.hasChildren;
             const isRootNode = el.parentId === null;
@@ -236,10 +254,6 @@ export abstract class BaseTreeState<T extends {
             elements = children;
         }
         this.treeInternal = tree;
-
-        const end = Date.now();
-        const duration = end - start;
-        console.debug(`%cconvertTree duration ${duration} ms`, 'color: brown;');
     }
 
     private forEachNode(childFunc: (node: ITreeElement) => void = null, eachFunc: (node: ITreeElement) => void = null): void {

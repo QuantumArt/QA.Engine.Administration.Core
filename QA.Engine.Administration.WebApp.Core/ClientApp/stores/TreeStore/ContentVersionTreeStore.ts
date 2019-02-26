@@ -2,10 +2,11 @@ import SiteMapService from 'services/SiteMapService';
 import { BaseTreeState } from 'stores/TreeStore/BaseTreeStore';
 import ContextMenuType from 'enums/ContextMenuType';
 import OperationState from 'enums/OperationState';
+import { observable, action } from 'mobx';
 
 export default class ContentVersionTreeStore extends BaseTreeState<PageModel> {
 
-    public selectedSiteTreeNode: PageModel;
+    @observable public selectedSiteTreeNode: PageModel;
 
     private contentVersionTree: PageModel[];
 
@@ -26,6 +27,7 @@ export default class ContentVersionTreeStore extends BaseTreeState<PageModel> {
         return SiteMapService.getSiteMapSubTree(id);
     }
 
+    @action
     public init(selectedNode: any) {
         this.selectedSiteTreeNode = selectedNode;
         if (selectedNode == null || selectedNode.contentVersions == null) {
