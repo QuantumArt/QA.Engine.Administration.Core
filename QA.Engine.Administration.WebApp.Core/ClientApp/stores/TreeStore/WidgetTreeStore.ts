@@ -1,31 +1,14 @@
+import v4 from 'uuid/v4';
 import SiteMapService from 'services/SiteMapService';
 import { BaseTreeState, ITreeElement } from 'stores/TreeStore/BaseTreeStore';
 import ContextMenuType from 'enums/ContextMenuType';
 import OperationState from 'enums/OperationState';
 import { observable, action } from 'mobx';
+import TreeErrors from 'enums/TreeErrors';
 
 export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
 
     @observable public selectedSiteTreeNode: PageModel;
-
-    private widgetTree: WidgetModel[];
-
-    protected contextMenuType: ContextMenuType = ContextMenuType.WIDGET;
-
-    protected async getTree(): Promise<ApiResult<WidgetModel[]>> {
-        return await new Promise<ApiResult<WidgetModel[]>>((resolve) => {
-            const value: ApiResult<WidgetModel[]> = {
-                isSuccess: true,
-                data: this.widgetTree,
-                error: null,
-            };
-            resolve(value);
-        });
-    }
-
-    protected getSubTree(id: number): Promise<ApiResult<WidgetModel>> {
-        return SiteMapService.getSiteMapSubTree(id);
-    }
 
     @action
     public handleNodeExpand = (nodeData: ITreeElement) => nodeData.isExpanded = true
@@ -60,7 +43,7 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
         this.fetchTree();
     }
 
-    async publish(itemIds: number[]): Promise<void> {
+    public async publish(itemIds: number[]): Promise<void> {
         this.treeState = OperationState.PENDING;
         try {
             const response: ApiResult<any> = await SiteMapService.publish(itemIds);
@@ -71,8 +54,30 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
             }
         } catch (e) {
             this.treeState = OperationState.ERROR;
-            console.error(e);
+            this.treeErrors.push({
+                type: TreeErrors.publish,
+                data: itemIds,
+                message: e,
+                id: v4(),
+            });
         }
+    }
+
+    protected readonly contextMenuType: ContextMenuType = ContextMenuType.WIDGET;
+
+    protected async getTree(): Promise<ApiResult<WidgetModel[]>> {
+        return await new Promise<ApiResult<WidgetModel[]>>((resolve) => {
+            const value: ApiResult<WidgetModel[]> = {
+                isSuccess: true,
+                data: this.widgetTree,
+                error: null,
+            };
+            resolve(value);
+        });
+    }
+
+    protected getSubTree(id: number): Promise<ApiResult<WidgetModel>> {
+        return SiteMapService.getSiteMapSubTree(id);
     }
 
     protected convertTree(data: WidgetModel[]): void {
@@ -150,4 +155,6 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
         });
         return treeElement;
     }
+
+    private widgetTree: WidgetModel[];
 }

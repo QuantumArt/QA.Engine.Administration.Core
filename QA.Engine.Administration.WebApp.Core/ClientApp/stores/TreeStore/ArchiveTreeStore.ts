@@ -1,3 +1,4 @@
+import v4 from 'uuid/v4';
 import SiteMapService from 'services/SiteMapService';
 import { BaseTreeState } from 'stores/TreeStore/BaseTreeStore';
 import OperationState from 'enums/OperationState';
@@ -6,17 +7,7 @@ import TreeErrors from 'enums/TreeErrors';
 
 export default class ArchiveTreeStore extends BaseTreeState<ArchiveModel> {
 
-    protected contextMenuType: ContextMenuType = ContextMenuType.ARCHIVE;
-
-    protected async getTree(): Promise<ApiResult<ArchiveModel[]>> {
-        return await SiteMapService.getArchiveTree();
-    }
-
-    protected getSubTree(id: number): Promise<ApiResult<ArchiveModel>> {
-        return SiteMapService.getArchiveSubTree(id);
-    }
-
-    async restore(model: RestoreModel): Promise<void> {
+    public async restore(model: RestoreModel): Promise<void> {
         this.treeState = OperationState.PENDING;
         try {
             const response: ApiResult<any> = await SiteMapService.restore(model);
@@ -33,11 +24,12 @@ export default class ArchiveTreeStore extends BaseTreeState<ArchiveModel> {
                 type: TreeErrors.restore,
                 data: model,
                 message: e,
+                id: v4(),
             });
         }
     }
 
-    async delete(model: DeleteModel): Promise<void> {
+    public async delete(model: DeleteModel): Promise<void> {
         this.treeState = OperationState.PENDING;
         try {
             const response: ApiResult<any> = await SiteMapService.delete(model);
@@ -54,7 +46,18 @@ export default class ArchiveTreeStore extends BaseTreeState<ArchiveModel> {
                 type: TreeErrors.delete,
                 data: model,
                 message: e,
+                id: v4(),
             });
         }
+    }
+
+    protected contextMenuType: ContextMenuType = ContextMenuType.ARCHIVE;
+
+    protected async getTree(): Promise<ApiResult<ArchiveModel[]>> {
+        return await SiteMapService.getArchiveTree();
+    }
+
+    protected getSubTree(id: number): Promise<ApiResult<ArchiveModel>> {
+        return SiteMapService.getArchiveSubTree(id);
     }
 }

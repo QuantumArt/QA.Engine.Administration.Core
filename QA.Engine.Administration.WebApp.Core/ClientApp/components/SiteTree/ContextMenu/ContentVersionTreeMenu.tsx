@@ -34,6 +34,7 @@ export default class ContentVersionTreeMenu extends React.Component<Props> {
 
     private publishClick = () => {
         const { treeStore, itemId } = this.props;
+        console.log(itemId, 'contentver menu');
         treeStore.getContentVersionsStore().publish([itemId]);
     }
 
