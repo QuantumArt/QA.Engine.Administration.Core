@@ -5,6 +5,8 @@ import OperationState from 'enums/OperationState';
 
 export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
 
+    public selectedSiteTreeNode: PageModel;
+
     private widgetTree: WidgetModel[];
 
     protected contextMenuType: ContextMenuType = ContextMenuType.CONTENTVERSION;
@@ -25,6 +27,7 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
     }
 
     public init(selectedNode: any) {
+        this.selectedSiteTreeNode = selectedNode;
         if (selectedNode == null || selectedNode.widgets == null) {
             this.widgetTree = [];
         } else {

@@ -5,6 +5,8 @@ import OperationState from 'enums/OperationState';
 
 export default class ContentVersionTreeStore extends BaseTreeState<PageModel> {
 
+    public selectedSiteTreeNode: PageModel;
+
     private contentVersionTree: PageModel[];
 
     protected contextMenuType: ContextMenuType = ContextMenuType.CONTENTVERSION;
@@ -25,6 +27,7 @@ export default class ContentVersionTreeStore extends BaseTreeState<PageModel> {
     }
 
     public init(selectedNode: any) {
+        this.selectedSiteTreeNode = selectedNode;
         if (selectedNode == null || selectedNode.contentVersions == null) {
             this.contentVersionTree = [];
         } else {

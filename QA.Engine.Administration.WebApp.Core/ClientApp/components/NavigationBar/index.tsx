@@ -3,13 +3,16 @@ import { inject, observer } from 'mobx-react';
 import { Alignment, Button, Classes, Intent, Navbar, NavbarGroup, NavbarHeading } from '@blueprintjs/core';
 import NavigationStore, { Pages } from 'stores/NavigationStore';
 import TreeStore from 'stores/TreeStore';
+import TextStore from 'stores/TextStore';
+import Texts from 'constants/Texts';
 
 interface Props {
     navigationStore?: NavigationStore;
     treeStore?: TreeStore;
+    textStore?: TextStore;
 }
 
-@inject('navigationStore', 'treeStore')
+@inject('navigationStore', 'treeStore', 'textStore')
 @observer
 export default class NavigationBar extends React.Component<Props> {
     componentDidMount() {
@@ -29,22 +32,22 @@ export default class NavigationBar extends React.Component<Props> {
     }
 
     render() {
-        const { navigationStore: { currentPage } } = this.props;
+        const { navigationStore: { currentPage }, textStore } = this.props;
         return (
             <Navbar fixedToTop>
                 <NavbarGroup align={Alignment.LEFT}>
-                    <NavbarHeading>Управление Сайтом</NavbarHeading>
+                    <NavbarHeading>{textStore.texts[Texts.siteManagement]}</NavbarHeading>
                     <Button
                         className={Classes.MINIMAL}
                         icon="diagram-tree"
-                        text="Карта Сайта"
+                        text={textStore.texts[Texts.siteMapMenu]}
                         onClick={this.handleClick(Pages.SITEMAP)}
                         intent={currentPage === Pages.SITEMAP ? Intent.PRIMARY : Intent.NONE}
                     />
                     <Button
                         className={Classes.MINIMAL}
                         icon="box"
-                        text="Архив"
+                        text={textStore.texts[Texts.archiveMenu]}
                         onClick={this.handleClick(Pages.ARCHIVE)}
                         intent={currentPage === Pages.ARCHIVE ? Intent.PRIMARY : Intent.NONE}
                     />

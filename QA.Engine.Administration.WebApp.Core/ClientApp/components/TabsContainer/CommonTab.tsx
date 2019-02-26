@@ -8,15 +8,18 @@ import SiteTreeStore from 'stores/TreeStore/SiteTreeStore';
 import TreeStore from 'stores/TreeStore';
 import QpIntegrationStore from 'stores/QpIntegrationStore';
 import EditArticleStore from 'stores/EditArticleStore';
+import TextStore from 'stores/TextStore';
+import Texts from 'constants/Texts';
 
 interface Props {
     navigationStore?: NavigationStore;
     qpIntegrationStore?: QpIntegrationStore;
     editArticleStore?: EditArticleStore;
     treeStore?: TreeStore;
+    textStore?: TextStore;
 }
 
-@inject('navigationStore', 'qpIntegrationStore', 'editArticleStore', 'treeStore')
+@inject('navigationStore', 'qpIntegrationStore', 'editArticleStore', 'treeStore', 'textStore')
 @observer
 export default class CommonTab extends React.Component<Props> {
 
@@ -62,7 +65,7 @@ export default class CommonTab extends React.Component<Props> {
     }
 
     render() {
-        const { treeStore, editArticleStore: { title, isVisible, isInSiteMap, isEditable } } = this.props;
+        const { treeStore, textStore, editArticleStore: { title, isVisible, isInSiteMap, isEditable } } = this.props;
         const tree = treeStore.resolveTreeStore();
         if (tree.selectedNode == null) {
             return null;
@@ -76,10 +79,10 @@ export default class CommonTab extends React.Component<Props> {
                 <div className="tab">
                     <Navbar className="tab-navbar">
                         <NavbarGroup>
-                            <Button minimal icon="refresh" text="Refresh" onClick={this.refreshClick}/>
+                            <Button minimal icon="refresh" text={textStore.texts[Texts.refresh]} onClick={this.refreshClick}/>
                             {isEditable ? [
-                                <Button key={1} minimal icon="edit" text="Edit" intent={Intent.PRIMARY} onClick={this.editClick} />,
-                                <Button key={2} minimal icon="saved" text="Save" intent={Intent.SUCCESS} onClick={this.saveClick} />,
+                                <Button key={1} minimal icon="edit" text={textStore.texts[Texts.edit]} intent={Intent.PRIMARY} onClick={this.editClick} />,
+                                <Button key={2} minimal icon="saved" text={textStore.texts[Texts.save]} intent={Intent.SUCCESS} onClick={this.saveClick} />,
                             ] : null}
                         </NavbarGroup>
                     </Navbar>
@@ -89,7 +92,7 @@ export default class CommonTab extends React.Component<Props> {
                             <p>{selectedNode.id}</p>
                         </div>
                         <div className="tab-entity">
-                            <H5>Title</H5>
+                            <H5>{textStore.texts[Texts.title]}</H5>
                             {isEditable ? (
                                 <InputGroup value={title} onChange={this.changeTitle} />
                                 ) : (
@@ -97,21 +100,21 @@ export default class CommonTab extends React.Component<Props> {
                             )}
                         </div>
                         <div className="tab-entity">
-                            <H5>Type Name</H5>
+                            <H5>{textStore.texts[Texts.typeName]}</H5>
                             <p>{selectedNode.discriminatorTitle}</p>
                         </div>
                         <div className="tab-entity">
-                            <H5>Alias</H5>
+                            <H5>{textStore.texts[Texts.alias]}</H5>
                             <p>{selectedNode.alias}</p>
                         </div>
                         <div className="tab-entity">
-                            <Checkbox checked={selectedNode.published} disabled={true}>Published</Checkbox>
+                            <Checkbox checked={selectedNode.published} disabled={true}>{textStore.texts[Texts.published]}</Checkbox>
                         </div>
                         <div className="tab-entity">
-                            <Checkbox checked={isInSiteMap} onChange={this.changeIsInSiteMap} disabled={!isEditable}>View in the site map</Checkbox>
+                            <Checkbox checked={isInSiteMap} onChange={this.changeIsInSiteMap} disabled={!isEditable}>{textStore.texts[Texts.isInSiteMap]}</Checkbox>
                         </div>
                         <div className="tab-entity">
-                            <Checkbox checked={isVisible} onChange={this.changeIsVisible} disabled={!isEditable}>Visible</Checkbox>
+                            <Checkbox checked={isVisible} onChange={this.changeIsVisible} disabled={!isEditable}>{textStore.texts[Texts.isVisible]}</Checkbox>
                         </div>
                         {isEditable ? (<ExtensionCard />) : null}
                     </div>

@@ -5,6 +5,26 @@
 /** Api справочников */
 class DictionaryService {
 
+    /** Тексты */
+    public async getTexts(): Promise<ApiResult<{ [key: string]: string; }>> {
+
+        const path = '/api/Dictionary/getTexts';
+        const headers = new Headers();
+        headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
+        const init = {
+            headers,
+            method: 'get',
+        };
+
+        console.debug(`%cstart api request get '${path}'`, 'color: green;');
+        const response = await fetch(path, init);
+
+        const result = await <Promise<ApiResult<{ [key: string]: string; }>>>response.json();
+        console.log(`%cresult api get '${path}'`, 'color: blue;', result);
+
+        return result;
+    }
+
     /** Возвращает типы контента */
     public async getDiscriminators(): Promise<ApiResult<DiscriminatorModel[]>> {
 

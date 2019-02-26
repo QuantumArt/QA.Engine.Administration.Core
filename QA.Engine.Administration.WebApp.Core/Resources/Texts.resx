@@ -1,0 +1,279 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Add" xml:space="preserve">
+    <value>Добавить</value>
+  </data>
+  <data name="AddItem" xml:space="preserve">
+    <value>Добавить подраздел</value>
+  </data>
+  <data name="AddVersionItem" xml:space="preserve">
+    <value>Добавить версию</value>
+  </data>
+  <data name="Alias" xml:space="preserve">
+    <value>Alias</value>
+  </data>
+  <data name="Archive" xml:space="preserve">
+    <value>Архивировать</value>
+  </data>
+  <data name="ArchiveMenu" xml:space="preserve">
+    <value>Архив</value>
+  </data>
+  <data name="CommonTab" xml:space="preserve">
+    <value>Инфо</value>
+  </data>
+  <data name="ContentVersionTab" xml:space="preserve">
+    <value>Контентные версии</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Редактировать</value>
+  </data>
+  <data name="History" xml:space="preserve">
+    <value>История изменений</value>
+  </data>
+  <data name="IsInSiteMap" xml:space="preserve">
+    <value>Показывать в структуре сайта</value>
+  </data>
+  <data name="IsVisible" xml:space="preserve">
+    <value>Видимость</value>
+  </data>
+  <data name="PopupActionType" xml:space="preserve">
+    <value>Тип действия</value>
+  </data>
+  <data name="PopupAddButton" xml:space="preserve">
+    <value>Добавить</value>
+  </data>
+  <data name="PopupAddItemTitle" xml:space="preserve">
+    <value>Добавить раздел</value>
+  </data>
+  <data name="PopupAddVersionItemTitle" xml:space="preserve">
+    <value>Добавить версию</value>
+  </data>
+  <data name="PopupAddWidgetTitle" xml:space="preserve">
+    <value>Добавить виджет</value>
+  </data>
+  <data name="PopupArchive" xml:space="preserve">
+    <value>Архивировать</value>
+  </data>
+  <data name="PopupArchiveAllVersion" xml:space="preserve">
+    <value>Архивировать все версии</value>
+  </data>
+  <data name="PopupArchiveButton" xml:space="preserve">
+    <value>Архивировать</value>
+  </data>
+  <data name="PopupArchiveItemTitle" xml:space="preserve">
+    <value>Отправить в архив</value>
+  </data>
+  <data name="PopupCancelButton" xml:space="preserve">
+    <value>Отмена</value>
+  </data>
+  <data name="PopupDeleteAllVersion" xml:space="preserve">
+    <value>Удалить все версии</value>
+  </data>
+  <data name="PopupDeleteButton" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+  <data name="PopupDeleteItemTitle" xml:space="preserve">
+    <value>Delete item</value>
+  </data>
+  <data name="PopupFieldAlias" xml:space="preserve">
+    <value>Алиас</value>
+  </data>
+  <data name="PopupFieldAliasPlaceholder" xml:space="preserve">
+    <value>alias</value>
+  </data>
+  <data name="PopupFieldContentType" xml:space="preserve">
+    <value>Тип контента</value>
+  </data>
+  <data name="PopupFieldTitle" xml:space="preserve">
+    <value>Название</value>
+  </data>
+  <data name="PopupFieldTitlePlaceholder" xml:space="preserve">
+    <value>Название нардела</value>
+  </data>
+  <data name="PopupFieldVersion" xml:space="preserve">
+    <value>Версия</value>
+  </data>
+  <data name="PopupMoveVersion" xml:space="preserve">
+    <value>Сменить версию</value>
+  </data>
+  <data name="PopupRestoreAllVersion" xml:space="preserve">
+    <value>Восстановить версии</value>
+  </data>
+  <data name="PopupRestoreButton" xml:space="preserve">
+    <value>Восстановить</value>
+  </data>
+  <data name="PopupRestoreChildren" xml:space="preserve">
+    <value>Восстановить вложенные страницы</value>
+  </data>
+  <data name="PopupRestoreContentVersion" xml:space="preserve">
+    <value>Восстановить контентные версии</value>
+  </data>
+  <data name="PopupRestoreItemTitle" xml:space="preserve">
+    <value>Восстановить раздел</value>
+  </data>
+  <data name="PopupRestoreWidget" xml:space="preserve">
+    <value>Восстановить виджеты</value>
+  </data>
+  <data name="PopupVersionContent" xml:space="preserve">
+    <value>Контентная</value>
+  </data>
+  <data name="PopupVersionStructural" xml:space="preserve">
+    <value>Структурная</value>
+  </data>
+  <data name="Publish" xml:space="preserve">
+    <value>Публиковать</value>
+  </data>
+  <data name="Published" xml:space="preserve">
+    <value>Опубликовано</value>
+  </data>
+  <data name="Refresh" xml:space="preserve">
+    <value>Обновить</value>
+  </data>
+  <data name="Restore" xml:space="preserve">
+    <value>Восстановить</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Сохранить</value>
+  </data>
+  <data name="ShowExtensionField" xml:space="preserve">
+    <value>Показать поля расширения</value>
+  </data>
+  <data name="SiteManagement" xml:space="preserve">
+    <value>Управление Сайтом</value>
+  </data>
+  <data name="SiteMapMenu" xml:space="preserve">
+    <value>Карта Сайта</value>
+  </data>
+  <data name="Title" xml:space="preserve">
+    <value>Заголовок</value>
+  </data>
+  <data name="TypeName" xml:space="preserve">
+    <value>Тип контента</value>
+  </data>
+  <data name="View" xml:space="preserve">
+    <value>Просмотр</value>
+  </data>
+  <data name="WidgetTab" xml:space="preserve">
+    <value>Виджеты</value>
+  </data>
+</root>

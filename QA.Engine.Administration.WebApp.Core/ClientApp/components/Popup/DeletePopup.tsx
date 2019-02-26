@@ -5,17 +5,20 @@ import PopupStore from 'stores/PopupStore';
 import PopupType from 'enums/PopupType';
 import TreeStore from 'stores/TreeStore';
 import ArchiveTreeStore  from 'stores/TreeStore/ArchiveTreeStore';
+import TextStore from 'stores/TextStore';
+import Texts from 'constants/Texts';
 
 interface Props {
     treeStore?: TreeStore;
     popupStore?: PopupStore;
+    textStore?: TextStore;
 }
 
 interface State {
     deleteAllVersions: boolean;
 }
 
-@inject('treeStore', 'popupStore')
+@inject('treeStore', 'popupStore', 'textStore')
 @observer
 export default class DeletePopup extends React.Component<Props, State> {
 
@@ -41,7 +44,7 @@ export default class DeletePopup extends React.Component<Props, State> {
         this.setState({ deleteAllVersions: version.target.checked })
 
     render() {
-        const { popupStore } = this.props;
+        const { popupStore, textStore } = this.props;
         const { deleteAllVersions } = this.state;
         if (popupStore.type !== PopupType.DELETE) {
             return null;
@@ -51,12 +54,12 @@ export default class DeletePopup extends React.Component<Props, State> {
             <Card>
                 <FormGroup>
                     <Checkbox checked={deleteAllVersions} onChange={this.changeDeleteAllVersions}>
-                        Удалить все версии
+                        {textStore.texts[Texts.popupDeleteAllVersion]}
                     </Checkbox>
                 </FormGroup>
                 <ButtonGroup className="dialog-button-group">
-                    <Button text="Удалить" icon="delete" onClick={this.deleteClick} intent={Intent.DANGER} />
-                    <Button text="Отмена" icon="undo" onClick={this.cancelClick} />
+                    <Button text={textStore.texts[Texts.popupDeleteButton]} icon="delete" onClick={this.deleteClick} intent={Intent.DANGER} />
+                    <Button text={textStore.texts[Texts.popupCancelButton]} icon="undo" onClick={this.cancelClick} />
                 </ButtonGroup>
             </Card>
         );

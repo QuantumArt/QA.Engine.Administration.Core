@@ -6,11 +6,14 @@ import PopupStore from 'stores/PopupStore';
 import DiscriminatorSelect from 'components/Select/DiscriminatorSelect';
 import PopupType from 'enums/PopupType';
 import TreeStore from 'stores/TreeStore';
+import TextStore from 'stores/TextStore';
+import Texts from 'constants/Texts';
 
 interface Props {
     qpIntegrationStore?: QpIntegrationStore;
     treeStore?: TreeStore;
     popupStore?: PopupStore;
+    textStore?: TextStore;
 }
 
 interface State {
@@ -18,7 +21,7 @@ interface State {
     version: VersionType;
 }
 
-@inject('qpIntegrationStore', 'treeStore', 'popupStore')
+@inject('qpIntegrationStore', 'treeStore', 'popupStore', 'textStore')
 @observer
 export default class AddVersionPopup extends React.Component<Props, State> {
 
@@ -47,7 +50,7 @@ export default class AddVersionPopup extends React.Component<Props, State> {
         this.setState({ version: version.target.value as VersionType })
 
     render() {
-        const { popupStore } = this.props;
+        const { popupStore, textStore } = this.props;
         const { version } = this.state;
         if (popupStore.type !== PopupType.ADDVERSION) {
             return null;
@@ -56,17 +59,17 @@ export default class AddVersionPopup extends React.Component<Props, State> {
         return (
             <Card>
                 <FormGroup>
-                    <RadioGroup label="Версия" selectedValue={version} onChange={this.changeVersion}>
-                        <Radio label="Контентная" value={VersionType.Content}/>
-                        <Radio label="Структурная" value={VersionType.Structural}/>
+                    <RadioGroup label={textStore.texts[Texts.popupFieldVersion]} selectedValue={version} onChange={this.changeVersion}>
+                        <Radio label={textStore.texts[Texts.popupVersionContent]} value={VersionType.Content}/>
+                        <Radio label={textStore.texts[Texts.popupVersionStructural]} value={VersionType.Structural}/>
                     </RadioGroup>
                 </FormGroup>
                 <FormGroup>
                     <DiscriminatorSelect items={popupStore.discriminators} onChange={this.changeDiscriminator}/>
                 </FormGroup>
                 <ButtonGroup className="dialog-button-group">
-                    <Button text="Добавить" icon="add" onClick={this.addClick} intent={Intent.SUCCESS}/>
-                    <Button text="Отмена" icon="undo" onClick={this.cancelClick}/>
+                    <Button text={textStore.texts[Texts.popupAddButton]} icon="add" onClick={this.addClick} intent={Intent.SUCCESS}/>
+                    <Button text={textStore.texts[Texts.popupCancelButton]} icon="undo" onClick={this.cancelClick}/>
                 </ButtonGroup>
             </Card>
         );

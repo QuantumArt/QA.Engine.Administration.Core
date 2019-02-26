@@ -5,10 +5,13 @@ import PopupStore from 'stores/PopupStore';
 import PopupType from 'enums/PopupType';
 import TreeStore from 'stores/TreeStore';
 import ArchiveTreeStore from 'stores/TreeStore/ArchiveTreeStore';
+import TextStore from 'stores/TextStore';
+import Texts from 'constants/Texts';
 
 interface Props {
     treeStore?: TreeStore;
     popupStore?: PopupStore;
+    textStore?: TextStore;
 }
 
 interface State {
@@ -18,7 +21,7 @@ interface State {
     restoreWidgets: boolean;
 }
 
-@inject('treeStore', 'popupStore')
+@inject('treeStore', 'popupStore', 'textStore')
 @observer
 export default class RestorePopup extends React.Component<Props, State> {
 
@@ -58,7 +61,7 @@ export default class RestorePopup extends React.Component<Props, State> {
         this.setState({ restoreContentVersions: version.target.checked })
 
     render() {
-        const { popupStore } = this.props;
+        const { popupStore, textStore } = this.props;
         const { restoreAllVersions, restoreChildren, restoreContentVersions, restoreWidgets } = this.state;
         if (popupStore.type !== PopupType.RESTORE) {
             return null;
@@ -68,21 +71,21 @@ export default class RestorePopup extends React.Component<Props, State> {
             <Card>
                 <FormGroup>
                     <Checkbox checked={restoreAllVersions} onChange={this.changeRestoreAllVersions}>
-                        Восстановить версии
+                        {textStore.texts[Texts.popupRestoreAllVersion]}
                     </Checkbox>
                     <Checkbox checked={restoreChildren} onChange={this.changeRestoreChildren}>
-                        Восстановить вложенные страницы
+                        {textStore.texts[Texts.popupRestoreChildren]}
                     </Checkbox>
                     <Checkbox checked={restoreWidgets} onChange={this.changeRestoreWidgets}>
-                        Восстановить виджеты
+                        {textStore.texts[Texts.popupRestoreWidget]}
                     </Checkbox>
                     <Checkbox checked={restoreContentVersions} onChange={this.changeRestoreContentVersions}>
-                        Восстановить контентные версии
+                        {textStore.texts[Texts.popupRestoreContentVersion]}
                     </Checkbox>
                 </FormGroup>
                 <ButtonGroup className="dialog-button-group">
-                    <Button text="Восстановить" icon="swap-horizontal" onClick={this.restoreClick} intent={Intent.SUCCESS} />
-                    <Button text="cancel" icon="undo" onClick={this.cancelClick} />
+                    <Button text={textStore.texts[Texts.popupRestoreButton]} icon="swap-horizontal" onClick={this.restoreClick} intent={Intent.SUCCESS} />
+                    <Button text={textStore.texts[Texts.popupCancelButton]} icon="undo" onClick={this.cancelClick} />
                 </ButtonGroup>
             </Card>
         );

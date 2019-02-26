@@ -27,6 +27,10 @@ export default class EditArticleStore {
     @action
     init(node: PageModel | ArchiveModel) {
         this.node = node;
+        if (node == null) {
+            this.title = this.isVisible = this.isInSiteMap = this.isShowExtensionFields = this.isEditable = null;
+            return;
+        }
         this.title = node.title;
         this.isVisible = node.isVisible;
         this.isInSiteMap = node.isInSiteMap;

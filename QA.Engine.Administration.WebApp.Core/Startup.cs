@@ -17,6 +17,9 @@ using QA.DotNetCore.Engine.QpData.Persistent.Dapper;
 using QA.Engine.Administration.Data.Core;
 using QA.Engine.Administration.Data.Core.Qp;
 using Swashbuckle.AspNetCore.Swagger;
+using System.Globalization;
+using Microsoft.AspNetCore.Localization;
+using QA.Engin.Administration.Common.Core;
 
 namespace QA.Engine.Administration.WebApp.Core
 {
@@ -101,6 +104,8 @@ namespace QA.Engine.Administration.WebApp.Core
             });
 
             services.AddAuthorization();
+
+            services.AddLocalization(x => x.ResourcesPath = "Resources");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -149,6 +154,18 @@ namespace QA.Engine.Administration.WebApp.Core
             //    if (env.IsDevelopment())
             //        spa.UseReactDevelopmentServer(npmScript: "start:dev");
             //});
+
+            var supportedCultures = new[]
+            {
+                new CultureInfo(QpLanguage.Russian.GetDescription()),
+                new CultureInfo(QpLanguage.English.GetDescription()),
+            };
+            app.UseRequestLocalization(new RequestLocalizationOptions
+            {
+                DefaultRequestCulture = new RequestCulture(QpLanguage.Default.GetDescription()),
+                SupportedCultures = supportedCultures,
+                SupportedUICultures = supportedCultures
+            });
         }
 
         private string GetConnectionString(IServiceProvider sp)

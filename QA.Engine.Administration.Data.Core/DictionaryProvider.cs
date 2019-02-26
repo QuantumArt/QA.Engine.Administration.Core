@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using QA.DotNetCore.Engine.Persistent.Interfaces;
+using QA.Engin.Administration.Common.Core;
 using QA.Engine.Administration.Data.Interfaces.Core;
 using QA.Engine.Administration.Data.Interfaces.Core.Models;
 using System.Collections.Generic;

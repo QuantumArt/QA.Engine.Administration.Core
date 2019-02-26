@@ -125,6 +125,12 @@
             Api справочников
             </summary>
         </member>
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.DictionaryController.GetTexts">
+            <summary>
+            Тексты
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.DictionaryController.GetDiscriminators">
             <summary>
             Возвращает типы контента

@@ -5,12 +5,15 @@ import NavigationStore, { Pages, TabTypes } from 'stores/NavigationStore';
 import CommonTab from './CommonTab';
 import WidgetTab from './WidgetTab';
 import ContentVersionTab from './ContentVersionTab';
+import TextStore from 'stores/TextStore';
+import Texts from 'constants/Texts';
 
 interface Props {
     navigationStore?: NavigationStore;
+    textStore?: TextStore;
 }
 
-@inject('navigationStore')
+@inject('navigationStore', 'textStore')
 @observer
 export default class TabsContainer extends React.Component<Props> {
 
@@ -20,7 +23,7 @@ export default class TabsContainer extends React.Component<Props> {
     }
 
     render() {
-        const { navigationStore } = this.props;
+        const { navigationStore, textStore } = this.props;
         return (
             <Card className="tabs-pane">
                 <Tabs
@@ -31,12 +34,12 @@ export default class TabsContainer extends React.Component<Props> {
                 >
                     {navigationStore.currentPage === Pages.SITEMAP ?
                         [
-                            <Tab key={TabTypes.COMMON} id={TabTypes.COMMON} title="Common" panel={<CommonTab />} />,
-                            <Tab key={TabTypes.WIDGETS} id={TabTypes.WIDGETS} title="Widgets" panel={<WidgetTab />} />,
-                            <Tab key={TabTypes.CONTENT_VERSIONS} id={TabTypes.CONTENT_VERSIONS} title="Content versions" panel={<ContentVersionTab />} />,
+                            <Tab key={TabTypes.COMMON} id={TabTypes.COMMON} title={textStore.texts[Texts.commonTab]} panel={<CommonTab />} />,
+                            <Tab key={TabTypes.WIDGETS} id={TabTypes.WIDGETS} title={textStore.texts[Texts.widgetTab]} panel={<WidgetTab />} />,
+                            <Tab key={TabTypes.CONTENT_VERSIONS} id={TabTypes.CONTENT_VERSIONS} title={textStore.texts[Texts.contentVersionTab]} panel={<ContentVersionTab />} />,
                         ] :
                         [
-                            <Tab key={TabTypes.COMMON} id={TabTypes.COMMON} title="Common" panel={<CommonTab />} />,
+                            <Tab key={TabTypes.COMMON} id={TabTypes.COMMON} title={textStore.texts[Texts.commonTab]} panel={<CommonTab />} />,
                         ]
                     }
                 </Tabs>

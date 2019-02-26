@@ -73,7 +73,7 @@ export abstract class BaseTreeState<T extends {
 
     @action
     public handleNodeClick = (nodeData: ITreeElement) => {
-        this.selectedNode = this.getNodeById(+nodeData.id);
+        this.selectedNode = nodeData.isSelected === true ? null : this.getNodeById(+nodeData.id);
         const originallySelected = nodeData.isSelected;
         this.forEachNode(null, (n) => {
             n.isSelected = false;

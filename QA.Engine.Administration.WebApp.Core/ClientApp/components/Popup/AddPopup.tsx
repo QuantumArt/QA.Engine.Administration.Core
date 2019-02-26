@@ -6,11 +6,14 @@ import PopupStore from 'stores/PopupStore';
 import DiscriminatorSelect from 'components/Select/DiscriminatorSelect';
 import PopupType from 'enums/PopupType';
 import TreeStore from 'stores/TreeStore';
+import TextStore from 'stores/TextStore';
+import Texts from 'constants/Texts';
 
 interface Props {
     qpIntegrationStore?: QpIntegrationStore;
     treeStore?: TreeStore;
     popupStore?: PopupStore;
+    textStore?: TextStore;
 }
 
 interface State {
@@ -19,7 +22,7 @@ interface State {
     title: string;
 }
 
-@inject('qpIntegrationStore', 'treeStore', 'popupStore')
+@inject('qpIntegrationStore', 'treeStore', 'popupStore', 'textStore')
 @observer
 export default class AddPopup extends React.Component<Props, State> {
 
@@ -48,7 +51,7 @@ export default class AddPopup extends React.Component<Props, State> {
         this.setState({ name: e.target.value })
 
     render() {
-        const { popupStore } = this.props;
+        const { popupStore, textStore } = this.props;
         const { name, title } = this.state;
         if (popupStore.type !== PopupType.ADD && popupStore.type !== PopupType.ADDWIDGET) {
             return null;
@@ -56,18 +59,18 @@ export default class AddPopup extends React.Component<Props, State> {
 
         return (
             <Card>
-                <FormGroup label="Title">
-                    <InputGroup placeholder="Название раздела" value={title} onChange={this.changeTitle} />
+                <FormGroup label={textStore.texts[Texts.popupFieldTitle]}>
+                    <InputGroup placeholder={textStore.texts[Texts.popupFieldTitlePlaceholder]} value={title} onChange={this.changeTitle} />
                 </FormGroup>
-                <FormGroup label="Name">
-                    <InputGroup placeholder="alias" value={name} onChange={this.changeName} />
+                <FormGroup label={textStore.texts[Texts.popupFieldAlias]}>
+                    <InputGroup placeholder={textStore.texts[Texts.popupFieldAliasPlaceholder]} value={name} onChange={this.changeName} />
                 </FormGroup>
-                <FormGroup label="Type">
+                <FormGroup label={textStore.texts[Texts.popupFieldContentType]}>
                     <DiscriminatorSelect items={popupStore.discriminators} onChange={this.changeDiscriminator} />
                 </FormGroup>
                 <ButtonGroup className="dialog-button-group">
-                    <Button text="Добавить" icon="new-object" onClick={this.addClick} intent={Intent.SUCCESS} />
-                    <Button text="Отмена" icon="undo" onClick={this.cancelClick} />
+                    <Button text={textStore.texts[Texts.popupAddButton]} icon="new-object" onClick={this.addClick} intent={Intent.SUCCESS} />
+                    <Button text={textStore.texts[Texts.popupCancelButton]} icon="undo" onClick={this.cancelClick} />
                 </ButtonGroup>
             </Card>
         );

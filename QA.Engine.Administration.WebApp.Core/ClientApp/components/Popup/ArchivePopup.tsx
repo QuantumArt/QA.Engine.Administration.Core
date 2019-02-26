@@ -6,10 +6,13 @@ import PageSelect from 'components/Select/PageSelect';
 import PopupType from 'enums/PopupType';
 import TreeStore from 'stores/TreeStore';
 import SiteTreeStore from 'stores/TreeStore/SiteTreeStore';
+import TextStore from 'stores/TextStore';
+import Texts from 'constants/Texts';
 
 interface Props {
     treeStore?: TreeStore;
     popupStore?: PopupStore;
+    textStore?: TextStore;
 }
 
 interface State {
@@ -23,7 +26,7 @@ enum ContentVersionOperations {
     move = 'move',
 }
 
-@inject('treeStore', 'popupStore')
+@inject('treeStore', 'popupStore', 'textStore')
 @observer
 export default class ArchivePopup extends React.Component<Props, State> {
 
@@ -58,7 +61,7 @@ export default class ArchivePopup extends React.Component<Props, State> {
         this.setState({ deleteContentVersions: version.target.value as ContentVersionOperations })
 
     render() {
-        const { popupStore } = this.props;
+        const { popupStore, textStore } = this.props;
         const { deleteAllVersions, deleteContentVersions } = this.state;
         if (popupStore.type !== PopupType.ARCHIVE) {
             return null;
@@ -68,23 +71,23 @@ export default class ArchivePopup extends React.Component<Props, State> {
             <Card>
                 <FormGroup>
                     <Checkbox checked={deleteAllVersions} onChange={this.changeDeleteAllVersions}>
-                        Архивировать все версии
+                        {textStore.texts[Texts.popupArchiveAllVersion]}
                     </Checkbox>
                 </FormGroup>
                 <FormGroup>
                     <RadioGroup
-                        label="Тип действия"
+                        label={textStore.texts[Texts.popupActionType]}
                         inline={true}
                         selectedValue={deleteContentVersions}
                         onChange={this.changeDeleteContentVersions}
                         disabled={deleteAllVersions}
                     >
                         <Radio
-                            label="Архивировать"
+                            label={textStore.texts[Texts.popupArchive]}
                             value={ContentVersionOperations.archive}
                         />
                         <Radio
-                            label="Сменить версию"
+                            label={textStore.texts[Texts.popupMoveVersion]}
                             value={ContentVersionOperations.move}
                         />
                     </RadioGroup>
@@ -97,8 +100,8 @@ export default class ArchivePopup extends React.Component<Props, State> {
                     />
                 </FormGroup>
                 <ButtonGroup className="dialog-button-group">
-                    <Button text="Архивировать" icon="box" onClick={this.archiveClick} intent={Intent.DANGER} />
-                    <Button text="Отмена" icon="undo" onClick={this.cancelClick} />
+                    <Button text={textStore.texts[Texts.popupArchiveButton]} icon="box" onClick={this.archiveClick} intent={Intent.DANGER} />
+                    <Button text={textStore.texts[Texts.popupCancelButton]} icon="undo" onClick={this.cancelClick} />
                 </ButtonGroup>
             </Card>
         );

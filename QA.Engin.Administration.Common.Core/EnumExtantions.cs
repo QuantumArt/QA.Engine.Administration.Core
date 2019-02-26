@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
-using System.Threading.Tasks;
 
-namespace QA.Engine.Administration.Data.Core
+namespace QA.Engin.Administration.Common.Core
 {
     public static class EnumExtantions
     {

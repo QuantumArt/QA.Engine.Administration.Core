@@ -3,12 +3,15 @@ import { inject, observer } from 'mobx-react';
 import { AnchorButton, InputGroup } from '@blueprintjs/core';
 import OperationState from 'enums/OperationState';
 import EditArticleStore from 'stores/EditArticleStore';
+import TextStore from 'stores/TextStore';
+import Texts from 'constants/Texts';
 
 interface Props {
     editArticleStore?: EditArticleStore;
+    textStore?: TextStore;
 }
 
-@inject('editArticleStore')
+@inject('editArticleStore', 'textStore')
 @observer
 export default class ExtentionCard extends React.Component<Props> {
 
@@ -23,19 +26,18 @@ export default class ExtentionCard extends React.Component<Props> {
     }
 
     render() {
-        console.log('ExtentionCard render');
-        const { editArticleStore } = this.props;
+        const { editArticleStore, textStore } = this.props;
         const isLoading = editArticleStore.state === OperationState.NONE || editArticleStore.state === OperationState.PENDING;
 
         if (!editArticleStore.isShowExtensionFields) {
             return (
-                <AnchorButton text="show extension fields" icon="eye-on" onClick={this.showClick} />
+                <AnchorButton text={textStore.texts[Texts.showExtensionField]} icon="eye-on" onClick={this.showClick} />
             );
         }
 
         if (isLoading) {
             return (
-                <AnchorButton text="show extension fields" icon="eye-on" loading={isLoading} onClick={this.showClick} />
+                <AnchorButton text={textStore.texts[Texts.showExtensionField]} icon="eye-on" loading={isLoading} onClick={this.showClick} />
             );
         }
 

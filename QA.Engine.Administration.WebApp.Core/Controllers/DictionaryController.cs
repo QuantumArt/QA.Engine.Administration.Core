@@ -1,7 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Threading;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using QA.Engine.Administration.Services.Core.Annotations;
@@ -25,21 +29,37 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         private readonly IContentService _contentService;
         private readonly IMapper _mapper;
         private readonly ILogger<SiteMapController> _logger;
+        private readonly IStringLocalizerFactory _stringLocalizerFactory;
         private readonly int _siteId;
         private readonly int _userId;
 
         public DictionaryController(
             IItemDifinitionService itemDifinitionService, IRegionService regionService, IContentService contentService,
-            IOptions<EnvironmentConfiguration> options, IWebAppQpHelper webAppQpHelper, IMapper mapper, ILogger<SiteMapController> logger)
+            IOptions<EnvironmentConfiguration> options, IWebAppQpHelper webAppQpHelper, IMapper mapper, ILogger<SiteMapController> logger,
+            IStringLocalizerFactory stringLocalizerFactory)
         {
             _itemDifinitionService = itemDifinitionService;
             _regionService = regionService;
             _contentService = contentService;
             _mapper = mapper;
             _logger = logger;
+            _stringLocalizerFactory = stringLocalizerFactory;
 
             _siteId = webAppQpHelper.SiteId;
             _userId = webAppQpHelper.UserId;
+        }
+
+        /// <summary>
+        /// Тексты
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("getTexts")]
+        public ApiResult<Dictionary<string, string>> GetTexts()
+        {
+            var assemblyName = Assembly.GetAssembly(typeof(DictionaryController));
+            var localizer = _stringLocalizerFactory.Create("Texts", assemblyName.FullName).WithCulture(Thread.CurrentThread.CurrentUICulture);
+            var result = localizer.GetAllStrings().ToDictionary(x => x.Name, x => x.Value);
+            return ApiResult<Dictionary<string, string>>.Success(result);
         }
 
         /// <summary>

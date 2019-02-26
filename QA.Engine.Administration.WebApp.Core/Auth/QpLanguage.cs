@@ -1,8 +1,8 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 
 namespace QA.Engine.Administration.WebApp.Core.Auth
 {
-    public enum QpLanguage : byte
+    public enum QpLanguage : int
     {
         [Description("ru-RU")]
         Default = 0,

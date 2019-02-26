@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\QA.Engin.Administration.Common.Core\QA.Engin.Administration.Common.Core.csproj" />
     <ProjectReference Include="..\QA.Engine.Administration.Data.Interfaces.Core\QA.Engine.Administration.Data.Interfaces.Core.csproj" />
   </ItemGroup>
 
