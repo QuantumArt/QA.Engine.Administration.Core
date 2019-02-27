@@ -69,17 +69,9 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpGet("getDiscriminators")]
         public ApiResult<List<DiscriminatorModel>> GetDiscriminators()
         {
-            try
-            {
-                _logger.LogTrace($"getDefinitions userId={_userId}");
-                var discriminators = _itemDifinitionService.GetAllItemDefinitions(_siteId);
-                return ApiResult<List<DiscriminatorModel>>.Success(discriminators);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "GetDescriminators error");
-                return ApiResult<List<DiscriminatorModel>>.Fail(e);
-            }
+            _logger.LogTrace($"getDefinitions userId={_userId}");
+            var discriminators = _itemDifinitionService.GetAllItemDefinitions(_siteId);
+            return ApiResult<List<DiscriminatorModel>>.Success(discriminators);
         }
 
         /// <summary>
@@ -89,17 +81,9 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpGet("getFlatRegions")]
         public ApiResult<List<RegionModel>> GetFlatRegions()
         {
-            try
-            {
-                _logger.LogTrace($"getFlatRegions userId={_userId}");
-                var regions = _regionService.GetRegions(_siteId);
-                return ApiResult<List<RegionModel>>.Success(regions);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "GetFlatRegions error");
-                return ApiResult<List<RegionModel>>.Fail(e);
-            }
+            _logger.LogTrace($"getFlatRegions userId={_userId}");
+            var regions = _regionService.GetRegions(_siteId);
+            return ApiResult<List<RegionModel>>.Success(regions);
         }
 
         /// <summary>
@@ -109,17 +93,9 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpGet("getRegionTree")]
         public ApiResult<List<RegionModel>> GetRegionTree()
         {
-            try
-            {
-                _logger.LogTrace($"getRegionTree userId={_userId}");
-                var regions = _regionService.GetRegionStructure(_siteId);
-                return ApiResult<List<RegionModel>>.Success(regions);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "GetRegionTree error");
-                return ApiResult<List<RegionModel>>.Fail(e);
-            }
+            _logger.LogTrace($"getRegionTree userId={_userId}");
+            var regions = _regionService.GetRegionStructure(_siteId);
+            return ApiResult<List<RegionModel>>.Success(regions);
         }
 
         /// <summary>
@@ -129,17 +105,9 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpGet("getQpContent")]
         public ApiResult<QpContentModel> GetQpContent(string contentName)
         {
-            try
-            {
-                _logger.LogTrace($"getRegionTree contentName={contentName}, userId={_userId}");
-                var content = _contentService.GetQpContent(_siteId, contentName);
-                return ApiResult<QpContentModel>.Success(content);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "GetQpContent error");
-                return ApiResult<QpContentModel>.Fail(e);
-            }
+            _logger.LogTrace($"getRegionTree contentName={contentName}, userId={_userId}");
+            var content = _contentService.GetQpContent(_siteId, contentName);
+            return ApiResult<QpContentModel>.Success(content);
         }
     }
 }

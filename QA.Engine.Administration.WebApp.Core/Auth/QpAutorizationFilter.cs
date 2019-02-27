@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
 using QA.Engin.Administration.Common.Core;
+using QA.Engine.Administration.WebApp.Core.Models;
 using System;
 using System.Globalization;
 using System.Threading;
@@ -38,7 +39,7 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
             Thread.CurrentThread.CurrentUICulture = ci;
 
             if (!isAuthorize)
-                context.Result = new UnauthorizedResult();
+                context.Result = new UnauthorizedObjectResult(ApiResult.Fail(new Exception("Unauthorized")));
         }
 
     }

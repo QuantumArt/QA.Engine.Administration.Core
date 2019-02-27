@@ -44,11 +44,11 @@ namespace QA.Engine.Administration.Data.Core
         {
             var columnNames = GetColumnNamesByNetNames(siteId, new List<string> { nameof(editData.Title), nameof(editData.IsVisible), nameof(editData.IsInSiteMap) });
             if (!columnNames.ContainsKey(nameof(editData.Title)))
-                throw new Exception("NetName для поля Title не найдено.");
+                throw new Exception("NetName for field Title not found");
             if (!columnNames.ContainsKey(nameof(editData.IsVisible)))
-                throw new Exception("NetName для поля IsVisible не найдено.");
+                throw new Exception("NetName for field IsVisible not found");
             if (!columnNames.ContainsKey(nameof(editData.IsInSiteMap)))
-                throw new Exception("NetName для поля IsInSiteMap не найдено.");
+                throw new Exception("NetName for field IsInSiteMap not found");
 
             _qpDbConnector.BeginTransaction(IsolationLevel.Serializable);
 
@@ -145,7 +145,7 @@ namespace QA.Engine.Administration.Data.Core
             {
                 var columnName = GetColumnNameByNetName(siteId, "IndexOrder");
                 if (string.IsNullOrWhiteSpace(columnName))
-                    throw new Exception("NetName для поля IndexOrder не найдено.");
+                    throw new Exception("NetName for field IndexOrder not found");
 
                 var values = items
                     .Where(x => x.IndexOrder.HasValue)
@@ -173,7 +173,7 @@ namespace QA.Engine.Administration.Data.Core
             {
                 var columnName = GetColumnNameByNetName(siteId, "Parent");
                 if (string.IsNullOrWhiteSpace(columnName))
-                    throw new Exception("NetName для поля Parent не найдено.");
+                    throw new Exception("NetName for field Parent not found");
 
                 var values = new Dictionary<string, string>
                 {
@@ -336,13 +336,13 @@ namespace QA.Engine.Administration.Data.Core
         {
             var columnNames = GetColumnNamesByNetNames(siteId, new List<string> { "Name", "Parent", "VersionOf", "IsPage" });
             if (!columnNames.ContainsKey("Name"))
-                throw new Exception("NetName для поля Name не найдено.");
+                throw new Exception("NetName for field Name not found");
             if (!columnNames.ContainsKey("Parent"))
-                throw new Exception("NetName для поля Parent не найдено.");
+                throw new Exception("NetName for field Parent not found");
             if (!columnNames.ContainsKey("VersionOf"))
-                throw new Exception("NetName для поля VersionOf не найдено.");
+                throw new Exception("NetName for field VersionOf not found");
             if (!columnNames.ContainsKey("IsPage"))
-                throw new Exception("NetName для поля IsPage не найдено.");
+                throw new Exception("NetName for field IsPage not found");
 
             var value = new Dictionary<string, string> { { ContentItemIdFieldName, item.Id.ToString(CultureInfo.InvariantCulture) } };
             foreach (var x in columnNames)

@@ -42,6 +42,7 @@ namespace QA.Engine.Administration.Services.Core
             var useRegion = _settingsProvider.HasRegion(siteId);
             if (useRegion)
             {
+                _logger.LogTrace("Use region filter");
                 var rootPage = _siteMapProvider.GetRootPage(siteId);
                 var regions = _dictionaryProvider.GetAllRegions(siteId);
                 var filter = RegionFilterFactory.Create(rootPage, regions, useHierarchyRegionFilter ?? false);
@@ -73,6 +74,7 @@ namespace QA.Engine.Administration.Services.Core
             var useRegion = _settingsProvider.HasRegion(siteId);
             if (useRegion)
             {
+                _logger.LogTrace("Use region filter");
                 var rootPage = _siteMapProvider.GetRootPage(siteId);
                 var regions = _dictionaryProvider.GetAllRegions(siteId);
                 var filter = RegionFilterFactory.Create(rootPage, regions, useHierarchyRegionFilter ?? false);
@@ -105,7 +107,7 @@ namespace QA.Engine.Administration.Services.Core
             var useRegion = _settingsProvider.HasRegion(siteId);
             if (useRegion)
             {
-                _logger.LogInformation("Use region filter");
+                _logger.LogTrace("Use region filter");
                 var rootPage = _siteMapProvider.GetRootPage(siteId);
                 var regions = _dictionaryProvider.GetAllRegions(siteId);
                 var filter = RegionFilterFactory.Create(rootPage, regions, useHierarchyRegionFilter ?? false);
@@ -138,7 +140,7 @@ namespace QA.Engine.Administration.Services.Core
             var useRegion = _settingsProvider.HasRegion(siteId);
             if (useRegion)
             {
-                _logger.LogInformation("Use region filter");
+                _logger.LogTrace("Use region filter");
                 var rootPage = _siteMapProvider.GetRootPage(siteId);
                 var regions = _dictionaryProvider.GetAllRegions(siteId);
                 var filter = RegionFilterFactory.Create(rootPage, regions, useHierarchyRegionFilter ?? false);

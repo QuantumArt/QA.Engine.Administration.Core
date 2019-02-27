@@ -113,7 +113,7 @@ namespace QA.Engine.Administration.WebApp.Core
         {
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
+                //app.UseDeveloperExceptionPage();
                 //app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions {
                 //    HotModuleReplacement = true,
                 //    ReactHotModuleReplacement = true,
@@ -125,6 +125,7 @@ namespace QA.Engine.Administration.WebApp.Core
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            app.UseMiddleware<ExceptionHandler>();
 
             app.UseStaticFiles();
             //app.UseSpaStaticFiles();

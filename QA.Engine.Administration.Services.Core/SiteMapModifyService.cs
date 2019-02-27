@@ -36,10 +36,10 @@ namespace QA.Engine.Administration.Services.Core
 
             var item = _siteMapProvider.GetByIds(siteId, false, new[] { editModel.ItemId })?.FirstOrDefault();
             if (item == null)
-                throw new InvalidOperationException("Элемент не найден.");
+                throw new InvalidOperationException($"Element {editModel.ItemId} not found");
 
             if (editModel.ExtensionId.HasValue && editModel.ExtensionId != item.ExtensionId)
-                throw new InvalidOperationException("Неверно задано расширение для контента.");
+                throw new InvalidOperationException($"Invalid extension ({editModel.ExtensionId}) for element {editModel.ItemId}");
 
             var contentId = _settingsProvider.GetContentId(siteId);
 
@@ -56,7 +56,7 @@ namespace QA.Engine.Administration.Services.Core
 
             var items = _siteMapProvider.GetByIds(siteId, false, itemIds);
             if (!items.Any())
-                throw new InvalidOperationException("Элемент не найден.");
+                throw new InvalidOperationException($"Elements {string.Join(", ", itemIds)} not found");
 
             var status = _dictionaryProvider.GetStatusType(siteId, QpContentItemStatus.Published);
             var contentId = _settingsProvider.GetContentId(siteId);
@@ -74,7 +74,7 @@ namespace QA.Engine.Administration.Services.Core
             var items = _siteMapProvider.GetByIds(siteId, false, new[] { itemId, relatedItemId });
 
             if (!items.Any(x => x.Id == itemId) || !items.Any(x => x.Id == relatedItemId))
-                throw new InvalidOperationException("itemId or relatedItemId doesn't exist");
+                throw new InvalidOperationException($"itemId or relatedItemId doesn't exist (itemId={itemId}, relatedItemId={relatedItemId})");
 
             var item = items.First(x => x.Id == itemId);
 
@@ -107,7 +107,7 @@ namespace QA.Engine.Administration.Services.Core
             var items = _siteMapProvider.GetByIds(siteId, false, new[] { itemId, newParentId });
 
             if (!items.Any(x => x.Id == itemId) || !items.Any(x => x.Id == newParentId))
-                throw new InvalidOperationException("itemId or newParentId doesn't exist");
+                throw new InvalidOperationException($"itemId or newParentId doesn't exist (itemId={itemId}, newParentId={newParentId})");
 
             var contentId = _settingsProvider.GetContentId(siteId);
 
@@ -121,22 +121,22 @@ namespace QA.Engine.Administration.Services.Core
             if (itemId <= 0)
                 throw new ArgumentException("itemId <= 0");
             if (!isDeleteContentVersion && contentVersionId == null)
-                throw new InvalidOperationException("Не указана версия для замены.");
+                throw new InvalidOperationException("Field contentVersionId is required if isDeleteContentVersion is false");
 
             var item = _siteMapProvider.GetByIds(siteId, false, new[] { itemId })?.FirstOrDefault();
             if (item == null || item.Id == 0)
-                throw new InvalidOperationException("Элемент не найден.");
+                throw new InvalidOperationException($"Element {itemId} not found");
 
             if (contentVersionId.HasValue)
             {
                 var contentVersion = _siteMapProvider.GetByIds(siteId, false, new[] { contentVersionId.Value })?.FirstOrDefault();
                 if (contentVersion == null || contentVersion.Id == 0)
-                    throw new InvalidOperationException("Контентная версия не найдена.");
+                    throw new InvalidOperationException($"Element {contentVersionId} not found");
             }
 
             var rootPageId = _siteMapProvider.GetRootPage(siteId)?.Id;
             if (itemId == rootPageId)
-                throw new InvalidOperationException("Нельзя удалить главную  страницу.");
+                throw new InvalidOperationException("Cannot delete the root page");
 
             var itemsToArchive = new List<AbstractItemData>();
             AbstractItemData moveContentVersion = null;
@@ -217,13 +217,13 @@ namespace QA.Engine.Administration.Services.Core
 
             var item = _siteMapProvider.GetByIds(siteId, true, new[] { itemId })?.FirstOrDefault();
             if (item == null || item.Id == 0)
-                throw new InvalidOperationException("Элемент не найден.");
+                throw new InvalidOperationException($"Element {itemId} not found");
 
             if (item.VersionOfId != null || item.ParentId != null)
             {
                 var parent = _siteMapProvider.GetByIds(siteId, false, new int[] { item.VersionOfId ?? item.ParentId.Value }).FirstOrDefault();
                 if (parent == null || parent.Id == 0)
-                    throw new InvalidOperationException("Нельзя восстановить элемент без элемента-предка.");
+                    throw new InvalidOperationException("Cannot restore element without parent element");
             }
 
             var itemsToRestore = new List<AbstractItemData>();
@@ -292,11 +292,11 @@ namespace QA.Engine.Administration.Services.Core
 
             var item = _siteMapProvider.GetByIds(siteId, true, new[] { itemId })?.FirstOrDefault();
             if (item == null || item.Id == 0)
-                throw new InvalidOperationException("Элемент не найден.");
+                throw new InvalidOperationException($"Element {itemId} not found");
 
             var rootPageId = _siteMapProvider.GetRootPage(siteId)?.Id;
             if (itemId == rootPageId)
-                throw new InvalidOperationException("Нельзя удалить главную страницу.");
+                throw new InvalidOperationException("Cannot delete the root page");
 
             var itemsToDelete = new List<AbstractItemData>();
 
