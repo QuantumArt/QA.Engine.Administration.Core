@@ -13,15 +13,17 @@ namespace QA.Engine.Administration.Data.Core
         private readonly IMetaInfoRepository _metaInfoRepository;
         private readonly IQpMetadataManager _qpMetadataManager;
         private readonly IQpContentManager _qpContentManager;
+        private readonly IQpDbConnector _qpDbConnector;
 
         private string AbstractItemNetName => "QPAbstractItem";
         private string RegionNetName => "QPRegion";
 
-        public SettingsProvider(IMetaInfoRepository metaInfoRepository, IQpMetadataManager qpMetadataManager, IQpContentManager qpContentManager)
+        public SettingsProvider(IMetaInfoRepository metaInfoRepository, IQpMetadataManager qpMetadataManager, IQpContentManager qpContentManager, IQpDbConnector qpDbConnector)
         {
             _metaInfoRepository = metaInfoRepository;
             _qpMetadataManager = qpMetadataManager;
             _qpContentManager = qpContentManager;
+            _qpDbConnector = qpDbConnector;
         }
 
         public int GetContentId(int siteId)
@@ -76,6 +78,13 @@ namespace QA.Engine.Administration.Data.Core
                 }).ToList();
 
             return result;
+        }
+
+        public string GetIconUrl(int siteId)
+        {
+            var fieldId = _qpDbConnector.DbConnector.GetAttributeIdByNetNames(siteId, "QPDiscriminator", "IconUrl");
+            var url = _qpDbConnector.DbConnector.GetUrlForFileAttribute(fieldId, true, false);
+            return url;
         }
     }
 }

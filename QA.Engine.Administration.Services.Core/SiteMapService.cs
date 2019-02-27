@@ -48,14 +48,18 @@ namespace QA.Engine.Administration.Services.Core
                 regionFilter = filter.GetFilter(regionIds);
             }
             
+            var iconUrl = _settingsProvider.GetIconUrl(siteId);
+
             var items = _siteMapProvider.GetItems(siteId, isArchive, parentId.HasValue ? new[] { parentId.Value } : null, useRegion)
                 .Where(regionFilter)
                 .Select(x => _mapper.Map<PageModel>(x))
                 .ToList();
+            items.ForEach(x => x.IconUrl = $"{iconUrl}/{x.IconUrl}");
             var children = _siteMapProvider.GetItems(siteId, isArchive, items.Select(x => x.Id), useRegion)
                 .Where(regionFilter)
                 .Select(x => _mapper.Map<PageModel>(x))
                 .ToList();
+            children.ForEach(x => x.IconUrl = $"{iconUrl}/{x.IconUrl}");
 
             foreach (var item in items)
                 item.Children = children.Where(x => x.ParentId == item.Id).ToList();
@@ -75,14 +79,18 @@ namespace QA.Engine.Administration.Services.Core
                 regionFilter = filter.GetFilter(regionIds);
             }
 
+            var iconUrl = _settingsProvider.GetIconUrl(siteId);
+
             var items = _widgetProvider.GetItems(siteId, isArchive, new[] { parentId })
                 .Where(regionFilter)
                 .Select(x => _mapper.Map<WidgetModel>(x))
                 .ToList();
+            items.ForEach(x => x.IconUrl = $"{iconUrl}/{x.IconUrl}");
             var children = _widgetProvider.GetItems(siteId, isArchive, items.Select(x => x.Id))
                 .Where(regionFilter)
                 .Select(x => _mapper.Map<WidgetModel>(x))
                 .ToList();
+            children.ForEach(x => x.IconUrl = $"{iconUrl}/{x.IconUrl}");
 
             foreach (var item in items)
                 item.Children = children.Where(x => x.ParentId == item.Id).ToList();
@@ -104,11 +112,14 @@ namespace QA.Engine.Administration.Services.Core
                 regionFilter = filter.GetFilter(regionIds);
             }
 
+            var iconUrl = _settingsProvider.GetIconUrl(siteId);
+
             var stopwatch = new Stopwatch();
             stopwatch.Start();
             var abstractItems = _siteMapProvider.GetAllItems(siteId, false, useRegion)
                 .Where(regionFilter)
                 .ToList();
+            abstractItems.ForEach(x => x.IconUrl = $"{iconUrl}/{x.IconUrl}");
             stopwatch.Stop();
             _logger.LogTrace($"get all abstract items {stopwatch.ElapsedMilliseconds}ms");
 
@@ -134,11 +145,14 @@ namespace QA.Engine.Administration.Services.Core
                 regionFilter = filter.GetFilter(regionIds);
             }
 
+            var iconUrl = _settingsProvider.GetIconUrl(siteId);
+
             var stopwatch = new Stopwatch();
             stopwatch.Start();
             var abstractItems = _siteMapProvider.GetAllItems(siteId, false, useRegion)
                 .Where(regionFilter)
                 .ToList();
+            abstractItems.ForEach(x => x.IconUrl = $"{iconUrl}/{x.IconUrl}");
             stopwatch.Stop();
             _logger.LogTrace($"get all abstract items {stopwatch.ElapsedMilliseconds}ms");
 
@@ -154,10 +168,12 @@ namespace QA.Engine.Administration.Services.Core
         {
             _logger.LogTrace($"GetSiteMapStructure siteId={siteId}");
             var useRegion = _settingsProvider.HasRegion(siteId);
+            var iconUrl = _settingsProvider.GetIconUrl(siteId);
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
             var abstractItems = _siteMapProvider.GetAllItems(siteId, true, useRegion);
+            abstractItems.ForEach(x => x.IconUrl = $"{iconUrl}/{x.IconUrl}");
             stopwatch.Stop();
             _logger.LogTrace($"get all archive abstract items {stopwatch.ElapsedMilliseconds}ms");
 
@@ -172,10 +188,12 @@ namespace QA.Engine.Administration.Services.Core
         {
             _logger.LogTrace($"GetSiteMapStructure siteId={siteId}");
             var useRegion = _settingsProvider.HasRegion(siteId);
+            var iconUrl = _settingsProvider.GetIconUrl(siteId);
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
             var abstractItems = _siteMapProvider.GetAllItems(siteId, true, useRegion);
+            abstractItems.ForEach(x => x.IconUrl = $"{iconUrl}/{x.IconUrl}");
             stopwatch.Stop();
             _logger.LogTrace($"get all archive abstract items {stopwatch.ElapsedMilliseconds}ms");
 

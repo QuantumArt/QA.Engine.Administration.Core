@@ -9,5 +9,6 @@ namespace QA.Engine.Administration.Data.Interfaces.Core
         bool HasRegion(int siteId);
         QpContentData GetContent(int siteId, string contentName);
         List<QpFieldData> GetFields(int siteId, int contentId);
+        string GetIconUrl(int siteId);
     }
 }
