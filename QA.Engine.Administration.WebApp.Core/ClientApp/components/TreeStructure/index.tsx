@@ -20,10 +20,11 @@ interface Props {
     editArticleStore?: EditArticleStore;
     sbHeightMin?: number;
     sbHeightMax?: number;
+    sbThumbSize?: number;
     spinnerSize?: number;
 }
 
-type DefaultProps = 'sbHeightMin' | 'sbHeightMax' | 'spinnerSize';
+type DefaultProps = 'sbHeightMin' | 'sbHeightMax' | 'sbThumbSize' | 'spinnerSize';
 
 interface InternalStyle extends JSX.IntrinsicAttributes, React.ClassAttributes<HTMLDivElement>, React.HTMLAttributes<HTMLDivElement> {
 }
@@ -97,13 +98,13 @@ export default class SiteTree extends React.Component<Props> {
         return (
             <Card className="tree-pane">
                 {isLoading ?
-                    <Spinner size={30}/> :
+                    <Spinner size={this.props.spinnerSize}/> :
                     <Scrollbars
                         autoHeight
                         autoHide
-                        autoHeightMin={30}
-                        autoHeightMax={855}
-                        thumbMinSize={100}
+                        autoHeightMin={this.props.sbHeightMin}
+                        autoHeightMax={this.props.sbHeightMax}
+                        thumbMinSize={this.props.sbThumbSize}
                         renderTrackVertical={(style: InternalStyle, ...props: InternalRestProps[]) => (
                             <div
                                 className="track-vertical"
