@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { observer, inject } from 'mobx-react';
-import { Button, Navbar, NavbarGroup, H5, Intent, Spinner, InputGroup, Card, Checkbox } from '@blueprintjs/core';
+import { Button, Navbar, NavbarGroup, H5, Intent, Spinner, Card, Checkbox } from '@blueprintjs/core';
 import OperationState from 'enums/OperationState';
 import PopupStore from 'stores/PopupStore';
 import TreeStore from 'stores/TreeStore';
-import ContentVersionTree from 'components/SiteTree/ContentVersionTree';
+import TreeStructure from 'components/TreeStructure';
 import PopupType from 'enums/PopupType';
 import TextStore from 'stores/TextStore';
 import Texts from 'constants/Texts';
@@ -82,7 +82,7 @@ export default class ContentVersionTab extends React.Component<Props> {
                         <Button minimal icon="add" text={textStore.texts[Texts.add]} intent={Intent.PRIMARY} onClick={this.addClick} />
                     </NavbarGroup>
                 </Navbar>
-                <ContentVersionTree />
+                <TreeStructure type="versions" treeStore={treeStore} />
                 {tab}
             </div>
         );

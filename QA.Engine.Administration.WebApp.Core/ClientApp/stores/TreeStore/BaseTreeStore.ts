@@ -2,7 +2,7 @@ import * as React from 'react';
 import { action, observable, computed } from 'mobx';
 import v4 from 'uuid/v4';
 import { IconName, ITreeNode } from '@blueprintjs/core';
-import ContextMenu from 'components/SiteTree/ContextMenu';
+import ContextMenu from 'components/TreeStructure/ContextMenu';
 import OperationState from 'enums/OperationState';
 import ContextMenuType from 'enums/ContextMenuType';
 import TreeErrors from 'enums/TreeErrors';
@@ -80,6 +80,7 @@ export abstract class BaseTreeState<T extends {
 
     @action
     public handleNodeCollapse = (nodeData: ITreeElement) => {
+        console.log('colapse');
         if (nodeData.childNodes.length !== 0 && nodeData.parentId !== null) {
             nodeData.icon = 'folder-close';
         }

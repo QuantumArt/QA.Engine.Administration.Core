@@ -1,7 +1,7 @@
 import classnames from 'classnames';
 import * as React from 'react';
 
-import { CustomTreeNode } from 'components/SiteTree/CustomTreeNode';
+import { CustomTreeNode } from 'components/TreeStructure/CustomTreeNode';
 import { ITreeNode, TreeNode, ITreeProps, TreeEventHandler } from '@blueprintjs/core';
 import { isFunction } from 'util';
 

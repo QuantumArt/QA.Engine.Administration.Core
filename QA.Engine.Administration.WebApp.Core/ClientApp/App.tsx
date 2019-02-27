@@ -7,7 +7,7 @@ import '@blueprintjs/icons/lib/css/blueprint-icons.css';
 import 'normalize.css/normalize.css';
 
 import 'assets/style.css';
-import SiteTree from 'components/SiteTree';
+import TreeStructure from 'components/TreeStructure';
 import TabsContainer from 'components/TabsContainer';
 import NavigationBar from 'components/NavigationBar';
 import NavigationStore from 'stores/NavigationStore';
@@ -40,7 +40,10 @@ const app = hot(module)(() => {
         >
         <div className="layout">
             <NavigationBar/>
-            <SiteTree/>
+            <TreeStructure
+                type="site"
+                treeStore={treeStoreInstance}
+            />
             <TabsContainer/>
             <Popup>
                 <AddPopup/>
