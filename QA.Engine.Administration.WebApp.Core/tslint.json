@@ -6,7 +6,8 @@
       "max-line-length": [true, {"limit": 120, "ignore-pattern": "^\\s*(.+)$"}],
       "ter-indent": [true, 4, {
         "SwitchCase": 1
-      }]
+      }],
+      "variable-name": [true, "allow-pascal-case"]
     },
     "rulesDirectory": []
 }

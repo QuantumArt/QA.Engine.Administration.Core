@@ -2,6 +2,7 @@ import * as React from 'react';
 import { inject, observer } from 'mobx-react';
 import { Card, Spinner } from '@blueprintjs/core';
 import Scrollbars from 'react-custom-scrollbars'; // tslint:disable-line
+import cn from 'classnames'; // tslint:disable-line
 import NavigationStore  from 'stores/NavigationStore';
 import OperationState from 'enums/OperationState';
 import { ITreeElement } from 'stores/TreeStore/BaseTreeStore';
@@ -22,6 +23,7 @@ interface Props {
     sbHeightMax?: number;
     sbThumbSize?: number;
     spinnerSize?: number;
+    className?: string;
 }
 
 type DefaultProps = 'sbHeightMin' | 'sbHeightMax' | 'sbThumbSize' | 'spinnerSize';
@@ -96,10 +98,11 @@ export default class SiteTree extends React.Component<Props> {
         this.resolveTree();
         const isLoading = this.tree.treeState === OperationState.NONE || this.tree.treeState === OperationState.PENDING;
         return (
-            <Card className="tree-pane">
+            <Card className={cn('tree-pane', this.props.className)}>
                 {isLoading ?
                     <Spinner size={this.props.spinnerSize}/> :
                     <Scrollbars
+                        hideTracksWhenNotNeeded
                         autoHeight
                         autoHide
                         autoHeightMin={this.props.sbHeightMin}
@@ -119,7 +122,7 @@ export default class SiteTree extends React.Component<Props> {
                         )}
                     >
                         <TreeR
-                            className="site-tree"
+                            className="tree"
                             contents={this.tree.tree}
                             onNodeCollapse={this.tree.handleNodeCollapse}
                             onNodeExpand={this.tree.handleNodeExpand}
