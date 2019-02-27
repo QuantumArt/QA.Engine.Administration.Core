@@ -63,6 +63,26 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
         }
     }
 
+    public async archive(model: RemoveModel): Promise<void> {
+        this.treeState = OperationState.PENDING;
+        try {
+            const response: ApiResult<any> = await SiteMapService.archive(model);
+            if (response.isSuccess) {
+                this.treeState = OperationState.SUCCESS;
+            } else {
+                throw response.error;
+            }
+        } catch (e) {
+            this.treeState = OperationState.ERROR;
+            this.treeErrors.push({
+                type: TreeErrors.archive,
+                data: model,
+                message: e,
+                id: v4(),
+            });
+        }
+    }
+
     protected readonly contextMenuType: ContextMenuType = ContextMenuType.WIDGET;
 
     protected async getTree(): Promise<ApiResult<WidgetModel[]>> {

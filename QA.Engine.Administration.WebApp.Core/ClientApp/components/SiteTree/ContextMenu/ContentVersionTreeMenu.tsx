@@ -22,6 +22,11 @@ interface Props {
 @observer
 export default class ContentVersionTreeMenu extends React.Component<Props> {
 
+    private async publish(treeStore: TreeStore, itemId: number): Promise<void> {
+        await treeStore.getContentVersionsStore().publish([itemId]);
+        await treeStore.updateSubTree();
+    }
+
     private editClick = () => {
         const { qpIntegrationStore, itemId } = this.props;
         qpIntegrationStore.edit(itemId);
@@ -34,12 +39,12 @@ export default class ContentVersionTreeMenu extends React.Component<Props> {
 
     private publishClick = () => {
         const { treeStore, itemId } = this.props;
-        treeStore.getContentVersionsStore().publish([itemId]);
+        this.publish(treeStore, itemId);
     }
 
     private archiveClick = () => {
         const { popupStore, itemId, textStore } = this.props;
-        popupStore.show(itemId, PopupType.ARCHIVE, textStore.texts[Texts.popupArchiveItemTitle]);
+        popupStore.show(itemId, PopupType.ARCHIVECONTENTVERSION, textStore.texts[Texts.popupArchiveItemTitle]);
     }
 
     private handleClick = (e: React.MouseEvent<HTMLElement>, cb: () => void) => {

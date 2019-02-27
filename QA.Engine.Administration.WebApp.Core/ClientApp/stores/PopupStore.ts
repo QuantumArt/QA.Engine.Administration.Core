@@ -17,11 +17,15 @@ export default class PopupStore {
     @action
     public show(itemId: number, type: PopupType, title: string) {
         this.state = OperationState.NONE;
+
         const useDiscriminators = [PopupType.ADD, PopupType.ADDVERSION, PopupType.ADDWIDGET];
+        const useContentVersions = [PopupType.ARCHIVE];
+
         if (useDiscriminators.indexOf(type) > -1) {
             this.getDiscriminators(type !== PopupType.ADDWIDGET);
         }
-        if (type === PopupType.ARCHIVE && itemId != null) {
+
+        if (useContentVersions.indexOf(type) > -1) {
             this.getContentVersions(itemId);
         }
         this.itemId = itemId;
@@ -56,7 +60,7 @@ export default class PopupStore {
         try {
             const response: ApiResult<PageModel> = await SiteMapService.getSiteMapSubTree(itemId);
             if (response.isSuccess) {
-                this.contentVersions = response.data.contentVersions;
+                this.contentVersions = response.data == null ? [] : response.data.contentVersions;
                 this.state = OperationState.SUCCESS;
             } else {
                 throw response.error;

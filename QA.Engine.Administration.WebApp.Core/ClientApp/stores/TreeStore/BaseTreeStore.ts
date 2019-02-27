@@ -39,6 +39,7 @@ export abstract class BaseTreeState<T extends {
     @observable public selectedNode: T;
 
     protected treeInternal: ITreeElement[];
+    protected origTree: T[];
 
     @computed
     get tree(): ITreeElement[] {
@@ -68,8 +69,6 @@ export abstract class BaseTreeState<T extends {
             });
         }
     }
-
-    protected origTree: T[];
 
     @action
     public handleNodeExpand = (nodeData: ITreeElement) => {

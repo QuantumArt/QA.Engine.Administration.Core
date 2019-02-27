@@ -33,13 +33,15 @@ export default class WidgetTab extends React.Component<Props> {
 
         const { treeStore, textStore } = this.props;
         const tree = treeStore.getWidgetStore();
+        const siteTree = treeStore.resolveTreeStore();
         const selectedNode = tree.selectedNode;
 
         if (tree.selectedSiteTreeNode == null) {
             return null;
         }
 
-        if (tree.treeState === OperationState.NONE || tree.treeState === OperationState.PENDING) {
+        const loadingStates = [OperationState.NONE, OperationState.PENDING];
+        if (loadingStates.indexOf(tree.treeState) > -1 || loadingStates.indexOf(siteTree.treeState) > -1) {
             return (<Spinner size={60} />);
         }
 

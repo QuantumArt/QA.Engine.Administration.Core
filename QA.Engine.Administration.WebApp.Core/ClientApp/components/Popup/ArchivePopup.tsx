@@ -36,6 +36,16 @@ export default class ArchivePopup extends React.Component<Props, State> {
         contentVersionId: null as number,
     };
 
+    private async archiveWidget(treeStore: TreeStore, model: RemoveModel): Promise<void> {
+        await treeStore.getWidgetStore().archive(model);
+        await treeStore.updateSubTree();
+    }
+
+    private async archiveContentVersion(treeStore: TreeStore, model: RemoveModel): Promise<void> {
+        await treeStore.getContentVersionsStore().archive(model);
+        await treeStore.updateSubTree();
+    }
+
     private archiveClick = () => {
         const { popupStore, treeStore } = this.props;
         const { deleteAllVersions, deleteContentVersions, contentVersionId } = this.state;
@@ -45,7 +55,15 @@ export default class ArchivePopup extends React.Component<Props, State> {
             isDeleteAllVersions: deleteAllVersions,
             isDeleteContentVersions: deleteContentVersions === ContentVersionOperations.archive,
         };
-        (treeStore.resolveTreeStore() as SiteTreeStore).archive(model);
+        if (popupStore.type === PopupType.ARCHIVE) {
+            (treeStore.resolveTreeStore() as SiteTreeStore).archive(model);
+        }
+        if (popupStore.type === PopupType.ARCHIVEWIDGET) {
+            this.archiveWidget(treeStore, model);
+        }
+        if (popupStore.type === PopupType.ARCHIVECONTENTVERSION) {
+            this.archiveContentVersion(treeStore, model);
+        }
         popupStore.close();
     }
 
@@ -63,8 +81,20 @@ export default class ArchivePopup extends React.Component<Props, State> {
     render() {
         const { popupStore, textStore } = this.props;
         const { deleteAllVersions, deleteContentVersions } = this.state;
-        if (popupStore.type !== PopupType.ARCHIVE) {
+
+        if ([PopupType.ARCHIVE, PopupType.ARCHIVEWIDGET, PopupType.ARCHIVECONTENTVERSION].indexOf(popupStore.type) < 0) {
             return null;
+        }
+
+        if ([PopupType.ARCHIVEWIDGET, PopupType.ARCHIVECONTENTVERSION].indexOf(popupStore.type) > -1) {
+            return (
+                <Card>
+                    <ButtonGroup className="dialog-button-group">
+                        <Button text={textStore.texts[Texts.popupArchiveButton]} icon="box" onClick={this.archiveClick} intent={Intent.DANGER} />
+                        <Button text={textStore.texts[Texts.popupCancelButton]} icon="undo" onClick={this.cancelClick} />
+                    </ButtonGroup>
+                </Card>
+            );
         }
 
         return (
