@@ -5,7 +5,7 @@ import TreeStore from 'stores/TreeStore';
 import PopupType from 'enums/PopupType';
 import OperationState from 'enums/OperationState';
 import { Spinner, Card, H5, Navbar, NavbarGroup, Button, Intent, Checkbox } from '@blueprintjs/core';
-import WidgetTree from 'components/SiteTree/WidgetTree';
+import TreeStructure from 'components/TreeStructure';
 import TextStore from 'stores/TextStore';
 import Texts from 'constants/Texts';
 
@@ -80,7 +80,7 @@ export default class WidgetTab extends React.Component<Props> {
                         <Button minimal icon="add" text={textStore.texts[Texts.add]} intent={Intent.PRIMARY} onClick={this.addClick} />
                     </NavbarGroup>
                 </Navbar>
-                <WidgetTree />
+                <TreeStructure type="widgets" treeStore={treeStore} />
                 {tab}
             </div>
         );

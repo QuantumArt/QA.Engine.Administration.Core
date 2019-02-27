@@ -7,17 +7,23 @@ import OperationState from 'enums/OperationState';
 import { ITreeElement } from 'stores/TreeStore/BaseTreeStore';
 import EditArticleStore from 'stores/EditArticleStore';
 import TreeStore from 'stores/TreeStore';
-import { CustomTree } from 'components/SiteTree/CustomTree';
-
-@observer
-class TreeR extends CustomTree {
-}
+import { CustomTree } from 'components/TreeStructure/CustomTree';
+import SiteTreeStore from 'stores/TreeStore/SiteTreeStore';
+import ArchiveTreeStore from 'stores/TreeStore/ArchiveTreeStore';
+import WidgetTreeStore from 'stores/TreeStore/WidgetTreeStore';
+import ContentVersionTreeStore from 'stores/TreeStore/ContentVersionTreeStore';
 
 interface Props {
+    type: 'site' | 'archive' | 'widgets' | 'versions';
+    treeStore: TreeStore;
     navigationStore?: NavigationStore;
     editArticleStore?: EditArticleStore;
-    treeStore?: TreeStore;
+    sbHeightMin?: number;
+    sbHeightMax?: number;
+    spinnerSize?: number;
 }
+
+type DefaultProps = 'sbHeightMin' | 'sbHeightMax' | 'spinnerSize';
 
 interface InternalStyle extends JSX.IntrinsicAttributes, React.ClassAttributes<HTMLDivElement>, React.HTMLAttributes<HTMLDivElement> {
 }
@@ -25,26 +31,69 @@ interface InternalStyle extends JSX.IntrinsicAttributes, React.ClassAttributes<H
 interface InternalRestProps extends JSX.IntrinsicAttributes, React.ClassAttributes<HTMLDivElement>, React.HTMLAttributes<HTMLDivElement> {
 }
 
-@inject('navigationStore', 'editArticleStore', 'treeStore')
+@observer
+class TreeR extends CustomTree {
+}
+
+@inject('navigationStore', 'editArticleStore')
 @observer
 export default class SiteTree extends React.Component<Props> {
-    private handleNodeClick = (e: ITreeElement) => {
+
+    static defaultProps: Pick<Props, DefaultProps> = {
+        sbHeightMin: 30,
+        sbHeightMax: 855,
+        spinnerSize: 30,
+    };
+
+    tree: SiteTreeStore | ArchiveTreeStore | WidgetTreeStore | ContentVersionTreeStore;
+
+    private resolveTree = () => {
+        const { type, treeStore } = this.props;
+        if (type === 'site' || type === 'archive') {
+            this.tree = treeStore.resolveTreeStore();
+        }
+        if (type === 'widgets') {
+            this.tree = treeStore.getWidgetStore();
+        }
+        if (type === 'versions') {
+            this.tree = treeStore.getContentVersionsStore();
+        }
+    }
+
+    private handleMajorTreeNode = (e: ITreeElement) => {
         const { navigationStore, editArticleStore, treeStore } = this.props;
-        const tree = treeStore.resolveTreeStore();
-        tree.handleNodeClick(e);
+        this.tree.handleNodeClick(e);
         navigationStore.setDefaultTab(e.isSelected);
         [
             editArticleStore,
             treeStore.getContentVersionsStore(),
             treeStore.getWidgetStore(),
-        ].forEach(x => x.init(tree.selectedNode));
+        ].forEach((x) => {
+            if (this.tree instanceof SiteTreeStore || this.tree instanceof ArchiveTreeStore) {
+                x.init(this.tree.selectedNode);
+            }
+        });
+    }
+
+    private handleMinorTreeNode = (e: ITreeElement) => {
+        this.tree.handleNodeClick(e);
+        if (!e.isSelected) {
+            this.tree.selectedNode = null;
+        }
+    }
+
+    private handleNodeClick = (e: ITreeElement) => {
+        const { type } = this.props;
+        if (type === 'site' || type === 'archive') {
+            this.handleMajorTreeNode(e);
+        } else {
+            this.handleMinorTreeNode(e);
+        }
     }
 
     render() {
-        const { treeStore } = this.props;
-        const tree = treeStore.resolveTreeStore();
-        const isLoading = tree.treeState === OperationState.NONE || tree.treeState === OperationState.PENDING;
-
+        this.resolveTree();
+        const isLoading = this.tree.treeState === OperationState.NONE || this.tree.treeState === OperationState.PENDING;
         return (
             <Card className="tree-pane">
                 {isLoading ?
@@ -70,9 +119,9 @@ export default class SiteTree extends React.Component<Props> {
                     >
                         <TreeR
                             className="site-tree"
-                            contents={tree.tree}
-                            onNodeCollapse={tree.handleNodeCollapse}
-                            onNodeExpand={tree.handleNodeExpand}
+                            contents={this.tree.tree}
+                            onNodeCollapse={this.tree.handleNodeCollapse}
+                            onNodeExpand={this.tree.handleNodeExpand}
                             onNodeClick={this.handleNodeClick}
                         />
                     </Scrollbars>
