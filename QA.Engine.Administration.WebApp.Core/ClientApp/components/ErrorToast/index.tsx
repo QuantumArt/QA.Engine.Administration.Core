@@ -26,12 +26,20 @@ export default class ErrorToast extends React.Component<Props> {
         tree.treeErrors.forEach((e) => {
             switch (e.type) {
                 case TreeErrors.fetch:
-                    if (tree instanceof SiteTreeStore) {
+                    if (tree instanceof SiteTreeStore ||
+                        tree instanceof ArchiveTreeStore ||
+                        tree instanceof WidgetTreeStore ||
+                        tree instanceof ContentVersionTreeStore
+                    ) {
                         tree.fetchTree();
                     }
                     break;
                 case TreeErrors.update:
-                    if (tree instanceof SiteTreeStore) {
+                    if (tree instanceof SiteTreeStore ||
+                        tree instanceof ArchiveTreeStore ||
+                        tree instanceof WidgetTreeStore ||
+                        tree instanceof ContentVersionTreeStore
+                    ) {
                         tree.updateSubTree(e.data);
                     }
                     break;

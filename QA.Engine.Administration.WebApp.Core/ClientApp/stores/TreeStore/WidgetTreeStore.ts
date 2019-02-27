@@ -3,7 +3,7 @@ import SiteMapService from 'services/SiteMapService';
 import { BaseTreeState, ITreeElement } from 'stores/TreeStore/BaseTreeStore';
 import ContextMenuType from 'enums/ContextMenuType';
 import OperationState from 'enums/OperationState';
-import { observable, action } from 'mobx';
+import { action, observable } from 'mobx';
 import TreeErrors from 'enums/TreeErrors';
 
 export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
@@ -142,7 +142,7 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
     }
 
     private mapWidgetZoneElement(x: WidgetModel): ITreeElement {
-        const treeElement = observable<ITreeElement>({
+        return observable<ITreeElement>({
             id: x.zoneName,
             childNodes: [],
             label: x.zoneName,
@@ -153,7 +153,6 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
             parentId: x.parentId,
             contextMenuType: null,
         });
-        return treeElement;
     }
 
     private widgetTree: WidgetModel[];
