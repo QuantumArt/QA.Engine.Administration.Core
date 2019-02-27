@@ -2,7 +2,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using QA.Engine.Administration.Services.Core.Annotations;
+using QA.Engin.Administration.Common.Core;
 using QA.Engine.Administration.Services.Core.Interfaces;
 using QA.Engine.Administration.Services.Core.Models;
 using QA.Engine.Administration.WebApp.Core.Auth;

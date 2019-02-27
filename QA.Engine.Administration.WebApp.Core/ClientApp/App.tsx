@@ -23,6 +23,7 @@ import DeletePopup from 'components/Popup/DeletePopup';
 import RestorePopup from 'components/Popup/RestorePopup';
 import ErrorToast from 'components/ErrorToast';
 import TextStore from 'stores/TextStore';
+import ReorderPopup from 'components/Popup/ReorderPopup';
 
 const app = hot(module)(() => {
     const navigationStoreInstance = new NavigationStore();
@@ -51,6 +52,7 @@ const app = hot(module)(() => {
                 <ArchivePopup/>
                 <DeletePopup/>
                 <RestorePopup/>
+                <ReorderPopup/>
             </Popup>
             <ErrorToast/>
             <DevTools/>

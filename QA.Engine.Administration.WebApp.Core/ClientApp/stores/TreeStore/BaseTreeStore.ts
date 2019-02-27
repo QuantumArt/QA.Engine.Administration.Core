@@ -171,7 +171,7 @@ export abstract class BaseTreeState<T extends {
 
     protected abstract contextMenuType: ContextMenuType;
 
-    private getNodeById(id: number): T {
+    protected getNodeById(id: number): T {
         let elements = this.origTree;
         let loop = true;
         while (loop) {

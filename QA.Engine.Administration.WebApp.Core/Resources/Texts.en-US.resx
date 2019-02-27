@@ -216,6 +216,21 @@
   <data name="PopupMoveVersion" xml:space="preserve">
     <value>Move version</value>
   </data>
+  <data name="PopupReorderButton" xml:space="preserve">
+    <value>Apply</value>
+  </data>
+  <data name="PopupReorderInsertAfter" xml:space="preserve">
+    <value>After</value>
+  </data>
+  <data name="PopupReorderInsertBefore" xml:space="preserve">
+    <value>Before</value>
+  </data>
+  <data name="PopupReorderInsertLabel" xml:space="preserve">
+    <value>Insert</value>
+  </data>
+  <data name="PopupReorderTitle" xml:space="preserve">
+    <value>Reorder items</value>
+  </data>
   <data name="PopupRestoreAllVersion" xml:space="preserve">
     <value>Restore all versions</value>
   </data>
@@ -248,6 +263,9 @@
   </data>
   <data name="Refresh" xml:space="preserve">
     <value>Refresh</value>
+  </data>
+  <data name="Reorder" xml:space="preserve">
+    <value>Reorder</value>
   </data>
   <data name="Restore" xml:space="preserve">
     <value>Restore</value>

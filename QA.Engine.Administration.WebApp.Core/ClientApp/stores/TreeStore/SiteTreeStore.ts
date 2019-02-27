@@ -70,6 +70,32 @@ export default class SiteTreeStore extends BaseTreeState<PageModel> {
         }
     }
 
+    public async reorder(model: ReorderModel): Promise<void> {
+        this.treeState = OperationState.PENDING;
+        try {
+            const response: ApiResult<any> = await SiteMapService.reorder(model);
+            if (response.isSuccess) {
+                const id = this.selectedNode.parentId;
+                await this.updateSubTreeInternal(id);
+                this.treeState = OperationState.SUCCESS;
+            } else {
+                throw response.error;
+            }
+        } catch (e) {
+            this.treeState = OperationState.ERROR;
+            this.treeErrors.push({
+                type: TreeErrors.reorder,
+                data: model,
+                message: e,
+                id: v4(),
+            });
+        }
+    }
+
+    public get parentNode(): PageModel {
+        return this.getNodeById(this.selectedNode.parentId);
+    }
+
     protected contextMenuType: ContextMenuType = ContextMenuType.SITEMAP;
 
     protected async getTree(): Promise<ApiResult<PageModel[]>> {

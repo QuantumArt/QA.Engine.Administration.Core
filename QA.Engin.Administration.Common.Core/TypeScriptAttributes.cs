@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace QA.Engine.Administration.Services.Core.Annotations
+namespace QA.Engin.Administration.Common.Core
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Enum)]
     public sealed class TypeScriptType : Attribute

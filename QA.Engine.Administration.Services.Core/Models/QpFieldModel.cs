@@ -1,4 +1,4 @@
-﻿using QA.Engine.Administration.Services.Core.Annotations;
+﻿using QA.Engin.Administration.Common.Core;
 
 namespace QA.Engine.Administration.Services.Core.Models
 {

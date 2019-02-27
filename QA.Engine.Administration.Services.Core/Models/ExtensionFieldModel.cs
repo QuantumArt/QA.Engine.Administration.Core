@@ -1,7 +1,4 @@
-﻿using QA.Engine.Administration.Services.Core.Annotations;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using QA.Engin.Administration.Common.Core;
 
 namespace QA.Engine.Administration.Services.Core.Models
 {

@@ -50,8 +50,9 @@ export default class AddVersionPopup extends React.Component<Props, State> {
         this.setState({ version: version.target.value as VersionType })
 
     render() {
-        const { popupStore, textStore } = this.props;
+        const { popupStore, textStore, treeStore } = this.props;
         const { version } = this.state;
+
         if (popupStore.type !== PopupType.ADDVERSION) {
             return null;
         }

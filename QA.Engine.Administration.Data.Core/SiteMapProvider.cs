@@ -237,8 +237,8 @@ ORDER BY ai.content_item_id";
             const int maxParentIdsPerRequest = 500;
 
             string query = useRegion 
-                ? _netNameQueryAnalyzer.PrepareQueryExtabtion(_metaInfoRepository, CmdGetAbstractItems, siteId)
-                : _netNameQueryAnalyzer.PrepareQueryExtabtion(_metaInfoRepository, CmdGetAbstractItemsWithRegions, siteId);
+                ? _netNameQueryAnalyzer.PrepareQueryExtabtion(_metaInfoRepository, CmdGetAbstractItemsWithRegions, siteId)
+                : _netNameQueryAnalyzer.PrepareQueryExtabtion(_metaInfoRepository, CmdGetAbstractItems, siteId);
 
             if (parentIds == null || !parentIds.Any())
             {
