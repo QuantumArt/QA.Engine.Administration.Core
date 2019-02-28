@@ -121,3 +121,7 @@ body {
 .hidden {
     display: none !important;
 }
+
+.select-menu .bp3-menu {
+    max-width: 600px;
+}

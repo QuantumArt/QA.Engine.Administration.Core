@@ -44,7 +44,7 @@ export default class SiteTree extends React.Component<Props> {
 
     static defaultProps: Pick<Props, DefaultProps> = {
         sbHeightMin: 30,
-        sbHeightMax: 855,
+        sbHeightMax: 850,
         spinnerSize: 30,
     };
 

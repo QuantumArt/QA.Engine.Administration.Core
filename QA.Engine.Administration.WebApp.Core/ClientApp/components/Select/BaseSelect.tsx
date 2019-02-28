@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { MenuItem, Button } from '@blueprintjs/core';
+import { MenuItem, Button, Position } from '@blueprintjs/core';
 import { Select, ItemRenderer } from '@blueprintjs/select';
 
 function renderDiscriminator<T extends { id: number, title: string }>(): ItemRenderer<T> {
@@ -91,6 +91,11 @@ export default abstract class BaseSelect<T extends { id: number, title: string }
                 filterable={false}
                 onItemSelect={this.selectItemClick}
                 disabled={disabled}
+                popoverProps={{
+                    position: Position.BOTTOM,
+                    boundary: 'viewport',
+                    popoverClassName: 'select-menu',
+                }}
             >
                 <Button
                     rightIcon="caret-down"
