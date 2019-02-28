@@ -12,7 +12,7 @@ body {
     width: 250px;
 }
 
-.site-tree {
+.tree {
     margin-right: 6px;
     margin-left: 6px;
 }
@@ -25,6 +25,11 @@ body {
     padding-right: 14px;
 }
 
+.minor-tree-pane {
+    width: 60%;
+    align-self: flex-start;
+}
+
 .tabs-pane {
     width: 70%;
     margin-left: 10px;
@@ -32,7 +37,20 @@ body {
 }
 
 .tab-content {
+    display: flex;
     padding: 25px 0 0;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.tab-content--row {
+    flex-direction: row;
+}
+
+.tab-aside {
+    margin-left: 10px;
+    align-self: flex-start;
+    width: 40%;
 }
 
 .tab-entity {
