@@ -156,6 +156,9 @@
   <data name="IsVisible" xml:space="preserve">
     <value>Видимость</value>
   </data>
+  <data name="Move" xml:space="preserve">
+    <value>Переместить</value>
+  </data>
   <data name="PopupActionType" xml:space="preserve">
     <value>Тип действия</value>
   </data>
@@ -212,6 +215,12 @@
   </data>
   <data name="PopupFieldVersion" xml:space="preserve">
     <value>Версия</value>
+  </data>
+  <data name="PopupMoveButton" xml:space="preserve">
+    <value>Переместить</value>
+  </data>
+  <data name="PopupMoveTitle" xml:space="preserve">
+    <value>Переместить страницу</value>
   </data>
   <data name="PopupMoveVersion" xml:space="preserve">
     <value>Сменить версию</value>

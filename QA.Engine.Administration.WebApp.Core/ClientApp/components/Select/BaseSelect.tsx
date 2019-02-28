@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { MenuItem, Button, Position } from '@blueprintjs/core';
-import { Select, ItemRenderer } from '@blueprintjs/select';
+import { Select, ItemRenderer, ItemPredicate } from '@blueprintjs/select';
 
-function renderDiscriminator<T extends { id: number, title: string }>(): ItemRenderer<T> {
+function renderItem<T extends { id: number, title: string }>(): ItemRenderer<T> {
     return (item, { handleClick, modifiers, query }) => {
         if (!modifiers.matchesPredicate) {
             return null;
@@ -17,6 +17,12 @@ function renderDiscriminator<T extends { id: number, title: string }>(): ItemRen
                 text={highlightText(text, query)}
             />
         );
+    };
+}
+
+function filterItem<T extends { id: number, title: string }>(): ItemPredicate<T> {
+    return (query, item) => {
+        return item.title.toLowerCase().indexOf(query.toLowerCase()) >= 0;
     };
 }
 
@@ -58,6 +64,7 @@ function escapeRegExpChars(text: string) {
 interface Props<T> {
     items: T[];
     disabled?: boolean;
+    filterable?: boolean;
     onChange: (x: T) => void;
 }
 
@@ -80,15 +87,15 @@ export default abstract class BaseSelect<T extends { id: number, title: string }
     }
 
     render() {
-        const { items, disabled } = this.props;
+        const { items, disabled, filterable } = this.props;
         const { page } = this.state;
 
         return (
             <this.selectElement
                 items={items}
-                itemRenderer={renderDiscriminator()}
-                itemPredicate={(query, item) => item.title.indexOf(query.toLowerCase()) >= 0}
-                filterable={false}
+                itemRenderer={renderItem()}
+                itemPredicate={filterItem()}
+                filterable={filterable === true}
                 onItemSelect={this.selectItemClick}
                 disabled={disabled}
                 popoverProps={{

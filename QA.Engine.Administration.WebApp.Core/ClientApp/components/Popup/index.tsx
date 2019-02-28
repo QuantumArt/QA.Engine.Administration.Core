@@ -23,6 +23,7 @@ export default class Popup extends React.Component<Props> {
                 isOpen={popupStore.showPopup}
                 onClose={this.handleClose}
                 title={popupStore.title}
+                enforceFocus={false}
             >
                 {isLoading ? <Spinner size={30} className="dialog-spinner" /> : children}
             </Dialog>
