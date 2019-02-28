@@ -5,7 +5,7 @@ import OperationState from 'enums/OperationState';
 import TreeStore from 'stores/TreeStore';
 import EditArticleStore from 'stores/EditArticleStore';
 import TreeErrors from 'enums/TreeErrors';
-import { TreeErrorModel } from 'stores/TreeStore/BaseTreeStore';
+import { ITreeErrorModel } from 'stores/TreeStore/BaseTreeStore';
 import SiteTreeStore from 'stores/TreeStore/SiteTreeStore';
 import ArchiveTreeStore from 'stores/TreeStore/ArchiveTreeStore';
 import WidgetTreeStore from 'stores/TreeStore/WidgetTreeStore';
@@ -81,7 +81,7 @@ export default class ErrorToast extends React.Component<Props> {
         cb(i);
     }
 
-    private renderToast = (e:TreeErrorModel, i: number, currentTree: CurrentTree) => (
+    private renderToast = (e:ITreeErrorModel, i: number, currentTree: CurrentTree) => (
         <Toast
             message={`${e.type}. ${e.message}`}
             icon="warning-sign"

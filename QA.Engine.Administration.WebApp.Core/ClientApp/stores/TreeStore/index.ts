@@ -18,8 +18,8 @@ export default class TreeStore {
     constructor(navigationStore: NavigationStore) {
         this.siteTreeStore = new SiteTreeStore();
         this.archiveStore = new ArchiveTreeStore();
-        this.contentVersionsStore = new ContentVersionTreeStore();
-        this.widgetStore = new WidgetTreeStore();
+        this.contentVersionsStore = new ContentVersionTreeStore({ root: 'panel-stats' });
+        this.widgetStore = new WidgetTreeStore({ node: 'heat-grid', leaf: 'widget-button' });
 
         this.navigationStore = navigationStore;
     }

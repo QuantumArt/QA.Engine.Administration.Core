@@ -18,6 +18,7 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
 
     @action
     public init(selectedNode: any) {
+        console.log(this.icons);
         this.selectedSiteTreeNode = selectedNode;
         if (selectedNode == null || selectedNode.widgets == null) {
             this.widgetTree = [];
@@ -157,7 +158,7 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
 
     protected mapElement(el: WidgetModel): ITreeElement {
         const treeElement = super.mapElement(el);
-        treeElement.icon = 'document';
+        treeElement.icon = this.icons.leaf;
         return treeElement;
     }
 
@@ -167,7 +168,7 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
             childNodes: [],
             label: x.zoneName,
             isExpanded: false,
-            icon: 'folder-close',
+            icon: this.icons.node,
             hasCaret: true,
             isContextMenuActive: false,
             parentId: x.parentId,

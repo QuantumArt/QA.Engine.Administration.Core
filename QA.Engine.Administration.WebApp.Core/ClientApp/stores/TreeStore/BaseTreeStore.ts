@@ -15,11 +15,17 @@ export interface ITreeElement extends ITreeNode {
     contextMenuType: ContextMenuType;
 }
 
-export interface TreeErrorModel {
+export interface ITreeErrorModel {
     type: TreeErrors;
     message: string;
     data?: any;
     id: string;
+}
+
+export interface ITreeIcons {
+    root?: IconName;
+    node?: IconName;
+    leaf?: IconName;
 }
 
 /**
@@ -34,8 +40,12 @@ export abstract class BaseTreeState<T extends {
     hasChildren: boolean;
 }> {
 
+    constructor(icons: ITreeIcons = { root: 'application', node: 'document', leaf: 'folder-close' }) {
+        this.icons = icons;
+    }
+
     @observable public treeState: OperationState = OperationState.NONE;
-    @observable public treeErrors: TreeErrorModel[] = [];
+    @observable public treeErrors: ITreeErrorModel[] = [];
     @observable public selectedNode: T;
 
     protected treeInternal: ITreeElement[];
@@ -80,7 +90,6 @@ export abstract class BaseTreeState<T extends {
 
     @action
     public handleNodeCollapse = (nodeData: ITreeElement) => {
-        console.log('colapse');
         if (nodeData.childNodes.length !== 0 && nodeData.parentId !== null) {
             nodeData.icon = 'folder-close';
         }
@@ -190,19 +199,19 @@ export abstract class BaseTreeState<T extends {
         return null;
     }
 
-    protected mapElement(el: T): ITreeElement {
-        const hasChildren = el.hasChildren;
-        const isRootNode = el.parentId === null;
-        const getIcon = (): IconName => {
-            if (isRootNode) {
-                return 'application';
-            }
-            if (!hasChildren) {
-                return 'document';
-            }
-            return 'folder-close';
-        };
+    protected getIcon = (isRootNode: boolean, hasChildren: boolean): IconName => {
+        if (isRootNode) {
+            return this.icons.root;
+        }
+        if (!hasChildren) {
+            return this.icons.node;
+        }
+        return this.icons.leaf;
+    }
 
+    protected mapElement(el: T): ITreeElement {
+        const isRootNode = el.parentId === null;
+        const hasChildren = el.hasChildren;
         const treeElement = observable<ITreeElement>({
             id: el.id,
             parentId: el.parentId,
@@ -210,7 +219,7 @@ export abstract class BaseTreeState<T extends {
             childNodes: [],
             label: el.title,
             isExpanded: false,
-            icon: getIcon(),
+            icon: this.getIcon(isRootNode, hasChildren),
             hasCaret: hasChildren,
             isContextMenuActive: false,
             contextMenuType: this.contextMenuType,
@@ -258,6 +267,8 @@ export abstract class BaseTreeState<T extends {
         }
         this.treeInternal = tree;
     }
+
+    protected icons: ITreeIcons;
 
     private forEachNode(childFunc: (node: ITreeElement) => void = null, eachFunc: (node: ITreeElement) => void = null): void {
         let elements = this.tree;
