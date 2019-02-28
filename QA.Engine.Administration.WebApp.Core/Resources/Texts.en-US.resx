@@ -156,6 +156,9 @@
   <data name="IsVisible" xml:space="preserve">
     <value>Visible</value>
   </data>
+  <data name="Move" xml:space="preserve">
+    <value>Move</value>
+  </data>
   <data name="PopupActionType" xml:space="preserve">
     <value>Action type</value>
   </data>
@@ -212,6 +215,12 @@
   </data>
   <data name="PopupFieldVersion" xml:space="preserve">
     <value>Version</value>
+  </data>
+  <data name="PopupMoveButton" xml:space="preserve">
+    <value>Move</value>
+  </data>
+  <data name="PopupMoveTitle" xml:space="preserve">
+    <value>Move item</value>
   </data>
   <data name="PopupMoveVersion" xml:space="preserve">
     <value>Move version</value>

@@ -62,6 +62,11 @@ export default class SiteTreeMenu extends React.Component<Props> {
         popupStore.show(itemId, PopupType.REORDER, textStore.texts[Texts.popupReorderTitle]);
     }
 
+    private moveClick = () => {
+        const { popupStore, itemId, textStore } = this.props;
+        popupStore.show(itemId, PopupType.MOVE, textStore.texts[Texts.popupMoveTitle]);
+    }
+
     private handleClick = (e: React.MouseEvent<HTMLElement>, cb: () => void) => {
         e.stopPropagation();
         this.props.node.isContextMenuActive = false;
@@ -119,6 +124,12 @@ export default class SiteTreeMenu extends React.Component<Props> {
                     onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.reorderClick)}
                     icon="sort"
                     text={textStore.texts[Texts.reorder]}
+                    intent={Intent.PRIMARY}
+                />
+                <MenuItem
+                    onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.moveClick)}
+                    icon="move"
+                    text={textStore.texts[Texts.move]}
                     intent={Intent.PRIMARY}
                 />
                 <MenuDivider/>

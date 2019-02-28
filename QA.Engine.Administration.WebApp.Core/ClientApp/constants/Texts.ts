@@ -15,6 +15,7 @@ export default class Texts {
     static readonly addVersionItem: string = 'AddVersionItem';
     static readonly save: string = 'Save';
     static readonly reorder: string = 'Reorder';
+    static readonly move: string = 'Move';
 
     static readonly commonTab: string = 'CommonTab';
     static readonly widgetTab: string = 'WidgetTab';
@@ -61,4 +62,6 @@ export default class Texts {
     static readonly popupReorderInsertBefore: string = 'PopupReorderInsertBefore';
     static readonly popupReorderInsertLabel: string = 'PopupReorderInsertLabel';
     static readonly popupReorderTitle: string = 'PopupReorderTitle';
+    static readonly popupMoveTitle: string = 'PopupMoveTitle';
+    static readonly popupMoveButton: string = 'PopupMoveButton';
 }
