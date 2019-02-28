@@ -80,6 +80,10 @@ body {
     background: rgba(167, 182, 194, 0.5);
 }
 
+.context-icon {
+    padding-right: 6px;
+}
+
 .track-vertical {
     position: absolute;
     width: 6px;

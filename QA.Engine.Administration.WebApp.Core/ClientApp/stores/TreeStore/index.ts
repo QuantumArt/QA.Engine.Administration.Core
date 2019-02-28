@@ -16,10 +16,28 @@ export default class TreeStore {
     private readonly navigationStore: NavigationStore;
 
     constructor(navigationStore: NavigationStore) {
-        this.siteTreeStore = new SiteTreeStore();
-        this.archiveStore = new ArchiveTreeStore();
-        this.contentVersionsStore = new ContentVersionTreeStore({ root: 'panel-stats' });
-        this.widgetStore = new WidgetTreeStore({ node: 'heat-grid', leaf: 'widget-button' });
+        this.siteTreeStore = new SiteTreeStore({
+            checkPublication: true,
+            root: 'application',
+            node: 'document',
+            nodePublished: 'saved',
+            nodeOpen: 'document',
+            nodeOpenPublished: 'saved',
+            leaf: 'document',
+            leafPublished: 'saved',
+        });
+        this.archiveStore = new ArchiveTreeStore({
+            checkPublication: true,
+            root: 'application',
+            node: 'document',
+            nodePublished: 'saved',
+            nodeOpen: 'document',
+            nodeOpenPublished: 'saved',
+            leaf: 'document',
+            leafPublished: 'saved',
+        });
+        this.contentVersionsStore = new ContentVersionTreeStore({ root: 'panel-stats', checkPublication: false });
+        this.widgetStore = new WidgetTreeStore({ node: 'heat-grid', leaf: 'widget-button', checkPublication: false });
 
         this.navigationStore = navigationStore;
     }

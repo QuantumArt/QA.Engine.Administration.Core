@@ -2,7 +2,7 @@ import * as React from 'react';
 import { action, observable, computed } from 'mobx';
 import v4 from 'uuid/v4';
 import { IconName, ITreeNode } from '@blueprintjs/core';
-import ContextMenu from 'components/TreeStructure/ContextMenu';
+import InteractiveZone from 'components/TreeStructure/InteractiveZone';
 import OperationState from 'enums/OperationState';
 import ContextMenuType from 'enums/ContextMenuType';
 import TreeErrors from 'enums/TreeErrors';
@@ -13,6 +13,8 @@ export interface ITreeElement extends ITreeNode {
     versionOfId?: number;
     isContextMenuActive: boolean;
     contextMenuType: ContextMenuType;
+    isVisible: boolean;
+    isPublished: boolean;
 }
 
 export interface ITreeErrorModel {
@@ -23,10 +25,26 @@ export interface ITreeErrorModel {
 }
 
 export interface ITreeIcons {
+    checkPublication: boolean;
     root?: IconName;
     node?: IconName;
+    nodePublished?: IconName;
+    nodeOpen?: IconName;
+    nodeOpenPublished?: IconName;
     leaf?: IconName;
+    leafPublished?: IconName;
 }
+
+const defaultIcons: ITreeIcons = {
+    checkPublication: false,
+    root: 'application',
+    node: 'folder-close',
+    nodePublished: 'folder-close',
+    nodeOpen: 'folder-open',
+    nodeOpenPublished: 'folder-open',
+    leaf: 'document',
+    leafPublished: 'document',
+};
 
 /**
  * @description Base class for tree manipulations
@@ -38,9 +56,11 @@ export abstract class BaseTreeState<T extends {
     title: string;
     children: T[];
     hasChildren: boolean;
+    isVisible?: boolean;
+    published?: boolean;
 }> {
 
-    constructor(icons: ITreeIcons = { root: 'application', node: 'document', leaf: 'folder-close' }) {
+    constructor(icons: ITreeIcons = defaultIcons) {
         this.icons = icons;
     }
 
@@ -83,7 +103,11 @@ export abstract class BaseTreeState<T extends {
     @action
     public handleNodeExpand = (nodeData: ITreeElement) => {
         if (nodeData.childNodes.length !== 0 && nodeData.parentId !== null) {
-            nodeData.icon = 'folder-open';
+            if (this.icons.checkPublication && nodeData.isPublished) {
+                nodeData.icon = this.icons.nodeOpenPublished;
+            } else {
+                nodeData.icon = this.icons.nodeOpen;
+            }
         }
         nodeData.isExpanded = true;
     }
@@ -91,7 +115,11 @@ export abstract class BaseTreeState<T extends {
     @action
     public handleNodeCollapse = (nodeData: ITreeElement) => {
         if (nodeData.childNodes.length !== 0 && nodeData.parentId !== null) {
-            nodeData.icon = 'folder-close';
+            if (this.icons.checkPublication && nodeData.isPublished) {
+                nodeData.icon = this.icons.nodePublished;
+            } else {
+                nodeData.icon = this.icons.node;
+            }
         }
         nodeData.isExpanded = false;
     }
@@ -199,19 +227,23 @@ export abstract class BaseTreeState<T extends {
         return null;
     }
 
-    protected getIcon = (isRootNode: boolean, hasChildren: boolean): IconName => {
-        if (isRootNode) {
+    protected getIcon = (el: T): IconName => {
+        if (el.parentId === null) {
             return this.icons.root;
         }
-        if (!hasChildren) {
-            return this.icons.node;
+        if (this.icons.checkPublication) {
+            if (!el.hasChildren) {
+                return el.published ? this.icons.leafPublished : this.icons.leaf;
+            }
+            return el.published ? this.icons.nodePublished : this.icons.node;
         }
-        return this.icons.leaf;
+        if (!el.hasChildren) {
+            return this.icons.leaf;
+        }
+        return this.icons.node;
     }
 
     protected mapElement(el: T): ITreeElement {
-        const isRootNode = el.parentId === null;
-        const hasChildren = el.hasChildren;
         const treeElement = observable<ITreeElement>({
             id: el.id,
             parentId: el.parentId,
@@ -219,12 +251,14 @@ export abstract class BaseTreeState<T extends {
             childNodes: [],
             label: el.title,
             isExpanded: false,
-            icon: this.getIcon(isRootNode, hasChildren),
-            hasCaret: hasChildren,
+            icon: this.getIcon(el),
+            hasCaret: el.hasChildren,
             isContextMenuActive: false,
             contextMenuType: this.contextMenuType,
+            isVisible: el.isVisible,
+            isPublished: el.published,
         });
-        treeElement.secondaryLabel = React.createElement(ContextMenu, {
+        treeElement.secondaryLabel = React.createElement(InteractiveZone, {
             node: treeElement,
         });
 

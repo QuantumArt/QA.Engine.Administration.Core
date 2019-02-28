@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { inject, observer } from 'mobx-react';
-import { Button, Popover, Position } from '@blueprintjs/core';
+import { Button, Popover, Position, Icon } from '@blueprintjs/core';
 import { ITreeElement } from 'stores/TreeStore/BaseTreeStore';
 import ContentVersionTreeMenu from './ContentVersionTreeMenu';
 import TreeStore from 'stores/TreeStore';
@@ -112,7 +112,9 @@ export default class ContextMenu extends React.Component<Props, State> {
                     onClick={this.handleClick}
                     className="context-button"
                 />
-            </Popover>
-            : null;
+            </Popover> :
+            <React.Fragment>
+                <Icon className="context-icon" icon={node.isVisible ? 'eye-open' : 'eye-off'} />
+            </React.Fragment>;
     }
 }
