@@ -1,4 +1,4 @@
-enum TreeErrors {
+export enum TreeErrors {
     fetch = 'Error fetching a tree',
     update = 'Error updating subtree',
     publish = 'Error publishing item',
@@ -9,4 +9,7 @@ enum TreeErrors {
     reorder = 'Error reordering items',
 }
 
-export default TreeErrors;
+export enum PopupErrors {
+    discriminators = 'Error fetching discriminators',
+    versions = 'Error fetching content versions',
+}

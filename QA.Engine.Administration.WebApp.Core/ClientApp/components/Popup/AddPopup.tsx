@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { Card, Button, FormGroup, InputGroup, ButtonGroup, Intent } from '@blueprintjs/core';
-import { observer, inject } from 'mobx-react';
+import { Button, ButtonGroup, Card, FormGroup, InputGroup, Intent } from '@blueprintjs/core';
+import { inject, observer } from 'mobx-react';
 import QpIntegrationStore from 'stores/QpIntegrationStore';
 import PopupStore from 'stores/PopupStore';
 import DiscriminatorSelect from 'components/Select/DiscriminatorSelect';
@@ -8,6 +8,7 @@ import PopupType from 'enums/PopupType';
 import TreeStore from 'stores/TreeStore';
 import TextStore from 'stores/TextStore';
 import Texts from 'constants/Texts';
+import OperationState from 'enums/OperationState';
 
 interface Props {
     qpIntegrationStore?: QpIntegrationStore;
@@ -38,6 +39,7 @@ export default class AddPopup extends React.Component<Props, State> {
         if (popupStore.type === PopupType.ADDWIDGET) {
             node = treeStore.getWidgetStore().selectedNode;
         }
+        debugger;
         qpIntegrationStore.add(node, null, name, title, discriminator.id, 0);
         popupStore.close();
     }

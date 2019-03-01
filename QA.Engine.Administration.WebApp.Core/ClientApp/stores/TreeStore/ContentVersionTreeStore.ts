@@ -4,7 +4,7 @@ import { BaseTreeState } from 'stores/TreeStore/BaseTreeStore';
 import ContextMenuType from 'enums/ContextMenuType';
 import OperationState from 'enums/OperationState';
 import { observable, action } from 'mobx';
-import TreeErrors from 'enums/TreeErrors';
+import { TreeErrors } from 'enums/ErrorsTypes';
 
 export default class ContentVersionTreeStore extends BaseTreeState<PageModel> {
 
