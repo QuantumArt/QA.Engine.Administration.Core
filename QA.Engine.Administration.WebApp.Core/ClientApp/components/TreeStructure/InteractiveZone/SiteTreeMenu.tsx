@@ -45,7 +45,7 @@ export default class SiteTreeMenu extends React.Component<Props> {
 
     private publishClick = () => {
         const { itemId, treeStore } = this.props;
-        (treeStore.resolveTreeStore() as SiteTreeStore).publish([itemId]);
+        treeStore.publish([itemId]);
     }
 
     private archiveClick = () => {

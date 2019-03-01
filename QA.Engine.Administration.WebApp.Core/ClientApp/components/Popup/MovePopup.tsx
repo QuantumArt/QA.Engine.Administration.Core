@@ -8,6 +8,7 @@ import Texts from 'constants/Texts';
 import SiteTreeStore from 'stores/TreeStore/SiteTreeStore';
 import { inject, observer } from 'mobx-react';
 import PageSelect from 'components/Select/PageSelect';
+import TreeStoreType from 'enums/TreeStoreType';
 
 interface Props {
     treeStore?: TreeStore;
@@ -28,12 +29,11 @@ export default class MovePopup extends React.Component<Props, State> {
     private moveClick = () => {
         const { treeStore, popupStore } = this.props;
         const { newParentId } = this.state;
-        const siteTreeStore = treeStore.resolveTreeStore() as SiteTreeStore;
         const model: MoveModel = {
             newParentId,
             itemId: popupStore.itemId,
         };
-        siteTreeStore.move(model);
+        treeStore.move(model);
         popupStore.close();
     }
 
@@ -50,7 +50,7 @@ export default class MovePopup extends React.Component<Props, State> {
             return null;
         }
 
-        const siteTreeStore = treeStore.resolveTreeStore() as SiteTreeStore;
+        const siteTreeStore = treeStore.getTreeStore(TreeStoreType.SITE) as SiteTreeStore;
         const pages = siteTreeStore.flatPages;
 
         return (

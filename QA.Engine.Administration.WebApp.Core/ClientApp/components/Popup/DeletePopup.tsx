@@ -34,7 +34,7 @@ export default class DeletePopup extends React.Component<Props, State> {
             itemId: popupStore.itemId,
             isDeleteAllVersions: deleteAllVersions,
         };
-        (treeStore.resolveTreeStore() as ArchiveTreeStore).delete(model);
+        treeStore.delete(model);
         popupStore.close();
     }
 

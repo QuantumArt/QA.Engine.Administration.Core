@@ -22,11 +22,6 @@ interface Props {
 @observer
 export default class WidgetTreeMenu extends React.Component<Props> {
 
-    private async publish(treeStore: TreeStore, itemId: number): Promise<void> {
-        await treeStore.getWidgetStore().publish([itemId]);
-        await treeStore.updateSubTree();
-    }
-
     private addClick = () => {
         const { popupStore, itemId, textStore } = this.props;
         popupStore.show(itemId, PopupType.ADDWIDGET, textStore.texts[Texts.popupAddWidgetTitle]);
@@ -44,7 +39,7 @@ export default class WidgetTreeMenu extends React.Component<Props> {
 
     private publishClick = () => {
         const { treeStore, itemId } = this.props;
-        this.publish(treeStore, itemId);
+        treeStore.publish([itemId]);
     }
 
     private archiveClick = () => {

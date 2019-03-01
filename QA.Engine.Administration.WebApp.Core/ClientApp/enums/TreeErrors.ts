@@ -7,6 +7,7 @@ enum TreeErrors {
     restore = 'Error restoring item',
     delete = 'Error deleting item',
     reorder = 'Error reordering items',
+    move = 'Error moving item',
 }
 
 export default TreeErrors;

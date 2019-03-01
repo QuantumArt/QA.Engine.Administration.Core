@@ -9,6 +9,8 @@ import TreeStructure from 'components/TreeStructure';
 import InfoPane from './InfoPane';
 import TextStore from 'stores/TextStore';
 import Texts from 'constants/Texts';
+import TreeStoreType from 'enums/TreeStoreType';
+import WidgetTreeStore from 'stores/TreeStore/WidgetTreeStore';
 
 interface Props {
     popupStore?: PopupStore;
@@ -22,8 +24,8 @@ export default class WidgetTab extends React.Component<Props> {
 
     private addClick = () => {
         const { treeStore, popupStore, textStore } = this.props;
-        const tree = treeStore.resolveTreeStore();
-        popupStore.show(tree.selectedNode.id, PopupType.ADDWIDGET, textStore.texts[Texts.popupAddWidgetTitle]);
+        const tree = treeStore.getTreeStore(TreeStoreType.WIDGET) as WidgetTreeStore;
+        popupStore.show(tree.selectedSiteTreeNode.id, PopupType.ADDWIDGET, textStore.texts[Texts.popupAddWidgetTitle]);
     }
 
     private refreshClick = () => {
@@ -32,15 +34,13 @@ export default class WidgetTab extends React.Component<Props> {
 
     render() {
         const { treeStore, textStore } = this.props;
-        const tree = treeStore.getWidgetStore();
-        const siteTree = treeStore.resolveTreeStore();
+        const tree = treeStore.getTreeStore(TreeStoreType.WIDGET) as WidgetTreeStore;
 
         if (tree.selectedSiteTreeNode == null) {
             return null;
         }
 
-        const loadingStates = [OperationState.NONE, OperationState.PENDING];
-        if (loadingStates.indexOf(tree.treeState) > -1 || loadingStates.indexOf(siteTree.treeState) > -1) {
+        if (treeStore.state === OperationState.PENDING) {
             return <Spinner size={60}/>;
         }
 
@@ -66,7 +66,7 @@ export default class WidgetTab extends React.Component<Props> {
                     <TreeStructure
                         type="widgets"
                         className="minor-tree-pane"
-                        treeStore={treeStore}
+                        tree={tree}
                         sbHeightMax={690}
                     />
                     <InfoPane type="widgets"/>

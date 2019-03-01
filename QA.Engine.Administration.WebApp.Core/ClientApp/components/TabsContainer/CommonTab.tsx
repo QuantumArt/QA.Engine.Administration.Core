@@ -3,13 +3,14 @@ import { observer, inject } from 'mobx-react';
 import { Button, Navbar, NavbarGroup, H5, Intent, Spinner, InputGroup, Checkbox } from '@blueprintjs/core';
 import ExtensionCard from './ExtensionCard';
 import OperationState from 'enums/OperationState';
-import NavigationStore from 'stores/NavigationStore';
+import NavigationStore, { Pages } from 'stores/NavigationStore';
 import SiteTreeStore from 'stores/TreeStore/SiteTreeStore';
 import TreeStore from 'stores/TreeStore';
 import QpIntegrationStore from 'stores/QpIntegrationStore';
 import EditArticleStore from 'stores/EditArticleStore';
 import TextStore from 'stores/TextStore';
 import Texts from 'constants/Texts';
+import TreeStoreType from 'enums/TreeStoreType';
 
 interface Props {
     navigationStore?: NavigationStore;
@@ -29,13 +30,13 @@ export default class CommonTab extends React.Component<Props> {
 
     private editClick = () => {
         const { treeStore, qpIntegrationStore } = this.props;
-        const tree = treeStore.resolveTreeStore();
+        const tree = treeStore.getTreeStore(TreeStoreType.SITE);
         qpIntegrationStore.edit(tree.selectedNode.id);
     }
 
     private saveClick = () => {
         const { treeStore, editArticleStore } = this.props;
-        const tree = treeStore.resolveTreeStore();
+        const tree = treeStore.getTreeStore(TreeStoreType.SITE);
         const model: EditModel = {
             itemId: tree.selectedNode.id,
             title: editArticleStore.title,
@@ -45,7 +46,7 @@ export default class CommonTab extends React.Component<Props> {
             fields: editArticleStore.changedFields,
         };
         if (tree instanceof SiteTreeStore) {
-            tree.edit(model).then(() => editArticleStore.init(tree.selectedNode));
+            treeStore.edit(model).then(() => editArticleStore.init(tree.selectedNode));
         }
     }
 
@@ -65,12 +66,13 @@ export default class CommonTab extends React.Component<Props> {
     }
 
     render() {
-        const { treeStore, textStore, editArticleStore: { title, isVisible, isInSiteMap, isEditable } } = this.props;
-        const tree = treeStore.resolveTreeStore();
+        const { treeStore, textStore, navigationStore, editArticleStore: { title, isVisible, isInSiteMap, isEditable } } = this.props;
+        const treeType = navigationStore.currentPage === Pages.SITEMAP ? TreeStoreType.SITE : TreeStoreType.ARCHIVE;
+        const tree = treeStore.getTreeStore(treeType);
         if (tree.selectedNode == null) {
             return null;
         }
-        if (tree.treeState === OperationState.NONE || tree.treeState === OperationState.PENDING) {
+        if (treeStore.state === OperationState.PENDING) {
             return (<Spinner size={60} />);
         }
         const selectedNode = tree.selectedNode;

@@ -8,6 +8,7 @@ import PopupType from 'enums/PopupType';
 import TreeStore from 'stores/TreeStore';
 import TextStore from 'stores/TextStore';
 import Texts from 'constants/Texts';
+import TreeStoreType from 'enums/TreeStoreType';
 
 interface Props {
     qpIntegrationStore?: QpIntegrationStore;
@@ -27,13 +28,13 @@ export default class AddVersionPopup extends React.Component<Props, State> {
 
     state = {
         discriminator: null as DiscriminatorModel,
-        version: null as VersionType,
+        version: VersionType.Content,
     };
 
     private addClick = () => {
         const { popupStore, qpIntegrationStore, treeStore } = this.props;
         const { discriminator, version } = this.state;
-        const node = treeStore.resolveTreeStore().selectedNode as PageModel;
+        const node = treeStore.getTreeStore(TreeStoreType.SITE).selectedNode as PageModel;
         qpIntegrationStore.add(node, version, node.alias, node.title, discriminator.id, 0);
         popupStore.close();
     }
@@ -50,19 +51,36 @@ export default class AddVersionPopup extends React.Component<Props, State> {
         this.setState({ version: version.target.value as VersionType })
 
     render() {
-        const { popupStore, textStore, treeStore } = this.props;
+        const { popupStore, textStore } = this.props;
         const { version } = this.state;
 
         if (popupStore.type !== PopupType.ADDVERSION) {
             return null;
         }
 
+        let useOnlyContentVersion = false;
+        if (popupStore.options && popupStore.options.onlyContentVersion) {
+            useOnlyContentVersion = true;
+        }
+
         return (
             <Card>
                 <FormGroup>
-                    <RadioGroup label={textStore.texts[Texts.popupFieldVersion]} selectedValue={version} onChange={this.changeVersion}>
-                        <Radio label={textStore.texts[Texts.popupVersionContent]} value={VersionType.Content}/>
-                        <Radio label={textStore.texts[Texts.popupVersionStructural]} value={VersionType.Structural}/>
+                    <RadioGroup
+                        label={textStore.texts[Texts.popupFieldVersion]}
+                        selectedValue={version}
+                        onChange={this.changeVersion}
+                    >
+                        <Radio
+                            label={textStore.texts[Texts.popupVersionContent]}
+                            value={VersionType.Content}
+                            disabled={useOnlyContentVersion}
+                        />
+                        <Radio
+                            label={textStore.texts[Texts.popupVersionStructural]}
+                            value={VersionType.Structural}
+                            disabled={useOnlyContentVersion}
+                        />
                     </RadioGroup>
                 </FormGroup>
                 <FormGroup>

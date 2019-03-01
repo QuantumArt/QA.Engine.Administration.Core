@@ -8,6 +8,7 @@ import ContextMenuType from 'enums/ContextMenuType';
 import SiteTreeMenu from './SiteTreeMenu';
 import ArchiveTreeMenu from './ArchiveTreeMenu';
 import WidgetTreeMenu from './WidgetTreeMenu';
+import TreeStoreType from 'enums/TreeStoreType';
 
 interface Props {
     treeStore?: TreeStore;
@@ -41,7 +42,19 @@ export default class ContextMenu extends React.Component<Props, State> {
             window.removeEventListener('click', this.stateHandler);
         }
         if (!isHovered) {
-            treeStore.resolveTreeStore().handleContextMenu(node);
+            if (node.contextMenuType === ContextMenuType.SITEMAP) {
+                treeStore.getTreeStore(TreeStoreType.SITE).handleContextMenu(node);
+            }
+            if (node.contextMenuType === ContextMenuType.ARCHIVE) {
+                treeStore.getTreeStore(TreeStoreType.ARCHIVE).handleContextMenu(node);
+            }
+            if (node.contextMenuType === ContextMenuType.CONTENTVERSION) {
+                treeStore.getTreeStore(TreeStoreType.CONTENTVERSION).handleContextMenu(node);
+            }
+            if (node.contextMenuType === ContextMenuType.WIDGET) {
+                treeStore.getTreeStore(TreeStoreType.WIDGET).handleContextMenu(node);
+            }
+            // treeStore.resolveTreeStore().handleContextMenu(node);
         }
     }
 

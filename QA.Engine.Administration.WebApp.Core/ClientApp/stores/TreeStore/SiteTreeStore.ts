@@ -8,114 +8,6 @@ import { computed } from 'mobx';
 
 export default class SiteTreeStore extends BaseTreeState<PageModel> {
 
-    public async publish(itemIds: number[]): Promise<void> {
-        this.treeState = OperationState.PENDING;
-        try {
-            const response: ApiResult<any> = await SiteMapService.publish(itemIds);
-            if (response.isSuccess) {
-                await Promise.all(itemIds.map(itemId => this.updateSubTreeInternal(itemId)));
-                this.treeState = OperationState.SUCCESS;
-            } else {
-                throw response.error;
-            }
-        } catch (e) {
-            this.treeState = OperationState.ERROR;
-            this.treeErrors.push({
-                type: TreeErrors.publish,
-                data: itemIds,
-                message: e,
-                id: v4(),
-            });
-        }
-    }
-
-    public async archive(model: RemoveModel): Promise<void> {
-        this.treeState = OperationState.PENDING;
-        try {
-            const response: ApiResult<any> = await SiteMapService.archive(model);
-            if (response.isSuccess) {
-                await this.updateSubTreeInternal(model.itemId);
-                this.treeState = OperationState.SUCCESS;
-            } else {
-                throw response.error;
-            }
-        } catch (e) {
-            this.treeState = OperationState.ERROR;
-            this.treeErrors.push({
-                type: TreeErrors.archive,
-                data: model,
-                message: e,
-                id: v4(),
-            });
-        }
-    }
-
-    public async edit(model: EditModel): Promise<void> {
-        this.treeState = OperationState.PENDING;
-        try {
-            const response: ApiResult<any> = await SiteMapService.edit(model);
-            if (response.isSuccess) {
-                await this.updateSubTreeInternal(model.itemId);
-                this.treeState = OperationState.SUCCESS;
-            } else {
-                throw response.error;
-            }
-        } catch (e) {
-            this.treeState = OperationState.ERROR;
-            this.treeErrors.push({
-                type: TreeErrors.edit,
-                data: model,
-                message: e,
-                id: v4(),
-            });
-        }
-    }
-
-    public async reorder(model: ReorderModel): Promise<void> {
-        this.treeState = OperationState.PENDING;
-        try {
-            const response: ApiResult<any> = await SiteMapService.reorder(model);
-            if (response.isSuccess) {
-                const id = this.selectedNode.parentId;
-                await this.updateSubTreeInternal(id);
-                this.treeState = OperationState.SUCCESS;
-            } else {
-                throw response.error;
-            }
-        } catch (e) {
-            this.treeState = OperationState.ERROR;
-            this.treeErrors.push({
-                type: TreeErrors.reorder,
-                data: model,
-                message: e,
-                id: v4(),
-            });
-        }
-    }
-
-    public async move(model: MoveModel): Promise<void> {
-        this.treeState = OperationState.PENDING;
-        try {
-            const response: ApiResult<any> = await SiteMapService.move(model);
-            if (response.isSuccess) {
-                const id = this.selectedNode.parentId;
-                await this.updateSubTreeInternal(id);
-                await this.updateSubTreeInternal(model.newParentId);
-                this.treeState = OperationState.SUCCESS;
-            } else {
-                throw response.error;
-            }
-        } catch (e) {
-            this.treeState = OperationState.ERROR;
-            this.treeErrors.push({
-                type: TreeErrors.reorder,
-                data: model,
-                message: e,
-                id: v4(),
-            });
-        }
-    }
-
     public get parentNode(): PageModel {
         return this.getNodeById(this.selectedNode.parentId);
     }
@@ -137,7 +29,7 @@ export default class SiteTreeStore extends BaseTreeState<PageModel> {
             pages = children;
             loop = children.length > 0;
         }
-        return elements.sort((a, b) => a.title > b.title ? 1 : (a.title === b.title ? 0 : -1));
+        return elements.slice().sort((a, b) => a.title > b.title ? 1 : (a.title === b.title ? 0 : -1));
     }
 
     protected contextMenuType: ContextMenuType = ContextMenuType.SITEMAP;

@@ -13,9 +13,10 @@ export default class PopupStore {
     contentVersions: PageModel[];
     itemId: number;
     title: string;
+    options: any;
 
     @action
-    public show(itemId: number, type: PopupType, title: string) {
+    public show(itemId: number, type: PopupType, title: string, options?: any) {
         this.state = OperationState.NONE;
 
         const useDiscriminators = [PopupType.ADD, PopupType.ADDVERSION, PopupType.ADDWIDGET];
@@ -32,6 +33,7 @@ export default class PopupStore {
         this.type = type;
         this.title = title;
         this.showPopup = true;
+        this.options = options;
     }
 
     @action

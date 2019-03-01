@@ -8,6 +8,8 @@ import PopupType from 'enums/PopupType';
 import TreeStore from 'stores/TreeStore';
 import TextStore from 'stores/TextStore';
 import Texts from 'constants/Texts';
+import TreeStoreType from 'enums/TreeStoreType';
+import WidgetTreeStore from 'stores/TreeStore/WidgetTreeStore';
 
 interface Props {
     qpIntegrationStore?: QpIntegrationStore;
@@ -33,10 +35,15 @@ export default class AddPopup extends React.Component<Props, State> {
         const { discriminator, name, title } = this.state;
         let node: PageModel | WidgetModel;
         if (popupStore.type === PopupType.ADD) {
-            node = treeStore.resolveTreeStore().selectedNode;
+            node = treeStore.getTreeStore(TreeStoreType.SITE).selectedNode;
         }
         if (popupStore.type === PopupType.ADDWIDGET) {
-            node = treeStore.getWidgetStore().selectedNode;
+            const widgetTreeStore = treeStore.getTreeStore(TreeStoreType.WIDGET) as WidgetTreeStore;
+            if (widgetTreeStore.selectedNode && widgetTreeStore.selectedNode.id === popupStore.itemId) {
+                node = widgetTreeStore.selectedNode;
+            } else {
+                node = widgetTreeStore.selectedSiteTreeNode;
+            }
         }
         qpIntegrationStore.add(node, null, name, title, discriminator.id, 0);
         popupStore.close();

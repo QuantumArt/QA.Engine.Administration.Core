@@ -10,6 +10,7 @@ import SiteTreeStore from 'stores/TreeStore/SiteTreeStore';
 import ArchiveTreeStore from 'stores/TreeStore/ArchiveTreeStore';
 import WidgetTreeStore from 'stores/TreeStore/WidgetTreeStore';
 import ContentVersionTreeStore from 'stores/TreeStore/ContentVersionTreeStore';
+import TreeStoreType from 'enums/TreeStoreType';
 
 interface Props {
     treeStore?: TreeStore;
@@ -22,88 +23,70 @@ type CurrentTree = SiteTreeStore | ArchiveTreeStore | WidgetTreeStore | ContentV
 @observer
 export default class ErrorToast extends React.Component<Props> {
 
-    private handleTreeErrorClick = (tree: CurrentTree) => () => {
-        tree.treeErrors.forEach((e) => {
-            switch (e.type) {
-                case TreeErrors.fetch:
-                    if (tree instanceof SiteTreeStore ||
-                        tree instanceof ArchiveTreeStore ||
-                        tree instanceof WidgetTreeStore ||
-                        tree instanceof ContentVersionTreeStore
-                    ) {
-                        tree.fetchTree();
-                    }
-                    break;
-                case TreeErrors.update:
-                    if (tree instanceof SiteTreeStore ||
-                        tree instanceof ArchiveTreeStore ||
-                        tree instanceof WidgetTreeStore ||
-                        tree instanceof ContentVersionTreeStore
-                    ) {
-                        tree.updateSubTree(e.data);
-                    }
-                    break;
-                case TreeErrors.publish:
-                    if (tree instanceof SiteTreeStore ||
-                        tree instanceof WidgetTreeStore ||
-                        tree instanceof ContentVersionTreeStore
-                    ) {
-                        tree.publish(e.data);
-                    }
-                    break;
-                case TreeErrors.archive:
-                    if (tree instanceof SiteTreeStore) {
-                        tree.archive(e.data);
-                    }
-                    break;
-                case TreeErrors.edit:
-                    if (tree instanceof SiteTreeStore) {
-                        tree.edit(e.data);
-                    }
-                    break;
-                case TreeErrors.restore:
-                    if (tree instanceof ArchiveTreeStore) {
-                        tree.restore(e.data);
-                    }
-                    break;
-                case TreeErrors.delete:
-                    if (tree instanceof ArchiveTreeStore) {
-                        tree.delete(e.data);
-                    }
-                    break;
-                default:
-                    break;
-            }
-        });
+    private handleTreeErrorClick = (e: ITreeErrorModel, treeStore: TreeStore) => () => {
+        switch (e.type) {
+            case TreeErrors.fetch:
+                treeStore.fetchTree();
+                break;
+            case TreeErrors.update:
+                treeStore.updateSubTree(e.data);
+                break;
+            case TreeErrors.publish:
+                treeStore.publish(e.data);
+                break;
+            case TreeErrors.archive:
+                treeStore.archive(e.data);
+                break;
+            case TreeErrors.edit:
+                treeStore.edit(e.data);
+                break;
+            case TreeErrors.restore:
+                treeStore.restore(e.data);
+                break;
+            case TreeErrors.delete:
+                treeStore.delete(e.data);
+                break;
+            case TreeErrors.reorder:
+                treeStore.reorder(e.data);
+                break;
+            case TreeErrors.move:
+                treeStore.move(e.data);
+                break;
+            default:
+                break;
+        }
     }
 
     private handleDismiss = (i: number, cb: (i: number) => void) => () => {
         cb(i);
     }
 
-    private renderToast = (e:ITreeErrorModel, i: number, currentTree: CurrentTree) => (
+    // private renderToast = (e:ITreeErrorModel, i: number, currentTree: CurrentTree) => (
+    private renderToast = (e: ITreeErrorModel, i: number, treeStore: TreeStore) => (
         <Toast
             message={`${e.type}. ${e.message}`}
             icon="warning-sign"
             intent={Intent.DANGER}
             action={{
-                onClick: this.handleTreeErrorClick(currentTree),
+                // onClick: this.handleTreeErrorClick(currentTree),
+                onClick: this.handleTreeErrorClick(e, treeStore),
                 icon: 'repeat',
             }}
-            onDismiss={this.handleDismiss(i, currentTree.removeError)}
+            // onDismiss={this.handleDismiss(i, currentTree.removeError)}
+            onDismiss={this.handleDismiss(i, treeStore.removeError)}
             key={e.id}
         />
     )
 
     render() {
         const { treeStore } = this.props;
-        const siteTree = treeStore.resolveTreeStore();
-        const widgetTree = treeStore.getWidgetStore();
-        const contentVersionsStore = treeStore.getContentVersionsStore();
+        // const siteTree = treeStore.resolveTreeStore();
+        // const widgetTree = treeStore.getWidgetStore();
+        // const contentVersionsStore = treeStore.getContentVersionsStore();
 
         return (
             <Toaster>
-                {siteTree.treeState === OperationState.ERROR &&
+                {/* {siteTree.treeState === OperationState.ERROR &&
                     siteTree.treeErrors.map((e, i) => this.renderToast(e, i, siteTree))
                 }
                 {widgetTree.treeState === OperationState.ERROR &&
@@ -111,6 +94,9 @@ export default class ErrorToast extends React.Component<Props> {
                 }
                 {contentVersionsStore.treeState === OperationState.ERROR &&
                     contentVersionsStore.treeErrors.map((e, i) => this.renderToast(e, i, contentVersionsStore))
+                } */}
+                {treeStore.state === OperationState.ERROR &&
+                    treeStore.treeErrors.map((e, i) => this.renderToast(e, i, treeStore))
                 }
             </Toaster>
         );

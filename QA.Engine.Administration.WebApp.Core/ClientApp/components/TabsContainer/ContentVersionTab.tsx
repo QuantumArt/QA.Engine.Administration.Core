@@ -9,6 +9,8 @@ import PopupType from 'enums/PopupType';
 import TextStore from 'stores/TextStore';
 import Texts from 'constants/Texts';
 import InfoPane from 'components/TabsContainer/InfoPane';
+import TreeStoreType from 'enums/TreeStoreType';
+import ContentVersionTreeStore from 'stores/TreeStore/ContentVersionTreeStore';
 
 interface Props {
     popupStore?: PopupStore;
@@ -22,8 +24,12 @@ export default class ContentVersionTab extends React.Component<Props> {
 
     private addClick = () => {
         const { treeStore, popupStore, textStore } = this.props;
-        const tree = treeStore.resolveTreeStore();
-        popupStore.show(tree.selectedNode.id, PopupType.ADDVERSION, textStore.texts[Texts.popupAddItemTitle]);
+        const tree = treeStore.getTreeStore(TreeStoreType.CONTENTVERSION) as ContentVersionTreeStore;
+        popupStore.show(
+            tree.selectedSiteTreeNode.id,
+            PopupType.ADDVERSION,
+            textStore.texts[Texts.popupAddItemTitle],
+            { onlyContentVersion: true });
     }
 
     private refreshClick = () => {
@@ -33,15 +39,13 @@ export default class ContentVersionTab extends React.Component<Props> {
     render() {
 
         const { treeStore, textStore } = this.props;
-        const tree = treeStore.getContentVersionsStore();
-        const siteTree = treeStore.resolveTreeStore();
+        const tree = treeStore.getTreeStore(TreeStoreType.CONTENTVERSION) as ContentVersionTreeStore;
 
         if (tree.selectedSiteTreeNode == null) {
             return null;
         }
 
-        const loadingStates = [OperationState.NONE, OperationState.PENDING];
-        if (loadingStates.indexOf(tree.treeState) > -1 || loadingStates.indexOf(siteTree.treeState) > -1) {
+        if (treeStore.state === OperationState.PENDING) {
             return <Spinner size={60}/>;
         }
 
@@ -59,7 +63,8 @@ export default class ContentVersionTab extends React.Component<Props> {
                             minimal
                             icon="add"
                             text={textStore.texts[Texts.add]}
-                            intent={Intent.PRIMARY} onClick={this.addClick}
+                            intent={Intent.PRIMARY}
+                            onClick={this.addClick}
                         />
                     </NavbarGroup>
                 </Navbar>
@@ -67,7 +72,7 @@ export default class ContentVersionTab extends React.Component<Props> {
                     <TreeStructure
                         type="versions"
                         className="minor-tree-pane"
-                        treeStore={treeStore}
+                        tree={tree}
                         sbHeightMax={690}
                     />
                     <InfoPane type="versions"/>

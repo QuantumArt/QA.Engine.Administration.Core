@@ -9,6 +9,7 @@ import SiteTreeStore from 'stores/TreeStore/SiteTreeStore';
 import { number } from 'prop-types';
 import { inject, observer } from 'mobx-react';
 import PageSelect from 'components/Select/PageSelect';
+import TreeStoreType from 'enums/TreeStoreType';
 
 interface Props {
     treeStore?: TreeStore;
@@ -30,13 +31,12 @@ export default class ReorderPopup extends React.Component<Props, State> {
     private reorderClick = () => {
         const { treeStore, popupStore } = this.props;
         const { isInsertBefore, relatedItemId } = this.state;
-        const siteTreeStore = treeStore.resolveTreeStore() as SiteTreeStore;
         const model: ReorderModel = {
             relatedItemId,
             itemId: popupStore.itemId,
             isInsertBefore: !!isInsertBefore,
         };
-        siteTreeStore.reorder(model);
+        treeStore.reorder(model);
         popupStore.close();
     }
 
@@ -57,7 +57,7 @@ export default class ReorderPopup extends React.Component<Props, State> {
             return null;
         }
 
-        const siteTreeStore = treeStore.resolveTreeStore() as SiteTreeStore;
+        const siteTreeStore = treeStore.getTreeStore(TreeStoreType.SITE) as SiteTreeStore;
         const pages = siteTreeStore.parentNode.children.filter(x => x.id !== siteTreeStore.selectedNode.id);
 
         return (

@@ -1,9 +1,7 @@
 import * as React from 'react';
 import { action, observable, computed } from 'mobx';
-import v4 from 'uuid/v4';
 import { IconName, ITreeNode } from '@blueprintjs/core';
 import InteractiveZone from 'components/TreeStructure/InteractiveZone';
-import OperationState from 'enums/OperationState';
 import ContextMenuType from 'enums/ContextMenuType';
 import TreeErrors from 'enums/TreeErrors';
 
@@ -64,11 +62,8 @@ export abstract class BaseTreeState<T extends {
         this.icons = icons;
     }
 
-    @observable public treeState: OperationState = OperationState.NONE;
-    @observable public treeErrors: ITreeErrorModel[] = [];
     @observable public selectedNode: T;
-
-    protected treeInternal: ITreeElement[];
+    @observable protected treeInternal: ITreeElement[];
     protected origTree: T[];
 
     @computed
@@ -79,24 +74,12 @@ export abstract class BaseTreeState<T extends {
     @action
     public async fetchTree(): Promise<void> {
         this.treeInternal = [];
-        this.treeState = OperationState.PENDING;
-        try {
-            const response: ApiResult<T[]> = await this.getTree();
-            if (response.isSuccess) {
-                this.origTree = response.data;
-                this.convertTree(response.data);
-                this.treeState = OperationState.SUCCESS;
-            } else {
-                this.treeState = OperationState.ERROR;
-                throw response.error;
-            }
-        } catch (e) {
-            this.treeState = OperationState.ERROR;
-            this.treeErrors.push({
-                type: TreeErrors.fetch,
-                message: e,
-                id: v4(),
-            });
+        const response: ApiResult<T[]> = await this.getTree();
+        if (response.isSuccess) {
+            this.origTree = response.data;
+            this.convertTree(response.data);
+        } else {
+            throw response.error;
         }
     }
 
@@ -142,24 +125,7 @@ export abstract class BaseTreeState<T extends {
 
     @action
     public async updateSubTree(id: number): Promise<any> {
-        this.treeState = OperationState.PENDING;
-        try {
-            await this.updateSubTreeInternal(id);
-            this.treeState = OperationState.SUCCESS;
-        } catch (e) {
-            this.treeState = OperationState.ERROR;
-            this.treeErrors.push({
-                type: TreeErrors.update,
-                data: id,
-                message: e,
-                id: v4(),
-            });
-        }
-    }
-
-    @action
-    public removeError = (i: number) => {
-        this.treeErrors.splice(i, 1);
+        await this.updateSubTreeInternal(id);
     }
 
     protected async updateSubTreeInternal(id: number): Promise<any> {
@@ -193,7 +159,7 @@ export abstract class BaseTreeState<T extends {
                     }
                 },
                 (x) => {
-                    if (this.selectedNode.id === +x.id) {
+                    if (this.selectedNode && this.selectedNode.id === +x.id) {
                         x.isSelected = true;
                     }
                 });

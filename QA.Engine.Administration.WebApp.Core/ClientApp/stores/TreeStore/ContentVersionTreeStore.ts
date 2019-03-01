@@ -23,46 +23,6 @@ export default class ContentVersionTreeStore extends BaseTreeState<PageModel> {
         this.fetchTree();
     }
 
-    public async publish(itemIds: number[]): Promise<void> {
-        this.treeState = OperationState.PENDING;
-        try {
-            const response: ApiResult<any> = await SiteMapService.publish(itemIds);
-            if (response.isSuccess) {
-                this.treeState = OperationState.SUCCESS;
-            } else {
-                throw response.error;
-            }
-        } catch (e) {
-            this.treeState = OperationState.ERROR;
-            this.treeErrors.push({
-                type: TreeErrors.publish,
-                data: itemIds,
-                message: e,
-                id: v4(),
-            });
-        }
-    }
-
-    public async archive(model: RemoveModel): Promise<void> {
-        this.treeState = OperationState.PENDING;
-        try {
-            const response: ApiResult<any> = await SiteMapService.archive(model);
-            if (response.isSuccess) {
-                this.treeState = OperationState.SUCCESS;
-            } else {
-                throw response.error;
-            }
-        } catch (e) {
-            this.treeState = OperationState.ERROR;
-            this.treeErrors.push({
-                type: TreeErrors.archive,
-                data: model,
-                message: e,
-                id: v4(),
-            });
-        }
-    }
-
     protected readonly contextMenuType: ContextMenuType = ContextMenuType.CONTENTVERSION;
 
     protected async getTree(): Promise<ApiResult<PageModel[]>> {

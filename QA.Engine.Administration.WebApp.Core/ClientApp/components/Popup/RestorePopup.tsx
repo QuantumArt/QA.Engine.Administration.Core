@@ -42,7 +42,7 @@ export default class RestorePopup extends React.Component<Props, State> {
             isRestoreContentVersions: restoreContentVersions,
             isRestoreWidgets: restoreWidgets,
         };
-        (treeStore.resolveTreeStore() as ArchiveTreeStore).restore(model);
+        treeStore.restore(model);
         popupStore.close();
     }
 

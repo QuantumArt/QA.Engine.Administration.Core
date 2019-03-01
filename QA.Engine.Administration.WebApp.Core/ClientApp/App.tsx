@@ -26,6 +26,7 @@ import ErrorToast from 'components/ErrorToast';
 import TextStore from 'stores/TextStore';
 import ReorderPopup from 'components/Popup/ReorderPopup';
 import MovePopup from 'components/Popup/MovePopup';
+import TreeStoreType from 'enums/TreeStoreType';
 
 const app = hot(module)(() => {
     const navigationStoreInstance = new NavigationStore();
@@ -46,6 +47,7 @@ const app = hot(module)(() => {
             <TreeStructure
                 type="site"
                 treeStore={treeStoreInstance}
+                tree={treeStoreInstance.getTreeStore(TreeStoreType.SITE)}
             />
             <TabsContainer/>
             <Popup>

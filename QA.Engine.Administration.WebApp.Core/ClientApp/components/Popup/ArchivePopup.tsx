@@ -36,16 +36,6 @@ export default class ArchivePopup extends React.Component<Props, State> {
         contentVersionId: null as number,
     };
 
-    private async archiveWidget(treeStore: TreeStore, model: RemoveModel): Promise<void> {
-        await treeStore.getWidgetStore().archive(model);
-        await treeStore.updateSubTree();
-    }
-
-    private async archiveContentVersion(treeStore: TreeStore, model: RemoveModel): Promise<void> {
-        await treeStore.getContentVersionsStore().archive(model);
-        await treeStore.updateSubTree();
-    }
-
     private archiveClick = () => {
         const { popupStore, treeStore } = this.props;
         const { deleteAllVersions, deleteContentVersions, contentVersionId } = this.state;
@@ -55,15 +45,7 @@ export default class ArchivePopup extends React.Component<Props, State> {
             isDeleteAllVersions: deleteAllVersions,
             isDeleteContentVersions: deleteContentVersions === ContentVersionOperations.archive,
         };
-        if (popupStore.type === PopupType.ARCHIVE) {
-            (treeStore.resolveTreeStore() as SiteTreeStore).archive(model);
-        }
-        if (popupStore.type === PopupType.ARCHIVEWIDGET) {
-            this.archiveWidget(treeStore, model);
-        }
-        if (popupStore.type === PopupType.ARCHIVECONTENTVERSION) {
-            this.archiveContentVersion(treeStore, model);
-        }
+        treeStore.archive(model);
         popupStore.close();
     }
 

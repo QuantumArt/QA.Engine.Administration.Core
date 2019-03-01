@@ -4,6 +4,7 @@ import { Card, Checkbox, H5 } from '@blueprintjs/core';
 import Texts from 'constants/Texts';
 import TreeStore from 'stores/TreeStore';
 import TextStore from 'stores/TextStore';
+import TreeStoreType from 'enums/TreeStoreType';
 
 interface Props {
     type: 'widgets' | 'versions';
@@ -15,9 +16,9 @@ const InfoPane = inject('treeStore', 'textStore')(observer((props: Props) => {
     const { type, treeStore, textStore } = props;
     let tree;
     if (type === 'widgets') {
-        tree = treeStore.getWidgetStore();
+        tree = treeStore.getTreeStore(TreeStoreType.WIDGET);
     } else if (type === 'versions') {
-        tree = treeStore.getContentVersionsStore();
+        tree = treeStore.getTreeStore(TreeStoreType.CONTENTVERSION);
     }
     const selectedNode = tree.selectedNode;
 
