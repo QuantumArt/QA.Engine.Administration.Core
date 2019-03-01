@@ -173,6 +173,8 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
             isContextMenuActive: false,
             parentId: x.parentId,
             contextMenuType: null,
+            isVisible: x.isVisible,
+            isPublished: x.published,
         });
     }
 
