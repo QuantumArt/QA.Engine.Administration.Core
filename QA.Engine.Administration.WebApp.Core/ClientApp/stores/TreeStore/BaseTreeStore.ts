@@ -25,6 +25,7 @@ export interface ITreeErrorModel {
 export interface ITreeIcons {
     checkPublication: boolean;
     root?: IconName;
+    rootPublished?: IconName;
     node?: IconName;
     nodePublished?: IconName;
     nodeOpen?: IconName;
@@ -34,14 +35,15 @@ export interface ITreeIcons {
 }
 
 const defaultIcons: ITreeIcons = {
-    checkPublication: false,
+    checkPublication: true,
     root: 'application',
-    node: 'folder-close',
-    nodePublished: 'folder-close',
-    nodeOpen: 'folder-open',
-    nodeOpenPublished: 'folder-open',
+    rootPublished: 'application',
+    node: 'document',
+    nodePublished: 'saved',
+    nodeOpen: 'document',
+    nodeOpenPublished: 'saved',
     leaf: 'document',
-    leafPublished: 'document',
+    leafPublished: 'saved',
 };
 
 /**
@@ -194,14 +196,17 @@ export abstract class BaseTreeState<T extends {
     }
 
     protected getIcon = (el: T): IconName => {
-        if (el.parentId === null) {
-            return this.icons.root;
-        }
         if (this.icons.checkPublication) {
+            if (el.parentId === null) {
+                return el.published ? this.icons.rootPublished : this.icons.root;
+            }
             if (!el.hasChildren) {
                 return el.published ? this.icons.leafPublished : this.icons.leaf;
             }
             return el.published ? this.icons.nodePublished : this.icons.node;
+        }
+        if (el.parentId === null) {
+            return this.icons.root;
         }
         if (!el.hasChildren) {
             return this.icons.leaf;

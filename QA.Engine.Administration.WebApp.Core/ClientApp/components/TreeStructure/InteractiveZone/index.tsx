@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { inject, observer } from 'mobx-react';
+import cn from 'classnames'; // tslint:disable-line
 import { Button, Popover, Position, Icon } from '@blueprintjs/core';
 import { ITreeElement } from 'stores/TreeStore/BaseTreeStore';
 import ContentVersionTreeMenu from './ContentVersionTreeMenu';
@@ -110,24 +111,32 @@ export default class ContextMenu extends React.Component<Props, State> {
                 break;
         }
 
-        return node.isSelected ?
-            <Popover
-                content={elementMenu}
-                position={Position.RIGHT}
-                autoFocus={false}
-                isOpen={node.isContextMenuActive}
-                boundary="viewport"
-                popoverRef={this.refFunc}
-            >
-                <Button
-                    icon="cog"
-                    minimal
-                    onClick={this.handleClick}
-                    className="context-button"
-                />
-            </Popover> :
+        return (
             <React.Fragment>
-                <Icon className="context-icon" icon={node.isVisible ? 'eye-open' : 'eye-off'} />
-            </React.Fragment>;
+                <Icon
+                    className={cn('context-icon', {
+                        'context-icon--active': node.isSelected,
+                    })}
+                    icon={node.isVisible ? 'eye-open' : 'eye-off'}
+                />
+                {node.isSelected &&
+                    <Popover
+                        className="context-popover"
+                        content={elementMenu}
+                        position={Position.RIGHT}
+                        autoFocus={false}
+                        isOpen={node.isContextMenuActive}
+                        boundary="viewport"
+                        popoverRef={this.refFunc}
+                    >
+                        <Button
+                            icon="cog"
+                            minimal
+                            onClick={this.handleClick}
+                            className="context-button"
+                        />
+                    </Popover>
+                }
+            </React.Fragment>);
     }
 }

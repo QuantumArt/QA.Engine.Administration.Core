@@ -30,28 +30,23 @@ export default class TreeStore {
     private readonly stores: Map<TreeStoreType, TreeType>;
 
     constructor(navigationStore: NavigationStore) {
-        this.siteTreeStore = new SiteTreeStore({
+        this.siteTreeStore = new SiteTreeStore();
+        this.archiveStore = new ArchiveTreeStore();
+        this.contentVersionsStore = new ContentVersionTreeStore({
+            checkPublication: true,
+            root: 'document',
+            rootPublished: 'saved',
+        });
+        this.widgetStore = new WidgetTreeStore({
             checkPublication: true,
             root: 'application',
-            node: 'document',
-            nodePublished: 'saved',
-            nodeOpen: 'document',
+            node: 'widget',
+            nodePublished: 'widget',
+            nodeOpen: 'widget',
             nodeOpenPublished: 'saved',
             leaf: 'document',
             leafPublished: 'saved',
         });
-        this.archiveStore = new ArchiveTreeStore({
-            checkPublication: true,
-            root: 'application',
-            node: 'document',
-            nodePublished: 'saved',
-            nodeOpen: 'document',
-            nodeOpenPublished: 'saved',
-            leaf: 'document',
-            leafPublished: 'saved',
-        });
-        this.contentVersionsStore = new ContentVersionTreeStore({ root: 'panel-stats', checkPublication: false });
-        this.widgetStore = new WidgetTreeStore({ node: 'heat-grid', leaf: 'widget-button', checkPublication: false });
 
         this.treeState = new TreeState();
         this.stores = new Map<TreeStoreType, TreeType>();
