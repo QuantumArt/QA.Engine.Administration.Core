@@ -1,9 +1,6 @@
-import v4 from 'uuid/v4';
 import SiteMapService from 'services/SiteMapService';
 import { BaseTreeState } from 'stores/TreeStore/BaseTreeStore';
-import OperationState from 'enums/OperationState';
 import ContextMenuType from 'enums/ContextMenuType';
-import { TreeErrors } from 'enums/ErrorsTypes';
 
 export default class ArchiveTreeStore extends BaseTreeState<ArchiveModel> {
 

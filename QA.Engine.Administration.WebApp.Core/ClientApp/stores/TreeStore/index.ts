@@ -6,9 +6,9 @@ import WidgetTreeStore from './WidgetTreeStore';
 import { observable, action, computed } from 'mobx';
 import OperationState from 'enums/OperationState';
 import TreeStoreType from 'enums/TreeStoreType';
-import TreeErrors from 'enums/TreeErrors';
+import { TreeErrors } from 'enums/ErrorsTypes';
 import SiteMapService from 'services/SiteMapService';
-import { ITreeErrorModel, ITreeElement } from './BaseTreeStore';
+import { ITreeErrorModel } from './BaseTreeStore';
 import { v4 } from 'uuid';
 
 export type TreeType = SiteTreeStore | ArchiveTreeStore | ContentVersionTreeStore | WidgetTreeStore;
@@ -226,12 +226,11 @@ export default class TreeStore {
             model);
     }
 
-    private async runAsync(func: () => Promise<any>, treeErrors: TreeErrors, model?: any): Promise<any> {
+    private async runAsync(func: () => Promise<void>, treeErrors: TreeErrors, model?: any): Promise<any> {
         this.treeState.pending();
         try {
             await func();
         } catch (e) {
-            console.error(e);
             this.treeState.error();
             this.treeErrors.push({
                 type: treeErrors,

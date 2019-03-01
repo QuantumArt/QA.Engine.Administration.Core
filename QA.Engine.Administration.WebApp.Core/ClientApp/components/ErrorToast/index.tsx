@@ -5,12 +5,6 @@ import OperationState from 'enums/OperationState';
 import TreeStore from 'stores/TreeStore';
 import EditArticleStore from 'stores/EditArticleStore';
 import { TreeErrors, PopupErrors } from 'enums/ErrorsTypes';
-import TreeStore from 'stores/TreeStore';
-import SiteTreeStore from 'stores/TreeStore/SiteTreeStore';
-import ArchiveTreeStore from 'stores/TreeStore/ArchiveTreeStore';
-import WidgetTreeStore from 'stores/TreeStore/WidgetTreeStore';
-import ContentVersionTreeStore from 'stores/TreeStore/ContentVersionTreeStore';
-import { ITreeErrorModel } from 'stores/TreeStore/BaseTreeStore';
 import PopupStore from 'stores/PopupStore';
 
 interface Props {
@@ -19,50 +13,51 @@ interface Props {
     popupStore?: PopupStore;
 }
 
-type CurrentTree = SiteTreeStore | ArchiveTreeStore | WidgetTreeStore | ContentVersionTreeStore;
-
+// TODO: Make a base interface for err handling
 @inject('treeStore', 'editArticleStore', 'popupStore')
 @observer
 export default class ErrorToast extends React.Component<Props> {
 
-    private handleTreeErrorClick = (e: ITreeErrorModel, treeStore: TreeStore) => () => {
-        switch (e.type) {
-            case TreeErrors.fetch:
-                treeStore.fetchTree();
-                break;
-            case TreeErrors.update:
-                treeStore.updateSubTree(e.data);
-                break;
-            case TreeErrors.publish:
-                treeStore.publish(e.data);
-                break;
-            case TreeErrors.archive:
-                treeStore.archive(e.data);
-                break;
-            case TreeErrors.edit:
-                treeStore.edit(e.data);
-                break;
-            case TreeErrors.restore:
-                treeStore.restore(e.data);
-                break;
-            case TreeErrors.delete:
-                treeStore.delete(e.data);
-                break;
-            case TreeErrors.reorder:
-                treeStore.reorder(e.data);
-                break;
-            case TreeErrors.move:
-                treeStore.move(e.data);
-                break;
-            default:
-                break;
-        }
+    private handleTreeErrorClick = (treeStore: TreeStore) => () => {
+        treeStore.treeErrors.forEach((e) => {
+            switch (e.type) {
+                case TreeErrors.fetch:
+                    treeStore.fetchTree();
+                    break;
+                case TreeErrors.update:
+                    treeStore.updateSubTree(e.data);
+                    break;
+                case TreeErrors.publish:
+                    treeStore.publish(e.data);
+                    break;
+                case TreeErrors.archive:
+                    treeStore.archive(e.data);
+                    break;
+                case TreeErrors.edit:
+                    treeStore.edit(e.data);
+                    break;
+                case TreeErrors.restore:
+                    treeStore.restore(e.data);
+                    break;
+                case TreeErrors.delete:
+                    treeStore.delete(e.data);
+                    break;
+                case TreeErrors.reorder:
+                    treeStore.reorder(e.data);
+                    break;
+                case TreeErrors.move:
+                    treeStore.move(e.data);
+                    break;
+                default:
+                    break;
+            }
+        });
     }
 
     private handlePopupErrorClick = (popupStore: PopupStore) => () => {
         popupStore.popupErrors.forEach((e) => {
-            const { data: { itemId, type, title } } = e;
-            popupStore.show(itemId, type, title);
+            const { data: { itemId, type, title, options } } = e;
+            popupStore.show(itemId, type, title, options);
         });
     }
 
@@ -74,7 +69,7 @@ export default class ErrorToast extends React.Component<Props> {
         e: IErrorModel<TreeErrors | PopupErrors>,
         i: number,
         currentStore: TreeStore | PopupStore,
-        action: (t: TreeStore | PopupStore, ) => (e: React.MouseEvent<HTMLElement>) => void,
+        action: (t: TreeStore | PopupStore) => (e: React.MouseEvent<HTMLElement>) => void,
     ) => (
         <Toast
             message={`${e.type}. ${e.message}`}

@@ -38,11 +38,11 @@ export default class PopupStore {
         const useContentVersions = [PopupType.ARCHIVE];
 
         if (useDiscriminators.indexOf(type) > -1) {
-            this.getDiscriminators(itemId, type, title);
+            this.getDiscriminators(itemId, type, title, options);
         }
 
         if (useContentVersions.indexOf(type) > -1) {
-            this.getContentVersions(itemId, type, title);
+            this.getContentVersions(itemId, type, title, options);
         }
         this.itemId = itemId;
         this.type = type;
@@ -56,7 +56,7 @@ export default class PopupStore {
         this.showPopup = false;
     }
 
-    private async getDiscriminators(itemId: number, type: PopupType, title: string) {
+    private async getDiscriminators(itemId: number, type: PopupType, title: string, options?: any) {
         const isPage = type !== PopupType.ADDWIDGET;
         this.state = OperationState.PENDING;
         try {
@@ -71,14 +71,14 @@ export default class PopupStore {
             this.state = OperationState.ERROR;
             this.popupErrors.push({
                 type: PopupErrors.discriminators,
-                data: { itemId, type, title },
+                data: { itemId, type, title, options },
                 message: e,
                 id: v4(),
             });
         }
     }
 
-    private async getContentVersions(itemId: number, type: PopupType, title: string) {
+    private async getContentVersions(itemId: number, type: PopupType, title: string, options?: any) {
         this.state = OperationState.PENDING;
         try {
             const response: ApiResult<PageModel> = await SiteMapService.getSiteMapSubTree(itemId);
@@ -92,7 +92,7 @@ export default class PopupStore {
             this.state = OperationState.ERROR;
             this.popupErrors.push({
                 type: PopupErrors.versions,
-                data: { itemId, type, title },
+                data: { itemId, type, title, options },
                 message: e,
                 id: v4(),
             });
