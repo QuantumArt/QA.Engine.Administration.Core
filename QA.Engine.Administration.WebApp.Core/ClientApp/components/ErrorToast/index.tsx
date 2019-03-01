@@ -4,22 +4,24 @@ import { Intent, Toast, Toaster } from '@blueprintjs/core';
 import OperationState from 'enums/OperationState';
 import TreeStore from 'stores/TreeStore';
 import EditArticleStore from 'stores/EditArticleStore';
-import TreeErrors from 'enums/TreeErrors';
-import { ITreeErrorModel } from 'stores/TreeStore/BaseTreeStore';
+import { TreeErrors, PopupErrors } from 'enums/ErrorsTypes';
+import TreeStore from 'stores/TreeStore';
 import SiteTreeStore from 'stores/TreeStore/SiteTreeStore';
 import ArchiveTreeStore from 'stores/TreeStore/ArchiveTreeStore';
 import WidgetTreeStore from 'stores/TreeStore/WidgetTreeStore';
 import ContentVersionTreeStore from 'stores/TreeStore/ContentVersionTreeStore';
-import TreeStoreType from 'enums/TreeStoreType';
+import { ITreeErrorModel } from 'stores/TreeStore/BaseTreeStore';
+import PopupStore from 'stores/PopupStore';
 
 interface Props {
     treeStore?: TreeStore;
     editArticleStore?: EditArticleStore;
+    popupStore?: PopupStore;
 }
 
 type CurrentTree = SiteTreeStore | ArchiveTreeStore | WidgetTreeStore | ContentVersionTreeStore;
 
-@inject('treeStore', 'editArticleStore')
+@inject('treeStore', 'editArticleStore', 'popupStore')
 @observer
 export default class ErrorToast extends React.Component<Props> {
 
@@ -57,46 +59,48 @@ export default class ErrorToast extends React.Component<Props> {
         }
     }
 
+    private handlePopupErrorClick = (popupStore: PopupStore) => () => {
+        popupStore.popupErrors.forEach((e) => {
+            const { data: { itemId, type, title } } = e;
+            popupStore.show(itemId, type, title);
+        });
+    }
+
     private handleDismiss = (i: number, cb: (i: number) => void) => () => {
         cb(i);
     }
 
-    // private renderToast = (e:ITreeErrorModel, i: number, currentTree: CurrentTree) => (
-    private renderToast = (e: ITreeErrorModel, i: number, treeStore: TreeStore) => (
+    private renderToast = (
+        e: IErrorModel<TreeErrors | PopupErrors>,
+        i: number,
+        currentStore: TreeStore | PopupStore,
+        action: (t: TreeStore | PopupStore, ) => (e: React.MouseEvent<HTMLElement>) => void,
+    ) => (
         <Toast
             message={`${e.type}. ${e.message}`}
             icon="warning-sign"
             intent={Intent.DANGER}
             action={{
-                // onClick: this.handleTreeErrorClick(currentTree),
-                onClick: this.handleTreeErrorClick(e, treeStore),
+                onClick: action(currentStore),
                 icon: 'repeat',
             }}
-            // onDismiss={this.handleDismiss(i, currentTree.removeError)}
-            onDismiss={this.handleDismiss(i, treeStore.removeError)}
+            onDismiss={this.handleDismiss(i, currentStore.removeError)}
             key={e.id}
         />
     )
 
     render() {
-        const { treeStore } = this.props;
-        // const siteTree = treeStore.resolveTreeStore();
-        // const widgetTree = treeStore.getWidgetStore();
-        // const contentVersionsStore = treeStore.getContentVersionsStore();
+        const { treeStore, popupStore } = this.props;
 
         return (
             <Toaster>
-                {/* {siteTree.treeState === OperationState.ERROR &&
-                    siteTree.treeErrors.map((e, i) => this.renderToast(e, i, siteTree))
-                }
-                {widgetTree.treeState === OperationState.ERROR &&
-                    widgetTree.treeErrors.map((e, i) => this.renderToast(e, i, widgetTree))
-                }
-                {contentVersionsStore.treeState === OperationState.ERROR &&
-                    contentVersionsStore.treeErrors.map((e, i) => this.renderToast(e, i, contentVersionsStore))
-                } */}
                 {treeStore.state === OperationState.ERROR &&
-                    treeStore.treeErrors.map((e, i) => this.renderToast(e, i, treeStore))
+                    treeStore.treeErrors.map((e, i) => this.renderToast(e, i, treeStore, this.handleTreeErrorClick))
+                }
+                {popupStore.state === OperationState.ERROR &&
+                    popupStore.popupErrors.map(
+                        (e, i) => this.renderToast(e, i, popupStore, this.handlePopupErrorClick),
+                    )
                 }
             </Toaster>
         );

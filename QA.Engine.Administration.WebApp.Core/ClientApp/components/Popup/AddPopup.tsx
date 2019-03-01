@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { Card, Button, FormGroup, InputGroup, ButtonGroup, Intent } from '@blueprintjs/core';
-import { observer, inject } from 'mobx-react';
+import { Button, ButtonGroup, Card, FormGroup, InputGroup, Intent } from '@blueprintjs/core';
+import { inject, observer } from 'mobx-react';
 import QpIntegrationStore from 'stores/QpIntegrationStore';
 import PopupStore from 'stores/PopupStore';
 import DiscriminatorSelect from 'components/Select/DiscriminatorSelect';

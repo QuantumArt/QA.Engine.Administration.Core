@@ -3,7 +3,7 @@ import { action, observable, computed } from 'mobx';
 import { IconName, ITreeNode } from '@blueprintjs/core';
 import InteractiveZone from 'components/TreeStructure/InteractiveZone';
 import ContextMenuType from 'enums/ContextMenuType';
-import TreeErrors from 'enums/TreeErrors';
+import { TreeErrors } from 'enums/ErrorsTypes';
 
 export interface ITreeElement extends ITreeNode {
     childNodes: ITreeElement[];
@@ -15,7 +15,7 @@ export interface ITreeElement extends ITreeNode {
     isPublished: boolean;
 }
 
-export interface ITreeErrorModel {
+export interface ITreeErrorModel extends IErrorModel<TreeErrors> {
     type: TreeErrors;
     message: string;
     data?: any;

@@ -3,7 +3,7 @@ import SiteMapService from 'services/SiteMapService';
 import { BaseTreeState } from 'stores/TreeStore/BaseTreeStore';
 import OperationState from 'enums/OperationState';
 import ContextMenuType from 'enums/ContextMenuType';
-import TreeErrors from 'enums/TreeErrors';
+import { TreeErrors } from 'enums/ErrorsTypes';
 import { computed } from 'mobx';
 
 export default class SiteTreeStore extends BaseTreeState<PageModel> {

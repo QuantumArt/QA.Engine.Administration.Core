@@ -1,13 +1,23 @@
+import v4 from 'uuid/v4';
 import { observable, action } from 'mobx';
 import DictionaryService from 'services/DictionaryService';
 import OperationState from 'enums/OperationState';
 import PopupType from 'enums/PopupType';
 import SiteMapService from 'services/SiteMapService';
+import { PopupErrors } from 'enums/ErrorsTypes';
+
+export interface IPopupErrorModel extends IErrorModel<PopupErrors> {
+    type: PopupErrors;
+    message: string;
+    data?: any;
+    id: string;
+}
 
 export default class PopupStore {
     @observable state: OperationState = OperationState.NONE;
-    @observable showPopup: boolean = false;
     @observable type: PopupType;
+    @observable showPopup: boolean = false;
+    @observable public popupErrors: IPopupErrorModel[] = [];
 
     discriminators: DiscriminatorModel[];
     contentVersions: PageModel[];
@@ -16,18 +26,23 @@ export default class PopupStore {
     options: any;
 
     @action
-    public show(itemId: number, type: PopupType, title: string, options?: any) {
+    public removeError = (i: number) => {
+        this.popupErrors.splice(i, 1);
+    }
+
+    @action
+    public async show(itemId: number, type: PopupType, title: string, options?: any) {
         this.state = OperationState.NONE;
 
         const useDiscriminators = [PopupType.ADD, PopupType.ADDVERSION, PopupType.ADDWIDGET];
         const useContentVersions = [PopupType.ARCHIVE];
 
         if (useDiscriminators.indexOf(type) > -1) {
-            this.getDiscriminators(type !== PopupType.ADDWIDGET);
+            this.getDiscriminators(itemId, type, title);
         }
 
         if (useContentVersions.indexOf(type) > -1) {
-            this.getContentVersions(itemId);
+            this.getContentVersions(itemId, type, title);
         }
         this.itemId = itemId;
         this.type = type;
@@ -41,7 +56,8 @@ export default class PopupStore {
         this.showPopup = false;
     }
 
-    public async getDiscriminators(isPage: boolean) {
+    private async getDiscriminators(itemId: number, type: PopupType, title: string) {
+        const isPage = type !== PopupType.ADDWIDGET;
         this.state = OperationState.PENDING;
         try {
             const response: ApiResult<DiscriminatorModel[]> = await DictionaryService.getDiscriminators();
@@ -53,11 +69,16 @@ export default class PopupStore {
             }
         } catch (e) {
             this.state = OperationState.ERROR;
-            console.error(e);
+            this.popupErrors.push({
+                type: PopupErrors.discriminators,
+                data: { itemId, type, title },
+                message: e,
+                id: v4(),
+            });
         }
     }
 
-    public async getContentVersions(itemId: number) {
+    private async getContentVersions(itemId: number, type: PopupType, title: string) {
         this.state = OperationState.PENDING;
         try {
             const response: ApiResult<PageModel> = await SiteMapService.getSiteMapSubTree(itemId);
@@ -69,7 +90,12 @@ export default class PopupStore {
             }
         } catch (e) {
             this.state = OperationState.ERROR;
-            console.error(e);
+            this.popupErrors.push({
+                type: PopupErrors.versions,
+                data: { itemId, type, title },
+                message: e,
+                id: v4(),
+            });
         }
     }
 }
