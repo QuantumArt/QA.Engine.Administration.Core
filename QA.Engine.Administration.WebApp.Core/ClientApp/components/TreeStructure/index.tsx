@@ -16,7 +16,7 @@ import ContentVersionTreeStore from 'stores/TreeStore/ContentVersionTreeStore';
 import TreeStoreType from 'enums/TreeStoreType';
 
 interface Props {
-    type: 'site' | 'archive' | 'widgets' | 'versions';
+    type: 'main' | 'widgets' | 'versions';
     tree: TreeType;
     treeStore?: TreeStore;
     navigationStore?: NavigationStore;
@@ -51,29 +51,27 @@ export default class SiteTree extends React.Component<Props> {
     };
 
     private resolveTree = (): TreeType => {
-        const { type, treeStore, navigationStore } = this.props;
-        if (type === 'site' || type === 'archive') {
-            if (navigationStore.currentPage === Pages.SITEMAP) {
-                return treeStore.getTreeStore(TreeStoreType.SITE);
-            }
-            return treeStore.getTreeStore(TreeStoreType.ARCHIVE);
+        const { type, treeStore } = this.props;
+        if (type === 'main') {
+            return treeStore.resolveMainTreeStore();
         }
         if (type === 'widgets') {
-            return treeStore.getTreeStore(TreeStoreType.WIDGET);
+            return treeStore.getWidgetTreeStore();
         }
         if (type === 'versions') {
-            return treeStore.getTreeStore(TreeStoreType.CONTENTVERSION);
+            return treeStore.getContentVersionTreeStore();
         }
     }
 
     private handleMajorTreeNode = (e: ITreeElement) => {
-        const { navigationStore, editArticleStore, treeStore, tree } = this.props;
+        const { navigationStore, editArticleStore, treeStore } = this.props;
+        const tree = treeStore.resolveMainTreeStore();
         tree.handleNodeClick(e);
         navigationStore.setDefaultTab(e.isSelected);
         [
             editArticleStore,
-            treeStore.getTreeStore(TreeStoreType.CONTENTVERSION) as ContentVersionTreeStore,
-            treeStore.getTreeStore(TreeStoreType.WIDGET) as WidgetTreeStore,
+            treeStore.getContentVersionTreeStore(),
+            treeStore.getWidgetTreeStore(),
         ].forEach((x) => {
             if (tree instanceof SiteTreeStore || tree instanceof ArchiveTreeStore) {
                 x.init(tree.selectedNode);
@@ -91,7 +89,7 @@ export default class SiteTree extends React.Component<Props> {
 
     private handleNodeClick = (e: ITreeElement) => {
         const { type } = this.props;
-        if (type === 'site' || type === 'archive') {
+        if (type === 'main') {
             this.handleMajorTreeNode(e);
         } else {
             this.handleMinorTreeNode(e);
@@ -100,9 +98,9 @@ export default class SiteTree extends React.Component<Props> {
 
     render() {
         const { treeStore } = this.props;
-        // this.resolveTree();
         const tree = this.resolveTree();
         const isLoading = treeStore.state === OperationState.PENDING;
+        console.log('TREE', tree.tree);
         return (
             <Card className={cn('tree-pane', this.props.className)}>
                 {isLoading ?

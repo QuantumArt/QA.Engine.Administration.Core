@@ -50,7 +50,7 @@ export default class MovePopup extends React.Component<Props, State> {
             return null;
         }
 
-        const siteTreeStore = treeStore.getTreeStore(TreeStoreType.SITE) as SiteTreeStore;
+        const siteTreeStore = treeStore.getSiteTreeStore();
         const pages = siteTreeStore.flatPages;
 
         return (

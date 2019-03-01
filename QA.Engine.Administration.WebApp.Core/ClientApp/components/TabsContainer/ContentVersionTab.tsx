@@ -24,7 +24,7 @@ export default class ContentVersionTab extends React.Component<Props> {
 
     private addClick = () => {
         const { treeStore, popupStore, textStore } = this.props;
-        const tree = treeStore.getTreeStore(TreeStoreType.CONTENTVERSION) as ContentVersionTreeStore;
+        const tree = treeStore.getContentVersionTreeStore();
         popupStore.show(
             tree.selectedSiteTreeNode.id,
             PopupType.ADDVERSION,
@@ -39,7 +39,7 @@ export default class ContentVersionTab extends React.Component<Props> {
     render() {
 
         const { treeStore, textStore } = this.props;
-        const tree = treeStore.getTreeStore(TreeStoreType.CONTENTVERSION) as ContentVersionTreeStore;
+        const tree = treeStore.getContentVersionTreeStore();
 
         if (tree.selectedSiteTreeNode == null) {
             return null;

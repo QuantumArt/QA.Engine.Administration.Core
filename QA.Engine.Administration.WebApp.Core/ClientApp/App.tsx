@@ -45,9 +45,9 @@ const app = hot(module)(() => {
         <div className="layout">
             <NavigationBar/>
             <TreeStructure
-                type="site"
+                type="main"
                 treeStore={treeStoreInstance}
-                tree={treeStoreInstance.getTreeStore(TreeStoreType.SITE)}
+                tree={treeStoreInstance.resolveMainTreeStore()}
             />
             <TabsContainer/>
             <Popup>

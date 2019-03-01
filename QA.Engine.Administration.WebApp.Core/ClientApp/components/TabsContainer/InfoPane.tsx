@@ -16,9 +16,9 @@ const InfoPane = inject('treeStore', 'textStore')(observer((props: Props) => {
     const { type, treeStore, textStore } = props;
     let tree;
     if (type === 'widgets') {
-        tree = treeStore.getTreeStore(TreeStoreType.WIDGET);
+        tree = treeStore.getWidgetTreeStore();
     } else if (type === 'versions') {
-        tree = treeStore.getTreeStore(TreeStoreType.CONTENTVERSION);
+        tree = treeStore.getContentVersionTreeStore();
     }
     const selectedNode = tree.selectedNode;
 

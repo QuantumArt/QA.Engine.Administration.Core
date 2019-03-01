@@ -30,13 +30,13 @@ export default class CommonTab extends React.Component<Props> {
 
     private editClick = () => {
         const { treeStore, qpIntegrationStore } = this.props;
-        const tree = treeStore.getTreeStore(TreeStoreType.SITE);
+        const tree = treeStore.getSiteTreeStore();
         qpIntegrationStore.edit(tree.selectedNode.id);
     }
 
     private saveClick = () => {
         const { treeStore, editArticleStore } = this.props;
-        const tree = treeStore.getTreeStore(TreeStoreType.SITE);
+        const tree = treeStore.getSiteTreeStore();
         const model: EditModel = {
             itemId: tree.selectedNode.id,
             title: editArticleStore.title,
@@ -67,8 +67,7 @@ export default class CommonTab extends React.Component<Props> {
 
     render() {
         const { treeStore, textStore, navigationStore, editArticleStore: { title, isVisible, isInSiteMap, isEditable } } = this.props;
-        const treeType = navigationStore.currentPage === Pages.SITEMAP ? TreeStoreType.SITE : TreeStoreType.ARCHIVE;
-        const tree = treeStore.getTreeStore(treeType);
+        const tree = navigationStore.currentPage === Pages.SITEMAP ? treeStore.getSiteTreeStore() : treeStore.getArchiveTreeStore();
         if (tree.selectedNode == null) {
             return null;
         }

@@ -34,7 +34,7 @@ export default class AddVersionPopup extends React.Component<Props, State> {
     private addClick = () => {
         const { popupStore, qpIntegrationStore, treeStore } = this.props;
         const { discriminator, version } = this.state;
-        const node = treeStore.getTreeStore(TreeStoreType.SITE).selectedNode as PageModel;
+        const node = treeStore.getSiteTreeStore().selectedNode as PageModel;
         qpIntegrationStore.add(node, version, node.alias, node.title, discriminator.id, 0);
         popupStore.close();
     }

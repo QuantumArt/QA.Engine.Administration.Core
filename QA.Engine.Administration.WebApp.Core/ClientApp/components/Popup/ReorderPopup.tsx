@@ -57,7 +57,7 @@ export default class ReorderPopup extends React.Component<Props, State> {
             return null;
         }
 
-        const siteTreeStore = treeStore.getTreeStore(TreeStoreType.SITE) as SiteTreeStore;
+        const siteTreeStore = treeStore.getSiteTreeStore();
         const pages = siteTreeStore.parentNode.children.filter(x => x.id !== siteTreeStore.selectedNode.id);
 
         return (

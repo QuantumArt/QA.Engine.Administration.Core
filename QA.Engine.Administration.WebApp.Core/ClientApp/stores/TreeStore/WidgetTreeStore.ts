@@ -18,7 +18,6 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
 
     @action
     public init(selectedNode: any) {
-        console.log(this.icons);
         this.selectedSiteTreeNode = selectedNode;
         if (selectedNode == null || selectedNode.widgets == null) {
             this.widgetTree = [];

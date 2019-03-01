@@ -24,7 +24,7 @@ export default class WidgetTab extends React.Component<Props> {
 
     private addClick = () => {
         const { treeStore, popupStore, textStore } = this.props;
-        const tree = treeStore.getTreeStore(TreeStoreType.WIDGET) as WidgetTreeStore;
+        const tree = treeStore.getWidgetTreeStore();
         popupStore.show(tree.selectedSiteTreeNode.id, PopupType.ADDWIDGET, textStore.texts[Texts.popupAddWidgetTitle]);
     }
 
@@ -34,7 +34,7 @@ export default class WidgetTab extends React.Component<Props> {
 
     render() {
         const { treeStore, textStore } = this.props;
-        const tree = treeStore.getTreeStore(TreeStoreType.WIDGET) as WidgetTreeStore;
+        const tree = treeStore.getWidgetTreeStore();
 
         if (tree.selectedSiteTreeNode == null) {
             return null;

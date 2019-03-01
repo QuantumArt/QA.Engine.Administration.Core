@@ -18,7 +18,7 @@ export type TreeType = SiteTreeStore | ArchiveTreeStore | ContentVersionTreeStor
  */
 export default class TreeStore {
 
-    @observable public treeErrors: ITreeErrorModel[] = [];
+    @observable treeErrors: ITreeErrorModel[] = [];
 
     private readonly siteTreeStore: SiteTreeStore;
     private readonly archiveStore: ArchiveTreeStore;
@@ -64,25 +64,33 @@ export default class TreeStore {
     }
 
     @action
-    public removeError = (i: number) => {
+    removeError = (i: number) => {
         this.treeErrors.splice(i, 1);
     }
 
-    getTreeStore(type: TreeStoreType): TreeType {
-        return this.stores.get(type);
+    getSiteTreeStore(): SiteTreeStore {
+        return this.siteTreeStore;
+    }
+    getArchiveTreeStore(): ArchiveTreeStore {
+        return this.archiveStore;
+    }
+    getContentVersionTreeStore(): ContentVersionTreeStore {
+        return this.contentVersionsStore;
+    }
+    getWidgetTreeStore(): WidgetTreeStore {
+        return this.widgetStore;
     }
 
-    private resolveTreeStore(): ArchiveTreeStore | SiteTreeStore {
+    resolveMainTreeStore(): ArchiveTreeStore | SiteTreeStore {
         if (this.navigationStore.currentPage === Pages.ARCHIVE) {
             return this.archiveStore;
         }
         return this.siteTreeStore;
     }
 
-    public async updateSubTree(id?: number): Promise<any> {
-        let current = this.resolveTreeStore();
+    async updateSubTree(id?: number): Promise<any> {
+        let current = this.resolveMainTreeStore();
         let selectedNode = current.selectedNode;
-        // await current.updateSubTree(id == null ? selectedNode.id : id);
         await this.runAsync(
             async () => {
                 await current.updateSubTree(id == null ? selectedNode.id : id);
@@ -91,15 +99,15 @@ export default class TreeStore {
             TreeErrors.update,
             id == null ? selectedNode.id : id);
 
-        current = this.resolveTreeStore();
+        current = this.resolveMainTreeStore();
         if (current instanceof SiteTreeStore) {
             selectedNode = current.selectedNode;
             [this.contentVersionsStore, this.widgetStore].forEach(x => x.init(selectedNode));
         }
     }
 
-    public async fetchTree(): Promise<any> {
-        const store = this.resolveTreeStore();
+    async fetchTree(): Promise<any> {
+        const store = this.resolveMainTreeStore();
         this.runAsync(
             async () => {
                 await store.fetchTree();
@@ -108,7 +116,7 @@ export default class TreeStore {
             TreeErrors.fetch);
     }
 
-    public async publish(itemIds: number[]): Promise<any> {
+    async publish(itemIds: number[]): Promise<any> {
         this.runAsync(
             async () => {
                 const response: ApiResult<any> = await SiteMapService.publish(itemIds);
@@ -123,7 +131,7 @@ export default class TreeStore {
             itemIds);
     }
 
-    public async archive(model: RemoveModel): Promise<any> {
+    async archive(model: RemoveModel): Promise<any> {
         this.runAsync(
             async () => {
                 const response: ApiResult<any> = await SiteMapService.archive(model);
@@ -138,7 +146,7 @@ export default class TreeStore {
             model);
     }
 
-    public async edit(model: EditModel): Promise<any> {
+    async edit(model: EditModel): Promise<any> {
         this.runAsync(
             async () => {
                 const response: ApiResult<any> = await SiteMapService.edit(model);
@@ -153,7 +161,7 @@ export default class TreeStore {
             model);
     }
 
-    public async reorder(model: ReorderModel): Promise<any> {
+    async reorder(model: ReorderModel): Promise<any> {
         this.runAsync(
             async () => {
                 const response: ApiResult<any> = await SiteMapService.reorder(model);
@@ -170,7 +178,7 @@ export default class TreeStore {
             model);
     }
 
-    public async move(model: MoveModel): Promise<any> {
+    async move(model: MoveModel): Promise<any> {
         this.runAsync(
             async () => {
                 const response: ApiResult<any> = await SiteMapService.move(model);
@@ -188,7 +196,7 @@ export default class TreeStore {
             model);
     }
 
-    public async restore(model: RestoreModel): Promise<any> {
+    async restore(model: RestoreModel): Promise<any> {
         this.runAsync(
             async () => {
                 const response: ApiResult<any> = await SiteMapService.restore(model);
@@ -203,7 +211,7 @@ export default class TreeStore {
             model);
     }
 
-    public async delete(model: DeleteModel): Promise<any> {
+    async delete(model: DeleteModel): Promise<any> {
         this.runAsync(
             async () => {
                 const response: ApiResult<any> = await SiteMapService.delete(model);

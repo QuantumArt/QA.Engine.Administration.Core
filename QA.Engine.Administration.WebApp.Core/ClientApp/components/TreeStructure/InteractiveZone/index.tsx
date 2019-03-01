@@ -44,16 +44,16 @@ export default class ContextMenu extends React.Component<Props, State> {
         }
         if (!isHovered) {
             if (node.contextMenuType === ContextMenuType.SITEMAP) {
-                treeStore.getTreeStore(TreeStoreType.SITE).handleContextMenu(node);
+                treeStore.getSiteTreeStore().handleContextMenu(node);
             }
             if (node.contextMenuType === ContextMenuType.ARCHIVE) {
-                treeStore.getTreeStore(TreeStoreType.ARCHIVE).handleContextMenu(node);
+                treeStore.getArchiveTreeStore().handleContextMenu(node);
             }
             if (node.contextMenuType === ContextMenuType.CONTENTVERSION) {
-                treeStore.getTreeStore(TreeStoreType.CONTENTVERSION).handleContextMenu(node);
+                treeStore.getContentVersionTreeStore().handleContextMenu(node);
             }
             if (node.contextMenuType === ContextMenuType.WIDGET) {
-                treeStore.getTreeStore(TreeStoreType.WIDGET).handleContextMenu(node);
+                treeStore.getWidgetTreeStore().handleContextMenu(node);
             }
             // treeStore.resolveTreeStore().handleContextMenu(node);
         }
