@@ -158,7 +158,11 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
 
     protected mapElement(el: WidgetModel): ITreeElement {
         const treeElement = super.mapElement(el);
-        treeElement.icon = this.icons.leaf;
+        if (this.icons.checkPublication) {
+            treeElement.icon = el.published ? this.icons.leafPublished : this.icons.leaf;
+        } else {
+            treeElement.icon = this.icons.leaf;
+        }
         return treeElement;
     }
 

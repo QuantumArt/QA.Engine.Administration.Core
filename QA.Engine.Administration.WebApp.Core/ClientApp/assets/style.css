@@ -18,7 +18,7 @@ body {
 }
 
 .tree-pane {
-    width: 30%;
+    width: 40%;
     min-width: 250px;
     min-height: 70px;
     padding-left: 14px;
@@ -26,12 +26,17 @@ body {
 }
 
 .minor-tree-pane {
-    width: 60%;
+    width: 68%;
     align-self: flex-start;
 }
 
+.bp3-tree-node-secondary-label {
+    white-space: nowrap;
+    padding-right: 0;
+}
+
 .tabs-pane {
-    width: 70%;
+    width: 60%;
     margin-left: 10px;
     z-index: 1;
 }
@@ -50,7 +55,7 @@ body {
 .tab-aside {
     margin-left: 10px;
     align-self: flex-start;
-    width: 40%;
+    width: 30%;
 }
 
 .tab-entity {
@@ -81,7 +86,17 @@ body {
 }
 
 .context-icon {
-    padding-right: 6px;
+    padding-right: 34px;
+    padding-bottom: 1px;
+}
+
+.context-icon--active {
+    padding-right: 4px;
+    padding-bottom: 4px;
+}
+
+.bp3-tree-node-secondary-label .context-popover {
+    display: inline-flex;
 }
 
 .track-vertical {
