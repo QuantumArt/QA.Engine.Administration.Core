@@ -4,7 +4,6 @@ import { Card, Checkbox, H5 } from '@blueprintjs/core';
 import Texts from 'constants/Texts';
 import TreeStore from 'stores/TreeStore';
 import TextStore from 'stores/TextStore';
-import TreeStoreType from 'enums/TreeStoreType';
 
 interface Props {
     type: 'widgets' | 'versions';

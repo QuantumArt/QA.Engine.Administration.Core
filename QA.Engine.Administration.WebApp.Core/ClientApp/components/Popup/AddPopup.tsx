@@ -8,8 +8,6 @@ import PopupType from 'enums/PopupType';
 import TreeStore from 'stores/TreeStore';
 import TextStore from 'stores/TextStore';
 import Texts from 'constants/Texts';
-import TreeStoreType from 'enums/TreeStoreType';
-import WidgetTreeStore from 'stores/TreeStore/WidgetTreeStore';
 
 interface Props {
     qpIntegrationStore?: QpIntegrationStore;

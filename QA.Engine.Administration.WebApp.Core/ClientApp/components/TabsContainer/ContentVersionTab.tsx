@@ -9,8 +9,6 @@ import PopupType from 'enums/PopupType';
 import TextStore from 'stores/TextStore';
 import Texts from 'constants/Texts';
 import InfoPane from 'components/TabsContainer/InfoPane';
-import TreeStoreType from 'enums/TreeStoreType';
-import ContentVersionTreeStore from 'stores/TreeStore/ContentVersionTreeStore';
 
 interface Props {
     popupStore?: PopupStore;

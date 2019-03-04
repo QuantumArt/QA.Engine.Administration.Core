@@ -5,7 +5,6 @@ import PopupStore from 'stores/PopupStore';
 import PageSelect from 'components/Select/PageSelect';
 import PopupType from 'enums/PopupType';
 import TreeStore from 'stores/TreeStore';
-import SiteTreeStore from 'stores/TreeStore/SiteTreeStore';
 import TextStore from 'stores/TextStore';
 import Texts from 'constants/Texts';
 

@@ -4,7 +4,6 @@ import { observer, inject } from 'mobx-react';
 import PopupStore from 'stores/PopupStore';
 import PopupType from 'enums/PopupType';
 import TreeStore from 'stores/TreeStore';
-import ArchiveTreeStore  from 'stores/TreeStore/ArchiveTreeStore';
 import TextStore from 'stores/TextStore';
 import Texts from 'constants/Texts';
 

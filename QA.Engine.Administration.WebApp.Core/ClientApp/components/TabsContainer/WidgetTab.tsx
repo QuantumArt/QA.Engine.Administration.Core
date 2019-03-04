@@ -9,8 +9,6 @@ import TreeStructure from 'components/TreeStructure';
 import InfoPane from './InfoPane';
 import TextStore from 'stores/TextStore';
 import Texts from 'constants/Texts';
-import TreeStoreType from 'enums/TreeStoreType';
-import WidgetTreeStore from 'stores/TreeStore/WidgetTreeStore';
 
 interface Props {
     popupStore?: PopupStore;

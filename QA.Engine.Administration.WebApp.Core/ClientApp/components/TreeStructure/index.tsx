@@ -11,9 +11,6 @@ import TreeStore, { TreeType } from 'stores/TreeStore';
 import { CustomTree } from 'components/TreeStructure/CustomTree';
 import SiteTreeStore from 'stores/TreeStore/SiteTreeStore';
 import ArchiveTreeStore from 'stores/TreeStore/ArchiveTreeStore';
-import WidgetTreeStore from 'stores/TreeStore/WidgetTreeStore';
-import ContentVersionTreeStore from 'stores/TreeStore/ContentVersionTreeStore';
-import TreeStoreType from 'enums/TreeStoreType';
 
 interface Props {
     type: 'main' | 'widgets' | 'versions';

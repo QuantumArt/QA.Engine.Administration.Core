@@ -10,7 +10,6 @@ import QpIntegrationStore from 'stores/QpIntegrationStore';
 import EditArticleStore from 'stores/EditArticleStore';
 import TextStore from 'stores/TextStore';
 import Texts from 'constants/Texts';
-import TreeStoreType from 'enums/TreeStoreType';
 
 interface Props {
     navigationStore?: NavigationStore;

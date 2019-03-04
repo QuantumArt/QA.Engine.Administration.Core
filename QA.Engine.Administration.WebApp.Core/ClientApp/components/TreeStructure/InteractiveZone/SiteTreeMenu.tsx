@@ -2,7 +2,6 @@ import * as React from 'react';
 import { Intent, Menu, MenuDivider, MenuItem } from '@blueprintjs/core';
 import { observer, inject } from 'mobx-react';
 import QpIntegrationStore from 'stores/QpIntegrationStore';
-import SiteTreeStore from 'stores/TreeStore/SiteTreeStore';
 import PopupStore from 'stores/PopupStore';
 import PopupType from 'enums/PopupType';
 import { ITreeElement } from 'stores/TreeStore/BaseTreeStore';

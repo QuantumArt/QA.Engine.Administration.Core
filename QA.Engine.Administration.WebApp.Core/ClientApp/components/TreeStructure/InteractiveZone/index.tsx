@@ -9,7 +9,6 @@ import ContextMenuType from 'enums/ContextMenuType';
 import SiteTreeMenu from './SiteTreeMenu';
 import ArchiveTreeMenu from './ArchiveTreeMenu';
 import WidgetTreeMenu from './WidgetTreeMenu';
-import TreeStoreType from 'enums/TreeStoreType';
 
 interface Props {
     treeStore?: TreeStore;

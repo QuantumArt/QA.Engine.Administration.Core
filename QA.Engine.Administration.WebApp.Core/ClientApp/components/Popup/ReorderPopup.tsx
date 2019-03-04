@@ -5,11 +5,8 @@ import PopupStore from 'stores/PopupStore';
 import PopupType from 'enums/PopupType';
 import TextStore from 'stores/TextStore';
 import Texts from 'constants/Texts';
-import SiteTreeStore from 'stores/TreeStore/SiteTreeStore';
-import { number } from 'prop-types';
 import { inject, observer } from 'mobx-react';
 import PageSelect from 'components/Select/PageSelect';
-import TreeStoreType from 'enums/TreeStoreType';
 
 interface Props {
     treeStore?: TreeStore;
