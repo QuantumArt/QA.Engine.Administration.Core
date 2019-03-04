@@ -65,7 +65,12 @@ export default class CommonTab extends React.Component<Props> {
     }
 
     render() {
-        const { treeStore, textStore, navigationStore, editArticleStore: { title, isVisible, isInSiteMap, isEditable } } = this.props;
+        const {
+            treeStore,
+            textStore,
+            navigationStore,
+            editArticleStore: { title, isVisible, isInSiteMap, isEditable },
+        } = this.props;
         const tree = navigationStore.currentPage === Pages.SITEMAP ? treeStore.getSiteTreeStore() : treeStore.getArchiveTreeStore();
         if (tree.selectedNode == null) {
             return null;

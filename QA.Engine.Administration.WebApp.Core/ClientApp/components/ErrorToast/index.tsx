@@ -4,99 +4,152 @@ import { Intent, Toast, Toaster } from '@blueprintjs/core';
 import OperationState from 'enums/OperationState';
 import TreeStore from 'stores/TreeStore';
 import EditArticleStore from 'stores/EditArticleStore';
-import { TreeErrors, PopupErrors } from 'enums/ErrorsTypes';
+import ErrorsTypes from 'constants/ErrorsTypes';
+import ErrorHandler, { IErrorModel } from 'stores/ErrorHandler';
 import PopupStore from 'stores/PopupStore';
+import QpIntegrationStore from 'stores/QpIntegrationStore';
+import TextStore from 'stores/TextStore';
 
 interface Props {
     treeStore?: TreeStore;
     editArticleStore?: EditArticleStore;
     popupStore?: PopupStore;
+    qpIntegrationStore?: QpIntegrationStore;
+    textStore?: TextStore;
 }
 
-// TODO: Make a base interface for err handling
-@inject('treeStore', 'editArticleStore', 'popupStore')
+interface ToastOptions {
+    error: IErrorModel;
+    i: number;
+    currentStore: ErrorHandler;
+    action: (t: ErrorHandler, errorType: ErrorsTypes) => (e: React.MouseEvent<HTMLElement>) => void;
+}
+
+@inject('treeStore', 'editArticleStore', 'popupStore', 'qpIntegrationStore', 'textStore')
 @observer
 export default class ErrorToast extends React.Component<Props> {
 
-    private handleTreeErrorClick = (treeStore: TreeStore) => () => {
-        treeStore.treeErrors.forEach((e) => {
-            switch (e.type) {
-                case TreeErrors.fetch:
-                    treeStore.fetchTree();
-                    break;
-                case TreeErrors.update:
-                    treeStore.updateSubTree(e.data);
-                    break;
-                case TreeErrors.publish:
-                    treeStore.publish(e.data);
-                    break;
-                case TreeErrors.archive:
-                    treeStore.archive(e.data);
-                    break;
-                case TreeErrors.edit:
-                    treeStore.edit(e.data);
-                    break;
-                case TreeErrors.restore:
-                    treeStore.restore(e.data);
-                    break;
-                case TreeErrors.delete:
-                    treeStore.delete(e.data);
-                    break;
-                case TreeErrors.reorder:
-                    treeStore.reorder(e.data);
-                    break;
-                case TreeErrors.move:
-                    treeStore.move(e.data);
-                    break;
-                default:
-                    break;
-            }
-        });
+    private handleTreeErrorClick = (store: TreeStore, error: IErrorModel) => () => {
+        switch (error.type) {
+            case ErrorsTypes.Tree.fetch:
+                store.fetchTree();
+                break;
+            case ErrorsTypes.Tree.update:
+                store.updateSubTree(error.data);
+                break;
+            case ErrorsTypes.Tree.publish:
+                store.publish(error.data);
+                break;
+            case ErrorsTypes.Tree.archive:
+                store.archive(error.data);
+                break;
+            case ErrorsTypes.Tree.edit:
+                store.edit(error.data);
+                break;
+            case ErrorsTypes.Tree.restore:
+                store.restore(error.data);
+                break;
+            case ErrorsTypes.Tree.delete:
+                store.delete(error.data);
+                break;
+            case ErrorsTypes.Tree.reorder:
+                store.reorder(error.data);
+                break;
+            case ErrorsTypes.Tree.move:
+                store.move(error.data);
+                break;
+            default:
+                break;
+        }
     }
 
-    private handlePopupErrorClick = (popupStore: PopupStore) => () => {
-        popupStore.popupErrors.forEach((e) => {
-            const { data: { itemId, type, title, options } } = e;
-            popupStore.show(itemId, type, title, options);
-        });
+    private handlePopupErrorClick = (store: PopupStore, error: IErrorModel) => () => {
+        const { data: { itemId, type, title, options } } = error;
+        store.show(itemId, type, title, options);
+    }
+
+    private handleArticleError = (store: EditArticleStore) => () => {
+        store.fetchExtentionFields();
+    }
+
+    private handleQPIntergrationError = (store: QpIntegrationStore, error: IErrorModel) => () => {
+        switch (error.type) {
+            case ErrorsTypes.QPintegration.fetchQPAbstractItemFields:
+                store.fetchQPAbstractItemFields();
+                break;
+            case ErrorsTypes.QPintegration.updateSiteMapSubTree:
+                store.updateSiteMapSubTree();
+                break;
+            default:
+                break;
+        }
+    }
+
+    private handleTextsError = (store: TextStore) => () => {
+        store.fetchTexts();
     }
 
     private handleDismiss = (i: number, cb: (i: number) => void) => () => {
         cb(i);
     }
 
-    private renderToast = (
-        e: IErrorModel<TreeErrors | PopupErrors>,
-        i: number,
-        currentStore: TreeStore | PopupStore,
-        action: (t: TreeStore | PopupStore) => (e: React.MouseEvent<HTMLElement>) => void,
-    ) => (
-        <Toast
-            message={`${e.type}. ${e.message}`}
-            icon="warning-sign"
-            intent={Intent.DANGER}
-            action={{
-                onClick: action(currentStore),
-                icon: 'repeat',
-            }}
-            onDismiss={this.handleDismiss(i, currentStore.removeError)}
-            key={e.id}
-        />
-    )
+    private renderToast(options: ToastOptions) {
+        const { error, i, currentStore, action } = options;
+        return (
+            <Toast
+                message={`${error.type}. ${error.message}`}
+                icon="warning-sign"
+                intent={Intent.DANGER}
+                action={{
+                    onClick: action(currentStore, error),
+                    icon: 'repeat',
+                }}
+                onDismiss={this.handleDismiss(i, currentStore.removeError)}
+                key={error.id}
+            />
+        );
+    }
 
     render() {
-        const { treeStore, popupStore } = this.props;
+        const { treeStore, popupStore, editArticleStore, qpIntegrationStore, textStore } = this.props;
 
         return (
             <Toaster>
                 {treeStore.state === OperationState.ERROR &&
-                    treeStore.treeErrors.map((e, i) => this.renderToast(e, i, treeStore, this.handleTreeErrorClick))
-                }
+                treeStore.errors.map((e, i) => this.renderToast({
+                    i,
+                    error: e,
+                    currentStore: treeStore,
+                    action: this.handleTreeErrorClick,
+                }))}
                 {popupStore.state === OperationState.ERROR &&
-                    popupStore.popupErrors.map(
-                        (e, i) => this.renderToast(e, i, popupStore, this.handlePopupErrorClick),
-                    )
-                }
+                popupStore.errors.map((e, i) => this.renderToast({
+                    i,
+                    error: e,
+                    currentStore: popupStore,
+                    action: this.handlePopupErrorClick,
+                }))}
+                {editArticleStore.state === OperationState.ERROR &&
+                editArticleStore.errors.map((e, i) => this.renderToast({
+                    i,
+                    error: e,
+                    currentStore: editArticleStore,
+                    action: this.handleArticleError,
+                }))}
+                {qpIntegrationStore.state === OperationState.ERROR &&
+                qpIntegrationStore.errors.map((e, i) => this.renderToast({
+                    i,
+                    error: e,
+                    currentStore: qpIntegrationStore,
+                    action: this.handleQPIntergrationError,
+                }))}
+                {textStore.state === OperationState.ERROR &&
+                textStore.errors.map((e, i) => this.renderToast({
+                    i,
+                    error: e,
+                    currentStore: textStore,
+                    action: this.handleTextsError,
+                }))}
             </Toaster>
         );
     }

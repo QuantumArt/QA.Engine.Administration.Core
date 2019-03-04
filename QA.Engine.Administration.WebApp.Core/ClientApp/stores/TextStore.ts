@@ -1,18 +1,21 @@
+import { observable, action } from 'mobx';
 import DictionaryService from 'services/DictionaryService';
 import OperationState from 'enums/OperationState';
-import { observable, action } from 'mobx';
+import ErrorHandler from 'stores/ErrorHandler';
+import ErrorsTypes from 'constants/ErrorsTypes';
 
-export default class TextStore {
+export default class TextStore extends ErrorHandler {
 
     @observable public state: OperationState = OperationState.NONE;
     @observable public texts: { [key: string]: string; } = {};
 
     constructor() {
+        super();
         this.fetchTexts();
     }
 
     @action
-    private async fetchTexts() {
+    public async fetchTexts() {
         this.state = OperationState.PENDING;
         try {
             const response: ApiResult<{ [key: string]: string; }> = await DictionaryService.getTexts();
@@ -23,8 +26,8 @@ export default class TextStore {
                 throw response.error;
             }
         } catch (e) {
-            console.error(e);
             this.state = OperationState.ERROR;
+            this.addError(ErrorsTypes.Texts.fetch, null, e);
         }
     }
 }

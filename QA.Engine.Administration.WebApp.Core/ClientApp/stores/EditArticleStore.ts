@@ -1,8 +1,10 @@
 import { action, observable, computed } from 'mobx';
 import OperationState from 'enums/OperationState';
 import SiteMapService from 'services/SiteMapService';
+import ErrorHandler from 'stores/ErrorHandler';
+import ErrorsTypes from 'constants/ErrorsTypes';
 
-export default class EditArticleStore {
+export default class EditArticleStore extends ErrorHandler {
 
     @observable public title: string;
     @observable public isVisible: boolean;
@@ -56,7 +58,7 @@ export default class EditArticleStore {
     }
 
     @action
-    public async fetchExtantionFields(): Promise<any> {
+    public async fetchExtentionFields(): Promise<void> {
         this.state = OperationState.PENDING;
         const id = this.node.id;
         const extantionId = this.node.extensionId;
@@ -70,8 +72,15 @@ export default class EditArticleStore {
                 throw response.error;
             }
         } catch (e) {
-            console.error(e);
             this.state = OperationState.ERROR;
+            this.addError(ErrorsTypes.ExtensionFields.fetch, { node: this.node }, e);
         }
+    }
+
+    @action
+    public removeError = (i: number) => {
+        this.state = OperationState.NONE;
+        this.errors.splice(i, 1);
+        this.init(this.node);
     }
 }

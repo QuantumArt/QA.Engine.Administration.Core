@@ -6,19 +6,16 @@ import WidgetTreeStore from './WidgetTreeStore';
 import { observable, action, computed } from 'mobx';
 import OperationState from 'enums/OperationState';
 import TreeStoreType from 'enums/TreeStoreType';
-import { TreeErrors } from 'enums/ErrorsTypes';
+import ErrorsTypes from 'constants/ErrorsTypes';
 import SiteMapService from 'services/SiteMapService';
-import { ITreeErrorModel } from './BaseTreeStore';
-import { v4 } from 'uuid';
+import ErrorHandler from 'stores/ErrorHandler';
 
 export type TreeType = SiteTreeStore | ArchiveTreeStore | ContentVersionTreeStore | WidgetTreeStore;
 
 /**
  * @description Facade class to access a proper tree
  */
-export default class TreeStore {
-
-    @observable treeErrors: ITreeErrorModel[] = [];
+export default class TreeStore extends ErrorHandler {
 
     private readonly siteTreeStore: SiteTreeStore;
     private readonly archiveStore: ArchiveTreeStore;
@@ -30,6 +27,7 @@ export default class TreeStore {
     private readonly stores: Map<TreeStoreType, TreeType>;
 
     constructor(navigationStore: NavigationStore) {
+        super();
         this.siteTreeStore = new SiteTreeStore();
         this.archiveStore = new ArchiveTreeStore();
         this.contentVersionsStore = new ContentVersionTreeStore({
@@ -63,11 +61,6 @@ export default class TreeStore {
         return this.treeState.state;
     }
 
-    @action
-    removeError = (i: number) => {
-        this.treeErrors.splice(i, 1);
-    }
-
     getSiteTreeStore(): SiteTreeStore {
         return this.siteTreeStore;
     }
@@ -96,7 +89,7 @@ export default class TreeStore {
                 await current.updateSubTree(id == null ? selectedNode.id : id);
                 this.treeState.success();
             },
-            TreeErrors.update,
+            ErrorsTypes.Tree.update,
             id == null ? selectedNode.id : id);
 
         current = this.resolveMainTreeStore();
@@ -113,7 +106,7 @@ export default class TreeStore {
                 await store.fetchTree();
                 this.treeState.success();
             },
-            TreeErrors.fetch);
+            ErrorsTypes.Tree.fetch);
     }
 
     async publish(itemIds: number[]): Promise<any> {
@@ -127,7 +120,7 @@ export default class TreeStore {
                     throw response.error;
                 }
             },
-            TreeErrors.publish,
+            ErrorsTypes.Tree.publish,
             itemIds);
     }
 
@@ -142,7 +135,7 @@ export default class TreeStore {
                     throw response.error;
                 }
             },
-            TreeErrors.archive,
+            ErrorsTypes.Tree.archive,
             model);
     }
 
@@ -157,7 +150,7 @@ export default class TreeStore {
                     throw response.error;
                 }
             },
-            TreeErrors.edit,
+            ErrorsTypes.Tree.edit,
             model);
     }
 
@@ -174,7 +167,7 @@ export default class TreeStore {
                     throw response.error;
                 }
             },
-            TreeErrors.reorder,
+            ErrorsTypes.Tree.reorder,
             model);
     }
 
@@ -192,7 +185,7 @@ export default class TreeStore {
                     throw response.error;
                 }
             },
-            TreeErrors.move,
+            ErrorsTypes.Tree.move,
             model);
     }
 
@@ -207,7 +200,7 @@ export default class TreeStore {
                     throw response.error;
                 }
             },
-            TreeErrors.restore,
+            ErrorsTypes.Tree.restore,
             model);
     }
 
@@ -222,22 +215,17 @@ export default class TreeStore {
                     throw response.error;
                 }
             },
-            TreeErrors.delete,
+            ErrorsTypes.Tree.delete,
             model);
     }
 
-    private async runAsync(func: () => Promise<void>, treeErrors: TreeErrors, model?: any): Promise<any> {
+    private async runAsync(func: () => Promise<void>, treeErrors: ErrorsTypes, model?: any): Promise<void> {
         this.treeState.pending();
         try {
             await func();
         } catch (e) {
             this.treeState.error();
-            this.treeErrors.push({
-                type: treeErrors,
-                data: model,
-                message: e,
-                id: v4(),
-            });
+            this.addError(treeErrors, model, e);
         }
     }
 }

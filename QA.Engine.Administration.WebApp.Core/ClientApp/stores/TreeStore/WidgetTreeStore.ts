@@ -1,10 +1,7 @@
-import v4 from 'uuid/v4';
 import SiteMapService from 'services/SiteMapService';
 import { BaseTreeState, ITreeElement } from 'stores/TreeStore/BaseTreeStore';
 import ContextMenuType from 'enums/ContextMenuType';
-import OperationState from 'enums/OperationState';
 import { action, observable } from 'mobx';
-import { TreeErrors } from 'enums/ErrorsTypes';
 
 export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
 
