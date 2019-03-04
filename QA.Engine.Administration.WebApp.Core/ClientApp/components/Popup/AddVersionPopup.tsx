@@ -20,6 +20,7 @@ interface Props {
 interface State {
     discriminator: DiscriminatorModel;
     version: VersionType;
+    discriminatorIntent: Intent;
 }
 
 @inject('qpIntegrationStore', 'treeStore', 'popupStore', 'textStore')
@@ -29,11 +30,16 @@ export default class AddVersionPopup extends React.Component<Props, State> {
     state = {
         discriminator: null as DiscriminatorModel,
         version: VersionType.Content,
+        ...this.resetIntent,
     };
 
     private addClick = () => {
         const { popupStore, qpIntegrationStore, treeStore } = this.props;
         const { discriminator, version } = this.state;
+        if (discriminator == null) {
+            this.setState({ discriminatorIntent: Intent.DANGER });
+            return;
+        }
         const node = treeStore.getSiteTreeStore().selectedNode as PageModel;
         qpIntegrationStore.add(node, version, node.alias, node.title, discriminator.id, 0);
         popupStore.close();
@@ -45,14 +51,14 @@ export default class AddVersionPopup extends React.Component<Props, State> {
     }
 
     private changeDiscriminator = (e: DiscriminatorModel) =>
-        this.setState({ discriminator: e })
+        this.setState({ discriminator: e, ...this.resetIntent })
 
     private changeVersion = (version: React.ChangeEvent<HTMLInputElement>) =>
-        this.setState({ version: version.target.value as VersionType })
+        this.setState({ version: version.target.value as VersionType, ...this.resetIntent })
 
     render() {
         const { popupStore, textStore } = this.props;
-        const { version } = this.state;
+        const { version, discriminatorIntent } = this.state;
 
         if (popupStore.type !== PopupType.ADDVERSION) {
             return null;
@@ -84,7 +90,7 @@ export default class AddVersionPopup extends React.Component<Props, State> {
                     </RadioGroup>
                 </FormGroup>
                 <FormGroup>
-                    <DiscriminatorSelect items={popupStore.discriminators} onChange={this.changeDiscriminator}/>
+                    <DiscriminatorSelect items={popupStore.discriminators} onChange={this.changeDiscriminator} intent={discriminatorIntent} />
                 </FormGroup>
                 <ButtonGroup className="dialog-button-group">
                     <Button text={textStore.texts[Texts.popupAddButton]} icon="add" onClick={this.addClick} intent={Intent.SUCCESS}/>
@@ -93,4 +99,6 @@ export default class AddVersionPopup extends React.Component<Props, State> {
             </Card>
         );
     }
+
+    private resetIntent = { discriminatorIntent: Intent.NONE };
 }

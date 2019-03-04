@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { MenuItem, Button, Position } from '@blueprintjs/core';
+import { MenuItem, Button, Position, Intent } from '@blueprintjs/core';
 import { Select, ItemRenderer, ItemPredicate } from '@blueprintjs/select';
 
 function renderItem<T extends { id: number, title: string }>(): ItemRenderer<T> {
@@ -65,6 +65,7 @@ interface Props<T> {
     items: T[];
     disabled?: boolean;
     filterable?: boolean;
+    intent?: Intent;
     onChange: (x: T) => void;
 }
 
@@ -87,7 +88,7 @@ export default abstract class BaseSelect<T extends { id: number, title: string }
     }
 
     render() {
-        const { items, disabled, filterable } = this.props;
+        const { items, disabled, filterable, intent } = this.props;
         const { page } = this.state;
 
         return (
@@ -108,6 +109,7 @@ export default abstract class BaseSelect<T extends { id: number, title: string }
                     rightIcon="caret-down"
                     text={page === null ? '(No selection)' : page.title}
                     disabled={disabled}
+                    intent={intent}
                 />
             </this.selectElement>
         );

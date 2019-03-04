@@ -17,20 +17,25 @@ interface Props {
 }
 
 interface State {
-    newParentId: number;
+    newParent: PageModel;
+    newParentIntent: Intent;
 }
 
 @inject('treeStore', 'popupStore', 'textStore')
 @observer
 export default class MovePopup extends React.Component<Props, State> {
 
-    state = { newParentId: null as number };
+    state = { newParent: null as PageModel, ...this.resetIntent };
 
     private moveClick = () => {
         const { treeStore, popupStore } = this.props;
-        const { newParentId } = this.state;
+        const { newParent } = this.state;
+        if (newParent == null) {
+            this.setState({ newParentIntent: Intent.DANGER });
+            return;
+        }
         const model: MoveModel = {
-            newParentId,
+            newParentId: newParent.id,
             itemId: popupStore.itemId,
         };
         treeStore.move(model);
@@ -38,13 +43,14 @@ export default class MovePopup extends React.Component<Props, State> {
     }
 
     private changeNewParent = (e: PageModel) =>
-        this.setState({ newParentId: e.id })
+        this.setState({ newParent: e, ...this.resetIntent })
 
     private cancelClick = () =>
         this.props.popupStore.close()
 
     render() {
         const { popupStore, textStore, treeStore } = this.props;
+        const { newParentIntent } = this.state;
 
         if (popupStore.type !== PopupType.MOVE) {
             return null;
@@ -56,7 +62,7 @@ export default class MovePopup extends React.Component<Props, State> {
         return (
             <Card>
                 <FormGroup>
-                    <PageSelect items={pages} filterable onChange={this.changeNewParent} />
+                    <PageSelect items={pages} filterable onChange={this.changeNewParent} intent={newParentIntent} />
                 </FormGroup>
                 <ButtonGroup className="dialog-button-group">
                     <Button text={textStore.texts[Texts.popupMoveButton]} icon="move" onClick={this.moveClick} intent={Intent.SUCCESS} />
@@ -65,4 +71,6 @@ export default class MovePopup extends React.Component<Props, State> {
             </Card>
         );
     }
+
+    private resetIntent = { newParentIntent: Intent.NONE };
 }

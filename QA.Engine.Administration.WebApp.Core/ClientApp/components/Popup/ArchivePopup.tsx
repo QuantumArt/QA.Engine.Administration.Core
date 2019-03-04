@@ -9,6 +9,8 @@ import SiteTreeStore from 'stores/TreeStore/SiteTreeStore';
 import TextStore from 'stores/TextStore';
 import Texts from 'constants/Texts';
 
+type ContentVersionOperations = 'archive' | 'move';
+
 interface Props {
     treeStore?: TreeStore;
     popupStore?: PopupStore;
@@ -18,12 +20,8 @@ interface Props {
 interface State {
     deleteAllVersions: boolean;
     deleteContentVersions: ContentVersionOperations;
-    contentVersionId: number;
-}
-
-enum ContentVersionOperations {
-    archive = 'archive',
-    move = 'move',
+    contentVersion: PageModel;
+    contentVersionIntent: Intent;
 }
 
 @inject('treeStore', 'popupStore', 'textStore')
@@ -32,18 +30,23 @@ export default class ArchivePopup extends React.Component<Props, State> {
 
     state = {
         deleteAllVersions: false,
-        deleteContentVersions: ContentVersionOperations.archive,
-        contentVersionId: null as number,
+        deleteContentVersions: 'archive' as ContentVersionOperations,
+        contentVersion: null as PageModel,
+        ...this.resetIntent,
     };
 
     private archiveClick = () => {
         const { popupStore, treeStore } = this.props;
-        const { deleteAllVersions, deleteContentVersions, contentVersionId } = this.state;
+        const { deleteAllVersions, deleteContentVersions, contentVersion } = this.state;
+        if (!deleteAllVersions && deleteContentVersions === 'move' && contentVersion == null) {
+            this.setState({ contentVersionIntent: Intent.DANGER });
+            return;
+        }
         const model: RemoveModel = {
-            contentVersionId,
             itemId: popupStore.itemId,
             isDeleteAllVersions: deleteAllVersions,
-            isDeleteContentVersions: deleteContentVersions === ContentVersionOperations.archive,
+            isDeleteContentVersions: deleteAllVersions ? true : deleteContentVersions === 'archive',
+            contentVersionId: (contentVersion == null || deleteContentVersions === 'archive' || deleteAllVersions) ? null : contentVersion.id,
         };
         treeStore.archive(model);
         popupStore.close();
@@ -52,17 +55,17 @@ export default class ArchivePopup extends React.Component<Props, State> {
     private cancelClick = () => this.props.popupStore.close();
 
     private changeContentVersion = (e: PageModel) =>
-        this.setState({ contentVersionId: e.id })
+        this.setState({ contentVersion: e, ...this.resetIntent })
 
     private changeDeleteAllVersions = (version: React.ChangeEvent<HTMLInputElement>) =>
-        this.setState({ deleteAllVersions: version.target.checked })
+        this.setState({ deleteAllVersions: version.target.checked, contentVersion: null, ...this.resetIntent })
 
     private changeDeleteContentVersions = (version: React.ChangeEvent<HTMLInputElement>) =>
-        this.setState({ deleteContentVersions: version.target.value as ContentVersionOperations })
+        this.setState({ deleteContentVersions: version.target.value as ContentVersionOperations, contentVersion: null, ...this.resetIntent })
 
     render() {
         const { popupStore, textStore } = this.props;
-        const { deleteAllVersions, deleteContentVersions } = this.state;
+        const { deleteAllVersions, deleteContentVersions, contentVersion, contentVersionIntent } = this.state;
 
         if ([PopupType.ARCHIVE, PopupType.ARCHIVEWIDGET, PopupType.ARCHIVECONTENTVERSION].indexOf(popupStore.type) < 0) {
             return null;
@@ -96,11 +99,11 @@ export default class ArchivePopup extends React.Component<Props, State> {
                     >
                         <Radio
                             label={textStore.texts[Texts.popupArchive]}
-                            value={ContentVersionOperations.archive}
+                            value={'archive'}
                         />
                         <Radio
                             label={textStore.texts[Texts.popupMoveVersion]}
-                            value={ContentVersionOperations.move}
+                            value={'move'}
                         />
                     </RadioGroup>
                 </FormGroup>
@@ -108,7 +111,8 @@ export default class ArchivePopup extends React.Component<Props, State> {
                     <PageSelect
                         items={popupStore.contentVersions}
                         onChange={this.changeContentVersion}
-                        disabled={deleteAllVersions || deleteContentVersions === ContentVersionOperations.archive}
+                        disabled={deleteAllVersions || deleteContentVersions === 'archive'}
+                        intent={contentVersionIntent}
                     />
                 </FormGroup>
                 <ButtonGroup className="dialog-button-group">
@@ -118,4 +122,6 @@ export default class ArchivePopup extends React.Component<Props, State> {
             </Card>
         );
     }
+
+    private resetIntent = { contentVersionIntent: Intent.NONE };
 }

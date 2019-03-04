@@ -19,20 +19,25 @@ interface Props {
 
 interface State {
     isInsertBefore: number;
-    relatedItemId: number;
+    relatedItem: PageModel;
+    relatedItemIntent: Intent;
 }
 
 @inject('treeStore', 'popupStore', 'textStore')
 @observer
 export default class ReorderPopup extends React.Component<Props, State> {
 
-    state = { isInsertBefore: 0, relatedItemId: null as number };
+    state = { isInsertBefore: 0, relatedItem: null as PageModel, ...this.resetIntent };
 
     private reorderClick = () => {
         const { treeStore, popupStore } = this.props;
-        const { isInsertBefore, relatedItemId } = this.state;
+        const { isInsertBefore, relatedItem } = this.state;
+        if (relatedItem == null) {
+            this.setState({ relatedItemIntent: Intent.DANGER });
+            return;
+        }
         const model: ReorderModel = {
-            relatedItemId,
+            relatedItemId: relatedItem.id,
             itemId: popupStore.itemId,
             isInsertBefore: !!isInsertBefore,
         };
@@ -41,17 +46,17 @@ export default class ReorderPopup extends React.Component<Props, State> {
     }
 
     private changeInsert = (e: React.ChangeEvent<HTMLInputElement>) =>
-        this.setState({ isInsertBefore: +e.target.value })
+        this.setState({ isInsertBefore: +e.target.value, ...this.resetIntent })
 
     private changeRelatedItem = (e: PageModel) =>
-        this.setState({ relatedItemId: e.id })
+        this.setState({ relatedItem: e, ...this.resetIntent })
 
     private cancelClick = () =>
         this.props.popupStore.close()
 
     render() {
         const { popupStore, textStore, treeStore } = this.props;
-        const { isInsertBefore } = this.state;
+        const { isInsertBefore, relatedItemIntent } = this.state;
 
         if (popupStore.type !== PopupType.REORDER) {
             return null;
@@ -69,7 +74,7 @@ export default class ReorderPopup extends React.Component<Props, State> {
                     </RadioGroup>
                 </FormGroup>
                 <FormGroup>
-                    <PageSelect items={pages} onChange={this.changeRelatedItem} />
+                    <PageSelect items={pages} onChange={this.changeRelatedItem} intent={relatedItemIntent} />
                 </FormGroup>
                 <ButtonGroup className="dialog-button-group">
                     <Button text={textStore.texts[Texts.popupReorderButton]} icon="sort" onClick={this.reorderClick} intent={Intent.SUCCESS} />
@@ -78,4 +83,6 @@ export default class ReorderPopup extends React.Component<Props, State> {
             </Card>
         );
     }
+
+    private resetIntent = { relatedItemIntent: Intent.NONE };
 }
