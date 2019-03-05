@@ -43,6 +43,11 @@ export default class PopupStore extends ErrorHandler {
         this.showPopup = false;
     }
 
+    @action
+    public removeError = (i: number) => {
+        this.errors.splice(i, 1);
+    }
+
     private async getDiscriminators(itemId: number, type: PopupType, title: string, options?: any) {
         const isPage = type !== PopupType.ADDWIDGET;
         this.state = OperationState.PENDING;

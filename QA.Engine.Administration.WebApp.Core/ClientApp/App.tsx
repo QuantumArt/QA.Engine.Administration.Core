@@ -6,8 +6,8 @@ import '@blueprintjs/core/lib/css/blueprint.css';
 import '@blueprintjs/icons/lib/css/blueprint-icons.css';
 import '@blueprintjs/select/lib/css/blueprint-select.css';
 import 'normalize.css/normalize.css';
-
 import 'assets/style.css';
+
 import TreeStructure from 'components/TreeStructure';
 import TabsContainer from 'components/TabsContainer';
 import NavigationBar from 'components/NavigationBar';
@@ -26,7 +26,6 @@ import ErrorToast from 'components/ErrorToast';
 import TextStore from 'stores/TextStore';
 import ReorderPopup from 'components/Popup/ReorderPopup';
 import MovePopup from 'components/Popup/MovePopup';
-import TreeStoreType from 'enums/TreeStoreType';
 
 const app = hot(module)(() => {
     const navigationStoreInstance = new NavigationStore();

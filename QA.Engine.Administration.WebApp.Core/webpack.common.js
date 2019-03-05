@@ -1,13 +1,11 @@
-const webpack = require('webpack');
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 module.exports = {
-    mode: 'development',
     entry: {
-        vendor: '@babel/polyfill',
+        polyfill: '@babel/polyfill',
         main: './ClientApp/index.tsx'
     },
     output: {
@@ -15,7 +13,6 @@ module.exports = {
         path: path.join(__dirname, 'wwwroot/dist'),
         publicPath: '/'
     },
-    devtool: 'source-map',
     resolve: {
         extensions: ['.ts', '.tsx', '.js', '.json'],
         modules: ['node_modules'],
@@ -32,25 +29,12 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.tsx?$/,
-                exclude: /node_modules/,
-                use: {
-                    loader: 'babel-loader'
-                }
-            },
-            {
-                test: /\.css$/,
-                use: [
-                    { loader: 'style-loader' },
-                    { loader: 'css-loader' }
-                ],
-            },
-            {
                 test: /\.(jpg|jpeg|png|gif|svg)?$/,
                 exclude: /fonts/,
                 use: {
                     loader: 'url-loader',
                     options: {
+                        name: 'img/[name].[ext]',
                         limit: 10000
                     }
                 }
@@ -61,6 +45,7 @@ module.exports = {
                 use: {
                     loader: 'url-loader',
                     options: {
+                        name: 'fonts/[name].[ext]',
                         limit: 10000
                     }
                 }
@@ -68,10 +53,9 @@ module.exports = {
         ]
     },
     plugins: [
-        new webpack.HotModuleReplacementPlugin(),
         new ForkTsCheckerWebpackPlugin(),
         new HtmlWebpackPlugin({
-            title: 'Dev Mode',
+            title: 'Manage Site',
             template: 'ClientApp/assets/index.html'
         }),
         CopyWebpackPlugin([{
@@ -79,16 +63,4 @@ module.exports = {
             to: './scripts'
         }])
     ],
-    optimization: {
-        namedModules: true
-    },
-    devServer: {
-        hot: true,
-        port: 3000,
-        proxy: {
-            '/api': 'http://localhost:3001',
-        },
-        open: true,
-        openPage: '?backend_sid=c3386b2f-e098-4dfb-a794-e774cba9fcfc&site_id=52&param_name=site_id&customerCode=qa_demosite&actionCode=custom_635494192491212659&hostUID=fc4a5aa1-48b9-4a3a-84c1-bcd99a8a8ff3'
-    }
 };

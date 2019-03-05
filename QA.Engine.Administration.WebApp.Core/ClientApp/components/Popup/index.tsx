@@ -16,6 +16,7 @@ export default class Popup extends React.Component<Props> {
 
     render() {
         const { popupStore, children } = this.props;
+        const isNothing = popupStore.state === OperationState.NONE;
         const isError = popupStore.state === OperationState.ERROR;
         const isLoading = popupStore.state === OperationState.PENDING;
 
@@ -31,7 +32,10 @@ export default class Popup extends React.Component<Props> {
                 title={popupStore.title}
                 enforceFocus={false}
             >
-                {isLoading ? <Spinner size={30} className="dialog-spinner" /> : children}
+                {isLoading ?
+                    <Spinner size={30} className="dialog-spinner" /> :
+                    children
+                }
             </Dialog>
         );
     }
