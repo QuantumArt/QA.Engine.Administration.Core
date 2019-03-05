@@ -59,11 +59,6 @@ namespace QA.Engine.Administration.WebApp.Core
                 o.IncludeXmlComments(xmlPath);
             });
 
-            //services.AddSpaStaticFiles(configuration =>
-            //{
-            //    configuration.RootPath = "ClientApp";
-            //});
-
             services.AddAutoMapper();
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -111,24 +106,10 @@ namespace QA.Engine.Administration.WebApp.Core
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                //app.UseDeveloperExceptionPage();
-                //app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions {
-                //    HotModuleReplacement = true,
-                //    ReactHotModuleReplacement = true,
-                //    ConfigFile = "webpack.config.dev.js"
-                //});
-            }
-            else
-            {
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
-            }
+            app.UseHsts();
             app.UseMiddleware<ExceptionHandler>();
 
             app.UseStaticFiles();
-            //app.UseSpaStaticFiles();
 
             app.UseSession();
             //app.UseAuthentication();
@@ -149,12 +130,10 @@ namespace QA.Engine.Administration.WebApp.Core
                    defaults: new { controller = "Home", action = "Index" });
             });
 
-            //app.UseSpa(spa =>
-            //{
-            //    spa.Options.SourcePath = "ClientApp";
-            //    if (env.IsDevelopment())
-            //        spa.UseReactDevelopmentServer(npmScript: "start:dev");
-            //});
+            app.UseSpa(spa =>
+            {
+                spa.Options.SourcePath = "ClientApp";
+            });
 
             var supportedCultures = new[]
             {

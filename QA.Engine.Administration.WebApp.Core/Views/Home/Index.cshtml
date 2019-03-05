@@ -1,11 +1,9 @@
 <div id="root">Loading...</div>
 
 @section Scripts {
-<environment exclude="Development">
-    <script src="~/dist/scripts/pmrpc.js"></script>
-    <script type="text/javascript" src="~/dist/vendors~polyfill.bundle.js"></script>
-    <script type="text/javascript" src="~/dist/polyfill.bundle.js"></script>
-    <script type="text/javascript" src="~/dist/vendors~main.bundle.js"></script>
-    <script type="text/javascript" src="~/dist/main.bundle.js"></script>
-</environment>
+    <script type="text/javascript" src="~/dist/scripts/pmrpc.js"></script>
+    <script type="text/javascript" src="~/dist/vendors~polyfill.bundle.js" asp-append-version="true"></script>
+    <script type="text/javascript" src="~/dist/polyfill.bundle.js" asp-append-version="true"></script>
+    <script type="text/javascript" src="~/dist/vendors~main.bundle.js" asp-append-version="true"></script>
+    <script type="text/javascript" src="~/dist/main.bundle.js" asp-append-version="true"></script>
 }

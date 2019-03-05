@@ -37,11 +37,11 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
 
         public ActionResult Index()
         {
-            var model = _siteMapService.GetSiteMapTree(_siteId);
-            var archive = _siteMapService.GetArchiveTree(_siteId);
-            ViewData["model"] = model;
-            ViewData["archive"] = archive;
-            ViewData["userId"] = _webAppQpHelper.UserId;
+            //var model = _siteMapService.GetSiteMapTree(_siteId);
+            //var archive = _siteMapService.GetArchiveTree(_siteId);
+            //ViewData["model"] = model;
+            //ViewData["archive"] = archive;
+            //ViewData["userId"] = _webAppQpHelper.UserId;
             return View();
         }
 
