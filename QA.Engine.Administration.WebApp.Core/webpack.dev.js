@@ -8,22 +8,24 @@ module.exports = merge(common, {
     plugins: [
         new webpack.HotModuleReplacementPlugin(),
     ],
-    rules: [
-        {
-            test: /\.tsx?$/,
-            exclude: /node_modules/,
-            use: {
-                loader: 'babel-loader'
-            }
-        },
-        {
-            test: /\.css$/,
-            use: [
-                { loader: 'style-loader' },
-                { loader: 'css-loader' }
-            ],
-        },
-    ],
+    module: {
+        rules: [
+            {
+                test: /\.tsx?$/,
+                exclude: /node_modules/,
+                use: {
+                    loader: 'babel-loader'
+                }
+            },
+            {
+                test: /\.css$/,
+                use: [
+                    { loader: 'style-loader' },
+                    { loader: 'css-loader' }
+                ],
+            },
+        ],
+    },
     devServer: {
         hot: true,
         port: 3000,
