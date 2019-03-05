@@ -1,7 +1,7 @@
 import SiteMapService from 'services/SiteMapService';
 import { BaseTreeState } from 'stores/TreeStore/BaseTreeStore';
 import ContextMenuType from 'enums/ContextMenuType';
-import { observable, action } from 'mobx';
+import { action, observable } from 'mobx';
 
 export default class ContentVersionTreeStore extends BaseTreeState<PageModel> {
 

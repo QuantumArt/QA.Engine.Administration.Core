@@ -18,7 +18,7 @@ export default class ExtentionCard extends React.Component<Props> {
     private showClick = () => {
         const { editArticleStore } = this.props;
         editArticleStore.showExtensionFields();
-        editArticleStore.fetchExtantionFields();
+        editArticleStore.fetchExtentionFields();
     }
 
     private change = (e: React.ChangeEvent<HTMLInputElement>, field: ExtensionFieldModel) => {

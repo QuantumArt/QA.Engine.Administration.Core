@@ -63,7 +63,11 @@ export default class CommonTab extends React.Component<Props> {
     }
 
     render() {
-        const { treeStore, textStore, editArticleStore: { title, isVisible, isInSiteMap, isEditable } } = this.props;
+        const {
+            treeStore,
+            textStore,
+            editArticleStore: { title, isVisible, isInSiteMap, isEditable },
+        } = this.props;
         const tree = treeStore.resolveMainTreeStore();
 
         if (tree.selectedNode == null) {

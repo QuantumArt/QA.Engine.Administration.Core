@@ -1,9 +1,8 @@
 import * as React from 'react';
-import { action, observable, computed } from 'mobx';
+import { action, computed, observable } from 'mobx';
 import { IconName, ITreeNode } from '@blueprintjs/core';
 import InteractiveZone from 'components/TreeStructure/InteractiveZone';
 import ContextMenuType from 'enums/ContextMenuType';
-import { TreeErrors } from 'enums/ErrorsTypes';
 
 export interface ITreeElement extends ITreeNode {
     childNodes: ITreeElement[];
@@ -13,13 +12,6 @@ export interface ITreeElement extends ITreeNode {
     contextMenuType: ContextMenuType;
     isVisible: boolean;
     isPublished: boolean;
-}
-
-export interface ITreeErrorModel extends IErrorModel<TreeErrors> {
-    type: TreeErrors;
-    message: string;
-    data?: any;
-    id: string;
 }
 
 export interface ITreeIcons {

@@ -1,3 +1,4 @@
+import { observable } from 'mobx';
 import DictionaryService from 'services/DictionaryService';
 import QpAbstractItemFields from 'constants/QpAbstractItemFields';
 import QpActionCodes from 'constants/QpActionCodes';
@@ -5,42 +6,50 @@ import QpCallbackProcNames from 'constants/QpCallbackProcNames';
 import QpEntityCodes from 'constants/QpEntityCodes';
 import { BackendEventObserver, executeBackendAction, ArticleFormState, ExecuteActionOptions, InitFieldValue } from 'qp/QP8BackendApi.Interaction';
 import TreeStore from 'stores/TreeStore';
-import SiteTreeStore from 'stores/TreeStore/SiteTreeStore';
+import ErrorHandler from 'stores/ErrorHandler';
+import ErrorsTypes from 'constants/ErrorsTypes';
+import OperationState from 'enums/OperationState';
 
 export enum VersionType {
     Content = 'Content',
     Structural = 'Structural',
 }
 
-export default class QpIntegrationStore {
+export default class QpIntegrationStore extends ErrorHandler {
     constructor(treeStore: TreeStore) {
+        super();
         this.treeStore = treeStore;
+    }
+
+    @observable state: OperationState = OperationState.NONE;
+
+    public async fetchQPAbstractItemFields() {
+        this.state = OperationState.PENDING;
+        try {
+            const response: ApiResult<QpContentModel> = await DictionaryService.getQpContent(this.qpAbstractItem);
+            if (response.isSuccess) {
+                this.qpContent = response.data;
+                this.state = OperationState.SUCCESS;
+            } else {
+                throw response.error;
+            }
+        } catch (e) {
+            this.state = OperationState.ERROR;
+            this.addError(ErrorsTypes.QPintegration.fetchQPAbstractItemFields, null, e);
+        }
+    }
+
+    public updateSiteMapSubTree() {
+        try {
+            this.treeStore.updateSubTree();
+        } catch (e) {
+            this.addError(ErrorsTypes.QPintegration.updateSiteMapSubTree, null, e);
+        }
     }
 
     private qpContent: QpContentModel;
     private qpAbstractItem: string = 'QPAbstractItem';
     private readonly treeStore: TreeStore;
-
-    private async fetchQPAbstractItemFields() {
-        try {
-            const response: ApiResult<QpContentModel> = await DictionaryService.getQpContent(this.qpAbstractItem);
-            if (response.isSuccess) {
-                this.qpContent = response.data;
-            } else {
-                throw response.error;
-            }
-        } catch (e) {
-            console.error(e);
-        }
-    }
-
-    private updateSiteMapSubTree() {
-        try {
-            this.treeStore.updateSubTree();
-        } catch (e) {
-            console.error(e);
-        }
-    }
 
     public async edit(id: number) {
 
