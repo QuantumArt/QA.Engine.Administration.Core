@@ -10,8 +10,9 @@ import { TreeErrors } from 'enums/ErrorsTypes';
 import SiteMapService from 'services/SiteMapService';
 import { ITreeErrorModel } from './BaseTreeStore';
 import { v4 } from 'uuid';
+import MoveTreeStore from './MoveTreeStore';
 
-export type TreeType = SiteTreeStore | ArchiveTreeStore | ContentVersionTreeStore | WidgetTreeStore;
+export type TreeType = SiteTreeStore | ArchiveTreeStore | ContentVersionTreeStore | WidgetTreeStore | MoveTreeStore;
 
 /**
  * @description Facade class to access a proper tree
@@ -24,10 +25,10 @@ export default class TreeStore {
     private readonly archiveStore: ArchiveTreeStore;
     private readonly contentVersionsStore: ContentVersionTreeStore;
     private readonly widgetStore: WidgetTreeStore;
+    private readonly moveStore: MoveTreeStore;
     private readonly navigationStore: NavigationStore;
 
     private readonly treeState: TreeState;
-    private readonly stores: Map<TreeStoreType, TreeType>;
 
     constructor(navigationStore: NavigationStore) {
         this.siteTreeStore = new SiteTreeStore();
@@ -47,13 +48,9 @@ export default class TreeStore {
             leaf: 'document',
             leafPublished: 'saved',
         });
+        this.moveStore = new MoveTreeStore();
 
         this.treeState = new TreeState();
-        this.stores = new Map<TreeStoreType, TreeType>();
-        this.stores.set(TreeStoreType.SITE, this.siteTreeStore);
-        this.stores.set(TreeStoreType.ARCHIVE, this.archiveStore);
-        this.stores.set(TreeStoreType.CONTENTVERSION, this.contentVersionsStore);
-        this.stores.set(TreeStoreType.WIDGET, this.widgetStore);
 
         this.navigationStore = navigationStore;
     }
@@ -79,6 +76,9 @@ export default class TreeStore {
     }
     getWidgetTreeStore(): WidgetTreeStore {
         return this.widgetStore;
+    }
+    getMoveTreeStore(): MoveTreeStore {
+        return this.moveStore;
     }
 
     resolveMainTreeStore(): ArchiveTreeStore | SiteTreeStore {
@@ -166,7 +166,7 @@ export default class TreeStore {
             async () => {
                 const response: ApiResult<any> = await SiteMapService.reorder(model);
                 if (response.isSuccess) {
-                    const store = this.stores.get(TreeStoreType.SITE);
+                    const store = this.siteTreeStore;
                     const parentId = store.selectedNode.parentId;
                     await this.updateSubTree(parentId);
                     this.treeState.success();
@@ -183,7 +183,7 @@ export default class TreeStore {
             async () => {
                 const response: ApiResult<any> = await SiteMapService.move(model);
                 if (response.isSuccess) {
-                    const store = this.stores.get(TreeStoreType.SITE);
+                    const store = this.siteTreeStore;
                     const parentId = store.selectedNode.parentId;
                     await this.updateSubTree(parentId);
                     await this.updateSubTree(model.newParentId);

@@ -66,11 +66,16 @@ export abstract class BaseTreeState<T extends {
 
     @observable public selectedNode: T;
     @observable protected treeInternal: ITreeElement[];
-    protected origTree: T[];
+    protected origTreeInternal: T[];
 
     @computed
     get tree(): ITreeElement[] {
         return this.treeInternal;
+    }
+
+    @computed
+    get origTree(): T[] {
+        return this.origTreeInternal;
     }
 
     @action
@@ -78,7 +83,7 @@ export abstract class BaseTreeState<T extends {
         this.treeInternal = [];
         const response: ApiResult<T[]> = await this.getTree();
         if (response.isSuccess) {
-            this.origTree = response.data;
+            this.origTreeInternal = response.data;
             this.convertTree(response.data);
         } else {
             throw response.error;
@@ -127,10 +132,6 @@ export abstract class BaseTreeState<T extends {
 
     @action
     public async updateSubTree(id: number): Promise<any> {
-        await this.updateSubTreeInternal(id);
-    }
-
-    protected async updateSubTreeInternal(id: number): Promise<any> {
         const response: ApiResult<T> = await this.getSubTree(id);
         if (response.isSuccess) {
             const expanded: number[] = [];
@@ -142,10 +143,11 @@ export abstract class BaseTreeState<T extends {
 
             const node = this.getNodeById(id);
             const parentNode = this.getNodeById(node.parentId == null ? node.versionOfId : node.parentId);
-            const elements = parentNode == null ? this.origTree : parentNode.children;
+            const elements = parentNode == null ? this.origTreeInternal : parentNode.children;
             for (let i = 0; i < elements.length; i += 1) {
                 if (response.data == null && elements[i].id === id) {
                     elements.splice(i, 1);
+                    this.selectedNode = null;
                     break;
                 } else if (response.data != null && elements[i].id === response.data.id) {
                     elements[i] = response.data;
@@ -153,7 +155,7 @@ export abstract class BaseTreeState<T extends {
                 }
             }
 
-            this.convertTree(this.origTree);
+            this.convertTree(this.origTreeInternal);
             this.forEachNode(
                 (x) => {
                     if (expanded.indexOf(+x.id) > -1) {
@@ -177,7 +179,7 @@ export abstract class BaseTreeState<T extends {
     protected abstract contextMenuType: ContextMenuType;
 
     protected getNodeById(id: number): T {
-        let elements = this.origTree;
+        let elements = this.origTreeInternal;
         let loop = true;
         while (loop) {
             loop = false;

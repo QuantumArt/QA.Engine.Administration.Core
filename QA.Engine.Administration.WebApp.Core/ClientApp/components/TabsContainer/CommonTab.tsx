@@ -3,7 +3,6 @@ import { observer, inject } from 'mobx-react';
 import { Button, Navbar, NavbarGroup, H5, Intent, Spinner, InputGroup, Checkbox } from '@blueprintjs/core';
 import ExtensionCard from './ExtensionCard';
 import OperationState from 'enums/OperationState';
-import NavigationStore, { Pages } from 'stores/NavigationStore';
 import SiteTreeStore from 'stores/TreeStore/SiteTreeStore';
 import TreeStore from 'stores/TreeStore';
 import QpIntegrationStore from 'stores/QpIntegrationStore';
@@ -12,14 +11,13 @@ import TextStore from 'stores/TextStore';
 import Texts from 'constants/Texts';
 
 interface Props {
-    navigationStore?: NavigationStore;
     qpIntegrationStore?: QpIntegrationStore;
     editArticleStore?: EditArticleStore;
     treeStore?: TreeStore;
     textStore?: TextStore;
 }
 
-@inject('navigationStore', 'qpIntegrationStore', 'editArticleStore', 'treeStore', 'textStore')
+@inject('qpIntegrationStore', 'editArticleStore', 'treeStore', 'textStore')
 @observer
 export default class CommonTab extends React.Component<Props> {
 
@@ -65,8 +63,9 @@ export default class CommonTab extends React.Component<Props> {
     }
 
     render() {
-        const { treeStore, textStore, navigationStore, editArticleStore: { title, isVisible, isInSiteMap, isEditable } } = this.props;
-        const tree = navigationStore.currentPage === Pages.SITEMAP ? treeStore.getSiteTreeStore() : treeStore.getArchiveTreeStore();
+        const { treeStore, textStore, editArticleStore: { title, isVisible, isInSiteMap, isEditable } } = this.props;
+        const tree = treeStore.resolveMainTreeStore();
+
         if (tree.selectedNode == null) {
             return null;
         }

@@ -7,6 +7,8 @@ import TextStore from 'stores/TextStore';
 import Texts from 'constants/Texts';
 import { inject, observer } from 'mobx-react';
 import PageSelect from 'components/Select/PageSelect';
+import TreeStructure from 'components/TreeStructure';
+import { ITreeElement } from 'stores/TreeStore/BaseTreeStore';
 
 interface Props {
     treeStore?: TreeStore;
@@ -15,7 +17,7 @@ interface Props {
 }
 
 interface State {
-    newParent: PageModel;
+    newParent: ITreeElement;
     newParentIntent: Intent;
 }
 
@@ -23,7 +25,7 @@ interface State {
 @observer
 export default class MovePopup extends React.Component<Props, State> {
 
-    state = { newParent: null as PageModel, ...this.resetIntent };
+    state = { newParent: null as ITreeElement, ...this.resetIntent };
 
     private moveClick = () => {
         const { treeStore, popupStore } = this.props;
@@ -33,14 +35,14 @@ export default class MovePopup extends React.Component<Props, State> {
             return;
         }
         const model: MoveModel = {
-            newParentId: newParent.id,
+            newParentId: +newParent.id,
             itemId: popupStore.itemId,
         };
         treeStore.move(model);
         popupStore.close();
     }
 
-    private changeNewParent = (e: PageModel) =>
+    private changeNewParent = (e: ITreeElement) =>
         this.setState({ newParent: e, ...this.resetIntent })
 
     private cancelClick = () =>
@@ -54,14 +56,17 @@ export default class MovePopup extends React.Component<Props, State> {
             return null;
         }
 
-        const siteTreeStore = treeStore.getSiteTreeStore();
-        const pages = siteTreeStore.flatPages;
+        const moveTreeStore = treeStore.getMoveTreeStore();
 
         return (
             <Card>
-                <FormGroup>
-                    <PageSelect items={pages} filterable onChange={this.changeNewParent} intent={newParentIntent} />
-                </FormGroup>
+                <TreeStructure
+                    type="move"
+                    className="minor-tree-pane"
+                    tree={moveTreeStore}
+                    sbHeightMax={290}
+                    onNodeClick={this.changeNewParent}
+                />
                 <ButtonGroup className="dialog-button-group">
                     <Button text={textStore.texts[Texts.popupMoveButton]} icon="move" onClick={this.moveClick} intent={Intent.SUCCESS} />
                     <Button text={textStore.texts[Texts.popupCancelButton]} icon="undo" onClick={this.cancelClick} />

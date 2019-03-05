@@ -11,8 +11,8 @@ export default class EditArticleStore {
     @observable public state: OperationState = OperationState.NONE;
     @observable public fields: ExtensionFieldModel[] = [];
     @observable public isShowExtensionFields: boolean = false;
-    public node: PageModel | ArchiveModel;
     public isEditable: boolean;
+    private node: PageModel | ArchiveModel;
     private extensionFieldsJson: string = JSON.stringify([]);
 
     @computed

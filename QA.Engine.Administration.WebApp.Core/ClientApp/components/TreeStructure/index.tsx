@@ -3,17 +3,17 @@ import { inject, observer } from 'mobx-react';
 import { Card, Spinner } from '@blueprintjs/core';
 import Scrollbars from 'react-custom-scrollbars'; // tslint:disable-line
 import cn from 'classnames'; // tslint:disable-line
-import NavigationStore, { Pages }  from 'stores/NavigationStore';
+import NavigationStore  from 'stores/NavigationStore';
 import OperationState from 'enums/OperationState';
 import { ITreeElement } from 'stores/TreeStore/BaseTreeStore';
 import EditArticleStore from 'stores/EditArticleStore';
 import TreeStore, { TreeType } from 'stores/TreeStore';
 import { CustomTree } from 'components/TreeStructure/CustomTree';
 import SiteTreeStore from 'stores/TreeStore/SiteTreeStore';
-import ArchiveTreeStore from 'stores/TreeStore/ArchiveTreeStore';
+import { when } from 'mobx';
 
 interface Props {
-    type: 'main' | 'widgets' | 'versions';
+    type: 'main' | 'widgets' | 'versions' | 'move';
     tree: TreeType;
     treeStore?: TreeStore;
     navigationStore?: NavigationStore;
@@ -23,6 +23,11 @@ interface Props {
     sbThumbSize?: number;
     spinnerSize?: number;
     className?: string;
+    onNodeClick?: (e: ITreeElement) => void;
+}
+
+interface State {
+    currentNode: PageModel | ArchiveModel;
 }
 
 type DefaultProps = 'sbHeightMin' | 'sbHeightMax' | 'sbThumbSize' | 'spinnerSize';
@@ -39,7 +44,38 @@ class TreeR extends CustomTree {
 
 @inject('navigationStore', 'editArticleStore', 'treeStore')
 @observer
-export default class SiteTree extends React.Component<Props> {
+export default class SiteTree extends React.Component<Props, State> {
+
+    constructor(props: Props) {
+        super(props);
+
+        this.state = { currentNode: null };
+
+        when(() => {
+            if (this.props == null || this.state == null) {
+                return false;
+            }
+            const { editArticleStore, treeStore, type } = this.props;
+            const { currentNode } = this.state;
+
+            const tree = treeStore.resolveMainTreeStore();
+            const currentNodeId = currentNode == null ? null : currentNode.id;
+            const selectedNodeId = tree.selectedNode == null ? null : tree.selectedNode.id;
+
+            if (selectedNodeId !== currentNodeId && type === 'main' && tree instanceof SiteTreeStore) {
+                [
+                    editArticleStore,
+                    treeStore.getContentVersionTreeStore(),
+                    treeStore.getWidgetTreeStore(),
+                ].forEach((x) => {
+                    x.init(tree.selectedNode);
+                });
+                treeStore.getMoveTreeStore().init(tree.selectedNode, tree.origTree);
+            }
+
+            return false;
+        });
+    }
 
     static defaultProps: Pick<Props, DefaultProps> = {
         sbHeightMin: 30,
@@ -58,6 +94,9 @@ export default class SiteTree extends React.Component<Props> {
         if (type === 'versions') {
             return treeStore.getContentVersionTreeStore();
         }
+        if (type === 'move') {
+            return treeStore.getMoveTreeStore();
+        }
     }
 
     private handleMajorTreeNode = (e: ITreeElement) => {
@@ -65,15 +104,7 @@ export default class SiteTree extends React.Component<Props> {
         const tree = treeStore.resolveMainTreeStore();
         tree.handleNodeClick(e);
         navigationStore.setDefaultTab(e.isSelected);
-        [
-            editArticleStore,
-            treeStore.getContentVersionTreeStore(),
-            treeStore.getWidgetTreeStore(),
-        ].forEach((x) => {
-            if (tree instanceof SiteTreeStore || tree instanceof ArchiveTreeStore) {
-                x.init(tree.selectedNode);
-            }
-        });
+        this.setState({ currentNode: tree.selectedNode });
     }
 
     private handleMinorTreeNode = (e: ITreeElement) => {
@@ -85,11 +116,14 @@ export default class SiteTree extends React.Component<Props> {
     }
 
     private handleNodeClick = (e: ITreeElement) => {
-        const { type } = this.props;
+        const { type, onNodeClick } = this.props;
         if (type === 'main') {
             this.handleMajorTreeNode(e);
         } else {
             this.handleMinorTreeNode(e);
+        }
+        if (onNodeClick != null) {
+            onNodeClick(e);
         }
     }
 
@@ -97,7 +131,6 @@ export default class SiteTree extends React.Component<Props> {
         const { treeStore } = this.props;
         const tree = this.resolveTree();
         const isLoading = treeStore.state === OperationState.PENDING;
-        console.log('TREE', tree.tree);
         return (
             <Card className={cn('tree-pane', this.props.className)}>
                 {isLoading ?
