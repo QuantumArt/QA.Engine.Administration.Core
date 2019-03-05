@@ -2,12 +2,16 @@ import * as React from 'react';
 import { MenuItem, Button, Position, Intent } from '@blueprintjs/core';
 import { Select, ItemRenderer, ItemPredicate } from '@blueprintjs/select';
 
-function renderItem<T extends { id: number, title: string }>(): ItemRenderer<T> {
+function getText<T extends { id: number, title: string, alias?: string }>(item: T): string {
+    return item.alias == null ? item.title : `${item.title} (${item.alias})`;
+}
+
+function renderItem<T extends { id: number, title: string, alias?: string }>(): ItemRenderer<T> {
     return (item, { handleClick, modifiers, query }) => {
         if (!modifiers.matchesPredicate) {
             return null;
         }
-        const text = item.title;
+        const text = getText(item);
         return (
             <MenuItem
                 active={modifiers.active}
@@ -20,9 +24,9 @@ function renderItem<T extends { id: number, title: string }>(): ItemRenderer<T> 
     };
 }
 
-function filterItem<T extends { id: number, title: string }>(): ItemPredicate<T> {
+function filterItem<T extends { id: number, title: string, alias?: string }>(): ItemPredicate<T> {
     return (query, item) => {
-        return item.title.toLowerCase().indexOf(query.toLowerCase()) >= 0;
+        return getText(item).toLowerCase().indexOf(query.toLowerCase()) >= 0;
     };
 }
 
@@ -73,7 +77,7 @@ interface State<T> {
     page: T;
 }
 
-export default abstract class BaseSelect<T extends { id: number, title: string }> extends React.Component<Props<T>, State<T>> {
+export default abstract class BaseSelect<T extends { id: number, title: string, alias?: string }> extends React.Component<Props<T>, State<T>> {
 
     selectElement = Select.ofType<T>();
 

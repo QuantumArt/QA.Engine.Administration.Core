@@ -28,4 +28,8 @@ export default class ErrorsTypes {
     static readonly Texts = {
         fetch: 'Error fetching site texts',
     };
+
+    static readonly Regions = {
+        fetch: 'Error fetching regions',
+    };
 }

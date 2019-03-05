@@ -6,7 +6,6 @@ import PopupType from 'enums/PopupType';
 import TextStore from 'stores/TextStore';
 import Texts from 'constants/Texts';
 import { inject, observer } from 'mobx-react';
-import PageSelect from 'components/Select/PageSelect';
 import TreeStructure from 'components/TreeStructure';
 import { ITreeElement } from 'stores/TreeStore/BaseTreeStore';
 
@@ -18,22 +17,17 @@ interface Props {
 
 interface State {
     newParent: ITreeElement;
-    newParentIntent: Intent;
 }
 
 @inject('treeStore', 'popupStore', 'textStore')
 @observer
 export default class MovePopup extends React.Component<Props, State> {
 
-    state = { newParent: null as ITreeElement, ...this.resetIntent };
+    state = { newParent: null as ITreeElement };
 
     private moveClick = () => {
         const { treeStore, popupStore } = this.props;
         const { newParent } = this.state;
-        if (newParent == null) {
-            this.setState({ newParentIntent: Intent.DANGER });
-            return;
-        }
         const model: MoveModel = {
             newParentId: +newParent.id,
             itemId: popupStore.itemId,
@@ -43,14 +37,13 @@ export default class MovePopup extends React.Component<Props, State> {
     }
 
     private changeNewParent = (e: ITreeElement) =>
-        this.setState({ newParent: e, ...this.resetIntent })
+        this.setState({ newParent: e })
 
     private cancelClick = () =>
         this.props.popupStore.close()
 
     render() {
         const { popupStore, textStore, treeStore } = this.props;
-        const { newParentIntent } = this.state;
 
         if (popupStore.type !== PopupType.MOVE) {
             return null;
@@ -74,6 +67,4 @@ export default class MovePopup extends React.Component<Props, State> {
             </Card>
         );
     }
-
-    private resetIntent = { newParentIntent: Intent.NONE };
 }

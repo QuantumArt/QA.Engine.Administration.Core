@@ -11,6 +11,8 @@ import TreeStore, { TreeType } from 'stores/TreeStore';
 import { CustomTree } from 'components/TreeStructure/CustomTree';
 import SiteTreeStore from 'stores/TreeStore/SiteTreeStore';
 import { when } from 'mobx';
+import RegionSelect from 'components/Select/RegionSelect';
+import RegionStore from 'stores/RegionStore';
 
 interface Props {
     type: 'main' | 'widgets' | 'versions' | 'move';
@@ -18,6 +20,7 @@ interface Props {
     treeStore?: TreeStore;
     navigationStore?: NavigationStore;
     editArticleStore?: EditArticleStore;
+    regionStore?: RegionStore;
     sbHeightMin?: number;
     sbHeightMax?: number;
     sbThumbSize?: number;
@@ -42,7 +45,7 @@ interface InternalRestProps extends JSX.IntrinsicAttributes, React.ClassAttribut
 class TreeR extends CustomTree {
 }
 
-@inject('navigationStore', 'editArticleStore', 'treeStore')
+@inject('navigationStore', 'editArticleStore', 'treeStore', 'regionStore')
 @observer
 export default class SiteTree extends React.Component<Props, State> {
 
@@ -127,12 +130,27 @@ export default class SiteTree extends React.Component<Props, State> {
         }
     }
 
+    private changeRegion = (e: RegionModel) => {
+        const { treeStore, type, regionStore } = this.props;
+        const store = treeStore.resolveMainTreeStore();
+        if (type === 'main' && store instanceof SiteTreeStore) {
+            store.setRegions(e.id);
+            store.fetchTree();
+        }
+    }
+
     render() {
-        const { treeStore } = this.props;
+        const { treeStore, regionStore, type } = this.props;
         const tree = this.resolveTree();
         const isLoading = treeStore.state === OperationState.PENDING;
+        const useRegions = type === 'main' && tree instanceof SiteTreeStore && regionStore.useRegions;
+        const regions = regionStore.regions != null && regionStore.regions.length > 0
+            ? [{ id: null, title: '(No selection)' } as RegionModel].concat(regionStore.regions)
+            : [];
+
         return (
             <Card className={cn('tree-pane', this.props.className)}>
+                {useRegions && <RegionSelect items={regions} filterable onChange={this.changeRegion} />}
                 {isLoading ?
                     <Spinner size={this.props.spinnerSize}/> :
                     <Scrollbars

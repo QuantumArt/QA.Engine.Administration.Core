@@ -26,12 +26,13 @@ import ErrorToast from 'components/ErrorToast';
 import TextStore from 'stores/TextStore';
 import ReorderPopup from 'components/Popup/ReorderPopup';
 import MovePopup from 'components/Popup/MovePopup';
-import TreeStoreType from 'enums/TreeStoreType';
+import RegionStore from 'stores/RegionStore';
 
 const app = hot(module)(() => {
     const navigationStoreInstance = new NavigationStore();
     const treeStoreInstance = new TreeStore(navigationStoreInstance);
     const textStore = new TextStore();
+    const regionStore = new RegionStore();
 
     return (
         <Provider
@@ -41,6 +42,7 @@ const app = hot(module)(() => {
             popupStore={new PopupStore()}
             editArticleStore={new EditArticleStore()}
             textStore={textStore}
+            regionStore={regionStore}
         >
         <div className="layout">
             <NavigationBar/>
