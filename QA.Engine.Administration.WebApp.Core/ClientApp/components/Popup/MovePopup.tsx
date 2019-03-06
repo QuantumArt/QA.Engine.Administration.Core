@@ -1,6 +1,6 @@
 import * as React from 'react';
 import TreeStore from 'stores/TreeStore';
-import { Card, ButtonGroup, Button, Intent, FormGroup } from '@blueprintjs/core';
+import { Card, ButtonGroup, Button, Intent } from '@blueprintjs/core';
 import PopupStore from 'stores/PopupStore';
 import PopupType from 'enums/PopupType';
 import TextStore from 'stores/TextStore';
@@ -36,11 +36,9 @@ export default class MovePopup extends React.Component<Props, State> {
         popupStore.close();
     }
 
-    private changeNewParent = (e: ITreeElement) =>
-        this.setState({ newParent: e })
+    private changeNewParent = (e: ITreeElement) => this.setState({ newParent: e });
 
-    private cancelClick = () =>
-        this.props.popupStore.close()
+    private cancelClick = () => this.props.popupStore.close();
 
     render() {
         const { popupStore, textStore, treeStore } = this.props;
@@ -52,12 +50,12 @@ export default class MovePopup extends React.Component<Props, State> {
         const moveTreeStore = treeStore.getMoveTreeStore();
 
         return (
-            <Card>
+            <Card className="move-popup">
                 <TreeStructure
                     type="move"
-                    className="minor-tree-pane"
+                    className="popup-tree-pane"
                     tree={moveTreeStore}
-                    sbHeightMax={290}
+                    sbHeightMax={460}
                     onNodeClick={this.changeNewParent}
                 />
                 <ButtonGroup className="dialog-button-group">
