@@ -1,6 +1,14 @@
 import * as React from 'react';
 import { inject, observer } from 'mobx-react';
-import { Card, Spinner } from '@blueprintjs/core';
+import { when } from 'mobx';
+import {
+    Button,
+    Card,
+    InputGroup,
+    Navbar,
+    NavbarDivider,
+    Spinner,
+} from '@blueprintjs/core';
 import Scrollbars from 'react-custom-scrollbars'; // tslint:disable-line
 import cn from 'classnames'; // tslint:disable-line
 import NavigationStore  from 'stores/NavigationStore';
@@ -10,7 +18,6 @@ import EditArticleStore from 'stores/EditArticleStore';
 import TreeStore, { TreeType } from 'stores/TreeStore';
 import { CustomTree } from 'components/TreeStructure/CustomTree';
 import SiteTreeStore from 'stores/TreeStore/SiteTreeStore';
-import { when } from 'mobx';
 import RegionSelect from 'components/Select/RegionSelect';
 import RegionStore from 'stores/RegionStore';
 
@@ -103,7 +110,7 @@ export default class SiteTree extends React.Component<Props, State> {
     }
 
     private handleMajorTreeNode = (e: ITreeElement) => {
-        const { navigationStore, editArticleStore, treeStore } = this.props;
+        const { navigationStore, treeStore } = this.props;
         const tree = treeStore.resolveMainTreeStore();
         tree.handleNodeClick(e);
         navigationStore.setDefaultTab(e.isSelected);
@@ -131,7 +138,7 @@ export default class SiteTree extends React.Component<Props, State> {
     }
 
     private changeRegion = (e: RegionModel) => {
-        const { treeStore, type, regionStore } = this.props;
+        const { treeStore, type } = this.props;
         const store = treeStore.resolveMainTreeStore();
         if (type === 'main' && store instanceof SiteTreeStore) {
             store.setRegions(e.id);
@@ -150,7 +157,17 @@ export default class SiteTree extends React.Component<Props, State> {
 
         return (
             <Card className={cn('tree-pane', this.props.className)}>
-                {useRegions && <RegionSelect items={regions} filterable onChange={this.changeRegion} />}
+                <Navbar className="tree-navbar">
+                    <InputGroup leftIcon="search" />
+                    <NavbarDivider />
+                    <Button icon="segmented-control">Show IDs</Button>
+                    {useRegions &&
+                        <React.Fragment>
+                            <NavbarDivider />
+                            <RegionSelect items={regions} filterable onChange={this.changeRegion} />
+                        </React.Fragment>
+                    }
+                </Navbar>
                 {isLoading ?
                     <Spinner size={this.props.spinnerSize}/> :
                     <Scrollbars

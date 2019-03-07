@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Provider } from 'mobx-react';
-import DevTools from 'mobx-react-devtools'; // tslint:disable-line
+// import DevTools from 'mobx-react-devtools'; // tslint:disable-line
 import { hot } from 'react-hot-loader';
 import '@blueprintjs/core/lib/css/blueprint.css';
 import '@blueprintjs/icons/lib/css/blueprint-icons.css';
@@ -62,7 +62,6 @@ const app = hot(module)(() => {
                 <MovePopup/>
             </Popup>
             <ErrorToast/>
-            <DevTools/>
         </div>
     </Provider>
     );
