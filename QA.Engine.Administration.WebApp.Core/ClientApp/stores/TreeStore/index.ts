@@ -100,7 +100,7 @@ export default class TreeStore extends ErrorHandler {
 
     async fetchTree(): Promise<any> {
         const store = this.resolveMainTreeStore();
-        this.runAsync(
+        await this.runAsync(
             async () => {
                 await store.fetchTree();
                 this.treeState.success();
@@ -109,7 +109,7 @@ export default class TreeStore extends ErrorHandler {
     }
 
     async publish(itemIds: number[]): Promise<any> {
-        this.runAsync(
+        await this.runAsync(
             async () => {
                 const response: ApiResult<any> = await SiteMapService.publish(itemIds);
                 if (response.isSuccess) {
@@ -124,7 +124,7 @@ export default class TreeStore extends ErrorHandler {
     }
 
     async archive(model: RemoveModel): Promise<any> {
-        this.runAsync(
+        await this.runAsync(
             async () => {
                 const response: ApiResult<any> = await SiteMapService.archive(model);
                 if (response.isSuccess) {
@@ -139,7 +139,7 @@ export default class TreeStore extends ErrorHandler {
     }
 
     async edit(model: EditModel): Promise<any> {
-        this.runAsync(
+        await this.runAsync(
             async () => {
                 const response: ApiResult<any> = await SiteMapService.edit(model);
                 if (response.isSuccess) {
@@ -154,7 +154,7 @@ export default class TreeStore extends ErrorHandler {
     }
 
     async reorder(model: ReorderModel): Promise<any> {
-        this.runAsync(
+        await this.runAsync(
             async () => {
                 const response: ApiResult<any> = await SiteMapService.reorder(model);
                 if (response.isSuccess) {
@@ -171,7 +171,7 @@ export default class TreeStore extends ErrorHandler {
     }
 
     async move(model: MoveModel): Promise<any> {
-        this.runAsync(
+        await this.runAsync(
             async () => {
                 const response: ApiResult<any> = await SiteMapService.move(model);
                 if (response.isSuccess) {
@@ -189,7 +189,7 @@ export default class TreeStore extends ErrorHandler {
     }
 
     async restore(model: RestoreModel): Promise<any> {
-        this.runAsync(
+        await this.runAsync(
             async () => {
                 const response: ApiResult<any> = await SiteMapService.restore(model);
                 if (response.isSuccess) {
@@ -204,7 +204,7 @@ export default class TreeStore extends ErrorHandler {
     }
 
     async delete(model: DeleteModel): Promise<any> {
-        this.runAsync(
+        await this.runAsync(
             async () => {
                 const response: ApiResult<any> = await SiteMapService.delete(model);
                 if (response.isSuccess) {

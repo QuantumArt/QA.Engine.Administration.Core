@@ -43,7 +43,11 @@ export default class CommonTab extends React.Component<Props> {
             fields: editArticleStore.changedFields,
         };
         if (tree instanceof SiteTreeStore) {
-            treeStore.edit(model).then(() => editArticleStore.init(tree.selectedNode));
+            (async () => {
+                await treeStore.edit(model);
+                await editArticleStore.init(tree.selectedNode);
+            })();
+            // treeStore.edit(model).then(() => editArticleStore.init(tree.selectedNode));
         }
     }
 
