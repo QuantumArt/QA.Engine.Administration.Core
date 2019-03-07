@@ -3,8 +3,12 @@ import { action, computed, observable } from 'mobx';
 import { IconName, ITreeNode } from '@blueprintjs/core';
 import InteractiveZone from 'components/TreeStructure/InteractiveZone';
 import ContextMenuType from 'enums/ContextMenuType';
+import TreeStoreType from 'enums/TreeStoreType';
+import NodeLabel from 'components/TreeStructure/NodeLabel';
 
 export interface ITreeElement extends ITreeNode {
+    title?: string;
+    idTitle?: string;
     childNodes: ITreeElement[];
     parentId: number;
     versionOfId?: number;
@@ -56,7 +60,10 @@ export abstract class BaseTreeState<T extends {
         this.icons = icons;
     }
 
+    public abstract type: TreeStoreType;
+
     @observable public selectedNode: T;
+    @observable public showIDs: boolean = false;
     @observable protected treeInternal: ITreeElement[];
     protected origTreeInternal: T[];
 
@@ -80,6 +87,11 @@ export abstract class BaseTreeState<T extends {
         } else {
             throw response.error;
         }
+    }
+
+    @action
+    public toggleIDs = () => {
+        this.showIDs = !this.showIDs;
     }
 
     @action
@@ -214,7 +226,9 @@ export abstract class BaseTreeState<T extends {
             parentId: el.parentId,
             versionOfId: el.versionOfId,
             childNodes: [],
-            label: el.title,
+            label: '',
+            title: el.title,
+            idTitle: `${el.title} - ${el.id}`,
             isExpanded: false,
             icon: this.getIcon(el),
             hasCaret: el.hasChildren,
@@ -225,6 +239,10 @@ export abstract class BaseTreeState<T extends {
         });
         treeElement.secondaryLabel = React.createElement(InteractiveZone, {
             node: treeElement,
+        });
+        treeElement.label = React.createElement(NodeLabel, {
+            node: treeElement,
+            type: this.type,
         });
 
         return treeElement;

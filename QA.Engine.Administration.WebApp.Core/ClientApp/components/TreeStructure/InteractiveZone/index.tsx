@@ -54,7 +54,6 @@ export default class ContextMenu extends React.Component<Props, State> {
             if (node.contextMenuType === ContextMenuType.WIDGET) {
                 treeStore.getWidgetTreeStore().handleContextMenu(node);
             }
-            // treeStore.resolveTreeStore().handleContextMenu(node);
         }
     }
 

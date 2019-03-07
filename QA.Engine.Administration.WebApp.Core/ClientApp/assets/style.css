@@ -32,6 +32,11 @@ body {
     justify-content: left;
 }
 
+.tree-switch {
+    margin-bottom: 0;
+    white-space: nowrap;
+}
+
 .tree-navbar .bp3-button-text {
     white-space: nowrap;
     overflow: hidden;
