@@ -2,12 +2,11 @@ import * as React from 'react';
 import { inject, observer } from 'mobx-react';
 import { when } from 'mobx';
 import {
-    Button,
     Card,
     InputGroup,
     Navbar,
     NavbarDivider,
-    Spinner,
+    Spinner, Switch,
 } from '@blueprintjs/core';
 import Scrollbars from 'react-custom-scrollbars'; // tslint:disable-line
 import cn from 'classnames'; // tslint:disable-line
@@ -164,7 +163,14 @@ export default class SiteTree extends React.Component<Props, State> {
                 <Navbar className="tree-navbar">
                     <InputGroup leftIcon="search" />
                     <NavbarDivider />
-                    <Button icon="segmented-control">Show IDs</Button>
+                    <Switch
+                        inline
+                        label="Show IDs"
+                        className="tree-switch"
+                        alignIndicator="right"
+                        checked={tree.showIDs}
+                        onChange={tree.toggleIDs}
+                    />
                     {useRegions &&
                         <React.Fragment>
                             <NavbarDivider />

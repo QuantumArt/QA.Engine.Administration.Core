@@ -1,8 +1,11 @@
+import { action } from 'mobx';
 import { BaseTreeState, ITreeElement } from 'stores/TreeStore/BaseTreeStore';
 import ContextMenuType from 'enums/ContextMenuType';
-import { action } from 'mobx';
+import TreeStoreType from 'enums/TreeStoreType';
 
 export default class MoveTreeStore extends BaseTreeState<PageModel> {
+
+    public type = TreeStoreType.MOVE;
 
     @action
     public init(selectedNode: PageModel, origTree: PageModel[]) {
@@ -32,7 +35,7 @@ export default class MoveTreeStore extends BaseTreeState<PageModel> {
 
     protected readonly contextMenuType: ContextMenuType = null;
     protected getTree = (): Promise<ApiResult<PageModel[]>> => null;
-    protected getSubTree = (id: number): Promise<ApiResult<PageModel>> => null;
+    protected getSubTree = (): Promise<ApiResult<PageModel>> => null;
 
     protected mapElement(el: PageModel): ITreeElement {
         const treeElement = super.mapElement(el);
