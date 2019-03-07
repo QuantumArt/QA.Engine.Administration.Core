@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Microsoft.Extensions.Logging;
 using QA.DotNetCore.Engine.Persistent.Interfaces;
 using QA.Engine.Administration.Data.Interfaces.Core;
 using QA.Engine.Administration.Data.Interfaces.Core.Models;
@@ -14,12 +15,14 @@ namespace QA.Engine.Administration.Data.Core
         private readonly IDbConnection _connection;
         private readonly INetNameQueryAnalyzer _netNameQueryAnalyzer;
         private readonly IMetaInfoRepository _metaInfoRepository;
+        private readonly ILogger<WidgetProvider> _logger;
 
-        public WidgetProvider(IUnitOfWork uow, INetNameQueryAnalyzer netNameQueryAnalyzer, IMetaInfoRepository metaInfoRepository)
+        public WidgetProvider(IUnitOfWork uow, INetNameQueryAnalyzer netNameQueryAnalyzer, IMetaInfoRepository metaInfoRepository, ILogger<WidgetProvider> logger)
         {
             _connection = uow.Connection;
             _netNameQueryAnalyzer = netNameQueryAnalyzer;
             _metaInfoRepository = metaInfoRepository;
+            _logger = logger;
         }
 
         //запрос с использованием NetName таблиц и столбцов
@@ -46,6 +49,8 @@ WHERE ai.archive=0 AND def.[|QPDiscriminator.IsPage|]=0 AND ai.[|QPAbstractItem.
 
         public List<AbstractItemData> GetItems(int siteId, bool isArchive, IEnumerable<int> parentIds)
         {
+            _logger.LogDebug($"getItems. siteId: {siteId}, isArchive: {isArchive}, parentIds: {SerializeData(parentIds)}");
+
             const int maxParentIdsPerRequest = 500;
 
             var query = _netNameQueryAnalyzer.PrepareQueryExtabtion(_metaInfoRepository, CmdGetAbstractWidgetItem, siteId);
@@ -63,13 +68,18 @@ WHERE ai.archive=0 AND def.[|QPDiscriminator.IsPage|]=0 AND ai.[|QPAbstractItem.
                     int[] r = parentIds.Skip(i * maxParentIdsPerRequest).Take(maxParentIdsPerRequest).ToArray();
                     result.AddRange(GetItems(siteId, isArchive, r));
                 }
+                _logger.LogDebug($"getItems. count: {result.Count()}");
                 return result;
             }
             else
             {
-                return _connection.Query<AbstractItemData>(query, new { Archive = isArchive, ParentIds = parentIds }).ToList();
+                var result = _connection.Query<AbstractItemData>(query, new { Archive = isArchive, ParentIds = parentIds }).ToList();
+                _logger.LogDebug($"getItems. count: {result.Count()}");
+                return result;
             }
         }
+
+        private static string SerializeData(object data) => Newtonsoft.Json.JsonConvert.SerializeObject(data);
 
     }
 }

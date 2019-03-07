@@ -1,4 +1,5 @@
-﻿using QA.DotNetCore.Engine.Persistent.Interfaces;
+﻿using Microsoft.Extensions.Logging;
+using QA.DotNetCore.Engine.Persistent.Interfaces;
 using QA.Engine.Administration.Data.Core.Qp;
 using QA.Engine.Administration.Data.Interfaces.Core;
 using QA.Engine.Administration.Data.Interfaces.Core.Models;
@@ -17,6 +18,7 @@ namespace QA.Engine.Administration.Data.Core
         private readonly IQpMetadataManager _qpMetadataManager;
         private readonly IQpContentManager _qpContentManager;
         private readonly IMetaInfoRepository _metaInfoRepository;
+        private readonly ILogger<QpDataProvider> _logger;
 
         private readonly string _statusNames = string.Join(",", new[]
             {
@@ -32,16 +34,19 @@ namespace QA.Engine.Administration.Data.Core
 
         public QpDataProvider(
             IQpDbConnector qpDbConnector, IQpMetadataManager qpMetadataManager, IQpContentManager qpContentManager,
-            IMetaInfoRepository metaInfoRepository)
+            IMetaInfoRepository metaInfoRepository, ILogger<QpDataProvider> logger)
         {
             _qpDbConnector = qpDbConnector;
             _qpMetadataManager = qpMetadataManager;
             _qpContentManager = qpContentManager;
             _metaInfoRepository = metaInfoRepository;
+            _logger = logger;
         }
 
         public void Edit(int siteId, int contentId, int userId, EditData editData)
         {
+            _logger.LogDebug($"edit. siteId: {siteId}, contentId: {contentId}, userId: {userId}, editData: {SerializeData(editData)}");
+
             var columnNames = GetColumnNamesByNetNames(siteId, new List<string> { nameof(editData.Title), nameof(editData.IsVisible), nameof(editData.IsInSiteMap) });
             if (!columnNames.ContainsKey(nameof(editData.Title)))
                 throw new Exception("NetName for field Title not found");
@@ -49,6 +54,8 @@ namespace QA.Engine.Administration.Data.Core
                 throw new Exception("NetName for field IsVisible not found");
             if (!columnNames.ContainsKey(nameof(editData.IsInSiteMap)))
                 throw new Exception("NetName for field IsInSiteMap not found");
+
+            _logger.LogDebug($"edit. column names: {SerializeData(columnNames)}");
 
             _qpDbConnector.BeginTransaction(IsolationLevel.Serializable);
 
@@ -62,6 +69,8 @@ namespace QA.Engine.Administration.Data.Core
                     { columnNames[nameof(editData.IsInSiteMap)], Convert.ToInt32(editData.IsInSiteMap).ToString() }
                 };
 
+                _logger.LogDebug($"edit. mass update. contentId: {contentId}, values: {SerializeData(value)}");
+
                 _qpDbConnector.DbConnector.MassUpdate(contentId, new[] { value }, userId);
 
                 if (editData.ExtensionId.HasValue && editData.Fields.Any())
@@ -73,15 +82,22 @@ namespace QA.Engine.Administration.Data.Core
                           .ContentName($"content_{editData.ExtensionId.Value}_united")
                           .Fields($"{ContentItemIdFieldName}")
                           .Where($"[ItemId] = '{editData.ItemId}'")
-                          .GetRealData();
-                    var extensionContentId = extentionContent.PrimaryContent.Select().Select(x => x[ContentItemIdFieldName].ToString()).FirstOrDefault();
+                          .GetRealData()
+                          .PrimaryContent
+                          .Select();
+
+                    _logger.LogTrace($"edit. get real data. extentionContent: {SerializeData(extentionContent)}");
+
+                    var extensionContentId = extentionContent.Select(x => x[ContentItemIdFieldName].ToString()).FirstOrDefault();
 
                     var extensionValue = new Dictionary<string, string>
-                {
-                    { ContentItemIdFieldName, extensionContentId }
-                };
+                    {
+                        { ContentItemIdFieldName, extensionContentId }
+                    };
                     foreach (var field in editData.Fields)
                         extensionValue.Add(field.FieldName, field.Value.ToString());
+
+                    _logger.LogDebug($"edit. mass update. contentId: {editData.ExtensionId.Value}, values: {SerializeData(extensionValue)}");
 
                     _qpDbConnector.DbConnector.MassUpdate(editData.ExtensionId.Value, new[] { extensionValue }, userId);
                 }
@@ -96,6 +112,8 @@ namespace QA.Engine.Administration.Data.Core
 
         public void Publish(int siteId, int contentId, int userId, IEnumerable<AbstractItemData> items, int statusId)
         {
+            _logger.LogDebug($"publish. siteId: {siteId}, contentId: {contentId}, userId: {userId}, statusId: {statusId}, items: {SerializeData(items.Select(x => new { x.Id, x.ExtensionId }))}");
+
             _qpDbConnector.BeginTransaction(IsolationLevel.Serializable);
 
             try
@@ -108,6 +126,9 @@ namespace QA.Engine.Administration.Data.Core
                     { ContentItemIdFieldName, x.Id.ToString(CultureInfo.InvariantCulture) },
                     { StatusTypeIdFieldName, statusId.ToString(CultureInfo.InvariantCulture) }
                 });
+
+                _logger.LogDebug($"publish. mass update. contentId: {contentId}, values: {SerializeData(values)}");
+
                 _qpDbConnector.DbConnector.MassUpdate(contentId, values, userId);
 
                 //update extantion
@@ -139,6 +160,8 @@ namespace QA.Engine.Administration.Data.Core
 
         public void Reorder(int siteId, int contentId, int userId, IEnumerable<AbstractItemData> items)
         {
+            _logger.LogDebug($"reorder. siteId: {siteId}, contentId: {contentId}, userId: {userId}, items: {SerializeData(items.Select(x => new { x.Id, x.IndexOrder }))}");
+
             _qpDbConnector.BeginTransaction(IsolationLevel.Serializable);
 
             try
@@ -147,13 +170,17 @@ namespace QA.Engine.Administration.Data.Core
                 if (string.IsNullOrWhiteSpace(columnName))
                     throw new Exception("NetName for field IndexOrder not found");
 
+                _logger.LogDebug($"reorder. column name: {columnName}");
+
                 var values = items
                     .Where(x => x.IndexOrder.HasValue)
                     .Select(x => new Dictionary<string, string>
                     {
-                    { ContentItemIdFieldName, x.Id.ToString(CultureInfo.InvariantCulture) },
-                    { columnName, x.IndexOrder.Value.ToString(CultureInfo.InvariantCulture) }
+                        { ContentItemIdFieldName, x.Id.ToString(CultureInfo.InvariantCulture) },
+                        { columnName, x.IndexOrder.Value.ToString(CultureInfo.InvariantCulture) }
                     });
+
+                _logger.LogDebug($"reorder. mass update. contentId: {contentId}, values: {SerializeData(values)}");
 
                 _qpDbConnector.DbConnector.MassUpdate(contentId, values, userId);
                 _qpDbConnector.CommitTransaction();
@@ -167,6 +194,8 @@ namespace QA.Engine.Administration.Data.Core
 
         public void Move(int siteId, int contentId, int userId, int itemId, int newParentId)
         {
+            _logger.LogDebug($"move. siteId: {siteId}, contentId: {contentId}, userId: {userId}, itemId: {itemId}, newParentId: {newParentId}");
+
             _qpDbConnector.BeginTransaction(IsolationLevel.Serializable);
 
             try
@@ -175,11 +204,15 @@ namespace QA.Engine.Administration.Data.Core
                 if (string.IsNullOrWhiteSpace(columnName))
                     throw new Exception("NetName for field Parent not found");
 
+                _logger.LogDebug($"move. column name: {columnName}");
+
                 var values = new Dictionary<string, string>
                 {
                     { ContentItemIdFieldName, itemId.ToString(CultureInfo.InvariantCulture) },
                     { columnName, newParentId.ToString(CultureInfo.InvariantCulture) }
                 };
+
+                _logger.LogDebug($"move. mass update. contentId: {contentId}, values: {SerializeData(values)}");
 
                 _qpDbConnector.DbConnector.MassUpdate(contentId, new[] { values }, userId);
                 _qpDbConnector.CommitTransaction();
@@ -193,6 +226,8 @@ namespace QA.Engine.Administration.Data.Core
 
         public void Remove(int siteId, int contentId, int userId, IEnumerable<AbstractItemData> items, AbstractItemData moveContentVersion)
         {
+            _logger.LogDebug($"remove. siteId: {siteId}, contentId: {contentId}, userId: {userId}, items: {SerializeData(items.Select(x => new { x.Id, x.ExtensionId }))}, moveContentVersion: {SerializeData(new { moveContentVersion.Id, moveContentVersion.Alias, moveContentVersion.ParentId })}");
+
             _qpDbConnector.BeginTransaction(IsolationLevel.Serializable);
 
             try
@@ -207,6 +242,9 @@ namespace QA.Engine.Administration.Data.Core
                         { ContentItemIdFieldName, x.Id.ToString(CultureInfo.InvariantCulture) },
                         { ArchiveFieldName, "1" }
                     });
+
+                    _logger.LogDebug($"remove. mass update. contentId: {contentId}, values: {SerializeData(values)}");
+
                     _qpDbConnector.DbConnector.MassUpdate(contentId, values, userId);
 
                     //update extantion
@@ -243,6 +281,8 @@ namespace QA.Engine.Administration.Data.Core
 
         public void Restore(int siteId, int contentId, int userId, IEnumerable<AbstractItemData> items)
         {
+            _logger.LogDebug($"restore. siteId: {siteId}, contentId: {contentId}, userId: {userId}, items: {SerializeData(items.Select(x => new { x.Id, x.ExtensionId }))}");
+
             _qpDbConnector.BeginTransaction(IsolationLevel.Serializable);
 
             try
@@ -255,6 +295,9 @@ namespace QA.Engine.Administration.Data.Core
                     { ContentItemIdFieldName, x.Id.ToString(CultureInfo.InvariantCulture) },
                     { ArchiveFieldName, "0" }
                 });
+
+                _logger.LogDebug($"restore. mass update. contentId: {contentId}, values: {SerializeData(values)}");
+
                 _qpDbConnector.DbConnector.MassUpdate(contentId, values, userId);
 
                 //update extantion
@@ -286,6 +329,8 @@ namespace QA.Engine.Administration.Data.Core
 
         public void Delete(int siteId, int contentId, int userId, IEnumerable<AbstractItemData> items)
         {
+            _logger.LogDebug($"delete. siteId: {siteId}, contentId: {contentId}, userId: {userId}, items: {SerializeData(items.Select(x => new { x.Id, x.ExtensionId }))}");
+
             _qpDbConnector.BeginTransaction(IsolationLevel.Serializable);
 
             try
@@ -334,6 +379,8 @@ namespace QA.Engine.Administration.Data.Core
 
         private void MoveUpContentVersion(int siteId, int contentId, int userId, AbstractItemData item, string siteName)
         {
+            _logger.LogDebug($"moveUpContentVersion. siteId: {siteId}, contentId: {contentId}, userId: {userId}, siteName: {siteName}, item: {SerializeData(new { item.Id, item.Alias, item.ParentId })}");
+
             var columnNames = GetColumnNamesByNetNames(siteId, new List<string> { "Name", "Parent", "VersionOf", "IsPage" });
             if (!columnNames.ContainsKey("Name"))
                 throw new Exception("NetName for field Name not found");
@@ -343,6 +390,8 @@ namespace QA.Engine.Administration.Data.Core
                 throw new Exception("NetName for field VersionOf not found");
             if (!columnNames.ContainsKey("IsPage"))
                 throw new Exception("NetName for field IsPage not found");
+
+            _logger.LogDebug($"moveUpContentVersion. column names: {string.Join(";", columnNames.Select(x => $"key: {x.Key}, value: ${x.Value}"))}");
 
             var value = new Dictionary<string, string> { { ContentItemIdFieldName, item.Id.ToString(CultureInfo.InvariantCulture) } };
             foreach (var x in columnNames)
@@ -365,6 +414,9 @@ namespace QA.Engine.Administration.Data.Core
                         break;
                 }
             }
+
+            _logger.LogDebug($"restore. mass update. contentId: {contentId}, values: {SerializeData(value)}");
+
             _qpDbConnector.DbConnector.MassUpdate(contentId, new[] { value }, userId);
         }
 
@@ -397,5 +449,7 @@ namespace QA.Engine.Administration.Data.Core
             }
             return contentAttribute;
         }
+
+        private static string SerializeData(object data) => Newtonsoft.Json.JsonConvert.SerializeObject(data);
     }
 }

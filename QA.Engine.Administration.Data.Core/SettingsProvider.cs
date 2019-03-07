@@ -1,4 +1,5 @@
-﻿using QA.DotNetCore.Engine.Persistent.Interfaces;
+﻿using Microsoft.Extensions.Logging;
+using QA.DotNetCore.Engine.Persistent.Interfaces;
 using QA.Engine.Administration.Data.Core.Qp;
 using QA.Engine.Administration.Data.Interfaces.Core;
 using QA.Engine.Administration.Data.Interfaces.Core.Models;
@@ -14,32 +15,39 @@ namespace QA.Engine.Administration.Data.Core
         private readonly IQpMetadataManager _qpMetadataManager;
         private readonly IQpContentManager _qpContentManager;
         private readonly IQpDbConnector _qpDbConnector;
+        private readonly ILogger<SettingsProvider> _logger;
 
         private string AbstractItemNetName => "QPAbstractItem";
         private string RegionNetName => "QPRegion";
 
-        public SettingsProvider(IMetaInfoRepository metaInfoRepository, IQpMetadataManager qpMetadataManager, IQpContentManager qpContentManager, IQpDbConnector qpDbConnector)
+        public SettingsProvider(IMetaInfoRepository metaInfoRepository, IQpMetadataManager qpMetadataManager, IQpContentManager qpContentManager, IQpDbConnector qpDbConnector, ILogger<SettingsProvider> logger)
         {
             _metaInfoRepository = metaInfoRepository;
             _qpMetadataManager = qpMetadataManager;
             _qpContentManager = qpContentManager;
             _qpDbConnector = qpDbConnector;
+            _logger = logger;
         }
 
         public int GetContentId(int siteId)
         {
+            _logger.LogDebug($"getContent. siteId: {siteId}");
             var content = _metaInfoRepository.GetContent(AbstractItemNetName, siteId);
+            _logger.LogDebug($"getContent. contentId: {content.ContentId}");
             return content.ContentId;
         }
 
         public bool HasRegion(int siteId)
         {
+            _logger.LogDebug($"hasRegion. siteId: {siteId}");
             var content = _metaInfoRepository.GetContent(RegionNetName, siteId);
+            _logger.LogDebug($"hasRegion. hasregion: {content != null}");
             return content != null;
         }
 
         public QpContentData GetContent(int siteId, string contentName)
         {
+            _logger.LogDebug($"getContent. siteId: {siteId}, contentName: {contentName}");
             var siteName = _qpMetadataManager.GetSiteName(siteId);
             var contents = _qpContentManager
                       .Connect()
@@ -56,11 +64,14 @@ namespace QA.Engine.Administration.Data.Core
                     Name = x["NET_CONTENT_NAME"].ToString()
                 }).ToList();
 
+            _logger.LogDebug($"getContent. contentId: {result.FirstOrDefault()?.Id}, contentName: {result.FirstOrDefault()?.Name }");
+
             return result.FirstOrDefault();
         }
 
         public List<QpFieldData> GetFields(int siteId, int contentId)
         {
+            _logger.LogDebug($"getFields. siteId: {siteId}, contentId: {contentId}");
             var siteName = _qpMetadataManager.GetSiteName(siteId);
             var fields = _qpContentManager
                 .Connect()
@@ -77,13 +88,17 @@ namespace QA.Engine.Administration.Data.Core
                     Name = x["NET_ATTRIBUTE_NAME"].ToString()
                 }).ToList();
 
+            _logger.LogDebug($"getFields. fields: {Newtonsoft.Json.JsonConvert.SerializeObject(result)}");
+
             return result;
         }
 
         public string GetIconUrl(int siteId)
         {
+            _logger.LogDebug($"getIconUrl. siteId: {siteId}");
             var fieldId = _qpDbConnector.DbConnector.GetAttributeIdByNetNames(siteId, "QPDiscriminator", "IconUrl");
             var url = _qpDbConnector.DbConnector.GetUrlForFileAttribute(fieldId, true, false);
+            _logger.LogDebug($"getIconUrl. url: {url}");
             return url;
         }
     }

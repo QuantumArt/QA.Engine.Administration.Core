@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Microsoft.Extensions.Logging;
 using QA.DotNetCore.Engine.Persistent.Interfaces;
 using QA.Engine.Administration.Data.Core.Qp;
 using QA.Engine.Administration.Data.Interfaces.Core;
@@ -15,12 +16,14 @@ namespace QA.Engine.Administration.Data.Core
         private readonly IDbConnection _connection;
         private readonly INetNameQueryAnalyzer _netNameQueryAnalyzer;
         private readonly IMetaInfoRepository _metaInfoRepository;
+        private readonly ILogger<SiteMapProvider> _logger;
 
-        public SiteMapProvider(IUnitOfWork uow, INetNameQueryAnalyzer netNameQueryAnalyzer, IMetaInfoRepository metaInfoRepository)
+        public SiteMapProvider(IUnitOfWork uow, INetNameQueryAnalyzer netNameQueryAnalyzer, IMetaInfoRepository metaInfoRepository, ILogger<SiteMapProvider> logger)
         {
             _connection = uow.Connection;
             _netNameQueryAnalyzer = netNameQueryAnalyzer;
             _metaInfoRepository = metaInfoRepository;
+            _logger = logger;
         }
 
         #region запросы с использованием NetName таблиц и столбцов
@@ -221,19 +224,26 @@ ORDER BY ai.content_item_id";
 
         public List<AbstractItemData> GetAllItems(int siteId, bool isArchive, bool useRegion)
         {
+            _logger.LogDebug($"getAllItems. siteId: {siteId}, isArchive: {isArchive}, useRegion: {useRegion}");
             string query;
             if (!useRegion)
             {
                 query = _netNameQueryAnalyzer.PrepareQueryExtabtion(_metaInfoRepository, CmdGetAllAbstractItems, siteId);
-                return _connection.Query<AbstractItemData>(query, new { Archive = isArchive }).ToList();
+                var result = _connection.Query<AbstractItemData>(query, new { Archive = isArchive }).ToList();
+                _logger.LogDebug($"getAllItems. count: {result.Count()}");
+                return result;
             }
 
             query = _netNameQueryAnalyzer.PrepareQueryExtabtion(_metaInfoRepository, CmdGetAllAbstractItemsWithRegions, siteId);
-            return GetWithRegions(_connection, query, isArchive);
+            var resultWithRegions = GetWithRegions(_connection, query, isArchive);
+            _logger.LogDebug($"getAllItems. count: {resultWithRegions.Count()}");
+            return resultWithRegions;
         }
 
         public List<AbstractItemData> GetItems(int siteId, bool isArchive, IEnumerable<int> parentIds, bool useRegion)
         {
+            _logger.LogDebug($"getItems. siteId: {siteId}, isArchive: {isArchive}, useRegion: {useRegion}, parentIds: {SerializeData(parentIds)}");
+
             const int maxParentIdsPerRequest = 500;
 
             string query = useRegion 
@@ -246,7 +256,9 @@ ORDER BY ai.content_item_id";
 
                 if (!useRegion)
                     return _connection.Query<AbstractItemData>(query, new { Archive = isArchive }).ToList();
-                return GetWithRegions(_connection, query, isArchive);
+                var resultWithRegions = GetWithRegions(_connection, query, isArchive);
+                _logger.LogDebug($"getItems. count: {resultWithRegions.Count()}");
+                return resultWithRegions;
             }
             else
             {
@@ -258,6 +270,7 @@ ORDER BY ai.content_item_id";
                         int[] r = parentIds.Skip(i * maxParentIdsPerRequest).Take(maxParentIdsPerRequest).ToArray();
                         result.AddRange(GetItems(siteId, isArchive, r, useRegion));
                     }
+                    _logger.LogDebug($"getItems. count: {result.Count()}");
                     return result;
                 }
                 else
@@ -265,26 +278,35 @@ ORDER BY ai.content_item_id";
                     query = string.Format(query, "IN @ParentIds");
                     if (!useRegion)
                         return _connection.Query<AbstractItemData>(query, new { Archive = isArchive, ParentIds = parentIds }).ToList();
-                    return GetWithRegions(_connection, query, isArchive, parentIds);
+                    var resultWithRegions = GetWithRegions(_connection, query, isArchive, parentIds);
+                    _logger.LogDebug($"getItems. count: {resultWithRegions.Count()}");
+                    return resultWithRegions;
                 }
             }
         }
 
         public List<AbstractItemData> GetByIds(int siteId, bool isArchive, IEnumerable<int> itemIds)
         {
+            _logger.LogDebug($"getByIds. siteId: {siteId}, isArchive: {isArchive}, itemIds: {SerializeData(itemIds)}");
+
             if (itemIds == null || !itemIds.Any())
                 throw new ArgumentNullException("itemIds");
             if (itemIds.Any(x => x <= 0))
                 throw new ArgumentException("itemId <= 0");
 
             var query = _netNameQueryAnalyzer.PrepareQueryExtabtion(_metaInfoRepository, CmdGetAbstractItemByIds, siteId);
-            return _connection.Query<AbstractItemData>(query, new { Archive = isArchive, ItemIds = itemIds }).ToList();
+            var result = _connection.Query<AbstractItemData>(query, new { Archive = isArchive, ItemIds = itemIds }).ToList();
+            _logger.LogDebug($"getByIds. count: {result.Count()}, result: {SerializeData(result)}");
+            return result;
         }
 
         public AbstractItemData GetRootPage(int siteId)
         {
+            _logger.LogDebug($"getRootPage. siteId: {siteId}");
             var query = _netNameQueryAnalyzer.PrepareQueryExtabtion(_metaInfoRepository, CmdGetRootPage, siteId);
-            return _connection.Query<AbstractItemData>(query).FirstOrDefault();
+            var result = _connection.Query<AbstractItemData>(query).FirstOrDefault();
+            _logger.LogDebug($"getRootPage. result: {SerializeData(result)}");
+            return result;
         }
 
         private static List<AbstractItemData> GetWithRegions(IDbConnection connection, string query, bool isArchive, IEnumerable<int> parentIds = null)
@@ -310,5 +332,7 @@ ORDER BY ai.content_item_id";
                 return abstractItems;
             }
         }
+
+        private static string SerializeData(object data) => Newtonsoft.Json.JsonConvert.SerializeObject(data);
     }
 }

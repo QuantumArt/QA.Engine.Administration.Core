@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Microsoft.Extensions.Logging;
 using QA.DotNetCore.Engine.Persistent.Interfaces;
 using QA.Engine.Administration.Data.Interfaces.Core;
 using QA.Engine.Administration.Data.Interfaces.Core.Models;
@@ -13,12 +14,14 @@ namespace QA.Engine.Administration.Data.Core
         private readonly IDbConnection _connection;
         private readonly INetNameQueryAnalyzer _netNameQueryAnalyzer;
         private readonly IMetaInfoRepository _metaInfoRepository;
+        private readonly ILogger<ItemExtensionProvider> _logger;
 
-        public ItemExtensionProvider(IUnitOfWork uow, INetNameQueryAnalyzer netNameQueryAnalyzer, IMetaInfoRepository metaInfoRepository)
+        public ItemExtensionProvider(IUnitOfWork uow, INetNameQueryAnalyzer netNameQueryAnalyzer, IMetaInfoRepository metaInfoRepository, ILogger<ItemExtensionProvider> logger)
         {
             _connection = uow.Connection;
             _netNameQueryAnalyzer = netNameQueryAnalyzer;
             _metaInfoRepository = metaInfoRepository;
+            _logger = logger;
         }
 
         private const string CmdGetExtantionItems = @"
@@ -34,6 +37,7 @@ SELECT * FROM content_{1}_united WHERE ItemId={2}
 
         public List<FieldAttributeData> GetItemExtensionFields(int siteId, int id, int extensionId)
         {
+            _logger.LogDebug($"getItemExtensionFields. siteId: {siteId}, id: {id}, extensionId: {extensionId}");
             var query = string.Format(CmdGetExtantionItems, extensionId, extensionId, id);
             using (var multi = _connection.QueryMultiple(query))
             {
@@ -44,6 +48,8 @@ SELECT * FROM content_{1}_united WHERE ItemId={2}
 
                 foreach(var field in fieldNames)
                     field.Value = dict.Where(x => x.Key == field.FieldName).FirstOrDefault().Value;
+
+                _logger.LogDebug($"getItemExtensionFields. fieldNames: {Newtonsoft.Json.JsonConvert.SerializeObject(fieldNames)}");
 
                 return fieldNames;
             }

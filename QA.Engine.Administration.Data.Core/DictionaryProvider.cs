@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Microsoft.Extensions.Logging;
 using QA.DotNetCore.Engine.Persistent.Interfaces;
 using QA.Engin.Administration.Common.Core;
 using QA.Engine.Administration.Data.Interfaces.Core;
@@ -14,12 +15,14 @@ namespace QA.Engine.Administration.Data.Core
         private readonly IDbConnection _connection;
         private readonly INetNameQueryAnalyzer _netNameQueryAnalyzer;
         private readonly IMetaInfoRepository _metaInfoRepository;
+        private readonly ILogger<DictionaryProvider> _logger;
 
-        public DictionaryProvider(IUnitOfWork uow, INetNameQueryAnalyzer netNameQueryAnalyzer, IMetaInfoRepository metaInfoRepository)
+        public DictionaryProvider(IUnitOfWork uow, INetNameQueryAnalyzer netNameQueryAnalyzer, IMetaInfoRepository metaInfoRepository, ILogger<DictionaryProvider> logger)
         {
             _connection = uow.Connection;
             _netNameQueryAnalyzer = netNameQueryAnalyzer;
             _metaInfoRepository = metaInfoRepository;
+            _logger = logger;
         }
 
         private const string CmdGetAllItemDefinitions = @"
@@ -64,24 +67,36 @@ WHERE reg.ARCHIVE = 0
 
         public List<ItemDefinitionData> GetAllItemDefinitions(int siteId)
         {
+            _logger.LogDebug($"getAllItemDefinitions. siteId: {siteId}");
             var query = _netNameQueryAnalyzer.PrepareQueryExtabtion(_metaInfoRepository, CmdGetAllItemDefinitions, siteId);
-            return _connection.Query<ItemDefinitionData>(query).ToList();
+            var result = _connection.Query<ItemDefinitionData>(query).ToList();
+            _logger.LogDebug($"getAllItemDefinitions. total: {result.Count()}");
+            return result;
         }
 
         public List<StatusTypeData> GetAllStatusTypes(int siteId)
         {
-            return _connection.Query<StatusTypeData>(CmdGetAllStatusTypes, new { SiteId = siteId }).ToList();
+            _logger.LogDebug($"getAllStatusTypes. siteId: {siteId}");
+            var result = _connection.Query<StatusTypeData>(CmdGetAllStatusTypes, new { SiteId = siteId }).ToList();
+            _logger.LogDebug($"getAllStatusTypes. total: {result.Count()}");
+            return result;
         }
 
         public StatusTypeData GetStatusType(int siteId, QpContentItemStatus status)
         {
-            return _connection.QueryFirst<StatusTypeData>(CmdGetStatusTypeById, new { SiteId = siteId, Status = status.GetDescription() });
+            _logger.LogDebug($"getStatusType. siteId: {siteId}, status: {status}");
+            var result = _connection.QueryFirst<StatusTypeData>(CmdGetStatusTypeById, new { SiteId = siteId, Status = status.GetDescription() });
+            _logger.LogDebug($"getStatusType. statusId: {result.Id}, statusName: {result.Name}");
+            return result;
         }
 
         public List<RegionData> GetAllRegions(int siteId)
         {
+            _logger.LogDebug($"getAllRegions. siteId: {siteId}");
             var query = _netNameQueryAnalyzer.PrepareQueryExtabtion(_metaInfoRepository, CmdGetAllRegions, siteId);
-            return _connection.Query<RegionData>(query).ToList();
+            var result = _connection.Query<RegionData>(query).ToList();
+            _logger.LogDebug($"getAllRegions. total: {result.Count()}");
+            return result;
         }
     }
 }
