@@ -55,7 +55,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpGet("getSiteMapTree")]
         public ApiResult<List<PageModel>> GetSiteMapTree([FromQuery]int[] regionIds = null)
         {
-            _logger.LogTrace($"getSiteMapTree regionIds={string.Join(", ", regionIds)}, userId={_userId}");
+            _logger.LogDebug($"getSiteMapTree regionIds={string.Join(", ", regionIds)}, userId={_userId}");
             var siteMap = _siteMapService.GetSiteMapTree(_siteId, regionIds, _useHierarchyRegionFilter);
             return ApiResult<List<PageModel>>.Success(siteMap);
         }
@@ -67,7 +67,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpGet("getSiteMapSubTree")]
         public ApiResult<PageModel> GetSiteMapSubTree(int id, [FromQuery]int[] regionIds = null)
         {
-            _logger.LogTrace($"getSiteMapSubTree id={id}, regionIds={string.Join(", ", regionIds)}, userId={_userId}");
+            _logger.LogDebug($"getSiteMapSubTree id={id}, regionIds={string.Join(", ", regionIds)}, userId={_userId}");
             var siteMap = _siteMapService.GetSiteMapSubTree(_siteId, id, regionIds, _useHierarchyRegionFilter);
             return ApiResult<PageModel>.Success(siteMap);
         }
@@ -79,7 +79,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpGet("getArchiveTree")]
         public ApiResult<List<ArchiveModel>> GetArchiveTree()
         {
-            _logger.LogTrace($"getArchiveTree userId={_userId}");
+            _logger.LogDebug($"getArchiveTree userId={_userId}");
             var archive = _siteMapService.GetArchiveTree(_siteId);
             return ApiResult<List<ArchiveModel>>.Success(archive);
         }
@@ -91,7 +91,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpGet("getArchiveSubTree")]
         public ApiResult<ArchiveModel> GetArchiveSubTree(int id)
         {
-            _logger.LogTrace($"getArchiveSubTree id={id}, userId={_userId}");
+            _logger.LogDebug($"getArchiveSubTree id={id}, userId={_userId}");
             var archive = _siteMapService.GetArchiveSubTree(_siteId, id);
             return ApiResult<ArchiveModel>.Success(archive);
         }
@@ -106,7 +106,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpGet("getPageTree")]
         public ApiResult<List<PageModel>> GetPageTree(bool isArchive, int? parentId, [FromQuery]int[] regionIds = null)
         {
-            _logger.LogTrace($"getPageTree isArchive={isArchive}, parentId={parentId}, regionIds={string.Join(", ", regionIds)}, userId={_userId}");
+            _logger.LogDebug($"getPageTree isArchive={isArchive}, parentId={parentId}, regionIds={string.Join(", ", regionIds)}, userId={_userId}");
             var siteMap = _siteMapService.GetSiteMapItems(_siteId, isArchive, parentId, regionIds, _useHierarchyRegionFilter);
             return ApiResult<List<PageModel>>.Success(siteMap);
         }
@@ -121,7 +121,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpGet("getWidgetTree")]
         public ApiResult<List<WidgetModel>> GetWidgetTree(bool isArchive, int parentId, [FromQuery]int[] regionIds = null)
         {
-            _logger.LogTrace($"getWidgetTree isArchive={isArchive}, parentId={parentId}, regionIds={string.Join(", ", regionIds)}, userId={_userId}");
+            _logger.LogDebug($"getWidgetTree isArchive={isArchive}, parentId={parentId}, regionIds={string.Join(", ", regionIds)}, userId={_userId}");
             var widgets = _siteMapService.GetWidgetItems(_siteId, isArchive, parentId, regionIds, _useHierarchyRegionFilter);
             return ApiResult<List<WidgetModel>>.Success(widgets);
         }
@@ -135,6 +135,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpGet("getExtantionFields")]
         public ApiResult<List<ExtensionFieldModel>> GetExtantionFields(int id, int extantionId)
         {
+            _logger.LogDebug($"getExtantionFields id={id}, extensionId={extantionId}");
             var fields = _siteMapService.GetItemExtantionFields(_siteId, id, extantionId);
             return ApiResult<List<ExtensionFieldModel>>.Success(fields);
         }
@@ -147,7 +148,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpPost("publish")]
         public ApiResult Publish([FromBody]List<int> itemIds)
         {
-            _logger.LogTrace($"publish itemIds={itemIds}, userId={_userId}");
+            _logger.LogDebug($"publish itemIds={itemIds}, userId={_userId}");
             _siteMapModifyService.PublishSiteMapItems(_siteId, _userId, itemIds);
             return ApiResult.Success();
         }
@@ -160,7 +161,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpPost("reorder")]
         public ApiResult Reorder([FromBody]ReorderModel model)
         {
-            _logger.LogTrace($"publish model={Newtonsoft.Json.JsonConvert.SerializeObject(model)}, userId={_userId}");
+            _logger.LogDebug($"publish model={Newtonsoft.Json.JsonConvert.SerializeObject(model)}, userId={_userId}");
             _siteMapModifyService.ReorderSiteMapItems(_siteId, _userId, model.ItemId, model.RelatedItemId, model.IsInsertBefore, _step);
             return ApiResult.Success();
         }
@@ -173,7 +174,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpPost("move")]
         public ApiResult Move([FromBody]MoveModel model)
         {
-            _logger.LogTrace($"move model={Newtonsoft.Json.JsonConvert.SerializeObject(model)}, userId={_userId}");
+            _logger.LogDebug($"move model={Newtonsoft.Json.JsonConvert.SerializeObject(model)}, userId={_userId}");
             _siteMapModifyService.MoveSiteMapItem(_siteId, _userId, model.ItemId, model.NewParentId);
             return ApiResult.Success();
         }
@@ -186,7 +187,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpPost("edit")]
         public ApiResult Edit([FromBody]EditModel model)
         {
-            _logger.LogTrace($"publish edit={Newtonsoft.Json.JsonConvert.SerializeObject(model)}, userId={_userId}");
+            _logger.LogDebug($"publish edit={Newtonsoft.Json.JsonConvert.SerializeObject(model)}, userId={_userId}");
             _siteMapModifyService.EditSiteMapItem(_siteId, _userId, model);
             return ApiResult.Success();
         }
@@ -199,7 +200,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpPost("archive")]
         public ApiResult Archive([FromBody]RemoveModel model)
         {
-            _logger.LogTrace($"remove model={Newtonsoft.Json.JsonConvert.SerializeObject(model)}, userId={_userId}");
+            _logger.LogDebug($"remove model={Newtonsoft.Json.JsonConvert.SerializeObject(model)}, userId={_userId}");
             _siteMapModifyService.RemoveSiteMapItems(
                 _siteId, _userId, model.ItemId,
                 model.IsDeleteAllVersions ?? false,
@@ -216,7 +217,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpPost("restore")]
         public ApiResult Restore([FromBody]RestoreModel model)
         {
-            _logger.LogTrace($"restore model={Newtonsoft.Json.JsonConvert.SerializeObject(model)}, userId={_userId}");
+            _logger.LogDebug($"restore model={Newtonsoft.Json.JsonConvert.SerializeObject(model)}, userId={_userId}");
             _siteMapModifyService.RestoreSiteMapItems(
                 _siteId, _userId, model.ItemId,
                 model.IsRestoreAllVersions ?? false,
@@ -234,7 +235,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpPost("delete")]
         public ApiResult Delete([FromBody]DeleteModel model)
         {
-            _logger.LogTrace($"delete model={Newtonsoft.Json.JsonConvert.SerializeObject(model)}, userId={_userId}");
+            _logger.LogDebug($"delete model={Newtonsoft.Json.JsonConvert.SerializeObject(model)}, userId={_userId}");
             _siteMapModifyService.DeleteSiteMapItems(
                 _siteId, _userId, model.ItemId,
                 model.IsDeleteAllVersions ?? false);

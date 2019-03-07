@@ -1,12 +1,17 @@
 {
-  "$schema": "http://json.schemastore.org/launchsettings.json",
   "iisSettings": {
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
+    "iis": {
+      "applicationUrl": "http://localhost:3001/",
+      "sslPort": 0
+    },
     "iisExpress": {
-      "applicationUrl": "http://mscpc43:84"
+      "applicationUrl": "http://mscpc43:84",
+      "sslPort": 0
     }
   },
+  "$schema": "http://json.schemastore.org/launchsettings.json",
   "profiles": {
     "IIS Express": {
       "commandName": "IISExpress",
@@ -26,37 +31,42 @@
     },
     "Development": {
       "commandName": "Project",
-      "launchBrowser": false,
       "launchUrl": "?backend_sid=c3386b2f-e098-4dfb-a794-e774cba9fcfc&site_id=52&param_name=site_id&customerCode=qa_demosite&actionCode=custom_635494192491212659&hostUID=fc4a5aa1-48b9-4a3a-84c1-bcd99a8a8ff3",
-      "applicationUrl": "http://localhost:3001",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "applicationUrl": "http://localhost:3001"
     },
     "Development Bee": {
       "commandName": "Project",
-      "launchBrowser": false,
       "launchUrl": "?backend_sid=98156264-5519-472e-8928-a23a0d0b0238&site_id=35&param_name=site_id&customerCode=qp_beeline_main_ge&actionCode=custom_634901353592264365&hostUID=c9dc51c6-6f19-4c72-942b-6da8f1b7d362",
-      "applicationUrl": "http://localhost:3001",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "applicationUrl": "http://localhost:3001"
     },
     "QA.Engine.Administration.WebApp.Core": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "?backend_sid=c3386b2f-e098-4dfb-a794-e774cba9fcfc&site_id=52&param_name=site_id&customerCode=qa_demosite&actionCode=custom_635494192491212659&hostUID=fc4a5aa1-48b9-4a3a-84c1-bcd99a8a8ff3",
-      "applicationUrl": "http://localhost:3001",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "applicationUrl": "http://localhost:3001"
     },
-
     "QA.Engine.Administration.WebApp.Core.Bee": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "Home/Dev?backend_sid=98156264-5519-472e-8928-a23a0d0b0238&site_id=35&param_name=site_id&customerCode=qp_beeline_main_ge&actionCode=custom_634901353592264365&hostUID=c9dc51c6-6f19-4c72-942b-6da8f1b7d362",
-      "applicationUrl": "http://localhost:84;https://localhost:5001",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "http://localhost:84;https://localhost:5001"
+    },
+    "IIS": {
+      "commandName": "IIS",
+      "launchBrowser": true,
+      "launchUrl": "?backend_sid=c3386b2f-e098-4dfb-a794-e774cba9fcfc&site_id=52&param_name=site_id&customerCode=qa_demosite&actionCode=custom_635494192491212659&hostUID=fc4a5aa1-48b9-4a3a-84c1-bcd99a8a8ff3",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
