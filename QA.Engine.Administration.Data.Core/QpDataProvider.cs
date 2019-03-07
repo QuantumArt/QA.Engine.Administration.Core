@@ -47,11 +47,9 @@ namespace QA.Engine.Administration.Data.Core
         {
             _logger.LogDebug($"edit. siteId: {siteId}, contentId: {contentId}, userId: {userId}, editData: {SerializeData(editData)}");
 
-            var columnNames = GetColumnNamesByNetNames(siteId, new List<string> { nameof(editData.Title), nameof(editData.IsVisible), nameof(editData.IsInSiteMap) });
+            var columnNames = GetColumnNamesByNetNames(siteId, new List<string> { nameof(editData.Title), nameof(editData.IsInSiteMap) });
             if (!columnNames.ContainsKey(nameof(editData.Title)))
                 throw new Exception("NetName for field Title not found");
-            if (!columnNames.ContainsKey(nameof(editData.IsVisible)))
-                throw new Exception("NetName for field IsVisible not found");
             if (!columnNames.ContainsKey(nameof(editData.IsInSiteMap)))
                 throw new Exception("NetName for field IsInSiteMap not found");
 
@@ -65,7 +63,6 @@ namespace QA.Engine.Administration.Data.Core
                 {
                     { ContentItemIdFieldName, editData.ItemId.ToString(CultureInfo.InvariantCulture) },
                     { columnNames[nameof(editData.Title)], editData.Title },
-                    { columnNames[nameof(editData.IsVisible)], Convert.ToInt32(editData.IsVisible).ToString() },
                     { columnNames[nameof(editData.IsInSiteMap)], Convert.ToInt32(editData.IsInSiteMap).ToString() }
                 };
 
@@ -73,34 +70,6 @@ namespace QA.Engine.Administration.Data.Core
 
                 _qpDbConnector.DbConnector.MassUpdate(contentId, new[] { value }, userId);
 
-                if (editData.ExtensionId.HasValue && editData.Fields.Any())
-                {
-                    var siteName = _qpMetadataManager.GetSiteName(siteId);
-                    var extentionContent = _qpContentManager
-                          .Connect()
-                          .SiteName(siteName)
-                          .ContentName($"content_{editData.ExtensionId.Value}_united")
-                          .Fields($"{ContentItemIdFieldName}")
-                          .Where($"[ItemId] = '{editData.ItemId}'")
-                          .GetRealData()
-                          .PrimaryContent
-                          .Select();
-
-                    _logger.LogTrace($"edit. get real data. extentionContent: {SerializeData(extentionContent)}");
-
-                    var extensionContentId = extentionContent.Select(x => x[ContentItemIdFieldName].ToString()).FirstOrDefault();
-
-                    var extensionValue = new Dictionary<string, string>
-                    {
-                        { ContentItemIdFieldName, extensionContentId }
-                    };
-                    foreach (var field in editData.Fields)
-                        extensionValue.Add(field.FieldName, field.Value.ToString());
-
-                    _logger.LogDebug($"edit. mass update. contentId: {editData.ExtensionId.Value}, values: {SerializeData(extensionValue)}");
-
-                    _qpDbConnector.DbConnector.MassUpdate(editData.ExtensionId.Value, new[] { extensionValue }, userId);
-                }
                 _qpDbConnector.CommitTransaction();
             }
             catch

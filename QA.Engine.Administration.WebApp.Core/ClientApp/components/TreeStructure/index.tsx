@@ -20,6 +20,7 @@ import { CustomTree } from 'components/TreeStructure/CustomTree';
 import SiteTreeStore from 'stores/TreeStore/SiteTreeStore';
 import RegionSelect from 'components/Select/RegionSelect';
 import RegionStore from 'stores/RegionStore';
+import ArchiveTreeStore from 'stores/TreeStore/ArchiveTreeStore';
 
 interface Props {
     type: 'main' | 'widgets' | 'versions' | 'move';
@@ -81,6 +82,9 @@ export default class SiteTree extends React.Component<Props, State> {
                     x.init(tree.selectedNode);
                 });
                 treeStore.getMoveTreeStore().init(tree.selectedNode, tree.origTree);
+            }
+            if (selectedNodeId !== currentNodeId && type === 'main' && tree instanceof ArchiveTreeStore) {
+                editArticleStore.init(tree.selectedNode);
             }
 
             return false;

@@ -38,9 +38,6 @@ namespace QA.Engine.Administration.Services.Core
             if (item == null)
                 throw new InvalidOperationException($"Element {editModel.ItemId} not found");
 
-            if (editModel.ExtensionId.HasValue && editModel.ExtensionId != item.ExtensionId)
-                throw new InvalidOperationException($"Invalid extension ({editModel.ExtensionId}) for element {editModel.ItemId}");
-
             var contentId = _settingsProvider.GetContentId(siteId);
 
             var model = _mapper.Map<EditData>(editModel);

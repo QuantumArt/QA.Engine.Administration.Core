@@ -1,5 +1,4 @@
 ﻿using QA.Engin.Administration.Common.Core;
-using System.Collections.Generic;
 
 namespace QA.Engine.Administration.Services.Core.Models
 {
@@ -8,9 +7,6 @@ namespace QA.Engine.Administration.Services.Core.Models
     {
         public int ItemId { get; set; }
         public string Title { get; set; }
-        public bool IsVisible { get; set; }
         public bool IsInSiteMap { get; set; }
-        public int? ExtensionId { get; set; }
-        public List<ExtensionFieldModel> Fields { get; set; }
     }
 }

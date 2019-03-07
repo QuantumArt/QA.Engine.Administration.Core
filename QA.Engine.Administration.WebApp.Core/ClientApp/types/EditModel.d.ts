@@ -5,9 +5,6 @@
 declare interface EditModel {
   itemId: number;
   title: string;
-  isVisible: boolean;
   isInSiteMap: boolean;
-  extensionId?: null | number; // number 
-  fields: ExtensionFieldModel[];
 }
 

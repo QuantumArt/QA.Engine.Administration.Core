@@ -7,35 +7,21 @@ import ErrorsTypes from 'constants/ErrorsTypes';
 export default class EditArticleStore extends ErrorHandler {
 
     @observable public title: string;
-    @observable public isVisible: boolean;
     @observable public isInSiteMap: boolean;
 
     @observable public state: OperationState = OperationState.NONE;
-    @observable public fields: ExtensionFieldModel[] = [];
-    @observable public isShowExtensionFields: boolean = false;
     public isEditable: boolean;
     private node: PageModel | ArchiveModel;
-    private extensionFieldsJson: string = JSON.stringify([]);
-
-    @computed
-    get changedFields(): ExtensionFieldModel[] {
-        const orig: ExtensionFieldModel[] = JSON.parse(this.extensionFieldsJson);
-        return this.fields.filter(x =>
-            orig.filter(y =>
-                y.fieldName === x.fieldName && y.value !== x.value).length > 0);
-    }
 
     @action
     init(node: PageModel | ArchiveModel) {
         this.node = node;
         if (node == null) {
-            this.title = this.isVisible = this.isInSiteMap = this.isShowExtensionFields = this.isEditable = null;
+            this.title = this.isInSiteMap = this.isEditable = null;
             return;
         }
         this.title = node.title;
-        this.isVisible = node.isVisible;
         this.isInSiteMap = node.isInSiteMap;
-        this.isShowExtensionFields = false;
         this.isEditable = !node.isArchive;
     }
 
@@ -44,17 +30,8 @@ export default class EditArticleStore extends ErrorHandler {
         this.title = title;
     }
     @action
-    setIsVisible(isVisible: boolean) {
-        this.isVisible = isVisible;
-    }
-    @action
     setIsInSiteMap(isInSiteMap: boolean) {
         this.isInSiteMap = isInSiteMap;
-    }
-
-    @action
-    showExtensionFields() {
-        this.isShowExtensionFields = true;
     }
 
     @action
@@ -65,8 +42,6 @@ export default class EditArticleStore extends ErrorHandler {
         try {
             const response: ApiResult<ExtensionFieldModel[]> = await SiteMapService.getExtantionFields(id, extantionId);
             if (response.isSuccess) {
-                this.fields = response.data;
-                this.extensionFieldsJson = JSON.stringify(this.fields.length > 0 ? this.fields : []);
                 this.state = OperationState.SUCCESS;
             } else {
                 throw response.error;

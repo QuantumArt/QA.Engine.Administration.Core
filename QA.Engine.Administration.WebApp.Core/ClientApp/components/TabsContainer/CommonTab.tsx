@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { observer, inject } from 'mobx-react';
 import { Button, Navbar, NavbarGroup, H5, Intent, Spinner, InputGroup, Checkbox } from '@blueprintjs/core';
-import ExtensionCard from './ExtensionCard';
 import OperationState from 'enums/OperationState';
 import SiteTreeStore from 'stores/TreeStore/SiteTreeStore';
 import TreeStore from 'stores/TreeStore';
@@ -37,28 +36,19 @@ export default class CommonTab extends React.Component<Props> {
         const model: EditModel = {
             itemId: tree.selectedNode.id,
             title: editArticleStore.title,
-            isVisible: editArticleStore.isVisible,
             isInSiteMap: editArticleStore.isInSiteMap,
-            extensionId: tree.selectedNode.extensionId,
-            fields: editArticleStore.changedFields,
         };
         if (tree instanceof SiteTreeStore) {
             (async () => {
                 await treeStore.edit(model);
                 await editArticleStore.init(tree.selectedNode);
             })();
-            // treeStore.edit(model).then(() => editArticleStore.init(tree.selectedNode));
         }
     }
 
     private changeTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { editArticleStore } = this.props;
         editArticleStore.setTitle(e.target.value);
-    }
-
-    private changeIsVisible = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { editArticleStore } = this.props;
-        editArticleStore.setIsVisible(e.target.checked);
     }
 
     private changeIsInSiteMap = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -70,7 +60,7 @@ export default class CommonTab extends React.Component<Props> {
         const {
             treeStore,
             textStore,
-            editArticleStore: { title, isVisible, isInSiteMap, isEditable },
+            editArticleStore: { title, isInSiteMap, isEditable },
         } = this.props;
         const tree = treeStore.resolveMainTreeStore();
 
@@ -115,15 +105,14 @@ export default class CommonTab extends React.Component<Props> {
                             <p>{selectedNode.alias}</p>
                         </div>
                         <div className="tab-entity">
-                            <Checkbox checked={selectedNode.published} disabled={true}>{textStore.texts[Texts.published]}</Checkbox>
+                            <Checkbox checked={selectedNode.published} disabled>{textStore.texts[Texts.published]}</Checkbox>
                         </div>
                         <div className="tab-entity">
                             <Checkbox checked={isInSiteMap} onChange={this.changeIsInSiteMap} disabled={!isEditable}>{textStore.texts[Texts.isInSiteMap]}</Checkbox>
                         </div>
                         <div className="tab-entity">
-                            <Checkbox checked={isVisible} onChange={this.changeIsVisible} disabled={!isEditable}>{textStore.texts[Texts.isVisible]}</Checkbox>
+                            <Checkbox checked={selectedNode.isVisible} disabled>{textStore.texts[Texts.isVisible]}</Checkbox>
                         </div>
-                        {isEditable && <ExtensionCard />}
                     </div>
                 </div>
             );
