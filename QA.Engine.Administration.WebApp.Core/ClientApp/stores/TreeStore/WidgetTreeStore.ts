@@ -2,8 +2,11 @@ import SiteMapService from 'services/SiteMapService';
 import { BaseTreeState, ITreeElement } from 'stores/TreeStore/BaseTreeStore';
 import ContextMenuType from 'enums/ContextMenuType';
 import { action, observable } from 'mobx';
+import TreeStoreType from 'enums/TreeStoreType';
 
 export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
+
+    public type = TreeStoreType.WIDGET;
 
     @observable public selectedSiteTreeNode: PageModel;
 

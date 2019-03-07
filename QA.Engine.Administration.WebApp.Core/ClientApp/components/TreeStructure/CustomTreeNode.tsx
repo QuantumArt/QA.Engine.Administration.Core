@@ -8,12 +8,7 @@ export class CustomTreeNode<T = {}> extends React.Component<ITreeNodeProps<T>, {
     }
 
     shouldComponentUpdate(nextProps: ITreeNodeProps<T>): boolean {
-        if (this.props.isExpanded === nextProps.isExpanded && this.props.isSelected === nextProps.isSelected) {
-            // console.debug(`%cshouldComponentUpdate false ${this.props.label}`, 'color: red;');
-            return false;
-        }
-        // console.debug(`%cshouldComponentUpdate true ${this.props.label}`, 'color: green;');
-        return true;
+        return !(this.props.isExpanded === nextProps.isExpanded && this.props.isSelected === nextProps.isSelected);
     }
 
     render() {
