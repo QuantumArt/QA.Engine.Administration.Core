@@ -14,6 +14,7 @@ export default class SiteTreeStore extends BaseTreeState<PageModel> {
     }
 
     public setRegions(regionId?: number) {
+        this.resetSearch();
         this.regionIds = regionId == null ? [] : [regionId];
     }
 

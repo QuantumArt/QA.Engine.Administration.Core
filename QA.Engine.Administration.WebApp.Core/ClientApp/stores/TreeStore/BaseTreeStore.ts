@@ -115,9 +115,11 @@ export abstract class BaseTreeState<T extends {
 
     @action
     public resetSearch = () => {
-        this.query = '';
-        this.searchActive = false;
-        this.origSearchedTreeInternal = [];
+        if (this.searchActive) {
+            this.query = '';
+            this.searchActive = false;
+            this.origSearchedTreeInternal = [];
+        }
     }
 
     @action
