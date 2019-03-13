@@ -17,13 +17,13 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
     public handleNodeCollapse = (nodeData: ITreeElement) => nodeData.isExpanded = false
 
     @action
-    public init(selectedNode: any) {
+    public init(selectedNode: PageModel) {
+        this.resetSearch();
         this.selectedSiteTreeNode = selectedNode;
         if (selectedNode == null || selectedNode.widgets == null) {
             this.widgetTree = [];
         } else {
-            const node = selectedNode as PageModel;
-            this.widgetTree = node.widgets.slice().sort((a, b) => {
+            this.widgetTree = selectedNode.widgets.slice().sort((a, b) => {
                 if (a.zoneName < b.zoneName) {
                     return -1;
                 }
@@ -61,6 +61,10 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
     }
 
     protected convertTree(data: WidgetModel[], key: 'searchedTreeInternal' | 'treeInternal'): void {
+        if (this.searchActive) {
+            super.convertTree(data, key);
+            return;
+        }
         let elements = data;
         let loop = true;
 

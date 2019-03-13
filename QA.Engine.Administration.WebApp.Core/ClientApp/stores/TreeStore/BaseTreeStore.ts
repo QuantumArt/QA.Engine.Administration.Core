@@ -114,6 +114,13 @@ export abstract class BaseTreeState<T extends {
     }
 
     @action
+    public resetSearch = () => {
+        this.query = '';
+        this.searchActive = false;
+        this.origSearchedTreeInternal = [];
+    }
+
+    @action
     public async fetchTree(): Promise<void> {
         this.treeInternal = [];
         this.origSearchedTreeInternal = [];
