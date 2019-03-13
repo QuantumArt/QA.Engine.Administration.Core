@@ -64,4 +64,6 @@ export default class Texts {
     static readonly popupReorderTitle: string = 'PopupReorderTitle';
     static readonly popupMoveTitle: string = 'PopupMoveTitle';
     static readonly popupMoveButton: string = 'PopupMoveButton';
+
+    static readonly showID: string = 'ShowID';
 }

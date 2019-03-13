@@ -285,6 +285,9 @@
   <data name="ShowExtensionField" xml:space="preserve">
     <value>Показать поля расширения</value>
   </data>
+  <data name="ShowID" xml:space="preserve">
+    <value>Показать ID</value>
+  </data>
   <data name="SiteManagement" xml:space="preserve">
     <value>Управление Сайтом</value>
   </data>

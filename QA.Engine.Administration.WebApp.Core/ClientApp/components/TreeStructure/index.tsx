@@ -20,6 +20,8 @@ import SiteTreeStore from 'stores/TreeStore/SiteTreeStore';
 import RegionSelect from 'components/Select/RegionSelect';
 import RegionStore from 'stores/RegionStore';
 import ArchiveTreeStore from 'stores/TreeStore/ArchiveTreeStore';
+import TextStore from 'stores/TextStore';
+import Texts from 'constants/Texts';
 
 interface Props {
     type: 'main' | 'widgets' | 'versions' | 'move';
@@ -27,6 +29,7 @@ interface Props {
     treeStore?: TreeStore;
     navigationStore?: NavigationStore;
     editArticleStore?: EditArticleStore;
+    textStore?: TextStore;
     regionStore?: RegionStore;
     sbHeightMin?: number;
     sbHeightMax?: number;
@@ -52,7 +55,7 @@ interface InternalRestProps extends JSX.IntrinsicAttributes, React.ClassAttribut
 class TreeR extends CustomTree {
 }
 
-@inject('navigationStore', 'editArticleStore', 'treeStore', 'regionStore')
+@inject('navigationStore', 'editArticleStore', 'treeStore', 'regionStore', 'textStore')
 @observer
 export default class SiteTree extends React.Component<Props, State> {
 
@@ -155,7 +158,7 @@ export default class SiteTree extends React.Component<Props, State> {
     }
 
     render() {
-        const { treeStore, regionStore, type } = this.props;
+        const { treeStore, regionStore, textStore, type } = this.props;
         const tree = this.resolveTree();
         const isLoading = treeStore.state === OperationState.PENDING;
         const useRegions = type === 'main' && tree instanceof SiteTreeStore && regionStore.useRegions;
@@ -176,7 +179,7 @@ export default class SiteTree extends React.Component<Props, State> {
                     <NavbarDivider />
                     <Switch
                         inline
-                        label="Show IDs"
+                        label={textStore.texts[Texts.showID]}
                         className="tree-switch"
                         alignIndicator="right"
                         checked={tree.showIDs}
