@@ -60,7 +60,7 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
         return SiteMapService.getSiteMapSubTree(id);
     }
 
-    protected convertTree(data: WidgetModel[]): void {
+    protected convertTree(data: WidgetModel[], key: 'searchedTreeInternal' | 'treeInternal'): void {
         let elements = data;
         let loop = true;
 
@@ -94,9 +94,9 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
                 const el = this.mapElement(x);
                 const parentId = el.parentId == null ? el.versionOfId : el.parentId;
                 const treeEl = hMap.get(parentId);
-                if (treeEl != null) {
+                if (treeEl) {
                     const zone = treeEl.childNodes.find(t => t.label === x.zoneName);
-                    if (zone == null) {
+                    if (!zone) {
                         zoneEl.childNodes.push(el);
                         treeEl.childNodes.push(zoneEl);
                     } else {
@@ -112,7 +112,7 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
             hMap = childNodes;
             elements = children;
         }
-        this.treeInternal = tree;
+        this[key] = tree;
     }
 
     protected mapElement(el: WidgetModel): ITreeElement {

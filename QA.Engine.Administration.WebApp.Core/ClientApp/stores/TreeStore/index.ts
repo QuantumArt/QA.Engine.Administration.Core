@@ -3,7 +3,7 @@ import SiteTreeStore from './SiteTreeStore';
 import NavigationStore, { Pages } from '../NavigationStore';
 import ContentVersionTreeStore from './ContentVersionTreeStore';
 import WidgetTreeStore from './WidgetTreeStore';
-import { observable, action, computed } from 'mobx';
+import { action, observable } from 'mobx';
 import OperationState from 'enums/OperationState';
 import ErrorsTypes from 'constants/ErrorsTypes';
 import SiteMapService from 'services/SiteMapService';
@@ -23,8 +23,6 @@ export default class TreeStore extends ErrorHandler {
     private readonly widgetStore: WidgetTreeStore;
     private readonly moveStore: MoveTreeStore;
     private readonly navigationStore: NavigationStore;
-
-    private readonly treeState: TreeState;
 
     constructor(navigationStore: NavigationStore) {
         super();
@@ -46,16 +44,10 @@ export default class TreeStore extends ErrorHandler {
             leafPublished: 'saved',
         });
         this.moveStore = new MoveTreeStore();
-
-        this.treeState = new TreeState();
-
         this.navigationStore = navigationStore;
     }
 
-    @computed
-    get state(): OperationState {
-        return this.treeState.state;
-    }
+    @observable public state: OperationState = OperationState.NONE;
 
     getSiteTreeStore(): SiteTreeStore {
         return this.siteTreeStore;
@@ -80,13 +72,14 @@ export default class TreeStore extends ErrorHandler {
         return this.siteTreeStore;
     }
 
+    @action
     async updateSubTree(id?: number): Promise<any> {
         let current = this.resolveMainTreeStore();
         let selectedNode = current.selectedNode;
         await this.runAsync(
             async () => {
                 await current.updateSubTree(id == null ? selectedNode.id : id);
-                this.treeState.success();
+                this.state = OperationState.SUCCESS;
             },
             ErrorsTypes.Tree.update,
             id == null ? selectedNode.id : id);
@@ -98,23 +91,25 @@ export default class TreeStore extends ErrorHandler {
         }
     }
 
+    @action
     async fetchTree(): Promise<any> {
         const store = this.resolveMainTreeStore();
         await this.runAsync(
             async () => {
                 await store.fetchTree();
-                this.treeState.success();
+                this.state = OperationState.SUCCESS;
             },
             ErrorsTypes.Tree.fetch);
     }
 
+    @action
     async publish(itemIds: number[]): Promise<any> {
         await this.runAsync(
             async () => {
                 const response: ApiResult<any> = await SiteMapService.publish(itemIds);
                 if (response.isSuccess) {
                     await this.updateSubTree();
-                    this.treeState.success();
+                    this.state = OperationState.SUCCESS;
                 } else {
                     throw response.error;
                 }
@@ -123,13 +118,14 @@ export default class TreeStore extends ErrorHandler {
             itemIds);
     }
 
+    @action
     async archive(model: RemoveModel): Promise<any> {
         await this.runAsync(
             async () => {
                 const response: ApiResult<any> = await SiteMapService.archive(model);
                 if (response.isSuccess) {
                     await this.updateSubTree();
-                    this.treeState.success();
+                    this.state = OperationState.SUCCESS;
                 } else {
                     throw response.error;
                 }
@@ -138,13 +134,14 @@ export default class TreeStore extends ErrorHandler {
             model);
     }
 
+    @action
     async edit(model: EditModel): Promise<any> {
         await this.runAsync(
             async () => {
                 const response: ApiResult<any> = await SiteMapService.edit(model);
                 if (response.isSuccess) {
                     await this.updateSubTree();
-                    this.treeState.success();
+                    this.state = OperationState.SUCCESS;
                 } else {
                     throw response.error;
                 }
@@ -153,6 +150,7 @@ export default class TreeStore extends ErrorHandler {
             model);
     }
 
+    @action
     async reorder(model: ReorderModel): Promise<any> {
         await this.runAsync(
             async () => {
@@ -161,7 +159,7 @@ export default class TreeStore extends ErrorHandler {
                     const store = this.siteTreeStore;
                     const parentId = store.selectedNode.parentId;
                     await this.updateSubTree(parentId);
-                    this.treeState.success();
+                    this.state = OperationState.SUCCESS;
                 } else {
                     throw response.error;
                 }
@@ -170,6 +168,7 @@ export default class TreeStore extends ErrorHandler {
             model);
     }
 
+    @action
     async move(model: MoveModel): Promise<any> {
         await this.runAsync(
             async () => {
@@ -179,7 +178,7 @@ export default class TreeStore extends ErrorHandler {
                     const parentId = store.selectedNode.parentId;
                     await this.updateSubTree(parentId);
                     await this.updateSubTree(model.newParentId);
-                    this.treeState.success();
+                    this.state = OperationState.SUCCESS;
                 } else {
                     throw response.error;
                 }
@@ -188,13 +187,14 @@ export default class TreeStore extends ErrorHandler {
             model);
     }
 
+    @action
     async restore(model: RestoreModel): Promise<any> {
         await this.runAsync(
             async () => {
                 const response: ApiResult<any> = await SiteMapService.restore(model);
                 if (response.isSuccess) {
                     await this.updateSubTree(model.itemId);
-                    this.treeState.success();
+                    this.state = OperationState.SUCCESS;
                 } else {
                     throw response.error;
                 }
@@ -203,13 +203,14 @@ export default class TreeStore extends ErrorHandler {
             model);
     }
 
+    @action
     async delete(model: DeleteModel): Promise<any> {
         await this.runAsync(
             async () => {
                 const response: ApiResult<any> = await SiteMapService.delete(model);
                 if (response.isSuccess) {
                     await this.updateSubTree();
-                    this.treeState.success();
+                    this.state = OperationState.SUCCESS;
                 } else {
                     throw response.error;
                 }
@@ -218,32 +219,14 @@ export default class TreeStore extends ErrorHandler {
             model);
     }
 
+    @action
     private async runAsync(func: () => Promise<void>, treeErrors: ErrorsTypes, model?: any): Promise<void> {
-        this.treeState.pending();
+        this.state = OperationState.PENDING;
         try {
             await func();
         } catch (e) {
-            this.treeState.error();
+            this.state = OperationState.ERROR;
             this.addError(treeErrors, model, e);
         }
-    }
-}
-
-class TreeState {
-    @observable state: OperationState = OperationState.NONE;
-
-    @action
-    pending(): void {
-        this.state = OperationState.PENDING;
-    }
-
-    @action
-    success(): void {
-        this.state = OperationState.SUCCESS;
-    }
-
-    @action
-    error(): void {
-        this.state = OperationState.ERROR;
     }
 }

@@ -62,10 +62,14 @@ export abstract class BaseTreeState<T extends {
 
     public abstract type: TreeStoreType;
 
-    @observable public selectedNode: T;
     @observable public showIDs: boolean = false;
+    @observable public searchActive: boolean = false;
+    @observable public query: string = '';
+    @observable public selectedNode: T;
     @observable protected treeInternal: ITreeElement[];
+    @observable protected searchedTreeInternal: ITreeElement[] = [];
     protected origTreeInternal: T[];
+    protected origSearchedTreeInternal: T[] = [];
 
     @computed
     get tree(): ITreeElement[] {
@@ -77,13 +81,42 @@ export abstract class BaseTreeState<T extends {
         return this.origTreeInternal;
     }
 
+    @computed
+    get searchedTree(): ITreeElement[] {
+        return this.searchedTreeInternal;
+    }
+
+    @action
+    public search = (query: string) => {
+        this.query = query.toLocaleLowerCase();
+        this.searchActive = query.length >= 3;
+        if (this.searchActive) {
+            const f = (node: T) => {
+                if (node.title.toLowerCase().includes(this.query) || node.id.toString().includes(this.query)) {
+                    const foundEl: T = {
+                        ...node,
+                        children: [],
+                        hasChildren: false,
+                        parentId: null,
+                    };
+                    this.origSearchedTreeInternal.push(foundEl);
+                }
+            };
+            this.forEachOrigNode(this.origTreeInternal, f);
+            this.convertTree(this.origSearchedTreeInternal, 'searchedTreeInternal');
+        } else if (this.origSearchedTreeInternal.length > 0) {
+            this.origSearchedTreeInternal = [];
+        }
+    }
+
     @action
     public async fetchTree(): Promise<void> {
         this.treeInternal = [];
+        this.origSearchedTreeInternal = [];
         const response: ApiResult<T[]> = await this.getTree();
         if (response.isSuccess) {
             this.origTreeInternal = response.data;
-            this.convertTree(response.data);
+            this.convertTree(response.data, 'treeInternal');
         } else {
             throw response.error;
         }
@@ -135,42 +168,48 @@ export abstract class BaseTreeState<T extends {
     }
 
     @action
-    public async updateSubTree(id: number): Promise<any> {
+    public async updateSubTree(id: number): Promise<void> {
         const response: ApiResult<T> = await this.getSubTree(id);
         if (response.isSuccess) {
-            const expanded: number[] = [];
-            this.forEachNode((x) => {
-                if (x.isExpanded) {
-                    expanded.push(+x.id);
-                }
-            });
-
-            const node = this.getNodeById(id);
-            const parentNode = this.getNodeById(node.parentId == null ? node.versionOfId : node.parentId);
-            const elements = parentNode == null ? this.origTreeInternal : parentNode.children;
-            for (let i = 0; i < elements.length; i += 1) {
-                if (response.data == null && elements[i].id === id) {
-                    elements.splice(i, 1);
-                    this.selectedNode = null;
-                    break;
-                } else if (response.data != null && elements[i].id === response.data.id) {
-                    elements[i] = response.data;
-                    this.selectedNode = response.data;
-                }
-            }
-
-            this.convertTree(this.origTreeInternal);
-            this.forEachNode(
-                (x) => {
-                    if (expanded.indexOf(+x.id) > -1) {
-                        x.isExpanded = true;
-                    }
-                },
-                (x) => {
-                    if (this.selectedNode && this.selectedNode.id === +x.id) {
-                        x.isSelected = true;
+            const updateInternal = (tree: T[], key: 'searchedTreeInternal' | 'treeInternal') => {
+                const expanded: number[] = [];
+                this.forEachNode((x) => {
+                    if (x.isExpanded) {
+                        expanded.push(+x.id);
                     }
                 });
+
+                const node = this.getNodeById(id);
+                const parentNode = this.getNodeById(node.parentId == null ? node.versionOfId : node.parentId);
+                const elements = parentNode == null ? tree : parentNode.children;
+                for (let i = 0; i < elements.length; i += 1) {
+                    if (response.data == null && elements[i].id === id) {
+                        elements.splice(i, 1);
+                        this.selectedNode = null;
+                        break;
+                    } else if (response.data != null && elements[i].id === response.data.id) {
+                        elements[i] = response.data;
+                        this.selectedNode = response.data;
+                    }
+                }
+
+                this.convertTree(tree, key);
+                this.forEachNode(
+                    (x) => {
+                        if (expanded.indexOf(+x.id) > -1) {
+                            x.isExpanded = true;
+                        }
+                    },
+                    (x) => {
+                        if (this.selectedNode && this.selectedNode.id === +x.id) {
+                            x.isSelected = true;
+                        }
+                    });
+            };
+            updateInternal(this.origTreeInternal, 'treeInternal');
+            if (this.searchActive) {
+                updateInternal(this.origSearchedTreeInternal, 'searchedTreeInternal');
+            }
         } else {
             throw response.error;
         }
@@ -183,6 +222,7 @@ export abstract class BaseTreeState<T extends {
     protected abstract contextMenuType: ContextMenuType;
 
     protected getNodeById(id: number): T {
+        // we don't need to use searched tree here to avoid tree logic doubling
         let elements = this.origTreeInternal;
         let loop = true;
         while (loop) {
@@ -203,6 +243,9 @@ export abstract class BaseTreeState<T extends {
 
     protected getIcon = (el: T): IconName => {
         if (this.icons.checkPublication) {
+            if (this.searchActive) {
+                return el.published ? this.icons.nodePublished : this.icons.node;
+            }
             if (el.parentId === null) {
                 return el.published ? this.icons.rootPublished : this.icons.root;
             }
@@ -210,6 +253,9 @@ export abstract class BaseTreeState<T extends {
                 return el.published ? this.icons.leafPublished : this.icons.leaf;
             }
             return el.published ? this.icons.nodePublished : this.icons.node;
+        }
+        if (this.searchActive) {
+            return this.icons.leaf;
         }
         if (el.parentId === null) {
             return this.icons.root;
@@ -248,7 +294,7 @@ export abstract class BaseTreeState<T extends {
         return treeElement;
     }
 
-    protected convertTree(data: T[]): void {
+    protected convertTree(data: T[], key: 'searchedTreeInternal' | 'treeInternal'): void {
         let elements = data;
         let loop = true;
 
@@ -282,13 +328,13 @@ export abstract class BaseTreeState<T extends {
             hMap = childNodes;
             elements = children;
         }
-        this.treeInternal = tree;
+        this[key] = tree;
     }
 
     protected icons: ITreeIcons;
 
     private forEachNode(childFunc: (node: ITreeElement) => void = null, eachFunc: (node: ITreeElement) => void = null): void {
-        let elements = this.tree;
+        let elements = this.searchActive ? this.searchedTree : this.tree;
         let loop = true;
         while (loop) {
             loop = false;
@@ -306,6 +352,17 @@ export abstract class BaseTreeState<T extends {
             });
             loop = children.length > 0;
             elements = children;
+        }
+    }
+
+    private forEachOrigNode(nodes: T[], callback: (node: T) => void) {
+        if (!nodes) {
+            return;
+        }
+
+        for (const node of nodes) {
+            callback(node);
+            this.forEachOrigNode(node.children, callback);
         }
     }
 }

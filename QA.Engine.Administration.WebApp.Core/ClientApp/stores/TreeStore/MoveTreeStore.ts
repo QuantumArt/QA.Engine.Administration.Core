@@ -29,7 +29,7 @@ export default class MoveTreeStore extends BaseTreeState<PageModel> {
             }
         }
 
-        this.convertTree(this.origTreeInternal);
+        this.convertTree(this.origTreeInternal, 'treeInternal');
         this.selectedNode = null;
     }
 

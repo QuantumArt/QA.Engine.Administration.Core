@@ -30,6 +30,7 @@ body {
     margin-bottom: 20px;
     align-items: center;
     justify-content: left;
+    z-index: 1;
 }
 
 .tree-switch {

@@ -140,6 +140,11 @@ export default class SiteTree extends React.Component<Props, State> {
         }
     }
 
+    private handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const tree = this.resolveTree();
+        tree.search(e.target.value);
+    }
+
     private changeRegion = (e: RegionModel) => {
         const { treeStore, type } = this.props;
         const store = treeStore.resolveMainTreeStore();
@@ -161,7 +166,12 @@ export default class SiteTree extends React.Component<Props, State> {
         return (
             <Card className={cn('tree-pane', this.props.className)}>
                 <Navbar className="tree-navbar">
-                    <InputGroup leftIcon="search" />
+                    <InputGroup
+                        leftIcon="search"
+                        type="search"
+                        onChange={this.handleInputChange}
+                        value={tree.query}
+                    />
                     <NavbarDivider />
                     <Switch
                         inline
@@ -202,7 +212,7 @@ export default class SiteTree extends React.Component<Props, State> {
                     >
                         <TreeR
                             className="tree"
-                            contents={tree.tree}
+                            contents={tree.searchActive ? tree.searchedTree : tree.tree}
                             onNodeCollapse={tree.handleNodeCollapse}
                             onNodeExpand={tree.handleNodeExpand}
                             onNodeClick={this.handleNodeClick}
