@@ -46,6 +46,7 @@ const defaultIcons: ITreeIcons = {
  * @description Base class for tree manipulations
  */
 export abstract class BaseTreeState<T extends {
+    alias: string;
     id: number;
     parentId?: null | number;
     versionOfId?: null | number;
@@ -92,7 +93,10 @@ export abstract class BaseTreeState<T extends {
         this.searchActive = query.length >= 3;
         if (this.searchActive) {
             const f = (node: T) => {
-                if (node.title.toLowerCase().includes(this.query) || node.id.toString().includes(this.query)) {
+                if (node.title.toLowerCase().includes(this.query) ||
+                    node.id.toString().includes(this.query) ||
+                    (node.alias !== null && node.alias.toLowerCase().includes(this.query))
+                ) {
                     const foundEl: T = {
                         ...node,
                         children: [],

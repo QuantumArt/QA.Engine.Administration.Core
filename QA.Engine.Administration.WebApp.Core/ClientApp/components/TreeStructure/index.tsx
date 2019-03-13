@@ -171,6 +171,7 @@ export default class SiteTree extends React.Component<Props, State> {
                         type="search"
                         onChange={this.handleInputChange}
                         value={tree.query}
+                        placeholder="Title/Alias/ID"
                     />
                     <NavbarDivider />
                     <Switch
