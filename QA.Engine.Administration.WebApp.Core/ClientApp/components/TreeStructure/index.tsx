@@ -185,7 +185,11 @@ export default class SiteTree extends React.Component<Props, State> {
                     {useRegions &&
                         <React.Fragment>
                             <NavbarDivider />
-                            <RegionSelect items={regions} filterable onChange={this.changeRegion} />
+                            <RegionSelect
+                                items={regions}
+                                filterable
+                                onChange={this.changeRegion}
+                            />
                         </React.Fragment>
                     }
                 </Navbar>

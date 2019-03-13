@@ -17,13 +17,14 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
     public handleNodeCollapse = (nodeData: ITreeElement) => nodeData.isExpanded = false
 
     @action
-    public init(selectedNode: PageModel) {
+    public init(selectedNode: any) {
         this.resetSearch();
-        this.selectedSiteTreeNode = selectedNode;
+        this.selectedSiteTreeNode = selectedNode as PageModel;
         if (selectedNode == null || selectedNode.widgets == null) {
             this.widgetTree = [];
         } else {
-            this.widgetTree = selectedNode.widgets.slice().sort((a, b) => {
+            const node = selectedNode as PageModel;
+            this.widgetTree = node.widgets.slice().sort((a, b) => {
                 if (a.zoneName < b.zoneName) {
                     return -1;
                 }

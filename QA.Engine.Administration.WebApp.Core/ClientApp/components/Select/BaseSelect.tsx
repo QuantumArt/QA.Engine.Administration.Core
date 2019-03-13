@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { MenuItem, Button, Position, Intent } from '@blueprintjs/core';
+import { MenuItem, Button, Position, Intent, IPopoverProps } from '@blueprintjs/core';
 import { Select, ItemRenderer, ItemPredicate } from '@blueprintjs/select';
 
 function getText<T extends { id: number, title: string, alias?: string }>(item: T): string {
@@ -71,6 +71,7 @@ interface Props<T> {
     filterable?: boolean;
     intent?: Intent;
     onChange: (x: T) => void;
+    popoverProps?: IPopoverProps;
 }
 
 interface State<T> {
@@ -92,7 +93,7 @@ export default abstract class BaseSelect<T extends { id: number, title: string, 
     }
 
     render() {
-        const { items, disabled, filterable, intent } = this.props;
+        const { items, disabled, filterable, intent, popoverProps } = this.props;
         const { page } = this.state;
 
         return (
@@ -107,6 +108,7 @@ export default abstract class BaseSelect<T extends { id: number, title: string, 
                     position: Position.BOTTOM,
                     boundary: 'viewport',
                     popoverClassName: 'select-menu',
+                    ...popoverProps,
                 }}
             >
                 <Button
