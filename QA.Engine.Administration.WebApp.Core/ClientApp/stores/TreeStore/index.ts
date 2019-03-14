@@ -32,6 +32,12 @@ export default class TreeStore extends ErrorHandler {
             checkPublication: true,
             root: 'document',
             rootPublished: 'saved',
+            node: 'document',
+            nodePublished: 'saved',
+            nodeOpen: 'document',
+            nodeOpenPublished: 'saved',
+            leaf: 'document',
+            leafPublished: 'saved',
         });
         this.widgetStore = new WidgetTreeStore({
             checkPublication: true,

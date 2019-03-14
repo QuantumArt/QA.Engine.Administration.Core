@@ -92,6 +92,7 @@ export abstract class BaseTreeState<T extends {
     public search = (query: string) => {
         this.query = query;
         this.searchActive = query.length >= 2;
+        const results = new Set<T>();
         if (this.searchActive) {
             const filterFunc = (node: T) => {
                 const query = this.query.toLowerCase();
@@ -105,10 +106,11 @@ export abstract class BaseTreeState<T extends {
                         hasChildren: false,
                         parentId: null,
                     };
-                    this.origSearchedTreeInternal.push(foundEl);
+                    results.add(foundEl);
                 }
             };
             this.forEachOrigNode(this.origTreeInternal, filterFunc);
+            this.origSearchedTreeInternal = Array.from(results);
             this.convertTree(this.origSearchedTreeInternal, 'searchedTreeInternal');
         } else if (this.origSearchedTreeInternal.length > 0) {
             this.origSearchedTreeInternal = [];

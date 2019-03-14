@@ -1,7 +1,7 @@
 import SiteMapService from 'services/SiteMapService';
 import { BaseTreeState, ITreeElement } from 'stores/TreeStore/BaseTreeStore';
 import ContextMenuType from 'enums/ContextMenuType';
-import { action, observable } from 'mobx';
+import { action, observable, toJS } from 'mobx';
 import TreeStoreType from 'enums/TreeStoreType';
 
 export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
@@ -49,6 +49,7 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
         this.forEachNode(
             null,
             (n) => {
+                console.log(toJS(n));
                 n.isSelected = false;
                 n.isContextMenuActive = false;
                 n.isExpanded = false;
@@ -97,8 +98,8 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
         let hMap = new Map<number, ITreeElement>();
         const tree: ITreeElement[] = [];
         elements.forEach((x) => {
-            const zoneItem = tree.find(t => t.label === x.zoneName); // TODO:???
-            const treeItem = this.mapElement(x);
+            const zoneItem = tree.find(t => t.label === x.zoneName);
+            const treeItem = this.mapWidgetElement(x);
             hMap.set(x.id, treeItem);
             if (zoneItem == null) {
                 const item = this.mapWidgetZoneElement(x);

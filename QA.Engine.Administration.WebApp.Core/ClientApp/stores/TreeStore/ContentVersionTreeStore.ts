@@ -12,6 +12,7 @@ export default class ContentVersionTreeStore extends BaseTreeState<PageModel> {
 
     @action
     public init(selectedNode: any) {
+        this.resetSearch();
         this.selectedSiteTreeNode = selectedNode;
         if (selectedNode == null || selectedNode.contentVersions == null) {
             this.contentVersionTree = [];
