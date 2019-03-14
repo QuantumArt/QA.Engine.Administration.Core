@@ -1,11 +1,12 @@
 import * as React from 'react';
 import { inject, observer } from 'mobx-react';
 import cn from 'classnames'; // tslint:disable-line
-import { Button, Popover, Position, Icon } from '@blueprintjs/core';
+import { Button, Popover, Position } from '@blueprintjs/core';
 import { ITreeElement } from 'stores/TreeStore/BaseTreeStore';
 import ContentVersionTreeMenu from './ContentVersionTreeMenu';
 import TreeStore from 'stores/TreeStore';
 import ContextMenuType from 'enums/ContextMenuType';
+import TreeStoreType from 'enums/TreeStoreType';
 import SiteTreeMenu from './SiteTreeMenu';
 import ArchiveTreeMenu from './ArchiveTreeMenu';
 import WidgetTreeMenu from './WidgetTreeMenu';
@@ -13,6 +14,7 @@ import WidgetTreeMenu from './WidgetTreeMenu';
 interface Props {
     treeStore?: TreeStore;
     node: ITreeElement;
+    type: TreeStoreType;
 }
 
 interface State {
@@ -82,6 +84,30 @@ export default class ContextMenu extends React.Component<Props, State> {
         }
     }
 
+    private resolveStore = () => {
+        const { treeStore, type } = this.props;
+        switch (type) {
+            case TreeStoreType.SITE:
+            case TreeStoreType.ARCHIVE:
+                return treeStore.resolveMainTreeStore();
+            case TreeStoreType.WIDGET:
+                return treeStore.getWidgetTreeStore();
+            case TreeStoreType.CONTENTVERSION:
+                return treeStore.getContentVersionTreeStore();
+            case TreeStoreType.MOVE:
+                return treeStore.getMoveTreeStore();
+            default:
+                return null;
+        }
+    }
+
+    private handleExpandToNodeClick = (node: ITreeElement) => (e: React.MouseEvent<HTMLElement>) => {
+        e.stopPropagation();
+        const tree = this.resolveStore();
+        tree.expandToNode(node);
+        tree.resetSearch();
+    }
+
     componentWillUnmount() {
         window.removeEventListener('click', this.stateHandler);
         window.removeEventListener('mouseenter', this.toggleHover);
@@ -91,6 +117,7 @@ export default class ContextMenu extends React.Component<Props, State> {
 
     render() {
         const { node } = this.props;
+        const store = this.resolveStore();
         let elementMenu: JSX.Element;
         switch (node.contextMenuType) {
             case ContextMenuType.SITEMAP:
@@ -111,13 +138,24 @@ export default class ContextMenu extends React.Component<Props, State> {
 
         return (
             <React.Fragment>
-                <Icon
-                    className={cn('context-icon', {
-                        'context-icon--active': node.isSelected,
-                    })}
-                    icon={node.isVisible ? 'eye-open' : 'eye-off'}
-                />
-                {node.isSelected &&
+                {/*<Icon*/}
+                    {/*className={cn('context-icon', {*/}
+                        {/*'context-icon--active': node.isSelected,*/}
+                    {/*})}*/}
+                    {/*icon={node.isVisible ? 'eye-open' : 'eye-off'}*/}
+                {/*/>*/}
+                {store.searchActive &&
+                    <Button
+                        icon="diagram-tree"
+                        minimal
+                        onClick={this.handleExpandToNodeClick(node)}
+                        className={cn('context-button', {
+                            'expand-to-node': store.type !== TreeStoreType.MOVE,
+                            'expand-to-node--active': node.isSelected && store.type !== TreeStoreType.MOVE,
+                        })}
+                    />
+                }
+                {(node.isSelected && store.type !== TreeStoreType.MOVE) &&
                     <Popover
                         className="context-popover"
                         content={elementMenu}

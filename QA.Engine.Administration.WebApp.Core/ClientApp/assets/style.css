@@ -107,21 +107,19 @@ body {
 .context-button.bp3-button.bp3-minimal:focus,
 .context-button.bp3-button.bp3-minimal.bp3-active {
     outline: none;
-    background: rgba(167, 182, 194, 0.5);
 }
 
-.context-icon {
-    padding-right: 34px;
-    padding-bottom: 1px;
+.expand-to-node {
+    margin-right: 34px;
 }
 
-.context-icon--active {
-    padding-right: 4px;
-    padding-bottom: 4px;
+.expand-to-node--active {
+    margin-right: 4px;
 }
 
 .bp3-tree-node-secondary-label .context-popover {
     display: inline-flex;
+    vertical-align: middle;
 }
 
 .track-vertical {

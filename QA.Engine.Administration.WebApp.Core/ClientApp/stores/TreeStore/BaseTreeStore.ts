@@ -10,6 +10,7 @@ export interface ITreeElement extends ITreeNode {
     title?: string;
     idTitle?: string;
     childNodes: ITreeElement[];
+    id: number;
     parentId: number;
     versionOfId?: number;
     isContextMenuActive: boolean;
@@ -89,13 +90,14 @@ export abstract class BaseTreeState<T extends {
 
     @action
     public search = (query: string) => {
-        this.query = query.toLocaleLowerCase();
-        this.searchActive = query.length >= 3;
+        this.query = query;
+        this.searchActive = query.length >= 2;
         if (this.searchActive) {
-            const f = (node: T) => {
-                if (node.title.toLowerCase().includes(this.query) ||
-                    node.id.toString().includes(this.query) ||
-                    (node.alias !== null && node.alias.toLowerCase().includes(this.query))
+            const filterFunc = (node: T) => {
+                const query = this.query.toLowerCase();
+                if (node.title.toLowerCase().includes(query) ||
+                    node.id.toString().includes(query) ||
+                    (node.alias !== null && node.alias.toLowerCase().includes(query))
                 ) {
                     const foundEl: T = {
                         ...node,
@@ -106,7 +108,7 @@ export abstract class BaseTreeState<T extends {
                     this.origSearchedTreeInternal.push(foundEl);
                 }
             };
-            this.forEachOrigNode(this.origTreeInternal, f);
+            this.forEachOrigNode(this.origTreeInternal, filterFunc);
             this.convertTree(this.origSearchedTreeInternal, 'searchedTreeInternal');
         } else if (this.origSearchedTreeInternal.length > 0) {
             this.origSearchedTreeInternal = [];
@@ -178,6 +180,29 @@ export abstract class BaseTreeState<T extends {
     @action
     public handleContextMenu = (nodeData: ITreeElement) => {
         nodeData.isContextMenuActive = !nodeData.isContextMenuActive;
+    }
+
+    @action
+    public expandToNode = (node: ITreeElement) => {
+        this.forEachNode(
+            null,
+            (n) => {
+                n.isSelected = false;
+                n.isContextMenuActive = false;
+                n.isExpanded = false;
+            },
+            this.treeInternal,
+        );
+        let curNode = this.getMappedNodeById(node.id);
+        do {
+            if (node.id === curNode.id) {
+                curNode.isSelected = true;
+            }
+            if (curNode.childNodes.length > 0) {
+                curNode.isExpanded = true;
+            }
+            curNode = this.getMappedNodeById(curNode.parentId);
+        } while (curNode !== null);
     }
 
     @action
@@ -254,6 +279,25 @@ export abstract class BaseTreeState<T extends {
         return null;
     }
 
+    protected getMappedNodeById(id: ITreeElement['id']): ITreeElement {
+        let elements = this.treeInternal;
+        let loop = true;
+        while (loop) {
+            loop = false;
+            const children: ITreeElement[] = [];
+            const node = elements.filter(x => x.id === id)[0];
+            if (node != null) {
+                return node;
+            }
+            elements.filter(x => x.childNodes.length > 0).forEach((x) => {
+                x.childNodes.forEach(y => children.push(<ITreeElement>y));
+            });
+            loop = children.length > 0;
+            elements = children;
+        }
+        return null;
+    }
+
     protected getIcon = (el: T): IconName => {
         if (this.icons.checkPublication) {
             if (this.searchActive) {
@@ -298,6 +342,7 @@ export abstract class BaseTreeState<T extends {
         });
         treeElement.secondaryLabel = React.createElement(InteractiveZone, {
             node: treeElement,
+            type: this.type,
         });
         treeElement.label = React.createElement(NodeLabel, {
             node: treeElement,
@@ -346,8 +391,12 @@ export abstract class BaseTreeState<T extends {
 
     protected icons: ITreeIcons;
 
-    private forEachNode(childFunc: (node: ITreeElement) => void = null, eachFunc: (node: ITreeElement) => void = null): void {
-        let elements = this.searchActive ? this.searchedTree : this.tree;
+    protected forEachNode(
+        childFunc: (node: ITreeElement) => void = null,
+        eachFunc: (node: ITreeElement) => void = null,
+        tree?: ITreeElement[],
+    ): void {
+        let elements = tree ? tree : (this.searchActive ? this.searchedTree : this.tree);
         let loop = true;
         while (loop) {
             loop = false;
