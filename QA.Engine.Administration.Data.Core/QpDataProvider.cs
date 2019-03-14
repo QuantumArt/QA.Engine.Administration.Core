@@ -195,7 +195,7 @@ namespace QA.Engine.Administration.Data.Core
 
         public void Remove(int siteId, int contentId, int userId, IEnumerable<AbstractItemData> items, AbstractItemData moveContentVersion)
         {
-            _logger.LogDebug($"remove. siteId: {siteId}, contentId: {contentId}, userId: {userId}, items: {SerializeData(items.Select(x => new { x.Id, x.ExtensionId }))}, moveContentVersion: {SerializeData(new { moveContentVersion.Id, moveContentVersion.Alias, moveContentVersion.ParentId })}");
+            _logger.LogDebug($"remove. siteId: {siteId}, contentId: {contentId}, userId: {userId}, items: {SerializeData(items.Select(x => new { x.Id, x.ExtensionId }))}, moveContentVersion: {SerializeData(moveContentVersion == null ? null : new { moveContentVersion.Id, moveContentVersion.Alias, moveContentVersion.ParentId })}");
 
             _qpDbConnector.BeginTransaction(IsolationLevel.Serializable);
 
