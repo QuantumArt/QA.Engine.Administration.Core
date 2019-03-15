@@ -1,7 +1,7 @@
 import SiteMapService from 'services/SiteMapService';
 import { BaseTreeState, ITreeElement } from 'stores/TreeStore/BaseTreeStore';
 import ContextMenuType from 'enums/ContextMenuType';
-import { action, observable, toJS } from 'mobx';
+import { action, observable } from 'mobx';
 import TreeStoreType from 'enums/TreeStoreType';
 
 export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
@@ -49,7 +49,6 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
         this.forEachNode(
             null,
             (n) => {
-                console.log(toJS(n));
                 n.isSelected = false;
                 n.isContextMenuActive = false;
                 n.isExpanded = false;
@@ -60,7 +59,7 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
         do {
             curNodes.forEach((n) => {
                 // zones can't have versions
-                if (node.id === n.id && n.versionOfId !== undefined) {
+                if (node.id === n.id) {
                     n.isSelected = true;
                 }
                 if (n.childNodes.length > 0) {
@@ -93,91 +92,71 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
             super.convertTree(data, key);
             return;
         }
-        let elements = data;
-
-        let hMap = new Map<number, ITreeElement>();
         const tree: ITreeElement[] = [];
-        elements.forEach((x) => {
-            const zoneItem = tree.find(t => t.label === x.zoneName);
-            const treeItem = this.mapWidgetElement(x);
-            hMap.set(x.id, treeItem);
-            if (zoneItem == null) {
-                const item = this.mapWidgetZoneElement(x);
-                item.childNodes.push(treeItem);
-                tree.push(item);
-            } else {
-                zoneItem.childNodes.push(treeItem);
+        const zones: ITreeElement[] = [];
+        data.forEach((x) => {
+            let zoneEl = zones.find(z => z.label === x.zoneName);
+            if (!zoneEl) {
+                zoneEl = this.mapWidgetZoneElement(x, null, -x.id);
+                tree.push(zoneEl);
+                zones.push(zoneEl);
             }
+            const treeItem = this.mapWidgetElement(x, zoneEl.id);
+            zoneEl.childNodes.push(treeItem);
+            this.convertTreeInternal(x, treeItem);
         });
-
-        let loop = true;
-        while (loop) {
-            loop = false;
-            const childNodes = new Map<number, ITreeElement>();
-            let children: WidgetModel[] = [];
-            elements.forEach((x) => {
-                if (x.hasChildren) {
-                    children = children.concat(x.children);
-                }
-            });
-            children.forEach((x) => {
-                loop = true;
-                const zoneEl = this.mapWidgetZoneElement(x);
-                const el = this.mapWidgetElement(x, zoneEl.parentId);
-                const parentId = el.parentId == null ? el.versionOfId : el.parentId;
-                const treeEl = hMap.get(parentId);
-                if (treeEl) {
-                    const zone = treeEl.childNodes.find(t => t.label === x.zoneName);
-                    if (!zone) {
-                        zoneEl.childNodes.push(el);
-                        treeEl.childNodes.push(zoneEl);
-                    } else {
-                        zone.childNodes.push(el);
-                    }
-                    childNodes.set(+el.id, el);
-                }
-            });
-            if (childNodes.size !== children.length) {
-                loop = false;
-                throw 'error tree convert';
-            }
-            hMap = childNodes;
-            elements = children;
-        }
 
         this[key] = tree;
     }
 
-    private mapWidgetElement(el: WidgetModel, id?: number): ITreeElement {
+    private convertTreeInternal(el: WidgetModel, parent: ITreeElement): void {
+        const zones: ITreeElement[] = [];
+        el.children.forEach((x) => {
+            let zoneEl = zones.find(z => z.label === x.zoneName);
+            if (!zoneEl) {
+                zoneEl = this.mapWidgetZoneElement(x, parent.id, -x.id);
+                zones.push(zoneEl);
+                parent.childNodes.push(zoneEl);
+            }
+            const treeItem = this.mapWidgetElement(x, zoneEl.id);
+            zoneEl.childNodes.push(treeItem);
+            this.convertTreeInternal(x, treeItem);
+        });
+    }
+
+    private mapWidgetElement(el: WidgetModel, parentId?: number, id?: number): ITreeElement {
         const treeElement = super.mapElement(el);
         if (this.icons.checkPublication) {
             treeElement.icon = el.published ? this.icons.leafPublished : this.icons.leaf;
         } else {
             treeElement.icon = this.icons.leaf;
         }
-        if (id) {
-            treeElement.parentId = id;
+        if (parentId != null) {
+            treeElement.parentId = parentId;
+        }
+        if (id != null) {
+            treeElement.id = id;
         }
         return treeElement;
     }
 
-    private mapWidgetZoneElement(x: WidgetModel): ITreeElement {
+    private mapWidgetZoneElement(x: WidgetModel, parentId?: number, id?: number): ITreeElement {
         return observable<ITreeElement>({
-            id: x.id,
+            id: id || x.id,
             childNodes: [],
             label: x.zoneName,
             isExpanded: false,
             icon: this.icons.node,
             hasCaret: true,
             isContextMenuActive: false,
-            parentId: x.parentId,
+            parentId: parentId || x.parentId,
             contextMenuType: null,
             isVisible: x.isVisible,
             isPublished: x.published,
         });
     }
 
-    private getMappedNodesById(id: ITreeElement['id']): ITreeElement[] {
+    private getMappedNodesById(id: number): ITreeElement[] {
         let elements = this.treeInternal;
         const result: ITreeElement[] = [];
         let loop = true;
