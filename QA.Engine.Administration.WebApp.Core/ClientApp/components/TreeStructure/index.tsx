@@ -59,6 +59,12 @@ class TreeR extends CustomTree {
 @observer
 export default class SiteTree extends React.Component<Props, State> {
 
+    static defaultProps: Pick<Props, DefaultProps> = {
+        sbHeightMin: 30,
+        sbHeightMax: 850,
+        spinnerSize: 30,
+    };
+
     constructor(props: Props) {
         super(props);
 
@@ -93,11 +99,7 @@ export default class SiteTree extends React.Component<Props, State> {
         });
     }
 
-    static defaultProps: Pick<Props, DefaultProps> = {
-        sbHeightMin: 30,
-        sbHeightMax: 850,
-        spinnerSize: 30,
-    };
+    private sbRef = React.createRef<Scrollbars>();
 
     private resolveTree = (): TreeType => {
         const { type, treeStore } = this.props;
@@ -157,6 +159,13 @@ export default class SiteTree extends React.Component<Props, State> {
         }
     }
 
+    private scrollTo = (y: number) => {
+        const { current } = this.sbRef;
+        if (current != null) {
+            return current.scrollTop(y);
+        }
+    };
+
     render() {
         const { treeStore, regionStore, textStore, type } = this.props;
         const tree = this.resolveTree();
@@ -199,6 +208,7 @@ export default class SiteTree extends React.Component<Props, State> {
                 {isLoading ?
                     <Spinner size={this.props.spinnerSize}/> :
                     <Scrollbars
+                        ref={this.sbRef}
                         hideTracksWhenNotNeeded
                         autoHeight
                         autoHide

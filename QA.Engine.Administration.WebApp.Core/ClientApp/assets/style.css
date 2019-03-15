@@ -17,6 +17,10 @@ body {
     margin-left: 6px;
 }
 
+.not-visible {
+    opacity: .5;
+}
+
 .tree-pane {
     width: 40%;
     min-width: 250px;

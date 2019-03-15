@@ -327,6 +327,7 @@ export abstract class BaseTreeState<T extends {
 
     protected mapElement(el: T): ITreeElement {
         const treeElement = observable<ITreeElement>({
+            className: el.isVisible ? '' : 'not-visible',
             id: el.id,
             parentId: el.parentId,
             versionOfId: el.versionOfId,

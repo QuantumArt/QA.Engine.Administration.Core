@@ -32,7 +32,6 @@ export class CustomTree<T = {}> extends React.Component<ITreeProps<T>, {}> {
     private nodeRefs: { [nodeId: string]: HTMLElement } = {};
 
     public render() {
-        console.debug('render custom tree');
         return (
             <div className={classnames(Classes.TREE, this.props.className)}>
                 {this.renderNodes(this.props.contents, [], Classes.TREE_ROOT)}
@@ -49,7 +48,6 @@ export class CustomTree<T = {}> extends React.Component<ITreeProps<T>, {}> {
             return null;
         }
 
-        // console.log('render tree, tree node count', treeNodes.length);
         const nodeItems = treeNodes.map((node, i) => {
             const elementPath = currentPath.concat(i);
             // tslint:disable-next-line:variable-name
