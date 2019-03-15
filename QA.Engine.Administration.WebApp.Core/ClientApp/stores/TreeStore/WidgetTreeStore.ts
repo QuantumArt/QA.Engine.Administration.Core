@@ -44,32 +44,6 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
         this.fetchTree();
     }
 
-    @action
-    public expandToNode = (node: ITreeElement) => {
-        this.forEachNode(
-            null,
-            (n) => {
-                n.isSelected = false;
-                n.isContextMenuActive = false;
-                n.isExpanded = false;
-            },
-            this.treeInternal,
-        );
-        let curNodes = this.getMappedNodesById(node.id);
-        do {
-            curNodes.forEach((n) => {
-                // zones can't have versions
-                if (node.id === n.id) {
-                    n.isSelected = true;
-                }
-                if (n.childNodes.length > 0) {
-                    n.isExpanded = true;
-                }
-                curNodes = this.getMappedNodesById(n.parentId);
-            });
-        } while (curNodes.length !== 0);
-    }
-
     protected readonly contextMenuType: ContextMenuType = ContextMenuType.WIDGET;
 
     protected async getTree(): Promise<ApiResult<WidgetModel[]>> {
@@ -154,23 +128,6 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
             isVisible: x.isVisible,
             isPublished: x.published,
         });
-    }
-
-    private getMappedNodesById(id: number): ITreeElement[] {
-        let elements = this.treeInternal;
-        const result: ITreeElement[] = [];
-        let loop = true;
-        while (loop) {
-            loop = false;
-            const children: ITreeElement[] = [];
-            elements.filter(x => x.id === id).forEach(y => result.push(y));
-            elements.filter(x => x.childNodes.length > 0).forEach((x) => {
-                x.childNodes.forEach(y => children.push(<ITreeElement>y));
-            });
-            loop = children.length > 0;
-            elements = children;
-        }
-        return result;
     }
 
     private widgetTree: WidgetModel[];
