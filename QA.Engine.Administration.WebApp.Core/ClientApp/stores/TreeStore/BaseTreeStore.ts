@@ -53,7 +53,6 @@ export abstract class BaseTreeState<T extends {
     versionOfId?: null | number;
     title: string;
     children: T[];
-    hasChildren: boolean;
     isVisible?: boolean;
     published?: boolean;
 }> {
@@ -103,7 +102,6 @@ export abstract class BaseTreeState<T extends {
                     const foundEl: T = {
                         ...node,
                         children: [],
-                        hasChildren: false,
                         parentId: null,
                     };
                     results.add(foundEl);
@@ -134,6 +132,7 @@ export abstract class BaseTreeState<T extends {
         if (response.isSuccess) {
             this.origTreeInternal = response.data;
             this.convertTree(response.data, 'treeInternal');
+            this.selectedNode = null;
         } else {
             throw response.error;
         }
@@ -272,7 +271,7 @@ export abstract class BaseTreeState<T extends {
             if (node != null) {
                 return node;
             }
-            elements.filter(x => x.hasChildren).forEach((x) => {
+            elements.filter(x => x.children && x.children.length > 0).forEach((x) => {
                 x.children.forEach(y => children.push(<T>y));
             });
             loop = children.length > 0;
@@ -308,7 +307,7 @@ export abstract class BaseTreeState<T extends {
             if (el.parentId === null) {
                 return el.published ? this.icons.rootPublished : this.icons.root;
             }
-            if (!el.hasChildren) {
+            if (!el.children || el.children.length === 0) {
                 return el.published ? this.icons.leafPublished : this.icons.leaf;
             }
             return el.published ? this.icons.nodePublished : this.icons.node;
@@ -319,7 +318,7 @@ export abstract class BaseTreeState<T extends {
         if (el.parentId === null) {
             return this.icons.root;
         }
-        if (!el.hasChildren) {
+        if (!el.children || el.children.length === 0) {
             return this.icons.leaf;
         }
         return this.icons.node;
@@ -337,7 +336,7 @@ export abstract class BaseTreeState<T extends {
             idTitle: `${el.title} - ${el.id}`,
             isExpanded: false,
             icon: this.getIcon(el),
-            hasCaret: el.hasChildren,
+            hasCaret: el.children && el.children.length > 0,
             isContextMenuActive: false,
             contextMenuType: this.contextMenuType,
             isVisible: el.isVisible,
@@ -368,7 +367,7 @@ export abstract class BaseTreeState<T extends {
             const childNodes = new Map<number, ITreeElement>();
             let children: T[] = [];
             elements.forEach((x) => {
-                if (x.hasChildren) {
+                if (x.children && x.children.length > 0) {
                     children = children.concat(x.children);
                 }
             });
