@@ -87,6 +87,7 @@ export default class SiteTree extends React.Component<Props, State> {
                     x.init(tree.selectedNode);
                 });
                 treeStore.getMoveTreeStore().init(tree.selectedNode, tree.origTree);
+                this.setState({ currentNode: tree.selectedNode });
             }
             if (selectedNodeId !== currentNodeId && type === 'main' && tree instanceof ArchiveTreeStore) {
                 editArticleStore.init(tree.selectedNode);
@@ -118,7 +119,6 @@ export default class SiteTree extends React.Component<Props, State> {
         const tree = treeStore.resolveMainTreeStore();
         tree.handleNodeClick(e);
         navigationStore.setDefaultTab(e.isSelected);
-        this.setState({ currentNode: tree.selectedNode });
     }
 
     private handleMinorTreeNode = (e: ITreeElement) => {

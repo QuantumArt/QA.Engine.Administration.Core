@@ -25,7 +25,7 @@ export default class MoveTreeStore extends BaseTreeState<PageModel> {
             const index = this.getIndex(parentNode.children, selectedNode.id);
             if (index > -1) {
                 parentNode.children.splice(index, 1);
-                parentNode.hasChildren = parentNode.children.length > 0;
+
             }
         }
 

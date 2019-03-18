@@ -199,7 +199,7 @@ export default class TreeStore extends ErrorHandler {
             async () => {
                 const response: ApiResult<any> = await SiteMapService.restore(model);
                 if (response.isSuccess) {
-                    await this.updateSubTree(model.itemId);
+                    await this.fetchTree();
                     this.state = OperationState.SUCCESS;
                 } else {
                     throw response.error;
