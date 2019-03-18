@@ -67,8 +67,9 @@ export abstract class BaseTreeState<T extends {
 
     @observable public searchActive: boolean = false;
     @observable public query: string = '';
-    @observable protected expandLaunched: boolean = false;
     @observable public cordsUpdated: boolean = false;
+    @observable protected expandLaunched: boolean = false;
+    searchTimer: number;
 
     @observable public selectedNode: T;
     @observable public nodeCords = new Map<number, number>();
@@ -96,28 +97,35 @@ export abstract class BaseTreeState<T extends {
     public search = (query: string) => {
         this.query = query;
         this.searchActive = query.length >= 2;
-        const results = new Set<T>();
-        if (this.searchActive) {
-            const filterFunc = (node: T) => {
-                const query = this.query.toLowerCase();
-                if (node.title.toLowerCase().includes(query) ||
-                    node.id.toString().includes(query) ||
-                    (node.alias !== null && node.alias.toLowerCase().includes(query))
-                ) {
-                    const foundEl: T = {
-                        ...node,
-                        children: [],
-                        parentId: null,
+        clearTimeout(this.searchTimer);
+        this.searchTimer = window.setTimeout(
+            () => {
+                if (this.searchActive) {
+                    const results = new Set<T>();
+                    const filterFunc = (node: T) => {
+                        const query = this.query.toLowerCase();
+                        if (node.title.toLowerCase().includes(query) ||
+                            node.id.toString().includes(query) ||
+                            (node.alias !== null && node.alias.toLowerCase().includes(query))
+                        ) {
+                            const foundEl: T = {
+                                ...node,
+                                children: [],
+                                parentId: null,
+                            };
+                            results.add(foundEl);
+                        }
                     };
-                    results.add(foundEl);
+                    this.forEachOrigNode(this.origTreeInternal, filterFunc);
+                    this.origSearchedTreeInternal = Array.from(results);
+                    this.convertTree(this.origSearchedTreeInternal, 'searchedTreeInternal');
+                } else if (this.origSearchedTreeInternal.length > 0) {
+                    this.origSearchedTreeInternal = [];
+                    clearTimeout(this.searchTimer);
                 }
-            };
-            this.forEachOrigNode(this.origTreeInternal, filterFunc);
-            this.origSearchedTreeInternal = Array.from(results);
-            this.convertTree(this.origSearchedTreeInternal, 'searchedTreeInternal');
-        } else if (this.origSearchedTreeInternal.length > 0) {
-            this.origSearchedTreeInternal = [];
-        }
+            },
+            500,
+        );
     }
 
     @action
