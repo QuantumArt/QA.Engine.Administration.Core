@@ -1,7 +1,7 @@
 import SiteMapService from 'services/SiteMapService';
 import { BaseTreeState, ITreeElement } from 'stores/TreeStore/BaseTreeStore';
 import ContextMenuType from 'enums/ContextMenuType';
-import { action, observable, toJS } from 'mobx';
+import { action, observable } from 'mobx';
 import TreeStoreType from 'enums/TreeStoreType';
 
 export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
@@ -41,7 +41,6 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
             });
         }
         this.selectedNode = null;
-        console.log(toJS(this.nodeCords));
         this.fetchTree();
     }
 
