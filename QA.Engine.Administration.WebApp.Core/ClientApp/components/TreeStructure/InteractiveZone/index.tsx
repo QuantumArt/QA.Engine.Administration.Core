@@ -104,6 +104,7 @@ export default class ContextMenu extends React.Component<Props, State> {
     private handleExpandToNodeClick = (node: ITreeElement) => (e: React.MouseEvent<HTMLElement>) => {
         e.stopPropagation();
         const tree = this.resolveStore();
+        tree.setSelectedNode(node);
         tree.expandToNode(node);
         tree.resetSearch();
     }

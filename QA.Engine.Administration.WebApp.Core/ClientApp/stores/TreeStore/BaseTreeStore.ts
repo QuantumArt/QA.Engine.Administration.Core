@@ -65,9 +65,14 @@ export abstract class BaseTreeState<T extends {
     public abstract type: TreeStoreType;
 
     @observable public showIDs: boolean = false;
+
     @observable public searchActive: boolean = false;
     @observable public query: string = '';
+    @observable protected expandLaunched: boolean = false;
+    @observable public cordsUpdated: boolean = false;
+
     @observable public selectedNode: T;
+    @observable public nodeCords = new Map<number, number>();
     @observable protected treeInternal: ITreeElement[];
     @observable protected searchedTreeInternal: ITreeElement[] = [];
     protected origTreeInternal: T[];
@@ -124,6 +129,31 @@ export abstract class BaseTreeState<T extends {
             this.searchActive = false;
             this.origSearchedTreeInternal = [];
         }
+    }
+
+    @action
+    public updateCords = (id: number, value: number) => {
+        this.nodeCords.set(id, value);
+    }
+
+    @action
+    public setCordsUpdateStatus = (status: boolean) => {
+        this.cordsUpdated = status;
+    }
+
+    @action
+    public getNodeToScroll(): number {
+        if (this.expandLaunched && this.cordsUpdated && !this.searchActive) {
+            this.setCordsUpdateStatus(false);
+            this.expandLaunched = false;
+            return this.selectedNode.id;
+        }
+        return null;
+    }
+
+    @action
+    public setSelectedNode = (node: ITreeElement) => {
+        this.selectedNode = this.getNodeById(node.id);
     }
 
     @action
@@ -205,6 +235,7 @@ export abstract class BaseTreeState<T extends {
             }
             curNode = this.getMappedNodeById(curNode.parentId);
         } while (curNode !== null);
+        this.expandLaunched = true;
     }
 
     @action

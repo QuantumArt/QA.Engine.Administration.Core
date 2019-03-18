@@ -41,6 +41,7 @@ interface Props {
 
 interface State {
     currentNode: PageModel | ArchiveModel;
+    shouldScroll: boolean;
 }
 
 type DefaultProps = 'sbHeightMin' | 'sbHeightMax' | 'sbThumbSize' | 'spinnerSize';
@@ -49,10 +50,6 @@ interface InternalStyle extends JSX.IntrinsicAttributes, React.ClassAttributes<H
 }
 
 interface InternalRestProps extends JSX.IntrinsicAttributes, React.ClassAttributes<HTMLDivElement>, React.HTMLAttributes<HTMLDivElement> {
-}
-
-@observer
-class TreeR extends CustomTree {
 }
 
 @inject('navigationStore', 'editArticleStore', 'treeStore', 'regionStore', 'textStore')
@@ -68,7 +65,7 @@ export default class SiteTree extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
 
-        this.state = { currentNode: null };
+        this.state = { currentNode: null, shouldScroll: false };
 
         when(() => {
             if (this.props == null || this.state == null) {
@@ -94,7 +91,6 @@ export default class SiteTree extends React.Component<Props, State> {
             if (selectedNodeId !== currentNodeId && type === 'main' && tree instanceof ArchiveTreeStore) {
                 editArticleStore.init(tree.selectedNode);
             }
-
             return false;
         });
     }
@@ -162,9 +158,9 @@ export default class SiteTree extends React.Component<Props, State> {
     private scrollTo = (y: number) => {
         const { current } = this.sbRef;
         if (current != null) {
-            return current.scrollTop(y);
+            current.scrollTop(y);
         }
-    };
+    }
 
     render() {
         const { treeStore, regionStore, textStore, type } = this.props;
@@ -174,6 +170,15 @@ export default class SiteTree extends React.Component<Props, State> {
         const regions = regionStore.regions != null && regionStore.regions.length > 0
             ? [{ id: null, title: '(No selection)' } as RegionModel].concat(regionStore.regions)
             : [];
+        const scrollNodeId = tree.getNodeToScroll();
+        if (scrollNodeId !== null) {
+            setTimeout(
+                () => {
+                    this.scrollTo(tree.nodeCords.get(scrollNodeId));
+                },
+                0,
+            );
+        }
 
         return (
             <Card className={cn('tree-pane', this.props.className)}>
@@ -228,9 +233,10 @@ export default class SiteTree extends React.Component<Props, State> {
                             />
                         )}
                     >
-                        <TreeR
+                        <CustomTree
                             className="tree"
                             contents={tree.searchActive ? tree.searchedTree : tree.tree}
+                            tree={tree}
                             onNodeCollapse={tree.handleNodeCollapse}
                             onNodeExpand={tree.handleNodeExpand}
                             onNodeClick={this.handleNodeClick}

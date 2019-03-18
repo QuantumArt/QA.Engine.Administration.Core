@@ -1,9 +1,11 @@
 import classnames from 'classnames';
 import * as React from 'react';
+import { inject, observer } from 'mobx-react';
 
 import { CustomTreeNode } from 'components/TreeStructure/CustomTreeNode';
 import { ITreeNode, TreeNode, ITreeProps, TreeEventHandler } from '@blueprintjs/core';
 import { isFunction } from 'util';
+import { TreeType } from 'stores/TreeStore';
 
 const DISPLAYNAME_PREFIX = 'Blueprint3';
 class Classes {
@@ -14,12 +16,18 @@ class Classes {
     public static TREE_NODE_LIST = `${Classes.TREE_NODE}-list`;
 }
 
-export class CustomTree<T = {}> extends React.Component<ITreeProps<T>, {}> {
+interface Props<T> extends ITreeProps<T> {
+    tree: TreeType;
+}
+
+@inject('treeStore')
+@observer
+export class CustomTree<T = {}> extends React.Component<Props<T>, {}> {
 
     public static displayName = `${DISPLAYNAME_PREFIX}.Tree`;
 
     public static ofType<T>() {
-        return CustomTree as new (props: ITreeProps<T>) => CustomTree<T>;
+        return CustomTree as new (props: Props<T>) => CustomTree<T>;
     }
 
     public static nodeFromPath(path: number[], treeNodes: ITreeNode[]): ITreeNode {
@@ -30,6 +38,11 @@ export class CustomTree<T = {}> extends React.Component<ITreeProps<T>, {}> {
     }
 
     private nodeRefs: { [nodeId: string]: HTMLElement } = {};
+
+    public componentDidUpdate(prevProps: Readonly<Props<T>>, prevState: Readonly<{}>, snapshot?: any): void {
+        const { tree } = this.props;
+        tree.setCordsUpdateStatus(true);
+    }
 
     public render() {
         return (
@@ -56,7 +69,7 @@ export class CustomTree<T = {}> extends React.Component<ITreeProps<T>, {}> {
                 <TypedTreeNode
                     {...node}
                     key={node.id}
-                    contentRef={this.handleContentRef}
+                    contentRef={this.handleContentRef(+node.id)}
                     depth={elementPath.length - 1}
                     onClick={this.handleNodeClick}
                     onContextMenu={this.handleNodeContextMenu}
@@ -85,8 +98,12 @@ export class CustomTree<T = {}> extends React.Component<ITreeProps<T>, {}> {
         this.handlerHelper(this.props.onNodeClick, node, e);
     }
 
-    private handleContentRef = (node: TreeNode<T>, element: HTMLElement | null) => {
+    private handleContentRef = (id: number) => (node: TreeNode<T>, element: HTMLElement | null) => {
         if (element != null) {
+            const { tree } = this.props;
+            if (!tree.searchActive) {
+                tree.updateCords(id, element.offsetTop);
+            }
             this.nodeRefs[node.props.id] = element;
         } else {
             // don't want our object to get bloated with old keys
