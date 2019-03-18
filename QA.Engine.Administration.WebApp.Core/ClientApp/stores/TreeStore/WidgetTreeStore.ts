@@ -3,6 +3,7 @@ import { BaseTreeState, ITreeElement } from 'stores/TreeStore/BaseTreeStore';
 import ContextMenuType from 'enums/ContextMenuType';
 import { action, observable } from 'mobx';
 import TreeStoreType from 'enums/TreeStoreType';
+import { IconName } from '@blueprintjs/core';
 
 export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
 
@@ -59,6 +60,31 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
 
     protected getSubTree(id: number): Promise<ApiResult<WidgetModel>> {
         return SiteMapService.getSiteMapSubTree(id);
+    }
+
+    protected getIcon = (el: WidgetModel): IconName => {
+        if (this.icons.checkPublication) {
+            if (this.searchActive) {
+                return el.published ? this.icons.leafPublished : this.icons.leaf;
+            }
+            if (el.parentId === null) {
+                return el.published ? this.icons.rootPublished : this.icons.root;
+            }
+            if (!el.children || el.children.length === 0) {
+                return el.published ? this.icons.leafPublished : this.icons.leaf;
+            }
+            return el.published ? this.icons.nodePublished : this.icons.node;
+        }
+        if (this.searchActive) {
+            return this.icons.leaf;
+        }
+        if (el.parentId === null) {
+            return this.icons.root;
+        }
+        if (!el.children || el.children.length === 0) {
+            return this.icons.leaf;
+        }
+        return this.icons.node;
     }
 
     protected convertTree(data: WidgetModel[], key: 'searchedTreeInternal' | 'treeInternal'): void {
