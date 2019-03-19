@@ -1,4 +1,5 @@
 import * as React from 'react';
+import lodashThrottle from 'lodash.throttle';
 import TreeStore from 'stores/TreeStore';
 import { Card, ButtonGroup, Button, Intent } from '@blueprintjs/core';
 import PopupStore from 'stores/PopupStore';
@@ -17,13 +18,17 @@ interface Props {
 
 interface State {
     newParent: ITreeElement;
+    height: number;
 }
 
 @inject('treeStore', 'popupStore', 'textStore')
 @observer
 export default class MovePopup extends React.Component<Props, State> {
 
-    state = { newParent: null as ITreeElement };
+    state = {
+        newParent: null as ITreeElement,
+        height: 500,
+    };
 
     private moveClick = () => {
         const { treeStore, popupStore } = this.props;
@@ -40,6 +45,24 @@ export default class MovePopup extends React.Component<Props, State> {
 
     private cancelClick = () => this.props.popupStore.close();
 
+    private handleResize = lodashThrottle(
+        () => {
+            this.setState({
+                height: window.innerHeight - 300,
+            });
+        },
+        100,
+    );
+
+    componentDidMount() {
+        this.handleResize();
+        window.addEventListener('resize', this.handleResize);
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('resize', this.handleResize);
+    }
+
     render() {
         const { popupStore, textStore, treeStore } = this.props;
 
@@ -50,12 +73,12 @@ export default class MovePopup extends React.Component<Props, State> {
         const moveTreeStore = treeStore.getMoveTreeStore();
 
         return (
-            <Card className="move-popup">
+            <Card style={{ height: this.state.height }}>
                 <TreeStructure
                     type="move"
                     className="popup-tree-pane"
                     tree={moveTreeStore}
-                    sbHeightMax={460}
+                    sbHeightDelta={499}
                     onNodeClick={this.changeNewParent}
                 />
                 <ButtonGroup className="dialog-button-group">

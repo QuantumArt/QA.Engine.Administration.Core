@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { inject, observer } from 'mobx-react';
+import lodashThrottle from 'lodash.throttle';
 import { when } from 'mobx';
 import {
     Card,
@@ -14,7 +15,7 @@ import NavigationStore  from 'stores/NavigationStore';
 import OperationState from 'enums/OperationState';
 import { ITreeElement } from 'stores/TreeStore/BaseTreeStore';
 import EditArticleStore from 'stores/EditArticleStore';
-import TreeStore, { TreeType } from 'stores/TreeStore';
+import TreeStore, { TreeStructureType, TreeType } from 'stores/TreeStore';
 import { CustomTree } from 'components/TreeStructure/CustomTree';
 import SiteTreeStore from 'stores/TreeStore/SiteTreeStore';
 import RegionSelect from 'components/Select/RegionSelect';
@@ -24,7 +25,7 @@ import TextStore from 'stores/TextStore';
 import Texts from 'constants/Texts';
 
 interface Props {
-    type: 'main' | 'widgets' | 'versions' | 'move';
+    type: TreeStructureType;
     tree: TreeType;
     treeStore?: TreeStore;
     navigationStore?: NavigationStore;
@@ -32,7 +33,7 @@ interface Props {
     textStore?: TextStore;
     regionStore?: RegionStore;
     sbHeightMin?: number;
-    sbHeightMax?: number;
+    sbHeightDelta?: number;
     sbThumbSize?: number;
     spinnerSize?: number;
     className?: string;
@@ -42,9 +43,10 @@ interface Props {
 interface State {
     currentNode: PageModel | ArchiveModel;
     shouldScroll: boolean;
+    sbHeightMax: number;
 }
 
-type DefaultProps = 'sbHeightMin' | 'sbHeightMax' | 'sbThumbSize' | 'spinnerSize';
+type DefaultProps = 'sbHeightMin' | 'sbHeightDelta' | 'sbThumbSize' | 'spinnerSize';
 
 interface InternalStyle extends JSX.IntrinsicAttributes, React.ClassAttributes<HTMLDivElement>, React.HTMLAttributes<HTMLDivElement> {
 }
@@ -58,14 +60,18 @@ export default class SiteTree extends React.Component<Props, State> {
 
     static defaultProps: Pick<Props, DefaultProps> = {
         sbHeightMin: 30,
-        sbHeightMax: 850,
+        sbHeightDelta: 180,
         spinnerSize: 30,
     };
 
     constructor(props: Props) {
         super(props);
 
-        this.state = { currentNode: null, shouldScroll: false };
+        this.state = {
+            currentNode: null,
+            shouldScroll: false,
+            sbHeightMax: window.innerHeight - props.sbHeightDelta,
+        };
 
         when(() => {
             if (this.props == null || this.state == null) {
@@ -98,22 +104,6 @@ export default class SiteTree extends React.Component<Props, State> {
 
     private sbRef = React.createRef<Scrollbars>();
 
-    private resolveTree = (): TreeType => {
-        const { type, treeStore } = this.props;
-        if (type === 'main') {
-            return treeStore.resolveMainTreeStore();
-        }
-        if (type === 'widgets') {
-            return treeStore.getWidgetTreeStore();
-        }
-        if (type === 'versions') {
-            return treeStore.getContentVersionTreeStore();
-        }
-        if (type === 'move') {
-            return treeStore.getMoveTreeStore();
-        }
-    }
-
     private handleMajorTreeNode = (e: ITreeElement) => {
         const { navigationStore, treeStore } = this.props;
         const tree = treeStore.resolveMainTreeStore();
@@ -142,11 +132,10 @@ export default class SiteTree extends React.Component<Props, State> {
     }
 
     private handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const tree = this.resolveTree();
         if (this.props.type === 'main') {
             this.props.navigationStore.resetTab();
         }
-        tree.search(e.target.value);
+        this.props.treeStore.resolveTree(this.props.type).search(e.target.value);
     }
 
     private changeRegion = (e: RegionModel) => {
@@ -165,9 +154,26 @@ export default class SiteTree extends React.Component<Props, State> {
         }
     }
 
+    private handleResize = lodashThrottle(
+        () => {
+            this.setState({
+                sbHeightMax: window.innerHeight - this.props.sbHeightDelta,
+            });
+        },
+        100,
+    );
+
+    componentDidMount() {
+        window.addEventListener('resize', this.handleResize);
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('resize', this.handleResize);
+    }
+
     render() {
         const { treeStore, regionStore, textStore, type } = this.props;
-        const tree = this.resolveTree();
+        const tree = treeStore.resolveTree(type);
         const isLoading = treeStore.state === OperationState.PENDING;
         const useRegions = type === 'main' && tree instanceof SiteTreeStore && regionStore.useRegions;
         const regions = regionStore.regions != null && regionStore.regions.length > 0
@@ -221,7 +227,7 @@ export default class SiteTree extends React.Component<Props, State> {
                         autoHeight
                         autoHide
                         autoHeightMin={this.props.sbHeightMin}
-                        autoHeightMax={this.props.sbHeightMax}
+                        autoHeightMax={this.state.sbHeightMax}
                         thumbMinSize={this.props.sbThumbSize}
                         renderTrackVertical={(style: InternalStyle, ...props: InternalRestProps[]) => (
                             <div
