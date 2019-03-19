@@ -10,6 +10,8 @@ export default class EditArticleStore extends ErrorHandler {
     @observable public isInSiteMap: boolean;
 
     @observable public state: OperationState = OperationState.NONE;
+    @observable public fields: ExtensionFieldModel[] = [];
+    @observable public isShowExtensionFields: boolean = false;
     public isEditable: boolean;
     private node: PageModel | ArchiveModel;
 
@@ -17,12 +19,13 @@ export default class EditArticleStore extends ErrorHandler {
     init(node: PageModel | ArchiveModel) {
         this.node = node;
         if (node == null) {
-            this.title = this.isInSiteMap = this.isEditable = null;
+            this.title = this.isInSiteMap = this.isEditable = this.isShowExtensionFields = null;
             return;
         }
         this.title = node.title;
         this.isInSiteMap = node.isInSiteMap;
         this.isEditable = !node.isArchive;
+        this.isShowExtensionFields = false;
     }
 
     @action
@@ -33,6 +36,10 @@ export default class EditArticleStore extends ErrorHandler {
     setIsInSiteMap(isInSiteMap: boolean) {
         this.isInSiteMap = isInSiteMap;
     }
+    @action
+    showExtensionFields() {
+        this.isShowExtensionFields = true;
+    }
 
     @action
     public async fetchExtentionFields(): Promise<void> {
@@ -42,6 +49,7 @@ export default class EditArticleStore extends ErrorHandler {
         try {
             const response: ApiResult<ExtensionFieldModel[]> = await SiteMapService.getExtantionFields(id, extantionId);
             if (response.isSuccess) {
+                this.fields = response.data || [];
                 this.state = OperationState.SUCCESS;
             } else {
                 throw response.error;
