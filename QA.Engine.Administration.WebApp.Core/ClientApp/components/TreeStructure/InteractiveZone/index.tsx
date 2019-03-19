@@ -5,6 +5,7 @@ import { Button, Popover, Position } from '@blueprintjs/core';
 import { ITreeElement } from 'stores/TreeStore/BaseTreeStore';
 import ContentVersionTreeMenu from './ContentVersionTreeMenu';
 import TreeStore from 'stores/TreeStore';
+import NavigationStore, { TabTypes } from 'stores/NavigationStore';
 import ContextMenuType from 'enums/ContextMenuType';
 import TreeStoreType from 'enums/TreeStoreType';
 import SiteTreeMenu from './SiteTreeMenu';
@@ -13,6 +14,7 @@ import WidgetTreeMenu from './WidgetTreeMenu';
 
 interface Props {
     treeStore?: TreeStore;
+    navigationStore?: NavigationStore;
     node: ITreeElement;
     type: TreeStoreType;
 }
@@ -21,7 +23,7 @@ interface State {
     isHovered: boolean;
 }
 
-@inject('treeStore')
+@inject('treeStore', 'navigationStore')
 @observer
 export default class ContextMenu extends React.Component<Props, State> {
     constructor(props: Props) {
@@ -102,9 +104,13 @@ export default class ContextMenu extends React.Component<Props, State> {
     }
 
     private handleExpandToNodeClick = (node: ITreeElement) => (e: React.MouseEvent<HTMLElement>) => {
+        const { navigationStore } = this.props;
         e.stopPropagation();
         const tree = this.resolveStore();
         tree.setSelectedNode(node);
+        if (navigationStore.currentTab === TabTypes.NONE) {
+            navigationStore.changeTab(TabTypes.COMMON);
+        }
         tree.expandToNode(node);
         tree.resetSearch();
     }
@@ -139,12 +145,6 @@ export default class ContextMenu extends React.Component<Props, State> {
 
         return (
             <React.Fragment>
-                {/*<Icon*/}
-                    {/*className={cn('context-icon', {*/}
-                        {/*'context-icon--active': node.isSelected,*/}
-                    {/*})}*/}
-                    {/*icon={node.isVisible ? 'eye-open' : 'eye-off'}*/}
-                {/*/>*/}
                 {store.searchActive &&
                     <Button
                         icon="diagram-tree"

@@ -143,6 +143,9 @@ export default class SiteTree extends React.Component<Props, State> {
 
     private handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const tree = this.resolveTree();
+        if (this.props.type === 'main') {
+            this.props.navigationStore.resetTab();
+        }
         tree.search(e.target.value);
     }
 

@@ -45,7 +45,7 @@ export default class TreeStore extends ErrorHandler {
             node: 'widget',
             nodePublished: 'widget',
             nodeOpen: 'widget',
-            nodeOpenPublished: 'saved',
+            nodeOpenPublished: 'widget',
             leaf: 'document',
             leafPublished: 'saved',
         });
