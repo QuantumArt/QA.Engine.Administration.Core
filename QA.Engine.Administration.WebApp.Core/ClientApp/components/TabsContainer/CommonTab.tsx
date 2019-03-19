@@ -8,6 +8,7 @@ import QpIntegrationStore from 'stores/QpIntegrationStore';
 import EditArticleStore from 'stores/EditArticleStore';
 import TextStore from 'stores/TextStore';
 import Texts from 'constants/Texts';
+import ExtensionCard from './ExtensionCard';
 
 interface Props {
     qpIntegrationStore?: QpIntegrationStore;
@@ -113,6 +114,7 @@ export default class CommonTab extends React.Component<Props> {
                         <div className="tab-entity">
                             <Checkbox checked={selectedNode.isVisible} disabled>{textStore.texts[Texts.isVisible]}</Checkbox>
                         </div>
+                        {isEditable && <ExtensionCard />}
                     </div>
                 </div>
             );
