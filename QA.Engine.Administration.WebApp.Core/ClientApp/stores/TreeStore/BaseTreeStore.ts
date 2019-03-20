@@ -8,7 +8,6 @@ import NodeLabel from 'components/TreeStructure/NodeLabel';
 
 export interface ITreeElement extends ITreeNode {
     title?: string;
-    idTitle?: string;
     childNodes: ITreeElement[];
     id: number;
     parentId: number;
@@ -64,6 +63,7 @@ export abstract class BaseTreeState<T extends {
     public abstract type: TreeStoreType;
 
     @observable public showIDs: boolean = false;
+    @observable public showPath: boolean = false;
 
     @observable public searchActive: boolean = false;
     @observable public query: string = '';
@@ -73,6 +73,7 @@ export abstract class BaseTreeState<T extends {
 
     @observable public selectedNode: T;
     @observable public nodeCords = new Map<number, number>();
+    public pathMap = new Map<number, string>();
     @observable protected treeInternal: ITreeElement[];
     @observable protected searchedTreeInternal: ITreeElement[] = [];
     protected origTreeInternal: T[];
@@ -372,7 +373,6 @@ export abstract class BaseTreeState<T extends {
             childNodes: [],
             label: '',
             title: el.title,
-            idTitle: `${el.title} - ${el.id}`,
             isExpanded: false,
             icon: this.getIcon(el),
             hasCaret: el.children && el.children.length > 0,
@@ -398,7 +398,10 @@ export abstract class BaseTreeState<T extends {
         let loop = true;
 
         let hMap = new Map<number, ITreeElement>();
-        elements.forEach(x => hMap.set(x.id, this.mapElement(x)));
+        const path: string[] = [];
+        elements.forEach((x) => {
+            hMap.set(x.id, this.mapElement(x));
+        });
         const tree: ITreeElement[] = Array.from(hMap.values());
 
         while (loop) {
@@ -410,6 +413,9 @@ export abstract class BaseTreeState<T extends {
                     children = children.concat(x.children);
                 }
             });
+            if (children.length && key === 'treeInternal') {
+                path.push(hMap.get(children[0].parentId).title);
+            }
             children.forEach((x) => {
                 loop = true;
                 const el = this.mapElement(x);
@@ -418,6 +424,7 @@ export abstract class BaseTreeState<T extends {
                 if (treeEl != null) {
                     treeEl.childNodes.push(el);
                     childNodes.set(+el.id, el);
+                    this.pathMap.set(el.id, path.join('/'));
                 }
             });
             if (childNodes.size !== children.length) {

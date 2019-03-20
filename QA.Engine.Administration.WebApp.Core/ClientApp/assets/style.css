@@ -89,6 +89,7 @@ body {
 
 .tab-entity {
     margin-bottom: 15px;
+    width: 100%;
 }
 
 .tab-entity:last-child {
