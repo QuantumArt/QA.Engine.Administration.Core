@@ -71,7 +71,7 @@ export default class ContentVersionTab extends React.Component<Props> {
                         type="versions"
                         className="minor-tree-pane"
                         tree={tree}
-                        sbHeightMax={690}
+                        sbHeightDelta={345}
                     />
                     <InfoPane type="versions"/>
                 </div>

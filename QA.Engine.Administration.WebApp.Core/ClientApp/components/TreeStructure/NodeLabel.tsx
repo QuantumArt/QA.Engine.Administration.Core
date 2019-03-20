@@ -13,34 +13,19 @@ interface Props {
 @inject('treeStore')
 @observer
 export default class NodeLabel extends React.Component<Props> {
-
-    private resolveStore = () => {
-        const { treeStore, type } = this.props;
-        switch (type) {
-            case TreeStoreType.SITE:
-            case TreeStoreType.ARCHIVE:
-                return treeStore.resolveMainTreeStore();
-            case TreeStoreType.WIDGET:
-                return treeStore.getWidgetTreeStore();
-            case TreeStoreType.CONTENTVERSION:
-                return treeStore.getContentVersionTreeStore();
-            case TreeStoreType.MOVE:
-                return treeStore.getMoveTreeStore();
-            default:
-                return null;
-        }
-    }
-
     render() {
-        const { node } = this.props;
-        const store = this.resolveStore();
-        if (!store) {
+        const { node, treeStore, type } = this.props;
+        const tree = treeStore.resolveTree(type);
+        const pathPrefix = tree.pathMap.get(node.id);
+        if (!tree) {
             return null;
         }
-        return (
-            <span className="bp3-tree-node-label">
-                {store.showIDs ? node.idTitle : node.title}
-            </span>
-        );
+        if (tree.showIDs) {
+            return <span className="bp3-tree-node-label">{`${node.title} - ${node.id}`}</span>;
+        }
+        if (tree.searchActive) {
+            return <span className="bp3-tree-node-label">{`${pathPrefix || ''}/${node.title}`}</span>;
+        }
+        return <span className="bp3-tree-node-label">{node.title}</span>;
     }
 }

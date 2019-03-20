@@ -25,7 +25,7 @@ interface State {
 
 @inject('treeStore', 'navigationStore')
 @observer
-export default class ContextMenu extends React.Component<Props, State> {
+export default class InteractiveZone extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -86,27 +86,10 @@ export default class ContextMenu extends React.Component<Props, State> {
         }
     }
 
-    private resolveStore = () => {
-        const { treeStore, type } = this.props;
-        switch (type) {
-            case TreeStoreType.SITE:
-            case TreeStoreType.ARCHIVE:
-                return treeStore.resolveMainTreeStore();
-            case TreeStoreType.WIDGET:
-                return treeStore.getWidgetTreeStore();
-            case TreeStoreType.CONTENTVERSION:
-                return treeStore.getContentVersionTreeStore();
-            case TreeStoreType.MOVE:
-                return treeStore.getMoveTreeStore();
-            default:
-                return null;
-        }
-    }
-
     private handleExpandToNodeClick = (node: ITreeElement) => (e: React.MouseEvent<HTMLElement>) => {
-        const { navigationStore } = this.props;
+        const { navigationStore, treeStore, type } = this.props;
         e.stopPropagation();
-        const tree = this.resolveStore();
+        const tree = treeStore.resolveTree(type);
         tree.setSelectedNode(node);
         if (navigationStore.currentTab === TabTypes.NONE) {
             navigationStore.changeTab(TabTypes.COMMON);
@@ -123,8 +106,8 @@ export default class ContextMenu extends React.Component<Props, State> {
     }
 
     render() {
-        const { node } = this.props;
-        const store = this.resolveStore();
+        const { node, treeStore, type } = this.props;
+        const tree = treeStore.resolveTree(type);
         let elementMenu: JSX.Element;
         switch (node.contextMenuType) {
             case ContextMenuType.SITEMAP:
@@ -145,18 +128,18 @@ export default class ContextMenu extends React.Component<Props, State> {
 
         return (
             <React.Fragment>
-                {store.searchActive &&
+                {tree.searchActive &&
                     <Button
                         icon="diagram-tree"
                         minimal
                         onClick={this.handleExpandToNodeClick(node)}
                         className={cn('context-button', {
-                            'expand-to-node': store.type !== TreeStoreType.MOVE,
-                            'expand-to-node--active': node.isSelected && store.type !== TreeStoreType.MOVE,
+                            'expand-to-node': tree.type !== TreeStoreType.MOVE,
+                            'expand-to-node--active': node.isSelected && tree.type !== TreeStoreType.MOVE,
                         })}
                     />
                 }
-                {(node.isSelected && store.type !== TreeStoreType.MOVE) &&
+                {(node.isSelected && tree.type !== TreeStoreType.MOVE) &&
                     <Popover
                         className="context-popover"
                         content={elementMenu}
