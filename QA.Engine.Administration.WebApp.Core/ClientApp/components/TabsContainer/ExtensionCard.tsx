@@ -56,8 +56,9 @@ export default class ExtentionCard extends React.Component<Props> {
 const readOnlyField = (field: ExtensionFieldModel): JSX.Element => {
     switch (field.typeName.toLowerCase()) {
         case 'string':
-            return (<InputGroup readOnly value={field.value == null ? '' : field.value} />);
         case 'numeric':
+        case 'file':
+        case 'image':
             return (<InputGroup readOnly value={field.value == null ? '' : field.value} />);
         case 'boolean':
             return (<Checkbox readOnly checked={field.value == null ? false : field.value} />);
@@ -73,12 +74,7 @@ const readOnlyField = (field: ExtensionFieldModel): JSX.Element => {
             const dt = field.value == null ? null : new Date(Date.parse(field.value));
             const dtValue = dt == null ? '' : `${dt.getDate()}.${dt.getMonth() + 1}.${dt.getFullYear()} ${dt.getHours()}:${dt.getMinutes()}`;
             return (<InputGroup readOnly value={dtValue} />);
-        case 'file':
-            return null;
-        case 'image':
-            return null;
         case 'textbox':
-            return (<TextArea large readOnly value={field.value == null ? '' : field.value} fill />);
         case 'visualedit':
             return (<TextArea large readOnly value={field.value == null ? '' : field.value} fill />);
         case 'relation':
