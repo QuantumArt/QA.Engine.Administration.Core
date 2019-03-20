@@ -21,7 +21,10 @@ export default class ErrorsTypes {
     };
 
     static readonly QPintegration = {
-        fetchQPAbstractItemFields: 'Error fetching abstract items fields.',
+        fetchQpContentFields: 'Error fetching qp content fields.',
+        fetchCustomActionCode: 'Error fetching custom action code.',
+        fetchCultures: 'Error fetching cultures.',
+        fetchRegions: 'Error fetching regions.',
         updateSiteMapSubTree: 'Error updating sitemap subtree',
     };
 

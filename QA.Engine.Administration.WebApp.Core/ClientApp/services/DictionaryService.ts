@@ -108,6 +108,46 @@ class DictionaryService {
         return result;
     }
 
+    /** Возвращает культуры */
+    public async getCultures(): Promise<ApiResult<CultureModel[]>> {
+
+        const path = '/api/Dictionary/getCultures';
+        const headers = new Headers();
+        headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
+        const init = {
+            headers,
+            method: 'get',
+        };
+
+        console.debug(`%cstart api request get '${path}'`, 'color: green;');
+        const response = await fetch(path, init);
+
+        const result = await <Promise<ApiResult<CultureModel[]>>>response.json();
+        console.log(`%cresult api get '${path}'`, 'color: blue;', result);
+
+        return result;
+    }
+
+    /** Получить код custom action */
+    public async getCustomAction(): Promise<ApiResult<CustomActionModel>> {
+
+        const path = '/api/Dictionary/getCustomAction';
+        const headers = new Headers();
+        headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
+        const init = {
+            headers,
+            method: 'get',
+        };
+
+        console.debug(`%cstart api request get '${path}'`, 'color: green;');
+        const response = await fetch(path, init);
+
+        const result = await <Promise<ApiResult<CustomActionModel>>>response.json();
+        console.log(`%cresult api get '${path}'`, 'color: blue;', result);
+
+        return result;
+    }
+
     private getHeaderData(): any {
         const getQueryVariable = (variable: string) => {
             const result = window.location.search.substring(1).split('&')

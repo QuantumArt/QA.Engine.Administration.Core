@@ -4,11 +4,12 @@ import QpAbstractItemFields from 'constants/QpAbstractItemFields';
 import QpActionCodes from 'constants/QpActionCodes';
 import QpCallbackProcNames from 'constants/QpCallbackProcNames';
 import QpEntityCodes from 'constants/QpEntityCodes';
-import { BackendEventObserver, executeBackendAction, ArticleFormState, ExecuteActionOptions, InitFieldValue } from 'qp/QP8BackendApi.Interaction';
+import { BackendEventObserver, executeBackendAction, ArticleFormState, ExecuteActionOptions, InitFieldValue, OpenSelectWindowOptions, openSelectWindow, EntitiesSelectedArgs } from 'qp/QP8BackendApi.Interaction';
 import TreeStore from 'stores/TreeStore';
 import ErrorHandler from 'stores/ErrorHandler';
 import ErrorsTypes from 'constants/ErrorsTypes';
 import OperationState from 'enums/OperationState';
+import SiteMapService from 'services/SiteMapService';
 
 export enum VersionType {
     Content = 'Content',
@@ -23,10 +24,10 @@ export default class QpIntegrationStore extends ErrorHandler {
 
     @observable state: OperationState = OperationState.NONE;
 
-    public async fetchQPAbstractItemFields() {
+    async fetchQpContentFields(qpContentName: string) {
         this.state = OperationState.PENDING;
         try {
-            const response: ApiResult<QpContentModel> = await DictionaryService.getQpContent(this.qpAbstractItem);
+            const response: ApiResult<QpContentModel> = await DictionaryService.getQpContent(qpContentName);
             if (response.isSuccess) {
                 this.qpContent = response.data;
                 this.state = OperationState.SUCCESS;
@@ -35,7 +36,55 @@ export default class QpIntegrationStore extends ErrorHandler {
             }
         } catch (e) {
             this.state = OperationState.ERROR;
-            this.addError(ErrorsTypes.QPintegration.fetchQPAbstractItemFields, null, e);
+            this.addError(ErrorsTypes.QPintegration.fetchQpContentFields, qpContentName, e);
+        }
+    }
+
+    async fetchCultures() {
+        this.state = OperationState.PENDING;
+        try {
+            const response: ApiResult<CultureModel[]> = await DictionaryService.getCultures();
+            if (response.isSuccess) {
+                this.cultures = response.data;
+                this.state = OperationState.SUCCESS;
+            } else {
+                throw response.error;
+            }
+        } catch (e) {
+            this.state = OperationState.ERROR;
+            this.addError(ErrorsTypes.QPintegration.fetchCultures, null, e);
+        }
+    }
+
+    async fetchRegions() {
+        this.state = OperationState.PENDING;
+        try {
+            const response: ApiResult<RegionModel[]> = await DictionaryService.getFlatRegions();
+            if (response.isSuccess) {
+                this.regions = response.data;
+                this.state = OperationState.SUCCESS;
+            } else {
+                throw response.error;
+            }
+        } catch (e) {
+            this.state = OperationState.ERROR;
+            this.addError(ErrorsTypes.QPintegration.fetchRegions, null, e);
+        }
+    }
+
+    async fetchCustomActionCode() {
+        this.state = OperationState.PENDING;
+        try {
+            const response: ApiResult<CustomActionModel> = await DictionaryService.getCustomAction();
+            if (response.isSuccess) {
+                this.customAction = response.data;
+                this.state = OperationState.SUCCESS;
+            } else {
+                throw response.error;
+            }
+        } catch (e) {
+            this.state = OperationState.ERROR;
+            this.addError(ErrorsTypes.QPintegration.fetchCustomActionCode, null, e);
         }
     }
 
@@ -47,20 +96,24 @@ export default class QpIntegrationStore extends ErrorHandler {
         }
     }
 
-    private qpContent: QpContentModel;
     private qpAbstractItem: string = 'QPAbstractItem';
+    private qpCulture: string = 'QPCulture';
+    private qpRegion: string = 'QPRegion';
+
+    private qpContent: QpContentModel;
+    private cultures: CultureModel[];
+    private regions: RegionModel[];
+    private customAction: CustomActionModel;
     private readonly treeStore: TreeStore;
 
     public async edit(id: number) {
 
-        if (this.qpContent == null || this.qpContent.fields == null || this.qpContent.fields!.length === 0) {
-            await this.fetchQPAbstractItemFields();
-        }
+        await this.fetchQpContentFields(this.qpAbstractItem);
 
         const func = (eventType: number, args: any) => this.updateCallback(eventType, args, id);
         new BackendEventObserver(QpCallbackProcNames.editCode, func);
 
-        const executeOptions = QpIntegrationUtils.initOptions(QpCallbackProcNames.editCode, QpActionCodes.edit_article, id, this.qpContent.id);
+        const executeOptions = QpIntegrationUtils.initOptions(QpCallbackProcNames.editCode, QpActionCodes.edit_article, QpEntityCodes.article, id, this.qpContent.id);
 
         if (executeOptions.options == null) {
             executeOptions.options = new ArticleFormState();
@@ -84,14 +137,12 @@ export default class QpIntegrationStore extends ErrorHandler {
         alias: string,
         title:string }>(node: T, versionType?: VersionType | null, name?: string, title?: string, discriminatorId?: number, extantionId?: number) {
 
-        if (this.qpContent == null || this.qpContent.fields == null || this.qpContent.fields!.length === 0) {
-            await this.fetchQPAbstractItemFields();
-        }
+        await this.fetchQpContentFields(this.qpAbstractItem);
 
         const func = (eventType: number, args: any) => this.addCallback(eventType, args, node.id);
         new BackendEventObserver(QpCallbackProcNames.addCode, func);
 
-        const executeOptions = QpIntegrationUtils.initOptions(QpCallbackProcNames.addCode, QpActionCodes.new_article, 0, this.qpContent.id);
+        const executeOptions = QpIntegrationUtils.initOptions(QpCallbackProcNames.addCode, QpActionCodes.new_article, QpEntityCodes.article, 0, this.qpContent.id);
 
         if (executeOptions.options == null) {
             executeOptions.options = new ArticleFormState();
@@ -137,17 +188,119 @@ export default class QpIntegrationStore extends ErrorHandler {
 
     public async history(id: number) {
 
-        if (this.qpContent == null || this.qpContent.fields == null || this.qpContent.fields!.length === 0) {
-            await this.fetchQPAbstractItemFields();
-        }
+        await this.fetchQpContentFields(this.qpAbstractItem);
 
         new BackendEventObserver(QpCallbackProcNames.historyCode, () => { });
-        const executeOptions = QpIntegrationUtils.initOptions(QpCallbackProcNames.historyCode, QpActionCodes.list_article_version, id, this.qpContent.id);
+        const executeOptions = QpIntegrationUtils.initOptions(QpCallbackProcNames.historyCode, QpActionCodes.list_article_version, QpEntityCodes.article, id, this.qpContent.id);
         this.executeWindow(executeOptions);
+    }
+
+    public async preview(id: number) {
+
+        await this.showCultureSelector(id);
+    }
+
+    private async showCultureSelector(id: number) {
+
+        await this.fetchQpContentFields(this.qpCulture);
+        await this.fetchCultures();
+
+        if (!this.cultures || this.cultures.length <= 1) {
+            this.showCustomAction(id, null, null);
+            return;
+        }
+
+        const func = (eventType: number, args: EntitiesSelectedArgs) => {
+            if (BackendEventObserver.EventType.SelectWindowClosed === eventType) {
+                return;
+            }
+            if (BackendEventObserver.EventType.EntitiesSelected === eventType) {
+                this.showRegionSelector(id, args.selectedEntityIDs);
+            }
+        };
+
+        new BackendEventObserver(QpCallbackProcNames.addCode, func);
+        const executeOptions = QpIntegrationUtils.initSelectOptions(false, this.qpContent.id, this.cultures.map(x => x.id), QpCallbackProcNames.addCode);
+        if (executeOptions.options == null) {
+            executeOptions.options = new ArticleFormState();
+        }
+        executeOptions.options.filter = `c.Archive = 0 and c.content_item_id in (${this.cultures.map(x => x.id).join(',')})`;
+        this.executeSelectWindow(executeOptions);
+    }
+
+    private async showRegionSelector(id: number, cultureIds: number[]) {
+
+        await this.fetchQpContentFields(this.qpRegion);
+        await this.fetchRegions();
+
+        if (!this.regions || this.regions.length <= 1) {
+            this.showCustomAction(id, cultureIds, null);
+            return;
+        }
+
+        const func = (eventType: number, args: EntitiesSelectedArgs) => {
+            if (BackendEventObserver.EventType.SelectWindowClosed === eventType) {
+                return;
+            }
+            if (BackendEventObserver.EventType.EntitiesSelected === eventType) {
+                this.showCustomAction(id, cultureIds, args.selectedEntityIDs);
+            }
+        };
+        new BackendEventObserver(QpCallbackProcNames.addCode, func);
+        const executeOptions = QpIntegrationUtils.initSelectOptions(false, this.qpContent.id, this.regions.map(x => x.id), QpCallbackProcNames.addCode);
+        this.executeSelectWindow(executeOptions);
+    }
+
+    private async showCustomAction(id: number, cultureIds: number[], regionIds: number[]) {
+
+        await this.fetchCustomActionCode();
+
+        const procName = QpCallbackProcNames.previewCode;
+        const entityTypeCode = QpEntityCodes.site;
+        const entityId = QpIntegrationUtils.headerData.SiteId;
+
+        new BackendEventObserver(procName, () => {});
+        const executeOptions = QpIntegrationUtils.initOptions(procName, this.customAction.code, entityTypeCode, entityId, this.customAction.id);
+
+        if (executeOptions.options == null) {
+            executeOptions.options = new ArticleFormState();
+        }
+        executeOptions.options.additionalParams = {};
+        if (this.customAction.itemIdParamName != null) {
+            executeOptions.options.additionalParams[this.customAction.itemIdParamName] = id;
+        }
+        if (cultureIds != null && this.customAction.cultureParamName != null) {
+            executeOptions.options.additionalParams[this.customAction.cultureParamName] = this.cultures.find(x => x.id === cultureIds[0]).name;
+        }
+        if (regionIds != null && this.customAction.regionParamName != null) {
+            executeOptions.options.additionalParams[this.customAction.regionParamName] = regionIds[0];
+        }
+        this.executeTab(executeOptions);
     }
 
     private executeWindow = (executeOptions: ExecuteActionOptions) => {
         executeOptions.isWindow = true;
+        executeOptions.changeCurrentTab = false;
+
+        if (window.parent == null) {
+            alert('Функционал недоступен.');
+            return;
+        }
+
+        executeBackendAction(executeOptions, QpIntegrationUtils.hostUID(), window.parent);
+    }
+
+    private executeSelectWindow = (executeOptions: OpenSelectWindowOptions) => {
+        if (window.parent == null) {
+            alert('Функционал недоступен.');
+            return;
+        }
+
+        openSelectWindow(executeOptions, QpIntegrationUtils.hostUID(), window.parent);
+    }
+
+    private executeTab = (executeOptions: ExecuteActionOptions) => {
+        executeOptions.isWindow = false;
         executeOptions.changeCurrentTab = false;
 
         if (window.parent == null) {
@@ -202,14 +355,26 @@ class QpIntegrationUtils {
     static hostUID = () =>
         (window.location.search.substring(1).split('&').filter(x => x.indexOf('hostUID=') > -1)[0]!.split('=')[1])
 
-    static initOptions = (procName: string, actionCode: string, entityId: number, contentId: number): ExecuteActionOptions => {
+    static initOptions = (procName: string, actionCode: string, entityTypeCode: string, entityId: number, contentId: number): ExecuteActionOptions => {
         const executeOptions = new ExecuteActionOptions();
         executeOptions.actionCode = actionCode;
-        executeOptions.entityTypeCode = QpEntityCodes.article;
+        executeOptions.entityTypeCode = entityTypeCode; // QpEntityCodes.article;
         executeOptions.entityId = entityId;
         executeOptions.parentEntityId = contentId;
         executeOptions.actionUID = QpIntegrationUtils.newGuid();
         executeOptions.callerCallback = procName;
+        return executeOptions;
+    }
+
+    static initSelectOptions = (isMultiple: boolean, entityId: number, selectedEntityIDs: number[], callback: string): OpenSelectWindowOptions => {
+        const executeOptions = new OpenSelectWindowOptions();
+        executeOptions.selectActionCode = isMultiple ? QpActionCodes.multiple_select_article : QpActionCodes.select_article;
+        executeOptions.entityTypeCode = QpEntityCodes.article;
+        executeOptions.isMultiple = isMultiple,
+        executeOptions.parentEntityId = entityId;
+        executeOptions.selectWindowUID = QpIntegrationUtils.newGuid();
+        executeOptions.callerCallback = callback;
+        executeOptions.selectedEntityIDs = selectedEntityIDs;
         return executeOptions;
     }
 
@@ -267,6 +432,22 @@ class QpIntegrationUtils {
 
     private static s4 = () =>
         (Math.floor(Math.random() * 0x10000).toString(16))
+
+    static get headerData(): any {
+        const getQueryVariable = (variable: string) => {
+            const result = window.location.search.substring(1).split('&')
+                .map(x => ({ name: x.split('=')[0], value: x.split('=')[1] }))
+                .filter(x => x.name === variable)[0];
+            return result == null ? null : result.value;
+        };
+
+        return {
+            BackendSid: getQueryVariable('backend_sid'),
+            CustomerCode: getQueryVariable('customerCode'),
+            HostId: getQueryVariable('hostUID'),
+            SiteId: getQueryVariable('site_id'),
+        };
+    }
 
 }
 

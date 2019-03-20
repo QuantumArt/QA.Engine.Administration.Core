@@ -26,24 +26,31 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
     {
         private readonly IItemDifinitionService _itemDifinitionService;
         private readonly IRegionService _regionService;
+        private readonly ICultureService _cultureService;
         private readonly IContentService _contentService;
+        private readonly ICustomActionService _customActionService;
         private readonly IMapper _mapper;
         private readonly ILogger<SiteMapController> _logger;
         private readonly IStringLocalizerFactory _stringLocalizerFactory;
+        private readonly CustomAction _customActionConfig;
         private readonly int _siteId;
         private readonly int _userId;
 
         public DictionaryController(
-            IItemDifinitionService itemDifinitionService, IRegionService regionService, IContentService contentService,
-            IOptions<EnvironmentConfiguration> options, IWebAppQpHelper webAppQpHelper, IMapper mapper, ILogger<SiteMapController> logger,
-            IStringLocalizerFactory stringLocalizerFactory)
+            IItemDifinitionService itemDifinitionService, IRegionService regionService, ICultureService cultureService, IContentService contentService,
+            IOptions<EnvironmentConfiguration> options, IWebAppQpHelper webAppQpHelper, ICustomActionService customActionService,
+            IMapper mapper, ILogger<SiteMapController> logger, IStringLocalizerFactory stringLocalizerFactory)
         {
             _itemDifinitionService = itemDifinitionService;
             _regionService = regionService;
+            _cultureService = cultureService;
             _contentService = contentService;
+            _customActionService = customActionService;
             _mapper = mapper;
             _logger = logger;
             _stringLocalizerFactory = stringLocalizerFactory;
+
+            _customActionConfig = options.Value?.CustomAction;
 
             _siteId = webAppQpHelper.SiteId;
             _userId = webAppQpHelper.UserId;
@@ -108,6 +115,33 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
             _logger.LogTrace($"getRegionTree contentName={contentName}, userId={_userId}");
             var content = _contentService.GetQpContent(_siteId, contentName);
             return ApiResult<QpContentModel>.Success(content);
+        }
+
+        /// <summary>
+        /// Возвращает культуры
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("getCultures")]
+        public ApiResult<List<CultureModel>> GetCultures()
+        {
+            _logger.LogTrace($"getCultures userId={_userId}");
+            var cultures = _cultureService.GetCultures(_siteId);
+            return ApiResult<List<CultureModel>>.Success(cultures);
+        }
+
+        /// <summary>
+        /// Получить код custom action
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("getCustomAction")]
+        public ApiResult<CustomActionModel> GetCustomAction()
+        {
+            _logger.LogTrace($"getCustomActionCode alias={_customActionConfig?.Alias}, userId={_userId}");
+            var customAction = _customActionService.GetCustomAction(_customActionConfig?.Alias);
+            customAction.ItemIdParamName = _customActionConfig?.ItemIdParamName;
+            customAction.CultureParamName = _customActionConfig?.CultureParamName;
+            customAction.RegionParamName = _customActionConfig?.RegionParamName;
+            return ApiResult<CustomActionModel>.Success(customAction);
         }
     }
 }

@@ -66,6 +66,12 @@
     <None Update="ClientApp\types\BaseTreeItemViewModel.d.ts">
       <CustomToolNamespace>Models\BaseTreeItemViewModel.cs</CustomToolNamespace>
     </None>
+    <None Update="ClientApp\types\CultureModel.d.ts">
+      <CustomToolNamespace>..\QA.Engine.Administration.Services.Core\Models\CultureModel.cs</CustomToolNamespace>
+    </None>
+    <None Update="ClientApp\types\CustomActionModel.d.ts">
+      <CustomToolNamespace>..\QA.Engine.Administration.Services.Core\Models\CustomActionModel.cs</CustomToolNamespace>
+    </None>
     <None Update="ClientApp\types\DeleteModel.d.ts">
       <CustomToolNamespace>Models\DeleteModel.cs</CustomToolNamespace>
     </None>

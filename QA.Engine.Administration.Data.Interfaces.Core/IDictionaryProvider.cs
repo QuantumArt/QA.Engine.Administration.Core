@@ -9,5 +9,6 @@ namespace QA.Engine.Administration.Data.Interfaces.Core
         List<StatusTypeData> GetAllStatusTypes(int siteId);
         StatusTypeData GetStatusType(int siteId, QpContentItemStatus status);
         List<RegionData> GetAllRegions(int siteId);
+        List<CultureData> GetAllCultures(int siteId);
     }
 }

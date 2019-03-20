@@ -74,8 +74,17 @@ export default class ErrorToast extends React.Component<Props> {
 
     private handleQPIntergrationError = (store: QpIntegrationStore, error: IErrorModel) => () => {
         switch (error.type) {
-            case ErrorsTypes.QPintegration.fetchQPAbstractItemFields:
-                store.fetchQPAbstractItemFields();
+            case ErrorsTypes.QPintegration.fetchQpContentFields:
+                store.fetchQpContentFields(error.data);
+                break;
+            case ErrorsTypes.QPintegration.fetchCustomActionCode:
+                store.fetchCustomActionCode();
+                break;
+            case ErrorsTypes.QPintegration.fetchCultures:
+                store.fetchCultures();
+                break;
+            case ErrorsTypes.QPintegration.fetchRegions:
+                store.fetchRegions();
                 break;
             case ErrorsTypes.QPintegration.updateSiteMapSubTree:
                 store.updateSiteMapSubTree();

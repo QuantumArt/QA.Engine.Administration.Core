@@ -13,11 +13,20 @@ namespace QA.Engine.Administration.WebApp.Core
         public bool IgnoreQPSecurityChecker { get; set; } = false;
         public bool UseFake { get; set; } = false;
         public FakeData FakeData { get; set; }
+        public CustomAction CustomAction { get; set; }
     }
 
     public class FakeData
     {
         public int UserId { get; set; }
         public string LangName { get; set; }
+    }
+
+    public class CustomAction
+    {
+        public string Alias { get; set; }
+        public string ItemIdParamName { get; set; }
+        public string CultureParamName { get; set; }
+        public string RegionParamName { get; set; }
     }
 }

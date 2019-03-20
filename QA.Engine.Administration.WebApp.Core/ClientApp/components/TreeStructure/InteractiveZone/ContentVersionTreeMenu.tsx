@@ -22,6 +22,11 @@ interface Props {
 @observer
 export default class ContentVersionTreeMenu extends React.Component<Props> {
 
+    private previewClick = () => {
+        const { qpIntegrationStore, itemId } = this.props;
+        qpIntegrationStore.preview(itemId);
+    }
+
     private editClick = () => {
         const { qpIntegrationStore, itemId } = this.props;
         qpIntegrationStore.edit(itemId);
@@ -48,17 +53,12 @@ export default class ContentVersionTreeMenu extends React.Component<Props> {
         cb();
     }
 
-    private handlerExample = () => {
-        // example method for menu action. Will be taken from some store in the future.
-        console.log('click');
-    }
-
     render() {
         const { textStore } = this.props;
         return (
             <Menu>
                 <MenuItem
-                    onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.handlerExample)}
+                    onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.previewClick)}
                     icon="eye-open"
                     text={textStore.texts[Texts.view]}
                 />

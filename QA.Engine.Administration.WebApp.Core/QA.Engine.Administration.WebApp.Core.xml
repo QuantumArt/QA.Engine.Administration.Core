@@ -155,6 +155,18 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.DictionaryController.GetCultures">
+            <summary>
+            Возвращает культуры
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.DictionaryController.GetCustomAction">
+            <summary>
+            Получить код custom action
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController">
             <summary>
             Api получения карты сайта

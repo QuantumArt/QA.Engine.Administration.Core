@@ -64,6 +64,14 @@ SELECT
 FROM [|QPRegion|] reg
 WHERE reg.ARCHIVE = 0
 ";
+        private const string CmdGetAllCultures = @"
+SELECT 
+    reg.CONTENT_ITEM_ID AS Id, 
+    reg.[|QPCulture.Title|] AS Title, 
+    reg.[|QPCulture.Name|] AS Name
+FROM [|QPCulture|] reg
+WHERE reg.ARCHIVE = 0
+";
 
         public List<ItemDefinitionData> GetAllItemDefinitions(int siteId)
         {
@@ -96,6 +104,15 @@ WHERE reg.ARCHIVE = 0
             var query = _netNameQueryAnalyzer.PrepareQueryExtabtion(_metaInfoRepository, CmdGetAllRegions, siteId);
             var result = _connection.Query<RegionData>(query).ToList();
             _logger.LogDebug($"getAllRegions. total: {result.Count()}");
+            return result;
+        }
+
+        public List<CultureData> GetAllCultures(int siteId)
+        {
+            _logger.LogDebug($"GetAllCultures. siteId: {siteId}");
+            var query = _netNameQueryAnalyzer.PrepareQueryExtabtion(_metaInfoRepository, CmdGetAllCultures, siteId);
+            var result = _connection.Query<CultureData>(query).ToList();
+            _logger.LogDebug($"GetAllCultures. total: {result.Count()}");
             return result;
         }
     }

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Dapper;
+using Microsoft.Extensions.Logging;
 using QA.DotNetCore.Engine.Persistent.Interfaces;
 using QA.Engine.Administration.Data.Core.Qp;
 using QA.Engine.Administration.Data.Interfaces.Core;
@@ -15,17 +16,21 @@ namespace QA.Engine.Administration.Data.Core
         private readonly IQpMetadataManager _qpMetadataManager;
         private readonly IQpContentManager _qpContentManager;
         private readonly IQpDbConnector _qpDbConnector;
+        private readonly IDbConnection _connection;
         private readonly ILogger<SettingsProvider> _logger;
 
         private string AbstractItemNetName => "QPAbstractItem";
         private string RegionNetName => "QPRegion";
 
-        public SettingsProvider(IMetaInfoRepository metaInfoRepository, IQpMetadataManager qpMetadataManager, IQpContentManager qpContentManager, IQpDbConnector qpDbConnector, ILogger<SettingsProvider> logger)
+        public SettingsProvider(
+            IMetaInfoRepository metaInfoRepository, IQpMetadataManager qpMetadataManager, IQpContentManager qpContentManager,
+            IUnitOfWork uow, IQpDbConnector qpDbConnector, ILogger<SettingsProvider> logger)
         {
             _metaInfoRepository = metaInfoRepository;
             _qpMetadataManager = qpMetadataManager;
             _qpContentManager = qpContentManager;
             _qpDbConnector = qpDbConnector;
+            _connection = uow.Connection;
             _logger = logger;
         }
 
@@ -100,6 +105,15 @@ namespace QA.Engine.Administration.Data.Core
             var url = _qpDbConnector.DbConnector.GetUrlForFileAttribute(fieldId, true, false);
             _logger.LogDebug($"getIconUrl. url: {url}");
             return url;
+        }
+
+        public CustomActionData GetCustomAction(string alias)
+        {
+            _logger.LogDebug($"getCustomActionCode. alias: {alias}");
+            var query = $"SELECT c.ID as Id, b.CODE as Code FROM CUSTOM_ACTION c JOIN BACKEND_ACTION b ON c.ACTION_ID=b.ID WHERE ALIAS='{alias}'";
+            var result = _connection.QuerySingleOrDefault<CustomActionData>(query);
+            _logger.LogDebug($"getCustomActionCode. result: {result}");
+            return result;
         }
     }
 }

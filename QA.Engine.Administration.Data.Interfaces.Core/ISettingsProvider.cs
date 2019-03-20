@@ -10,5 +10,6 @@ namespace QA.Engine.Administration.Data.Interfaces.Core
         QpContentData GetContent(int siteId, string contentName);
         List<QpFieldData> GetFields(int siteId, int contentId);
         string GetIconUrl(int siteId);
+        CustomActionData GetCustomAction(string alias);
     }
 }
