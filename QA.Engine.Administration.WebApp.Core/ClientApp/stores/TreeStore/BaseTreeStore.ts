@@ -5,6 +5,7 @@ import InteractiveZone from 'components/TreeStructure/InteractiveZone';
 import ContextMenuType from 'enums/ContextMenuType';
 import TreeStoreType from 'enums/TreeStoreType';
 import NodeLabel from 'components/TreeStructure/NodeLabel';
+import { number } from 'prop-types';
 
 export interface ITreeElement extends ITreeNode {
     title?: string;
@@ -116,6 +117,7 @@ export abstract class BaseTreeState<T extends {
                             };
                             results.add(foundEl);
                         }
+                        this.searchInternal(results, query, node);
                     };
                     this.forEachOrigNode(this.origTreeInternal, filterFunc);
                     this.origSearchedTreeInternal = Array.from(results);
@@ -127,6 +129,8 @@ export abstract class BaseTreeState<T extends {
             },
             500,
         );
+    }
+    protected searchInternal(results: Set<T>, query: string, node: T) {
     }
 
     @action
@@ -396,11 +400,13 @@ export abstract class BaseTreeState<T extends {
     protected convertTree(data: T[], key: 'searchedTreeInternal' | 'treeInternal'): void {
         let elements = data;
         let loop = true;
-
         let hMap = new Map<number, ITreeElement>();
-        const path: string[] = [];
+
+        this.pathMap = key === 'treeInternal' ? new Map<number, string>() : this.pathMap;
+
         elements.forEach((x) => {
             hMap.set(x.id, this.mapElement(x));
+            key === 'treeInternal' && this.pathMap.set(x.id, '');
         });
         const tree: ITreeElement[] = Array.from(hMap.values());
 
@@ -413,9 +419,6 @@ export abstract class BaseTreeState<T extends {
                     children = children.concat(x.children);
                 }
             });
-            if (children.length && key === 'treeInternal') {
-                path.push(hMap.get(children[0].parentId).title);
-            }
             children.forEach((x) => {
                 loop = true;
                 const el = this.mapElement(x);
@@ -424,7 +427,8 @@ export abstract class BaseTreeState<T extends {
                 if (treeEl != null) {
                     treeEl.childNodes.push(el);
                     childNodes.set(+el.id, el);
-                    this.pathMap.set(el.id, path.join('/'));
+                    key === 'treeInternal' && this.pathMap.has(el.parentId)
+                        && this.pathMap.set(el.id, `${this.pathMap.get(el.parentId)}/${hMap.get(el.parentId).title}`);
                 }
             });
             if (childNodes.size !== children.length) {

@@ -92,7 +92,6 @@ export default class SiteTree extends React.Component<Props, State> {
                 ].forEach((x) => {
                     x.init(tree.selectedNode);
                 });
-                treeStore.getMoveTreeStore().init(tree.selectedNode, tree.origTree);
                 this.setState({ currentNode: tree.selectedNode });
             }
             if (selectedNodeId !== currentNodeId && type === 'main' && tree instanceof ArchiveTreeStore) {

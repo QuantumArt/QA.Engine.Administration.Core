@@ -67,7 +67,9 @@ export default class SiteTreeMenu extends React.Component<Props> {
     }
 
     private moveClick = () => {
-        const { popupStore, itemId, textStore } = this.props;
+        const { popupStore, itemId, textStore, treeStore } = this.props;
+        const tree = treeStore.getSiteTreeStore();
+        treeStore.getMoveTreeStore().init(tree.selectedNode, tree.origTree);
         popupStore.show(itemId, PopupType.MOVE, textStore.texts[Texts.popupMoveTitle]);
     }
 

@@ -45,6 +45,22 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
         this.fetchTree();
     }
 
+    @action
+    public setSelectedNode = (node: ITreeElement) => {
+        this.selectedNode = this.getNodeById(node.id);
+        this.selectedTreeElement = node;
+    }
+
+    @action
+    public getNodeToScroll(): number {
+        if (this.expandLaunched && this.cordsUpdated && !this.searchActive) {
+            this.setCordsUpdateStatus(false);
+            this.expandLaunched = false;
+            return this.selectedTreeElement.id;
+        }
+        return null;
+    }
+
     protected readonly contextMenuType: ContextMenuType = ContextMenuType.WIDGET;
 
     protected async getTree(): Promise<ApiResult<WidgetModel[]>> {
@@ -87,6 +103,19 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
         return this.icons.node;
     }
 
+    protected searchInternal(results: Set<WidgetModel>, query: string, node: WidgetModel) {
+        if (node.zoneName && node.zoneName.toLowerCase().includes(query)) {
+            const foundEl: WidgetModel = {
+                ...node,
+                id: -node.id,
+                title: '',
+                children: [],
+                parentId: null,
+            };
+            results.add(foundEl);
+        }
+    }
+
     protected convertTree(data: WidgetModel[], key: 'searchedTreeInternal' | 'treeInternal'): void {
         if (this.searchActive) {
             super.convertTree(data, key);
@@ -94,24 +123,25 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
         }
         const tree: ITreeElement[] = [];
         const zones: ITreeElement[] = [];
-        let path: string[] = [];
+
         data.forEach((x) => {
+            const path: string[] = [];
             if (key === 'treeInternal') {
-                path.push(x.zoneName);
+                path.push(`[${x.zoneName ? x.zoneName : ''}]`);
             }
             let zoneEl = zones.find(z => z.label === x.zoneName);
             if (!zoneEl) {
                 zoneEl = this.mapWidgetZoneElement(x, null, -x.id);
-                // if (key === 'treeInternal') {
-                //     path.push(zoneEl.title);
-                // }
                 tree.push(zoneEl);
                 zones.push(zoneEl);
             }
             const treeItem = this.mapWidgetElement(x, zoneEl.id);
             zoneEl.childNodes.push(treeItem);
             this.pathMap.set(treeItem.id, path.join('/'));
-            path = [];
+            this.pathMap.set(-treeItem.id, path.join('/'));
+            if (key === 'treeInternal') {
+                path.push(x.title);
+            }
             this.convertTreeInternal(x, treeItem, path, key);
         });
 
@@ -121,23 +151,24 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
     private convertTreeInternal(el: WidgetModel, parent: ITreeElement, path: string[], key: 'searchedTreeInternal' | 'treeInternal'): void {
         const zones: ITreeElement[] = [];
         el.children.forEach((x) => {
+            const internalPath = Object.assign([], path);
             if (key === 'treeInternal') {
-                path.push(x.zoneName);
-                path.push(x.title);
+                internalPath.push(`[${x.zoneName ? x.zoneName : ''}]`);
             }
             let zoneEl = zones.find(z => z.label === x.zoneName);
             if (!zoneEl) {
                 zoneEl = this.mapWidgetZoneElement(x, parent.id, -x.id);
-                // if (key === 'treeInternal') {
-                //     path.push(zoneEl.title);
-                // }
                 zones.push(zoneEl);
                 parent.childNodes.push(zoneEl);
             }
             const treeItem = this.mapWidgetElement(x, zoneEl.id);
             zoneEl.childNodes.push(treeItem);
-            this.pathMap.set(treeItem.id, path.join('/'));
-            this.convertTreeInternal(x, treeItem, path, key);
+            this.pathMap.set(treeItem.id, internalPath.join('/'));
+            this.pathMap.set(-treeItem.id, internalPath.join('/'));
+            if (key === 'treeInternal') {
+                internalPath.push(x.title);
+            }
+            this.convertTreeInternal(x, treeItem, internalPath, key);
         });
     }
 
@@ -175,4 +206,5 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
     }
 
     private widgetTree: WidgetModel[];
+    private selectedTreeElement: ITreeElement;
 }
