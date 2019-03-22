@@ -195,6 +195,12 @@ export default class QpIntegrationStore extends ErrorHandler {
         this.executeWindow(executeOptions);
     }
 
+    public link(extensionId: number, relatedId: number) {
+        new BackendEventObserver(QpCallbackProcNames.editCode, () => { });
+        const executeOptions = QpIntegrationUtils.initOptions(QpCallbackProcNames.editCode, QpActionCodes.edit_article, QpEntityCodes.article, relatedId, extensionId);
+        this.executeWindow(executeOptions);
+    }
+
     public async preview(id: number) {
 
         await this.showCultureSelector(id);

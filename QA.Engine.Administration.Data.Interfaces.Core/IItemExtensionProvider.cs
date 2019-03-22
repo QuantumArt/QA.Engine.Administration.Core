@@ -6,5 +6,6 @@ namespace QA.Engine.Administration.Data.Interfaces.Core
     public interface IItemExtensionProvider
     {
         List<FieldAttributeData> GetItemExtensionFields(int siteId, int id, int extantionId);
+        string GetRelatedItemName(int siteId, int id, int attributeId);
     }
 }

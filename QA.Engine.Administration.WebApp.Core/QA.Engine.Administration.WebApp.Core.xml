@@ -219,12 +219,20 @@
             <param name="regionIds">Id регионов</param>
             <returns></returns>
         </member>
-        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.GetExtantionFields(System.Int32,System.Int32)">
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.GetExtensionFields(System.Int32,System.Int32)">
             <summary>
             Возвращает поля расширения для статьи контента
             </summary>
             <param name="id">Id статьи</param>
-            <param name="extantionId">Id расширения</param>
+            <param name="extensionId">Id расширения</param>
+            <returns></returns>
+        </member>
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.GetRelatedItemName(System.Int32,System.Int32)">
+            <summary>
+            Возвращает значение поля связанного элемента по id и id поля
+            </summary>
+            <param name="id">id элемента расширения</param>
+            <param name="attributeId">id поля</param>
             <returns></returns>
         </member>
         <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.Publish(System.Collections.Generic.List{System.Int32})">

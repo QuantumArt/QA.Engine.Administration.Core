@@ -15,5 +15,6 @@ namespace QA.Engine.Administration.Services.Core.Interfaces
         ArchiveModel GetArchiveSubTree(int siteId, int itemId);
 
         List<ExtensionFieldModel> GetItemExtantionFields(int siteId, int id, int extensionId);
+        string GetRelatedItemName(int siteId, int id, int attributeId);
     }
 }

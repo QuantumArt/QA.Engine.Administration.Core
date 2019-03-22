@@ -12,6 +12,7 @@ export default class EditArticleStore extends ErrorHandler {
     @observable public state: OperationState = OperationState.NONE;
     @observable public fields: ExtensionFieldModel[] = [];
     @observable public isShowExtensionFields: boolean = false;
+    public relatedItems: Map<number, string>;
     public isEditable: boolean;
     private node: PageModel | ArchiveModel;
 
@@ -24,8 +25,9 @@ export default class EditArticleStore extends ErrorHandler {
         }
         this.title = node.title;
         this.isInSiteMap = node.isInSiteMap;
-        this.isEditable = !node.isArchive;
+        this.isEditable = !node.isArchive && node.extensionId != null;
         this.isShowExtensionFields = false;
+        this.relatedItems = new Map<number, string>();
     }
 
     @action
@@ -42,14 +44,22 @@ export default class EditArticleStore extends ErrorHandler {
     }
 
     @action
-    public async fetchExtentionFields(): Promise<void> {
+    async fetchExtensionFields(): Promise<void> {
         this.state = OperationState.PENDING;
         const id = this.node.id;
-        const extantionId = this.node.extensionId;
+        const extensionId = this.node.extensionId;
         try {
-            const response: ApiResult<ExtensionFieldModel[]> = await SiteMapService.getExtantionFields(id, extantionId);
+            const response: ApiResult<ExtensionFieldModel[]> = await SiteMapService.getExtensionFields(id, extensionId);
             if (response.isSuccess) {
-                this.fields = response.data || [];
+                const fields = response.data || [];
+
+                const relationFields = fields.filter(x => x.typeName.toLowerCase() === 'relation' && x.value);
+                const itemNames = relationFields.map((x) => {
+                    return this.fetchRelatedItemName(x, x.value, x.attributeId);
+                });
+                await Promise.all(itemNames);
+
+                this.fields = fields;
                 this.state = OperationState.SUCCESS;
             } else {
                 throw response.error;
@@ -61,9 +71,19 @@ export default class EditArticleStore extends ErrorHandler {
     }
 
     @action
-    public removeError = (i: number) => {
+    removeError = (i: number) => {
         this.state = OperationState.NONE;
         this.errors.splice(i, 1);
         this.init(this.node);
+    }
+
+    private async fetchRelatedItemName(field: ExtensionFieldModel, id: number, attributeId: number) {
+        const response: ApiResult<string> = await SiteMapService.getRelatedItemName(id, attributeId);
+        if (response.isSuccess) {
+            this.relatedItems.set(field.attributeId, response.data);
+            this.state = OperationState.SUCCESS;
+        } else {
+            throw response.error;
+        }
     }
 }

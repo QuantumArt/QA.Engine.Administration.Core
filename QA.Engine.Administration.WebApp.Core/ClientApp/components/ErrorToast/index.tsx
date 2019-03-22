@@ -69,7 +69,7 @@ export default class ErrorToast extends React.Component<Props> {
     }
 
     private handleArticleError = (store: EditArticleStore) => () => {
-        store.fetchExtentionFields();
+        store.fetchExtensionFields();
     }
 
     private handleQPIntergrationError = (store: QpIntegrationStore, error: IErrorModel) => () => {

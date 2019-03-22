@@ -7,5 +7,7 @@ declare interface ExtensionFieldModel {
   typeName: string;
   typeDescription: string;
   value: null | any; // any 
+  relationExtensionId?: null | number; // number 
+  attributeId: number;
 }
 

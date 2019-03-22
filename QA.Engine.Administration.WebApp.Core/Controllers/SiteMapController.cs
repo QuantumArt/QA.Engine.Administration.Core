@@ -130,14 +130,28 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// Возвращает поля расширения для статьи контента
         /// </summary>
         /// <param name="id">Id статьи</param>
-        /// <param name="extantionId">Id расширения</param>
+        /// <param name="extensionId">Id расширения</param>
         /// <returns></returns>
-        [HttpGet("getExtantionFields")]
-        public ApiResult<List<ExtensionFieldModel>> GetExtantionFields(int id, int extantionId)
+        [HttpGet("getExtensionFields")]
+        public ApiResult<List<ExtensionFieldModel>> GetExtensionFields(int id, int extensionId)
         {
-            _logger.LogDebug($"getExtantionFields id={id}, extensionId={extantionId}");
-            var fields = _siteMapService.GetItemExtantionFields(_siteId, id, extantionId);
+            _logger.LogDebug($"getExtantionFields id={id}, extensionId={extensionId}");
+            var fields = _siteMapService.GetItemExtantionFields(_siteId, id, extensionId);
             return ApiResult<List<ExtensionFieldModel>>.Success(fields);
+        }
+
+        /// <summary>
+        /// Возвращает значение поля связанного элемента по id и id поля
+        /// </summary>
+        /// <param name="id">id элемента расширения</param>
+        /// <param name="attributeId">id поля</param>
+        /// <returns></returns>
+        [HttpGet("getRelatedItemName")]
+        public ApiResult<string> GetRelatedItemName(int id, int attributeId)
+        {
+            _logger.LogDebug($"getRelatedItem id={id}, attributeId={attributeId}");
+            var fields = _siteMapService.GetRelatedItemName(_siteId, id, attributeId);
+            return ApiResult<string>.Success(fields);
         }
 
         /// <summary>

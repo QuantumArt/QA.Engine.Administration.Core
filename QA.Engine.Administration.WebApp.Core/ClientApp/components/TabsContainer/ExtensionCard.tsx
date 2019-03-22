@@ -5,20 +5,27 @@ import OperationState from 'enums/OperationState';
 import EditArticleStore from 'stores/EditArticleStore';
 import TextStore from 'stores/TextStore';
 import Texts from 'constants/Texts';
+import QpIntegrationStore from 'stores/QpIntegrationStore';
 
 interface Props {
     editArticleStore?: EditArticleStore;
     textStore?: TextStore;
+    qpIntegrationStore?: QpIntegrationStore;
 }
 
-@inject('editArticleStore', 'textStore')
+@inject('editArticleStore', 'textStore', 'qpIntegrationStore')
 @observer
 export default class ExtentionCard extends React.Component<Props> {
 
     private showClick = () => {
         const { editArticleStore } = this.props;
         editArticleStore.showExtensionFields();
-        editArticleStore.fetchExtentionFields();
+        editArticleStore.fetchExtensionFields();
+    }
+
+    private relationClick = (field: ExtensionFieldModel) => {
+        const { qpIntegrationStore } = this.props;
+        qpIntegrationStore.link(field.relationExtensionId, field.value);
     }
 
     private change = (e: React.ChangeEvent<HTMLInputElement>, field: ExtensionFieldModel) => {
@@ -45,7 +52,7 @@ export default class ExtentionCard extends React.Component<Props> {
             <React.Fragment>
                 {editArticleStore.fields.map((field, i) => (
                     <FormGroup label={field.fieldName} inline key={i}>
-                        {readOnlyField(field)}
+                        {readOnlyField(field, editArticleStore.relatedItems, this.relationClick)}
                     </FormGroup>),
                 )}
             </React.Fragment>
@@ -53,7 +60,11 @@ export default class ExtentionCard extends React.Component<Props> {
     }
 }
 
-const readOnlyField = (field: ExtensionFieldModel): JSX.Element => {
+const readOnlyField = (
+    field: ExtensionFieldModel,
+    relatedItems: Map<number, string>,
+    relationClick: (field: ExtensionFieldModel) => void,
+    ): JSX.Element => {
     switch (field.typeName.toLowerCase()) {
         case 'string':
         case 'numeric':
@@ -78,7 +89,9 @@ const readOnlyField = (field: ExtensionFieldModel): JSX.Element => {
         case 'visualedit':
             return (<TextArea large readOnly value={field.value == null ? '' : field.value} fill />);
         case 'relation':
-            return null;
+            const name = relatedItems.get(field.attributeId);
+            const text = `(${field.value == null ? '' : field.value}) ${name}`;
+            return (<AnchorButton minimal rightIcon="th-derived" text={text} onClick={() => { relationClick(field); }} />);
         case 'dynamic image':
             return null;
         case 'relation many-to-one':

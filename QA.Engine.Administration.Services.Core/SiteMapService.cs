@@ -212,5 +212,11 @@ namespace QA.Engine.Administration.Services.Core
             var result = _mapper.Map<List<ExtensionFieldModel>>(fields);
             return result;
         }
+
+        public string GetRelatedItemName(int siteId, int id, int attributeId)
+        {
+            var relatedItemName = _itemExtensionProvider.GetRelatedItemName(siteId, id, attributeId);
+            return relatedItemName;
+        }
     }
 }

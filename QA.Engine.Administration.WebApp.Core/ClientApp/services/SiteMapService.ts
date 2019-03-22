@@ -146,13 +146,13 @@ class SiteMapService {
     }
 
     /** Возвращает поля расширения для статьи контента */
-    public async getExtantionFields(id: number, extantionId: number): Promise<ApiResult<ExtensionFieldModel[]>> {
+    public async getExtensionFields(id: number, extensionId: number): Promise<ApiResult<ExtensionFieldModel[]>> {
 
         let urlparams = '';
         urlparams += Array.isArray(id) && id.length === 0 ? '' : `&id=${id} `;
-        urlparams += Array.isArray(extantionId) && extantionId.length === 0 ? '' : `&extantionId=${extantionId} `;
+        urlparams += Array.isArray(extensionId) && extensionId.length === 0 ? '' : `&extensionId=${extensionId} `;
         urlparams = urlparams.length > 0 ? `?${urlparams.slice(1)}` : '';
-        const path = `/api/SiteMap/getExtantionFields${urlparams}`;
+        const path = `/api/SiteMap/getExtensionFields${urlparams}`;
         const headers = new Headers();
         headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
         const init = {
@@ -164,6 +164,30 @@ class SiteMapService {
         const response = await fetch(path, init);
 
         const result = await <Promise<ApiResult<ExtensionFieldModel[]>>>response.json();
+        console.log(`%cresult api get '${path}'`, 'color: blue;', result);
+
+        return result;
+    }
+
+    /** Возвращает значение поля связанного элемента по id и id поля */
+    public async getRelatedItemName(id: number, attributeId: number): Promise<ApiResult<string>> {
+
+        let urlparams = '';
+        urlparams += Array.isArray(id) && id.length === 0 ? '' : `&id=${id} `;
+        urlparams += Array.isArray(attributeId) && attributeId.length === 0 ? '' : `&attributeId=${attributeId} `;
+        urlparams = urlparams.length > 0 ? `?${urlparams.slice(1)}` : '';
+        const path = `/api/SiteMap/getRelatedItemName${urlparams}`;
+        const headers = new Headers();
+        headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
+        const init = {
+            headers,
+            method: 'get',
+        };
+
+        console.debug(`%cstart api request get '${path}'`, 'color: green;');
+        const response = await fetch(path, init);
+
+        const result = await <Promise<ApiResult<string>>>response.json();
         console.log(`%cresult api get '${path}'`, 'color: blue;', result);
 
         return result;
