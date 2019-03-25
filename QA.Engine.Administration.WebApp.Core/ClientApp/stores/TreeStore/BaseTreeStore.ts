@@ -5,7 +5,6 @@ import InteractiveZone from 'components/TreeStructure/InteractiveZone';
 import ContextMenuType from 'enums/ContextMenuType';
 import TreeStoreType from 'enums/TreeStoreType';
 import NodeLabel from 'components/TreeStructure/NodeLabel';
-import { number } from 'prop-types';
 
 export interface ITreeElement extends ITreeNode {
     title?: string;

@@ -18,6 +18,14 @@ export default class SiteTreeStore extends BaseTreeState<PageModel> {
         this.regionIds = regionId == null ? [] : [regionId];
     }
 
+    public getRootElement(): PageModel {
+        let node = this.selectedNode;
+        while (node.parentId != null) {
+            node = this.getNodeById(node.parentId);
+        }
+        return node;
+    }
+
     protected contextMenuType: ContextMenuType = ContextMenuType.SITEMAP;
 
     protected async getTree(): Promise<ApiResult<PageModel[]>> {

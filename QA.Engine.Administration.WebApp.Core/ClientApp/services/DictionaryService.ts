@@ -129,9 +129,12 @@ class DictionaryService {
     }
 
     /** Получить код custom action */
-    public async getCustomAction(): Promise<ApiResult<CustomActionModel>> {
+    public async getCustomAction(alias: string): Promise<ApiResult<CustomActionModel>> {
 
-        const path = '/api/Dictionary/getCustomAction';
+        let urlparams = '';
+        urlparams += Array.isArray(alias) && alias.length === 0 ? '' : `&alias=${alias} `;
+        urlparams = urlparams.length > 0 ? `?${urlparams.slice(1)}` : '';
+        const path = `/api/Dictionary/getCustomAction${urlparams}`;
         const headers = new Headers();
         headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
         const init = {

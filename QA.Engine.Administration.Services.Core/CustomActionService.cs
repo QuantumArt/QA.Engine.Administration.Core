@@ -17,7 +17,7 @@ namespace QA.Engine.Administration.Services.Core
         public CustomActionModel GetCustomAction(string alias)
         {
             var customAction = _settingsProvider.GetCustomAction(alias);
-            return new CustomActionModel
+            return customAction == null ? null : new CustomActionModel
             {
                 Id = customAction.Id,
                 Code = customAction.Code

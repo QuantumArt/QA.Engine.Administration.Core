@@ -110,9 +110,9 @@ namespace QA.Engine.Administration.Data.Core
         public CustomActionData GetCustomAction(string alias)
         {
             _logger.LogDebug($"getCustomActionCode. alias: {alias}");
-            var query = $"SELECT c.ID as Id, b.CODE as Code FROM CUSTOM_ACTION c JOIN BACKEND_ACTION b ON c.ACTION_ID=b.ID WHERE ALIAS='{alias}'";
+            var query = $"SELECT c.ID as Id, b.CODE as Code FROM CUSTOM_ACTION c JOIN BACKEND_ACTION b ON c.ACTION_ID=b.ID WHERE ALIAS='{alias.ToLower()}'";
             var result = _connection.QuerySingleOrDefault<CustomActionData>(query);
-            _logger.LogDebug($"getCustomActionCode. result: {result}");
+            _logger.LogDebug($"getCustomActionCode. result: {Newtonsoft.Json.JsonConvert.SerializeObject(result)}");
             return result;
         }
     }

@@ -23,8 +23,10 @@ interface Props {
 export default class SiteTreeMenu extends React.Component<Props> {
 
     private previewClick = () => {
-        const { qpIntegrationStore, itemId } = this.props;
-        qpIntegrationStore.preview(itemId);
+        const { qpIntegrationStore, itemId, treeStore } = this.props;
+        const tree = treeStore.getSiteTreeStore();
+        const root = tree.getRootElement();
+        qpIntegrationStore.preview(itemId, root.alias.trim());
     }
 
     private editClick = () => {

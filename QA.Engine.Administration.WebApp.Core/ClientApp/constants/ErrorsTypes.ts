@@ -23,6 +23,7 @@ export default class ErrorsTypes {
     static readonly QPintegration = {
         fetchQpContentFields: 'Error fetching qp content fields.',
         fetchCustomActionCode: 'Error fetching custom action code.',
+        fetchCustomActionCodeNotFound: 'Custom action code doesn\'t exist. Check the Alias field of custom action',
         fetchCultures: 'Error fetching cultures.',
         fetchRegions: 'Error fetching regions.',
         updateSiteMapSubTree: 'Error updating sitemap subtree',

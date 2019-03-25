@@ -72,19 +72,24 @@ export default class QpIntegrationStore extends ErrorHandler {
         }
     }
 
-    async fetchCustomActionCode() {
+    async fetchCustomActionCode(alias: string) {
         this.state = OperationState.PENDING;
         try {
-            const response: ApiResult<CustomActionModel> = await DictionaryService.getCustomAction();
+            const response: ApiResult<CustomActionModel> = await DictionaryService.getCustomAction(alias);
             if (response.isSuccess) {
                 this.customAction = response.data;
-                this.state = OperationState.SUCCESS;
+                if (this.customAction == null) {
+                    this.state = OperationState.ERROR;
+                    this.addError(ErrorsTypes.QPintegration.fetchCustomActionCodeNotFound, null, '');
+                } else {
+                    this.state = OperationState.SUCCESS;
+                }
             } else {
                 throw response.error;
             }
         } catch (e) {
             this.state = OperationState.ERROR;
-            this.addError(ErrorsTypes.QPintegration.fetchCustomActionCode, null, e);
+            this.addError(ErrorsTypes.QPintegration.fetchCustomActionCode, alias, e);
         }
     }
 
@@ -201,18 +206,18 @@ export default class QpIntegrationStore extends ErrorHandler {
         this.executeWindow(executeOptions);
     }
 
-    public async preview(id: number) {
+    public async preview(id: number, alias: string) {
 
-        await this.showCultureSelector(id);
+        await this.showCultureSelector(id, alias);
     }
 
-    private async showCultureSelector(id: number) {
+    private async showCultureSelector(id: number, alias: string) {
 
         await this.fetchQpContentFields(this.qpCulture);
         await this.fetchCultures();
 
         if (!this.cultures || this.cultures.length <= 1) {
-            this.showCustomAction(id, null, null);
+            this.showCustomAction(id, alias, null, null);
             return;
         }
 
@@ -221,7 +226,7 @@ export default class QpIntegrationStore extends ErrorHandler {
                 return;
             }
             if (BackendEventObserver.EventType.EntitiesSelected === eventType) {
-                this.showRegionSelector(id, args.selectedEntityIDs);
+                this.showRegionSelector(id, alias, args.selectedEntityIDs);
             }
         };
 
@@ -234,13 +239,13 @@ export default class QpIntegrationStore extends ErrorHandler {
         this.executeSelectWindow(executeOptions);
     }
 
-    private async showRegionSelector(id: number, cultureIds: number[]) {
+    private async showRegionSelector(id: number, alias: string, cultureIds: number[]) {
 
         await this.fetchQpContentFields(this.qpRegion);
         await this.fetchRegions();
 
         if (!this.regions || this.regions.length <= 1) {
-            this.showCustomAction(id, cultureIds, null);
+            this.showCustomAction(id, alias, cultureIds, null);
             return;
         }
 
@@ -249,7 +254,7 @@ export default class QpIntegrationStore extends ErrorHandler {
                 return;
             }
             if (BackendEventObserver.EventType.EntitiesSelected === eventType) {
-                this.showCustomAction(id, cultureIds, args.selectedEntityIDs);
+                this.showCustomAction(id, alias, cultureIds, args.selectedEntityIDs);
             }
         };
         new BackendEventObserver(QpCallbackProcNames.addCode, func);
@@ -257,13 +262,17 @@ export default class QpIntegrationStore extends ErrorHandler {
         this.executeSelectWindow(executeOptions);
     }
 
-    private async showCustomAction(id: number, cultureIds: number[], regionIds: number[]) {
+    private async showCustomAction(id: number, alias: string, cultureIds: number[], regionIds: number[]) {
 
-        await this.fetchCustomActionCode();
+        await this.fetchCustomActionCode(alias);
 
         const procName = QpCallbackProcNames.previewCode;
         const entityTypeCode = QpEntityCodes.site;
         const entityId = QpIntegrationUtils.headerData.SiteId;
+
+        if (this.customAction == null) {
+            return;
+        }
 
         new BackendEventObserver(procName, () => {});
         const executeOptions = QpIntegrationUtils.initOptions(procName, this.customAction.code, entityTypeCode, entityId, this.customAction.id);

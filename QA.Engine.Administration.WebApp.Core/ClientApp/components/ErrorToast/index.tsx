@@ -78,7 +78,7 @@ export default class ErrorToast extends React.Component<Props> {
                 store.fetchQpContentFields(error.data);
                 break;
             case ErrorsTypes.QPintegration.fetchCustomActionCode:
-                store.fetchCustomActionCode();
+                store.fetchCustomActionCode(error.data);
                 break;
             case ErrorsTypes.QPintegration.fetchCultures:
                 store.fetchCultures();

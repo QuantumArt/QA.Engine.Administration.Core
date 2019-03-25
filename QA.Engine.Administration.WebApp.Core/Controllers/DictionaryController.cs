@@ -134,10 +134,13 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("getCustomAction")]
-        public ApiResult<CustomActionModel> GetCustomAction()
+        public ApiResult<CustomActionModel> GetCustomAction(string alias)
         {
-            _logger.LogTrace($"getCustomActionCode alias={_customActionConfig?.Alias}, userId={_userId}");
-            var customAction = _customActionService.GetCustomAction(_customActionConfig?.Alias);
+            alias = string.IsNullOrWhiteSpace(alias) ? _customActionConfig?.Alias : $"{_customActionConfig?.Alias}_{alias}";
+            _logger.LogTrace($"getCustomActionCode alias={alias}, userId={_userId}");
+            var customAction = _customActionService.GetCustomAction(alias);
+            if (customAction == null)
+                return ApiResult<CustomActionModel>.Success(null);
             customAction.ItemIdParamName = _customActionConfig?.ItemIdParamName;
             customAction.CultureParamName = _customActionConfig?.CultureParamName;
             customAction.RegionParamName = _customActionConfig?.RegionParamName;

@@ -161,7 +161,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.DictionaryController.GetCustomAction">
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.DictionaryController.GetCustomAction(System.String)">
             <summary>
             Получить код custom action
             </summary>
