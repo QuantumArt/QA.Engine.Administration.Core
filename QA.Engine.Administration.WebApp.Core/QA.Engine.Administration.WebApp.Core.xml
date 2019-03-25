@@ -235,6 +235,15 @@
             <param name="attributeId">id поля</param>
             <returns></returns>
         </member>
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.GetManyToOneRelatedItemNames(System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Возвращает значения полей связанных элементов (many-to-one)
+            </summary>
+            <param name="id"></param>
+            <param name="value"></param>
+            <param name="attributeId"></param>
+            <returns></returns>
+        </member>
         <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.SiteMapController.Publish(System.Collections.Generic.List{System.Int32})">
             <summary>
             Опубликовать страницу

@@ -193,6 +193,31 @@ class SiteMapService {
         return result;
     }
 
+    /** Возвращает значения полей связанных элементов (many-to-one) */
+    public async getManyToOneRelatedItemNames(id: number, value: number, attributeId: number): Promise<ApiResult<{ [key: number]: string; }>> {
+
+        let urlparams = '';
+        urlparams += Array.isArray(id) && id.length === 0 ? '' : `&id=${id} `;
+        urlparams += Array.isArray(value) && value.length === 0 ? '' : `&value=${value} `;
+        urlparams += Array.isArray(attributeId) && attributeId.length === 0 ? '' : `&attributeId=${attributeId} `;
+        urlparams = urlparams.length > 0 ? `?${urlparams.slice(1)}` : '';
+        const path = `/api/SiteMap/getManyToOneRelatedItemNames${urlparams}`;
+        const headers = new Headers();
+        headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
+        const init = {
+            headers,
+            method: 'get',
+        };
+
+        console.debug(`%cstart api request get '${path}'`, 'color: green;');
+        const response = await fetch(path, init);
+
+        const result = await <Promise<ApiResult<{ [key: number]: string; }>>>response.json();
+        console.log(`%cresult api get '${path}'`, 'color: blue;', result);
+
+        return result;
+    }
+
     /** Опубликовать страницу */
     public async publish(itemIds: number[]): Promise<any> {
 

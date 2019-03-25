@@ -23,9 +23,9 @@ export default class ExtentionCard extends React.Component<Props> {
         editArticleStore.fetchExtensionFields();
     }
 
-    private relationClick = (field: ExtensionFieldModel) => {
+    private relationClick = (relationExtensionId: number, relatedId: number) => {
         const { qpIntegrationStore } = this.props;
-        qpIntegrationStore.link(field.relationExtensionId, field.value);
+        qpIntegrationStore.link(relationExtensionId, relatedId);
     }
 
     private change = (e: React.ChangeEvent<HTMLInputElement>, field: ExtensionFieldModel) => {
@@ -52,7 +52,7 @@ export default class ExtentionCard extends React.Component<Props> {
             <React.Fragment>
                 {editArticleStore.fields.map((field, i) => (
                     <FormGroup label={field.fieldName} inline key={i}>
-                        {readOnlyField(field, editArticleStore.relatedItems, this.relationClick)}
+                        {readOnlyField(field, editArticleStore.relatedItems, editArticleStore.relatedManyToOneItems, this.relationClick)}
                     </FormGroup>),
                 )}
             </React.Fragment>
@@ -63,7 +63,8 @@ export default class ExtentionCard extends React.Component<Props> {
 const readOnlyField = (
     field: ExtensionFieldModel,
     relatedItems: Map<number, string>,
-    relationClick: (field: ExtensionFieldModel) => void,
+    manyRelatedItems: Map<number, Map<number, string>>,
+    relationClick: (relationExtensionId: number, relatedId: number) => void,
     ): JSX.Element => {
     switch (field.typeName.toLowerCase()) {
         case 'string':
@@ -89,13 +90,25 @@ const readOnlyField = (
         case 'visualedit':
             return (<TextArea large readOnly value={field.value == null ? '' : field.value} fill />);
         case 'relation':
+            if (field.value == null || !relatedItems.has(field.attributeId)) {
+                return null;
+            }
             const name = relatedItems.get(field.attributeId);
-            const text = `(${field.value == null ? '' : field.value}) ${name}`;
-            return (<AnchorButton minimal rightIcon="th-derived" text={text} onClick={() => { relationClick(field); }} />);
+            const text = `(${field.value}) ${name == null ? '' : name}`;
+            return (<AnchorButton minimal rightIcon="th-derived" text={text} onClick={() => { relationClick(field.relationExtensionId, field.value); }} />);
         case 'dynamic image':
             return null;
         case 'relation many-to-one':
-            return null;
+            if (field.value == null || !manyRelatedItems.has(field.attributeId)) {
+                return null;
+            }
+            const map = manyRelatedItems.get(field.attributeId);
+            const el = Array.from(map.keys()).map((x) => {
+                const name = map.get(x);
+                const text = `(${x}) ${name == null ? '' : name}`;
+                return (<AnchorButton key={x} minimal rightIcon="th-derived" text={text} onClick={() => { relationClick(field.relationExtensionId, x); }} />);
+            });
+            return (<React.Fragment>{el}</React.Fragment>);
         default:
             return null;
     }

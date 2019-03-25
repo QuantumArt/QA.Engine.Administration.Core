@@ -13,6 +13,7 @@ export default class EditArticleStore extends ErrorHandler {
     @observable public fields: ExtensionFieldModel[] = [];
     @observable public isShowExtensionFields: boolean = false;
     public relatedItems: Map<number, string>;
+    public relatedManyToOneItems: Map<number, Map<number, string>>;
     public isEditable: boolean;
     private node: PageModel | ArchiveModel;
 
@@ -28,6 +29,7 @@ export default class EditArticleStore extends ErrorHandler {
         this.isEditable = !node.isArchive && node.extensionId != null;
         this.isShowExtensionFields = false;
         this.relatedItems = new Map<number, string>();
+        this.relatedManyToOneItems = new Map<number, Map<number, string>>();
     }
 
     @action
@@ -53,9 +55,14 @@ export default class EditArticleStore extends ErrorHandler {
             if (response.isSuccess) {
                 const fields = response.data || [];
 
+                const itemNames = <any[]>[];
                 const relationFields = fields.filter(x => x.typeName.toLowerCase() === 'relation' && x.value);
-                const itemNames = relationFields.map((x) => {
-                    return this.fetchRelatedItemName(x, x.value, x.attributeId);
+                relationFields.forEach((x) => {
+                    itemNames.push(this.fetchRelatedItemName(x.value, x.attributeId));
+                });
+                const manyToOneRelationFields = fields.filter(x => x.typeName.toLowerCase() === 'relation many-to-one' && x.value);
+                manyToOneRelationFields.forEach((x) => {
+                    itemNames.push(this.fetchManyToOneRelatedItemName(x.value, this.node.id, x.attributeId));
                 });
                 await Promise.all(itemNames);
 
@@ -77,11 +84,26 @@ export default class EditArticleStore extends ErrorHandler {
         this.init(this.node);
     }
 
-    private async fetchRelatedItemName(field: ExtensionFieldModel, id: number, attributeId: number) {
+    private async fetchRelatedItemName(id: number, attributeId: number) {
         const response: ApiResult<string> = await SiteMapService.getRelatedItemName(id, attributeId);
         if (response.isSuccess) {
-            this.relatedItems.set(field.attributeId, response.data);
-            this.state = OperationState.SUCCESS;
+            this.relatedItems.set(attributeId, response.data);
+        } else {
+            throw response.error;
+        }
+    }
+
+    private async fetchManyToOneRelatedItemName(id: number, value: number, attributeId: number) {
+        const response: ApiResult<{ [key: number]: string; }> = await SiteMapService.getManyToOneRelatedItemNames(id, value, attributeId);
+        if (response.isSuccess) {
+            const data = response.data;
+            const map = new Map<number, string>();
+            for (const field in data) {
+                map.set(+field, data[field]);
+            }
+            if (map.size > 0) {
+                this.relatedManyToOneItems.set(attributeId, map);
+            }
         } else {
             throw response.error;
         }

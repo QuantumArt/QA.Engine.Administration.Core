@@ -36,8 +36,11 @@ WHERE ca.CONTENT_ID={0} AND ca.ATTRIBUTE_NAME <> 'ItemId' AND (ca.REQUIRED=1 OR 
 SELECT * FROM content_{0}_united WHERE ItemId={1}
 
 SELECT b.ATTRIBUTE_NAME as 'FieldName', a.CONTENT_ID as 'ExtensionId'
-FROM CONTENT_ATTRIBUTE a JOIN (SELECT ATTRIBUTE_ID, ATTRIBUTE_NAME, RELATED_ATTRIBUTE_ID FROM CONTENT_ATTRIBUTE WHERE CONTENT_ID={0} AND RELATED_ATTRIBUTE_ID is not null) b
-	ON a.ATTRIBUTE_ID=b.RELATED_ATTRIBUTE_ID
+FROM CONTENT_ATTRIBUTE a JOIN (
+	SELECT ATTRIBUTE_ID, ATTRIBUTE_NAME, RELATED_ATTRIBUTE_ID, BACK_RELATED_ATTRIBUTE_ID 
+	FROM CONTENT_ATTRIBUTE 
+	WHERE CONTENT_ID={0} AND (RELATED_ATTRIBUTE_ID is not null OR BACK_RELATED_ATTRIBUTE_ID is not null)) b
+	ON a.ATTRIBUTE_ID=b.RELATED_ATTRIBUTE_ID OR a.ATTRIBUTE_ID=b.BACK_RELATED_ATTRIBUTE_ID
 ";
         private const string CmdGetContentAttribute = @"
 SELECT
@@ -45,20 +48,26 @@ SELECT
     ca.CONTENT_ID AS ContentId,
     ca.ATTRIBUTE_NAME AS AttributeName,
     ca.RELATED_ATTRIBUTE_ID AS RelatedAttributeId,
-    LOWER(t.TYPE_NAME) AS AttributeType
+    LOWER(t.TYPE_NAME) AS AttributeType,
+    ca.BACK_RELATED_ATTRIBUTE_ID AS BackRelatedAttributeId,
+    ca.TREE_ORDER_FIELD AS TreeOrderField
 FROM CONTENT_ATTRIBUTE ca JOIN ATTRIBUTE_TYPE t ON ca.ATTRIBUTE_TYPE_ID=t.ATTRIBUTE_TYPE_ID
 WHERE ca.ATTRIBUTE_ID=@attributeId
 ";
         private const string CmdGetContentFieldValue = @"
-SELECT {1}
-FROM content_{0}_united c
-WHERE CONTENT_ITEM_ID=@id
+SELECT {1} FROM content_{0}_united c WHERE CONTENT_ITEM_ID=@id
+";
+        private const string CmdGetContentIdByItemId = @"
+SELECT CONTENT_ITEM_ID FROM content_{0}_united WHERE ItemId=@itemId
+";
+        private const string CmdGetContentFieldValues = @"
+SELECT CONTENT_ITEM_ID AS ContentId, {1} AS Name FROM content_{0}_united WHERE {2}=@itemId
 ";
 
-        public List<FieldAttributeData> GetItemExtensionFields(int siteId, int id, int extensionId)
+        public List<FieldAttributeData> GetItemExtensionFields(int siteId, int value, int extensionId)
         {
-            _logger.LogDebug($"getItemExtensionFields. siteId: {siteId}, id: {id}, extensionId: {extensionId}");
-            var query = string.Format(CmdGetExtantionItems, extensionId, id);
+            _logger.LogDebug($"getItemExtensionFields. siteId: {siteId}, value: {value}, extensionId: {extensionId}");
+            var query = string.Format(CmdGetExtantionItems, extensionId, value);
             using (var multi = _connection.QueryMultiple(query))
             {
                 var fieldNames = multi.Read<FieldAttributeData>().ToList();
@@ -88,7 +97,7 @@ WHERE CONTENT_ITEM_ID=@id
                 contentAttribute = GetContentAttribute(contentAttribute.RelatedAttributeId.Value);
                 if(contentAttribute.RelatedAttributeId.HasValue)
                 {
-                    var fieldValue = GetContentFieldValue(id, contentAttribute);
+                    var fieldValue = GetContentFieldValue(id, contentAttribute.ContentId, contentAttribute.AttributeName);
                     if (!int.TryParse(fieldValue, out id))
                     {
                         _logger.LogDebug($"GetRelatedItemName. result: {fieldValue}");
@@ -96,8 +105,25 @@ WHERE CONTENT_ITEM_ID=@id
                     }
                 }
             }
-            var result = GetContentFieldValue(id, contentAttribute);
+            var result = GetContentFieldValue(id, contentAttribute.ContentId, contentAttribute.AttributeName);
             _logger.LogDebug($"GetRelatedItemName. result: {result}");
+            return result;
+        }
+
+        public Dictionary<int, string> GetManyToOneRelatedItemNames(int siteId, int id, int value, int attributeId)
+        {
+            _logger.LogDebug($"GetManyToOneRelatedItemNames. siteId: {siteId}, id: {id}, value: {value}, attributeId: {attributeId}");
+            var contentAttribute = GetContentAttribute(attributeId);
+            if (!contentAttribute.TreeOrderField.HasValue)
+            {
+                _logger.LogDebug($"GetManyToOneRelatedItemNames. result: null");
+                return null;
+            }
+            var itemId = GetContentIdByItemId(value, contentAttribute.ContentId);
+            var nameAttribute = GetContentAttribute(contentAttribute.TreeOrderField.Value);
+            var relatedAttribute = GetContentAttribute(id);
+            var result = GetContentFieldValues(itemId, nameAttribute.ContentId, nameAttribute.AttributeName, relatedAttribute.AttributeName);
+            _logger.LogDebug($"GetManyToOneRelatedItemNames. result: {SerializeData(result)}");
             return result;
         }
 
@@ -109,13 +135,31 @@ WHERE CONTENT_ITEM_ID=@id
             return result;
         }
 
-        private string GetContentFieldValue(int id, ContentAttribute contentAttribute)
+        private string GetContentFieldValue(int id, int contentId, string attributeName)
         {
-            _logger.LogDebug($"GetContentFieldValue. attributeId: {SerializeData(contentAttribute)}");
-            var query = string.Format(CmdGetContentFieldValue, contentAttribute.ContentId, contentAttribute.AttributeName);
+            _logger.LogDebug($"GetContentFieldValue. id: {id}, contentId: {contentId}, attributeName: {attributeName}");
+            var query = string.Format(CmdGetContentFieldValue, contentId, attributeName);
             var result = _connection.QuerySingleOrDefault<string>(query, new { id });
             _logger.LogDebug($"GetContentFieldValue. result: {result}");
             return result?.ToString();
+        }
+
+        private Dictionary<int, string> GetContentFieldValues(int itemId, int contentId, string titleAttributeName, string attributeName)
+        {
+            _logger.LogDebug($"GetContentFieldValue. contentId: {contentId}, titleAttributeName: {titleAttributeName}, attributeName: {attributeName}");
+            var query = string.Format(CmdGetContentFieldValues, contentId, titleAttributeName, attributeName);
+            var result = _connection.Query<RelatedItem>(query, new { itemId }).ToDictionary(k => k.ContentId, v => v.Name);
+            _logger.LogDebug($"GetContentFieldValue. result: {SerializeData(result)}");
+            return result;
+        }
+
+        private int GetContentIdByItemId(int id, int contentId)
+        {
+            _logger.LogDebug($"GetContentIdByItemId. id: {id}, contentId: {contentId}");
+            var query = string.Format(CmdGetContentIdByItemId, contentId);
+            var result = _connection.QuerySingleOrDefault<int>(query, new { itemId = id });
+            _logger.LogDebug($"GetContentIdByItemId. result: {result}");
+            return result;
         }
 
         private static string SerializeData(object data) => Newtonsoft.Json.JsonConvert.SerializeObject(data);
@@ -133,6 +177,14 @@ WHERE CONTENT_ITEM_ID=@id
             public string AttributeName { get; set; }
             public int? RelatedAttributeId { get; set; }
             public string AttributeType { get; set; }
+            public int? BackRelatedAttributeId { get; set; }
+            public int? TreeOrderField { get; set; }
+        }
+
+        class RelatedItem
+        {
+            public int ContentId { get; set; }
+            public string Name { get; set; }
         }
     }
 }

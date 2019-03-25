@@ -155,6 +155,21 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         }
 
         /// <summary>
+        /// Возвращает значения полей связанных элементов (many-to-one)
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="value"></param>
+        /// <param name="attributeId"></param>
+        /// <returns></returns>
+        [HttpGet("getManyToOneRelatedItemNames")]
+        public ApiResult<Dictionary<int, string>> GetManyToOneRelatedItemNames(int id, int value, int attributeId)
+        {
+            _logger.LogDebug($"getManyToOneRelatedItemNames id={id}, value={value}, attributeId={attributeId}");
+            var fields = _siteMapService.GetManyToOneRelatedItemNames(_siteId, id, value, attributeId);
+            return ApiResult<Dictionary<int, string>>.Success(fields);
+        }
+
+        /// <summary>
         /// Опубликовать страницу
         /// </summary>
         /// <param name="itemIds">Id страниц</param>

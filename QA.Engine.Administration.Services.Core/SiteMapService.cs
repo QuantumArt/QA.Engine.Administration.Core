@@ -215,8 +215,14 @@ namespace QA.Engine.Administration.Services.Core
 
         public string GetRelatedItemName(int siteId, int id, int attributeId)
         {
-            var relatedItemName = _itemExtensionProvider.GetRelatedItemName(siteId, id, attributeId);
-            return relatedItemName;
+            var result = _itemExtensionProvider.GetRelatedItemName(siteId, id, attributeId);
+            return result;
+        }
+
+        public Dictionary<int, string> GetManyToOneRelatedItemNames(int siteId, int id, int value, int attributeId)
+        {
+            var result = _itemExtensionProvider.GetManyToOneRelatedItemNames(siteId, id, value, attributeId);
+            return result;
         }
     }
 }

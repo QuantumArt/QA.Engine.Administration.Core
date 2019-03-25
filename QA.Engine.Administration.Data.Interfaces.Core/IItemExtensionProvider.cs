@@ -7,5 +7,6 @@ namespace QA.Engine.Administration.Data.Interfaces.Core
     {
         List<FieldAttributeData> GetItemExtensionFields(int siteId, int id, int extantionId);
         string GetRelatedItemName(int siteId, int id, int attributeId);
+        Dictionary<int, string> GetManyToOneRelatedItemNames(int siteId, int id, int value, int attributeId);
     }
 }
