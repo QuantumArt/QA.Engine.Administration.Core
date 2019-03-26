@@ -22,10 +22,10 @@ interface Props {
 @observer
 export default class SiteTreeMenu extends React.Component<Props> {
 
-    private previewClick = () => {
+    private previewClick = async () => {
         const { qpIntegrationStore, itemId, treeStore } = this.props;
         const tree = treeStore.getSiteTreeStore();
-        const root = tree.getRootElement();
+        const root = await tree.getRootElement();
         qpIntegrationStore.preview(itemId, root.alias.trim());
     }
 

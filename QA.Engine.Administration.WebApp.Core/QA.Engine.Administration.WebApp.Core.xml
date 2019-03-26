@@ -137,6 +137,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.DictionaryController.GetRootPageDiscriminator">
+            <summary>
+            Дискриминатор стартовой страницы
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:QA.Engine.Administration.WebApp.Core.Controllers.DictionaryController.GetFlatRegions">
             <summary>
             Возвращает регионы списком

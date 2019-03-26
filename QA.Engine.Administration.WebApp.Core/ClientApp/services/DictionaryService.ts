@@ -45,6 +45,26 @@ class DictionaryService {
         return result;
     }
 
+    /** Дискриминатор стартовой страницы */
+    public async getRootPageDiscriminator(): Promise<ApiResult<string>> {
+
+        const path = '/api/Dictionary/getRootPageDiscriminator';
+        const headers = new Headers();
+        headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
+        const init = {
+            headers,
+            method: 'get',
+        };
+
+        console.debug(`%cstart api request get '${path}'`, 'color: green;');
+        const response = await fetch(path, init);
+
+        const result = await <Promise<ApiResult<string>>>response.json();
+        console.log(`%cresult api get '${path}'`, 'color: blue;', result);
+
+        return result;
+    }
+
     /** Возвращает регионы списком */
     public async getFlatRegions(): Promise<ApiResult<RegionModel[]>> {
 
