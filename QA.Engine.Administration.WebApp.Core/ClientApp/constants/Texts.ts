@@ -66,4 +66,5 @@ export default class Texts {
     static readonly popupMoveButton: string = 'PopupMoveButton';
 
     static readonly showID: string = 'ShowID';
+    static readonly showPath: string = 'ShowPath';
 }

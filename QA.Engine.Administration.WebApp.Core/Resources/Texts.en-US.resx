@@ -288,6 +288,9 @@
   <data name="ShowID" xml:space="preserve">
     <value>Show IDs</value>
   </data>
+  <data name="ShowPath" xml:space="preserve">
+    <value>Show path</value>
+  </data>
   <data name="SiteManagement" xml:space="preserve">
     <value>Site management</value>
   </data>

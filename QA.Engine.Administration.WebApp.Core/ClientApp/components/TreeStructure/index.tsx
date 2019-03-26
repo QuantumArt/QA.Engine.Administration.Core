@@ -209,7 +209,7 @@ export default class SiteTree extends React.Component<Props, State> {
                     {tree.searchActive &&
                         <Switch
                             inline
-                            label="Показывать путь"
+                            label={textStore.texts[Texts.showPath]}
                             className="tree-switch"
                             checked={tree.showPath}
                             onChange={tree.togglePath}
