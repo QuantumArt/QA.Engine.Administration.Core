@@ -33,6 +33,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         private readonly ILogger<SiteMapController> _logger;
         private readonly IStringLocalizerFactory _stringLocalizerFactory;
         private readonly CustomAction _customActionConfig;
+        private readonly string _rootPageDiscriminator;
         private readonly int _siteId;
         private readonly int _userId;
 
@@ -51,6 +52,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
             _stringLocalizerFactory = stringLocalizerFactory;
 
             _customActionConfig = options.Value?.CustomAction;
+            _rootPageDiscriminator = options.Value?.RootPageDiscriminator;
 
             _siteId = webAppQpHelper.SiteId;
             _userId = webAppQpHelper.UserId;
@@ -76,9 +78,20 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpGet("getDiscriminators")]
         public ApiResult<List<DiscriminatorModel>> GetDiscriminators()
         {
-            _logger.LogTrace($"getDefinitions userId={_userId}");
+            _logger.LogTrace($"getDiscriminators userId={_userId}");
             var discriminators = _itemDifinitionService.GetAllItemDefinitions(_siteId);
             return ApiResult<List<DiscriminatorModel>>.Success(discriminators);
+        }
+
+        /// <summary>
+        /// Дискриминатор стартовой страницы
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("getRootPageDiscriminator")]
+        public ApiResult<string> GetRootPageDiscriminator()
+        {
+            _logger.LogTrace($"getRootPageDiscriminator userId={_userId}");
+            return ApiResult<string>.Success(_rootPageDiscriminator);
         }
 
         /// <summary>

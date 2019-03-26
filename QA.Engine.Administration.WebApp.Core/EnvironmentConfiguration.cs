@@ -14,6 +14,7 @@ namespace QA.Engine.Administration.WebApp.Core
         public bool UseFake { get; set; } = false;
         public FakeData FakeData { get; set; }
         public CustomAction CustomAction { get; set; }
+        public string RootPageDiscriminator { get; set; }
     }
 
     public class FakeData
