@@ -182,7 +182,18 @@ export abstract class BaseTreeState<T extends {
 
     @action
     public toggleIDs = () => {
+        if (this.showPath) {
+            this.showPath = false;
+        }
         this.showIDs = !this.showIDs;
+    }
+
+    @action
+    public togglePath = () => {
+        if (this.showIDs) {
+            this.showIDs = false;
+        }
+        this.showPath = !this.showPath;
     }
 
     @action

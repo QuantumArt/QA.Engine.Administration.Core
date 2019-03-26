@@ -3,6 +3,7 @@ import { inject, observer } from 'mobx-react';
 import TreeStore from 'stores/TreeStore';
 import { ITreeElement } from 'stores/TreeStore/BaseTreeStore';
 import TreeStoreType from 'enums/TreeStoreType';
+import { Position, Tooltip } from '@blueprintjs/core';
 
 interface Props {
     treeStore?: TreeStore;
@@ -23,8 +24,19 @@ export default class NodeLabel extends React.Component<Props> {
         if (tree.showIDs) {
             return <span className="bp3-tree-node-label">{`${node.title} - ${node.id}`}</span>;
         }
-        if (tree.searchActive) {
-            return <span className="bp3-tree-node-label">{`${pathPrefix || ''}/${node.title}`}</span>;
+        if (tree.searchActive && tree.showPath) {
+            return (
+                <Tooltip
+                    content={`${pathPrefix || ''}/${node.title}`}
+                    boundary="viewport"
+                    position={Position.BOTTOM}
+                    modifiers={{
+                        arrow: { enabled: false },
+                    }}
+                >
+                    <span className="bp3-tree-node-label">{`${pathPrefix || ''}/${node.title}`}</span>
+                </Tooltip>
+            );
         }
         return <span className="bp3-tree-node-label">{node.title}</span>;
     }

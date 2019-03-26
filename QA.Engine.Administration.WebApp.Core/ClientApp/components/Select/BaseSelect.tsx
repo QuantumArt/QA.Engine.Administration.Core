@@ -72,6 +72,7 @@ interface Props<T> {
     intent?: Intent;
     onChange: (x: T) => void;
     popoverProps?: IPopoverProps;
+    className?: string;
 }
 
 interface State<T> {
@@ -93,7 +94,7 @@ export default abstract class BaseSelect<T extends { id: number, title: string, 
     }
 
     render() {
-        const { items, disabled, filterable, intent, popoverProps } = this.props;
+        const { items, disabled, filterable, intent, popoverProps, className } = this.props;
         const { page } = this.state;
 
         return (
@@ -110,6 +111,7 @@ export default abstract class BaseSelect<T extends { id: number, title: string, 
                     popoverClassName: 'select-menu',
                     ...popoverProps,
                 }}
+                className={className}
             >
                 <Button
                     rightIcon="caret-down"

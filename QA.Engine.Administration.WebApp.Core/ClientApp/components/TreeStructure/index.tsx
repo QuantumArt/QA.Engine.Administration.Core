@@ -203,17 +203,26 @@ export default class SiteTree extends React.Component<Props, State> {
                         inline
                         label={textStore.texts[Texts.showID]}
                         className="tree-switch"
-                        alignIndicator="right"
                         checked={tree.showIDs}
                         onChange={tree.toggleIDs}
                     />
+                    {tree.searchActive &&
+                        <Switch
+                            inline
+                            label="Показывать путь"
+                            className="tree-switch"
+                            checked={tree.showPath}
+                            onChange={tree.togglePath}
+                        />
+                    }
                     {useRegions &&
                         <React.Fragment>
-                            <NavbarDivider />
+                            <NavbarDivider className={cn({ hidden: tree.searchActive })} />
                             <RegionSelect
                                 items={regions}
                                 filterable
                                 onChange={this.changeRegion}
+                                className={cn({ hidden: tree.searchActive })}
                             />
                         </React.Fragment>
                     }
