@@ -11,7 +11,7 @@ export default class SiteTreeStore extends BaseTreeState<PageModel> {
     private regionIds: number[] = [];
 
     public get parentNode(): PageModel {
-        return this.getNodeById(this.selectedNode.parentId);
+        return this.nodesMap.get(this.selectedNode.parentId).original;
     }
 
     public setRegions(regionId?: number) {
@@ -23,7 +23,7 @@ export default class SiteTreeStore extends BaseTreeState<PageModel> {
         await this.getRootPageDiscriminator();
         let node = this.selectedNode;
         while (node.parentId != null && node.discriminator !== this.rootPageDiscriminator) {
-            node = this.getNodeById(node.parentId);
+            node = this.nodesMap.get(node.parentId).original;
         }
         return node;
     }
@@ -37,8 +37,8 @@ export default class SiteTreeStore extends BaseTreeState<PageModel> {
         return await SiteMapService.getSiteMapTree(this.regionIds);
     }
 
-    protected getSubTree(id: number): Promise<ApiResult<PageModel>> {
-        return SiteMapService.getSiteMapSubTree(id, this.regionIds);
+    protected async getSubTree(id: number): Promise<ApiResult<PageModel>> {
+        return await SiteMapService.getSiteMapSubTree(id, this.regionIds);
     }
 
     private rootPageDiscriminator: string = null;

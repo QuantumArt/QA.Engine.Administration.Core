@@ -1,17 +1,11 @@
 import * as React from 'react';
 import { inject, observer } from 'mobx-react';
 import lodashThrottle from 'lodash.throttle';
-import { when } from 'mobx';
-import {
-    Card,
-    InputGroup,
-    Navbar,
-    NavbarDivider,
-    Spinner, Switch,
-} from '@blueprintjs/core';
+import { autorun, toJS, when } from 'mobx';
+import { Card, InputGroup, Navbar, NavbarDivider, Spinner, Switch } from '@blueprintjs/core';
 import Scrollbars from 'react-custom-scrollbars'; // tslint:disable-line
 import cn from 'classnames'; // tslint:disable-line
-import NavigationStore  from 'stores/NavigationStore';
+import NavigationStore, { Pages, TabTypes } from 'stores/NavigationStore';
 import OperationState from 'enums/OperationState';
 import { ITreeElement } from 'stores/TreeStore/BaseTreeStore';
 import EditArticleStore from 'stores/EditArticleStore';
@@ -23,6 +17,7 @@ import RegionStore from 'stores/RegionStore';
 import ArchiveTreeStore from 'stores/TreeStore/ArchiveTreeStore';
 import TextStore from 'stores/TextStore';
 import Texts from 'constants/Texts';
+import { ToJSOptions } from 'mobx/lib/api/tojs';
 
 interface Props {
     type: TreeStructureType;
@@ -41,7 +36,6 @@ interface Props {
 }
 
 interface State {
-    currentNode: PageModel | ArchiveModel;
     shouldScroll: boolean;
     sbHeightMax: number;
 }
@@ -68,36 +62,14 @@ export default class SiteTree extends React.Component<Props, State> {
         super(props);
 
         this.state = {
-            currentNode: null,
             shouldScroll: false,
             sbHeightMax: window.innerHeight - props.sbHeightDelta,
         };
 
-        when(() => {
-            if (this.props == null || this.state == null) {
-                return false;
-            }
-            const { editArticleStore, treeStore, type } = this.props;
-            const { currentNode } = this.state;
-
+        autorun(() => {
+            const { treeStore, editArticleStore } = props;
             const tree = treeStore.resolveMainTreeStore();
-            const currentNodeId = currentNode == null ? null : currentNode.id;
-            const selectedNodeId = tree.selectedNode == null ? null : tree.selectedNode.id;
-
-            if (selectedNodeId !== currentNodeId && type === 'main' && tree instanceof SiteTreeStore) {
-                [
-                    editArticleStore,
-                    treeStore.getContentVersionTreeStore(),
-                    treeStore.getWidgetTreeStore(),
-                ].forEach((x) => {
-                    x.init(tree.selectedNode);
-                });
-                this.setState({ currentNode: tree.selectedNode });
-            }
-            if (selectedNodeId !== currentNodeId && type === 'main' && tree instanceof ArchiveTreeStore) {
-                editArticleStore.init(tree.selectedNode);
-            }
-            return false;
+            editArticleStore.init(tree.selectedNode);
         });
     }
 

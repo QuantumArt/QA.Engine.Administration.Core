@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { action, computed, observable } from 'mobx';
+import { action, computed, observable, toJS } from 'mobx';
 import { IconName, ITreeNode } from '@blueprintjs/core';
 import InteractiveZone from 'components/TreeStructure/InteractiveZone';
 import ContextMenuType from 'enums/ContextMenuType';
@@ -28,6 +28,11 @@ export interface ITreeIcons {
     nodeOpenPublished?: IconName;
     leaf?: IconName;
     leafPublished?: IconName;
+}
+
+export interface MapEntity<T> {
+    original: T;
+    mapped: ITreeElement;
 }
 
 const defaultIcons: ITreeIcons = {
@@ -69,13 +74,15 @@ export abstract class BaseTreeState<T extends {
     @observable public query: string = '';
     @observable public cordsUpdated: boolean = false;
     @observable protected expandLaunched: boolean = false;
-    searchTimer: number;
+    protected searchTimer: number;
 
     @observable public selectedNode: T;
     @observable public nodeCords = new Map<number, number>();
-    public pathMap = new Map<number, string>();
+    @observable public pathMap = new Map<number, string>();
     @observable protected treeInternal: ITreeElement[];
     @observable protected searchedTreeInternal: ITreeElement[] = [];
+    @observable protected nodesMap = new Map<number, MapEntity<T>>();
+    @observable protected searchedNodesMap = new Map<number, MapEntity<T>>();
     protected origTreeInternal: T[];
     protected origSearchedTreeInternal: T[] = [];
 
@@ -96,6 +103,7 @@ export abstract class BaseTreeState<T extends {
 
     @action
     public search = (query: string) => {
+        this.searchedTreeInternal = [];
         this.query = query;
         this.searchActive = query.length >= 2;
         clearTimeout(this.searchTimer);
@@ -163,7 +171,7 @@ export abstract class BaseTreeState<T extends {
 
     @action
     public setSelectedNode = (node: ITreeElement) => {
-        this.selectedNode = this.getNodeById(node.id);
+        this.selectedNode = this.nodesMap.get(node.id).original;
     }
 
     @action
@@ -222,13 +230,22 @@ export abstract class BaseTreeState<T extends {
 
     @action
     public handleNodeClick = (nodeData: ITreeElement) => {
-        this.selectedNode = nodeData.isSelected === true ? null : this.getNodeById(+nodeData.id);
+        const targetNode = this.nodesMap.get(nodeData.id);
         const originallySelected = nodeData.isSelected;
-        this.forEachNode(null, (n) => {
-            n.isSelected = false;
-            n.isContextMenuActive = false;
-        });
-        nodeData.isSelected = originallySelected == null ? true : !originallySelected;
+        if (this.selectedNode !== null) {
+            if (this.searchActive) {
+                const node = this.searchedNodesMap.get(this.selectedNode.id);
+                if (node) {
+                    node.mapped.isSelected = false;
+                }
+            }
+            this.nodesMap.get(this.selectedNode.id).mapped.isSelected = false;
+        }
+        this.selectedNode = nodeData.isSelected === true ? null : targetNode.original;
+        if (targetNode.mapped.id === targetNode.original.id) {
+            // means it's not zone
+            nodeData.isSelected = originallySelected == null ? true : !originallySelected;
+        }
     }
 
     @action
@@ -247,16 +264,16 @@ export abstract class BaseTreeState<T extends {
             },
             this.treeInternal,
         );
-        let curNode = this.getMappedNodeById(node.id);
+        let curNode = this.nodesMap.get(node.id);
         do {
-            if (node.id === curNode.id) {
-                curNode.isSelected = true;
+            if (node.id === curNode.mapped.id && curNode.mapped.id === curNode.original.id) {
+                curNode.mapped.isSelected = true;
             }
-            if (curNode.childNodes.length > 0) {
-                curNode.isExpanded = true;
+            if (curNode.mapped.childNodes.length > 0) {
+                curNode.mapped.isExpanded = true;
             }
-            curNode = this.getMappedNodeById(curNode.parentId);
-        } while (curNode !== null);
+            curNode = this.nodesMap.get(curNode.mapped.parentId);
+        } while (curNode != null);
         this.expandLaunched = true;
     }
 
@@ -313,45 +330,6 @@ export abstract class BaseTreeState<T extends {
     protected abstract async getSubTree(id: number): Promise<ApiResult<T>>;
 
     protected abstract contextMenuType: ContextMenuType;
-
-    protected getNodeById(id: number): T {
-        // we don't need to use searched tree here to avoid tree logic doubling
-        let elements = this.origTreeInternal;
-        let loop = true;
-        while (loop) {
-            loop = false;
-            const children: T[] = [];
-            const node = elements.filter(x => x.id === id)[0];
-            if (node != null) {
-                return node;
-            }
-            elements.filter(x => x.children && x.children.length > 0).forEach((x) => {
-                x.children.forEach(y => children.push(<T>y));
-            });
-            loop = children.length > 0;
-            elements = children;
-        }
-        return null;
-    }
-
-    protected getMappedNodeById(id: ITreeElement['id']): ITreeElement {
-        let elements = this.treeInternal;
-        let loop = true;
-        while (loop) {
-            loop = false;
-            const children: ITreeElement[] = [];
-            const node = elements.filter(x => x.id === id)[0];
-            if (node != null) {
-                return node;
-            }
-            elements.filter(x => x.childNodes.length > 0).forEach((x) => {
-                x.childNodes.forEach(y => children.push(<ITreeElement>y));
-            });
-            loop = children.length > 0;
-            elements = children;
-        }
-        return null;
-    }
 
     protected getIcon = (el: T): IconName => {
         if (this.icons.checkPublication) {
@@ -415,8 +393,14 @@ export abstract class BaseTreeState<T extends {
         this.pathMap = key === 'treeInternal' ? new Map<number, string>() : this.pathMap;
 
         elements.forEach((x) => {
-            hMap.set(x.id, this.mapElement(x));
-            key === 'treeInternal' && this.pathMap.set(x.id, '');
+            const el = this.mapElement(x);
+            hMap.set(x.id, el);
+            if (key === 'treeInternal') {
+                this.nodesMap.set(x.id, { original: x, mapped: el });
+                this.pathMap.set(x.id, '');
+            } else {
+                this.searchedNodesMap.set(x.id, { original: x, mapped: el });
+            }
         });
         const tree: ITreeElement[] = Array.from(hMap.values());
 
@@ -437,8 +421,14 @@ export abstract class BaseTreeState<T extends {
                 if (treeEl != null) {
                     treeEl.childNodes.push(el);
                     childNodes.set(+el.id, el);
-                    key === 'treeInternal' && this.pathMap.has(el.parentId)
-                        && this.pathMap.set(el.id, `${this.pathMap.get(el.parentId)}/${hMap.get(el.parentId).title}`);
+                    if (key === 'treeInternal') {
+                        this.nodesMap.set(x.id, { original: x, mapped: el });
+                        if (this.pathMap.has(el.parentId)) {
+                            this.pathMap.set(el.id, `${this.pathMap.get(el.parentId)}/${hMap.get(el.parentId).title}`);
+                        }
+                    } else {
+                        this.searchedNodesMap.set(x.id, { original: x, mapped: el });
+                    }
                 }
             });
             if (childNodes.size !== children.length) {
@@ -452,6 +442,28 @@ export abstract class BaseTreeState<T extends {
     }
 
     protected icons: ITreeIcons;
+
+    /**
+     * @description method exclusively used to get node from raw array data
+     */
+    protected getNodeById(id: number): T {
+        let elements = this.origTreeInternal;
+        let loop = true;
+        while (loop) {
+            loop = false;
+            const children: T[] = [];
+            const node = elements.filter(x => x.id === id)[0];
+            if (node != null) {
+                return node;
+            }
+            elements.filter(x => x.children && x.children.length > 0).forEach((x) => {
+                x.children.forEach(y => children.push(<T>y));
+            });
+            loop = children.length > 0;
+            elements = children;
+        }
+        return null;
+    }
 
     protected forEachNode(
         childFunc: (node: ITreeElement) => void = null,
@@ -479,7 +491,7 @@ export abstract class BaseTreeState<T extends {
         }
     }
 
-    private forEachOrigNode(nodes: T[], callback: (node: T) => void) {
+    protected forEachOrigNode(nodes: T[], callback: (node: T) => void) {
         if (!nodes) {
             return;
         }

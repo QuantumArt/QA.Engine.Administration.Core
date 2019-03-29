@@ -13,7 +13,6 @@ export default class MoveTreeStore extends BaseTreeState<PageModel> {
             return;
         }
         this.origTreeInternal = JSON.parse(JSON.stringify(origTree)) as PageModel[];
-
         const node = this.getNodeById(selectedNode.id);
         if (node.parentId == null) {
             const index = this.getIndex(this.origTreeInternal, selectedNode.id);
@@ -25,7 +24,6 @@ export default class MoveTreeStore extends BaseTreeState<PageModel> {
             const index = this.getIndex(parentNode.children, selectedNode.id);
             if (index > -1) {
                 parentNode.children.splice(index, 1);
-
             }
         }
 

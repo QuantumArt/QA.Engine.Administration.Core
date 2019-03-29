@@ -8,6 +8,7 @@ import { ITreeElement } from 'stores/TreeStore/BaseTreeStore';
 import TreeStore from 'stores/TreeStore';
 import TextStore from 'stores/TextStore';
 import Texts from 'constants/Texts';
+import { toJS } from 'mobx';
 
 interface Props {
     qpIntegrationStore?: QpIntegrationStore;

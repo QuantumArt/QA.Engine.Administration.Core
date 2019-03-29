@@ -7,19 +7,37 @@ import WidgetTab from './WidgetTab';
 import ContentVersionTab from './ContentVersionTab';
 import TextStore from 'stores/TextStore';
 import Texts from 'constants/Texts';
+import TreeStore from 'stores/TreeStore';
+import { autorun, when } from 'mobx';
 
 interface Props {
     navigationStore?: NavigationStore;
     textStore?: TextStore;
+    treeStore?: TreeStore;
 }
 
-@inject('navigationStore', 'textStore')
+@inject('navigationStore', 'textStore', 'treeStore')
 @observer
 export default class TabsContainer extends React.Component<Props> {
 
+    constructor(props: Props) {
+        super(props);
+        autorun(() => {
+            const { navigationStore, treeStore } = props;
+            const tree = treeStore.resolveMainTreeStore();
+            switch (navigationStore.currentTab) {
+                case TabTypes.WIDGETS:
+                    treeStore.getWidgetTreeStore().init(tree.selectedNode);
+                    break;
+                case TabTypes.CONTENT_VERSIONS:
+                    treeStore.getContentVersionTreeStore().init(tree.selectedNode);
+                    break;
+            }
+        });
+    }
+
     private handleChange = (newTabId: TabId & TabTypes) => {
-        const { navigationStore } = this.props;
-        navigationStore.changeTab(newTabId);
+        this.props.navigationStore.changeTab(newTabId);
     }
 
     render() {

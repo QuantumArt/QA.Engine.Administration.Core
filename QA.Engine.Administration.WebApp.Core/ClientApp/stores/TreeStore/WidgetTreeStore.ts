@@ -4,6 +4,8 @@ import ContextMenuType from 'enums/ContextMenuType';
 import { action, observable } from 'mobx';
 import TreeStoreType from 'enums/TreeStoreType';
 import { IconName } from '@blueprintjs/core';
+import * as React from 'react';
+import NodeLabel from 'components/TreeStructure/NodeLabel';
 
 export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
 
@@ -47,7 +49,8 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
 
     @action
     public setSelectedNode = (node: ITreeElement) => {
-        this.selectedNode = this.getNodeById(node.id);
+        const targetNode = this.nodesMap.get(node.id);
+        this.selectedNode = targetNode.original;
         this.selectedTreeElement = node;
     }
 
@@ -79,6 +82,9 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
     }
 
     protected getIcon = (el: WidgetModel): IconName => {
+        if (el.id < 0) {
+            return this.icons.node;
+        }
         if (this.icons.checkPublication) {
             if (this.searchActive) {
                 return el.published ? this.icons.leafPublished : this.icons.leaf;
@@ -108,7 +114,7 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
             const foundEl: WidgetModel = {
                 ...node,
                 id: -node.id,
-                title: '',
+                title: node.zoneName,
                 children: [],
                 parentId: null,
             };
@@ -117,7 +123,7 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
     }
 
     protected convertTree(data: WidgetModel[], key: 'searchedTreeInternal' | 'treeInternal'): void {
-        if (this.searchActive) {
+        if (key === 'searchedTreeInternal') {
             super.convertTree(data, key);
             return;
         }
@@ -126,49 +132,45 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
 
         data.forEach((x) => {
             const path: string[] = [];
-            if (key === 'treeInternal') {
-                path.push(`[${x.zoneName ? x.zoneName : ''}]`);
-            }
+            path.push(`[${x.zoneName ? x.zoneName : ''}]`, x.title);
             let zoneEl = zones.find(z => z.label === x.zoneName);
             if (!zoneEl) {
                 zoneEl = this.mapWidgetZoneElement(x, null, -x.id);
+                this.nodesMap.set(zoneEl.id, { original: x, mapped: zoneEl });
                 tree.push(zoneEl);
                 zones.push(zoneEl);
             }
             const treeItem = this.mapWidgetElement(x, zoneEl.id);
             zoneEl.childNodes.push(treeItem);
+            this.nodesMap.set(x.id, { original: x, mapped: treeItem });
             this.pathMap.set(treeItem.id, path.join('/'));
             this.pathMap.set(-treeItem.id, path.join('/'));
-            if (key === 'treeInternal') {
-                path.push(x.title);
-            }
-            this.convertTreeInternal(x, treeItem, path, key);
+            path.push(x.title);
+            this.convertTreeInternal(x, treeItem, path);
         });
 
         this[key] = tree;
     }
 
-    private convertTreeInternal(el: WidgetModel, parent: ITreeElement, path: string[], key: 'searchedTreeInternal' | 'treeInternal'): void {
+    private convertTreeInternal(el: WidgetModel, parent: ITreeElement, path: string[]): void {
         const zones: ITreeElement[] = [];
         el.children.forEach((x) => {
             const internalPath = Object.assign([], path);
-            if (key === 'treeInternal') {
-                internalPath.push(`[${x.zoneName ? x.zoneName : ''}]`);
-            }
+            internalPath.push(`[${x.zoneName ? x.zoneName : ''}]`);
             let zoneEl = zones.find(z => z.label === x.zoneName);
             if (!zoneEl) {
                 zoneEl = this.mapWidgetZoneElement(x, parent.id, -x.id);
+                this.nodesMap.set(zoneEl.id, { original: x, mapped: zoneEl });
                 zones.push(zoneEl);
                 parent.childNodes.push(zoneEl);
             }
             const treeItem = this.mapWidgetElement(x, zoneEl.id);
             zoneEl.childNodes.push(treeItem);
+            this.nodesMap.set(x.id, { original: x, mapped: treeItem });
             this.pathMap.set(treeItem.id, internalPath.join('/'));
             this.pathMap.set(-treeItem.id, internalPath.join('/'));
-            if (key === 'treeInternal') {
-                internalPath.push(x.title);
-            }
-            this.convertTreeInternal(x, treeItem, internalPath, key);
+            internalPath.push(x.title);
+            this.convertTreeInternal(x, treeItem, internalPath);
         });
     }
 
@@ -189,10 +191,10 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
     }
 
     private mapWidgetZoneElement(x: WidgetModel, parentId?: number, id?: number): ITreeElement {
-        return observable<ITreeElement>({
+        const treeElement = observable<ITreeElement>({
             id: id || x.id,
             childNodes: [],
-            label: x.zoneName,
+            label: '',
             title: x.zoneName,
             isExpanded: false,
             icon: this.icons.node,
@@ -202,7 +204,14 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
             contextMenuType: null,
             isVisible: x.isVisible,
             isPublished: x.published,
+            isSelected: false,
         });
+        treeElement.label = React.createElement(NodeLabel, {
+            node: treeElement,
+            type: this.type,
+        });
+
+        return treeElement;
     }
 
     private widgetTree: WidgetModel[];

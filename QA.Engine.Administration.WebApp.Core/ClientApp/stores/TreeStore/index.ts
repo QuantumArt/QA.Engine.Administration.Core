@@ -114,7 +114,6 @@ export default class TreeStore extends ErrorHandler {
         current = this.resolveMainTreeStore();
         if (current instanceof SiteTreeStore) {
             selectedNode = current.selectedNode;
-            [this.contentVersionsStore, this.widgetStore].forEach(x => x.init(selectedNode));
         }
     }
 
