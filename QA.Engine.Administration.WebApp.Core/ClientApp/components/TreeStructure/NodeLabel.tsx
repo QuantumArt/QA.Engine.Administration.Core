@@ -21,7 +21,7 @@ export default class NodeLabel extends React.Component<Props> {
         if (!tree) {
             return null;
         }
-        if (tree.showIDs && node.contextMenuType > 0) {
+        if (tree.showIDs && node.id > 0) {
             return <span className="bp3-tree-node-label">{`${node.title} - ${node.id}`}</span>;
         }
         if (tree.searchActive && tree.showPath) {
