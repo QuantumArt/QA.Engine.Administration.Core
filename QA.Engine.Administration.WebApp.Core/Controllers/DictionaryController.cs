@@ -52,7 +52,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
             _stringLocalizerFactory = stringLocalizerFactory;
 
             _customActionConfig = options.Value?.CustomAction;
-            _rootPageDiscriminator = options.Value?.RootPageDiscriminator;
+            _rootPageDiscriminator = options.Value?.StartPageDiscriminator;
 
             _siteId = webAppQpHelper.SiteId;
             _userId = webAppQpHelper.UserId;
