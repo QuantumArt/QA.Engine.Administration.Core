@@ -26,6 +26,7 @@ interface State {
 @observer
 export default class AddVersionPopup extends React.Component<Props, State> {
 
+    private resetIntent = { discriminatorIntent: Intent.NONE };
     state = {
         discriminator: null as DiscriminatorModel,
         version: VersionType.Content,
@@ -98,6 +99,4 @@ export default class AddVersionPopup extends React.Component<Props, State> {
             </Card>
         );
     }
-
-    private resetIntent = { discriminatorIntent: Intent.NONE };
 }

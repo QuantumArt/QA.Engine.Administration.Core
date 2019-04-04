@@ -9,7 +9,6 @@ import TreeStore from 'stores/TreeStore';
 import ErrorHandler from 'stores/ErrorHandler';
 import ErrorsTypes from 'constants/ErrorsTypes';
 import OperationState from 'enums/OperationState';
-import SiteMapService from 'services/SiteMapService';
 
 export enum VersionType {
     Content = 'Content',

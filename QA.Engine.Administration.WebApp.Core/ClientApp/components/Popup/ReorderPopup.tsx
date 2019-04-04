@@ -24,6 +24,7 @@ interface State {
 @observer
 export default class ReorderPopup extends React.Component<Props, State> {
 
+    private resetIntent = { relatedItemIntent: Intent.NONE };
     state = { isInsertBefore: 0, relatedItem: null as PageModel, ...this.resetIntent };
 
     private reorderClick = () => {
@@ -80,6 +81,4 @@ export default class ReorderPopup extends React.Component<Props, State> {
             </Card>
         );
     }
-
-    private resetIntent = { relatedItemIntent: Intent.NONE };
 }

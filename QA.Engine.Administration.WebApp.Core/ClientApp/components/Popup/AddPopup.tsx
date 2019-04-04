@@ -29,6 +29,7 @@ interface State {
 @observer
 export default class AddPopup extends React.Component<Props, State> {
 
+    private resetIntent = { discriminatorIntent: Intent.NONE, nameIntent: Intent.NONE, titleIntent: Intent.NONE };
     state = { discriminator: null as DiscriminatorModel, name: '', title: '', ...this.resetIntent };
 
     private addClick = () => {
@@ -99,6 +100,4 @@ export default class AddPopup extends React.Component<Props, State> {
             </Card>
         );
     }
-
-    private resetIntent = { discriminatorIntent: Intent.NONE, nameIntent: Intent.NONE, titleIntent: Intent.NONE };
 }

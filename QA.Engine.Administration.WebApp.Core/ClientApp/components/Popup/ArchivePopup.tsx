@@ -27,6 +27,7 @@ interface State {
 @observer
 export default class ArchivePopup extends React.Component<Props, State> {
 
+    private resetIntent = { contentVersionIntent: Intent.NONE };
     state = {
         deleteAllVersions: false,
         deleteContentVersions: 'archive' as ContentVersionOperations,
@@ -121,6 +122,4 @@ export default class ArchivePopup extends React.Component<Props, State> {
             </Card>
         );
     }
-
-    private resetIntent = { contentVersionIntent: Intent.NONE };
 }
