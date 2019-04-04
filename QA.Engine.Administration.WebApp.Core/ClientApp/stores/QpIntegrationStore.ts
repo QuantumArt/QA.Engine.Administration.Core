@@ -4,7 +4,17 @@ import QpAbstractItemFields from 'constants/QpAbstractItemFields';
 import QpActionCodes from 'constants/QpActionCodes';
 import QpCallbackProcNames from 'constants/QpCallbackProcNames';
 import QpEntityCodes from 'constants/QpEntityCodes';
-import { BackendEventObserver, executeBackendAction, ArticleFormState, ExecuteActionOptions, InitFieldValue, OpenSelectWindowOptions, openSelectWindow, EntitiesSelectedArgs } from 'qp/QP8BackendApi.Interaction';
+// import { BackendEventObserver, executeBackendAction, ArticleFormState, ExecuteActionOptions, InitFieldValue, OpenSelectWindowOptions, openSelectWindow, EntitiesSelectedArgs } from 'qp/QP8BackendApi.Interaction';
+import {
+    BackendEventObserver,
+    executeBackendAction,
+    ArticleFormState,
+    ExecuteActionOptions,
+    InitFieldValue,
+    OpenSelectWindowOptions,
+    openSelectWindow,
+    EntitiesSelectedArgs,
+} from 'qp8backendapi-interaction';
 import TreeStore from 'stores/TreeStore';
 import ErrorHandler from 'stores/ErrorHandler';
 import ErrorsTypes from 'constants/ErrorsTypes';
