@@ -8,7 +8,7 @@ import ContentVersionTab from './ContentVersionTab';
 import TextStore from 'stores/TextStore';
 import Texts from 'constants/Texts';
 import TreeStore from 'stores/TreeStore';
-import { autorun, when } from 'mobx';
+import { autorun } from 'mobx';
 
 interface Props {
     navigationStore?: NavigationStore;

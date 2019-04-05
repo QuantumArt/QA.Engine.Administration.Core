@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { inject, observer } from 'mobx-react';
-import { AnchorButton, H5, InputGroup, Spinner, TextArea, Checkbox, FormGroup, ControlGroup } from '@blueprintjs/core';
+import { AnchorButton, Checkbox, H5, InputGroup, Intent, Spinner, TextArea } from '@blueprintjs/core';
 import OperationState from 'enums/OperationState';
 import EditArticleStore from 'stores/EditArticleStore';
 import TextStore from 'stores/TextStore';
@@ -28,32 +28,34 @@ export default class ExtentionCard extends React.Component<Props> {
         qpIntegrationStore.link(relationExtensionId, relatedId);
     }
 
-    private change = (e: React.ChangeEvent<HTMLInputElement>, field: ExtensionFieldModel) => {
-        field.value = e.target.value;
-    }
-
     render() {
         const { editArticleStore, textStore } = this.props;
         const isLoading = editArticleStore.state === OperationState.NONE || editArticleStore.state === OperationState.PENDING;
 
         if (!editArticleStore.isShowExtensionFields) {
             return (
-                <AnchorButton text={textStore.texts[Texts.showExtensionField]} icon="eye-on" onClick={this.showClick} />
+                <AnchorButton
+                    text={textStore.texts[Texts.showExtensionField]}
+                    icon="search-around"
+                    onClick={this.showClick}
+                    intent={Intent.PRIMARY}
+                />
             );
         }
 
         if (isLoading) {
             return (
-                <Spinner size={30} />
+                <Spinner size={30}/>
             );
         }
 
         return (
             <React.Fragment>
                 {editArticleStore.fields.map((field, i) => (
-                    <FormGroup label={field.fieldName} inline key={i}>
+                    <div className="tab-entity" key={i}>
+                        <H5>{field.fieldName}</H5>
                         {readOnlyField(field, editArticleStore.relatedItems, editArticleStore.relatedManyToOneItems, this.relationClick)}
-                    </FormGroup>),
+                    </div>),
                 )}
             </React.Fragment>
         );
@@ -65,37 +67,43 @@ const readOnlyField = (
     relatedItems: Map<number, string>,
     manyRelatedItems: Map<number, Map<number, string>>,
     relationClick: (relationExtensionId: number, relatedId: number) => void,
-    ): JSX.Element => {
+): JSX.Element => {
     switch (field.typeName.toLowerCase()) {
         case 'string':
         case 'numeric':
         case 'file':
         case 'image':
-            return (<InputGroup readOnly value={field.value == null ? '' : field.value} />);
+            return (<InputGroup readOnly value={field.value == null ? '' : field.value}/>);
         case 'boolean':
-            return (<Checkbox readOnly checked={field.value == null ? false : field.value} />);
+            return (<Checkbox readOnly checked={field.value == null ? false : field.value}/>);
         case 'date':
             const d = field.value == null ? null : new Date(Date.parse(field.value));
             const dValue = d == null ? '' : `${d.getDate()}.${d.getMonth() + 1}.${d.getFullYear()}`;
-            return (<InputGroup readOnly value={dValue} />);
+            return (<InputGroup readOnly value={dValue}/>);
         case 'time':
             const t = field.value == null ? null : new Date(Date.parse(field.value));
             const tValue = t == null ? '' : `${t.getHours()}:${t.getMinutes()}`;
-            return (<InputGroup readOnly value={tValue} />);
+            return (<InputGroup readOnly value={tValue}/>);
         case 'datetime':
             const dt = field.value == null ? null : new Date(Date.parse(field.value));
             const dtValue = dt == null ? '' : `${dt.getDate()}.${dt.getMonth() + 1}.${dt.getFullYear()} ${dt.getHours()}:${dt.getMinutes()}`;
-            return (<InputGroup readOnly value={dtValue} />);
+            return (<InputGroup readOnly value={dtValue}/>);
         case 'textbox':
         case 'visualedit':
-            return (<TextArea large readOnly value={field.value == null ? '' : field.value} fill />);
+            return (<TextArea rows={10} large readOnly value={field.value == null ? '' : field.value} fill/>);
         case 'relation':
             if (field.value == null || !relatedItems.has(field.attributeId)) {
                 return null;
             }
             const name = relatedItems.get(field.attributeId);
             const text = `(${field.value}) ${name == null ? '' : name}`;
-            return (<AnchorButton minimal rightIcon="th-derived" text={text} onClick={() => { relationClick(field.relationExtensionId, field.value); }} />);
+            return (<AnchorButton
+                minimal
+                intent={Intent.PRIMARY}
+                rightIcon="th-derived"
+                text={text}
+                onClick={() => relationClick(field.relationExtensionId, field.value)}
+            />);
         case 'dynamic image':
             return null;
         case 'relation many-to-one':
@@ -106,7 +114,14 @@ const readOnlyField = (
             const el = Array.from(map.keys()).map((x) => {
                 const name = map.get(x);
                 const text = `(${x}) ${name == null ? '' : name}`;
-                return (<AnchorButton key={x} minimal rightIcon="th-derived" text={text} onClick={() => { relationClick(field.relationExtensionId, x); }} />);
+                return (<AnchorButton
+                    key={x}
+                    intent={Intent.PRIMARY}
+                    minimal
+                    rightIcon="th-derived"
+                    text={text}
+                    onClick={() => relationClick(field.relationExtensionId, x)}
+                />);
             });
             return (<React.Fragment>{el}</React.Fragment>);
         default:
