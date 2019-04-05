@@ -1,13 +1,17 @@
-﻿using QA.Engine.Administration.Services.Core.Models;
+﻿using Microsoft.Extensions.Logging;
+using QA.Engine.Administration.Services.Core.Models;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace QA.Engine.Administration.Services.Core
 {
     public class SiteMapStructureBuilder
     {
-        public static List<PageModel> GetPageTree(List<PageModel> pages, List<WidgetModel> widgets)
+        public static List<PageModel> GetPageTree(List<PageModel> pages, List<WidgetModel> widgets, ILogger _logger)
         {
+            var sw = new Stopwatch();
+            sw.Start();
             var pageTree = pages
                 .Where(x => x.ParentId == null && x.VersionOfId == null)
                 .ToList();
@@ -16,7 +20,10 @@ namespace QA.Engine.Administration.Services.Core
 
             pageTree.ForEach(x => pages.Remove(x));
 
-            var result = GetPageTreeInternal(pageTree, pages, widgets);
+            sw.Stop();
+            _logger.LogTrace($"Site Map Builder prepare {sw.ElapsedMilliseconds}ms");
+
+            var result = GetPageTreeInternal(pageTree, pages, widgets, _logger);
 
             return result;
         }
@@ -90,8 +97,11 @@ namespace QA.Engine.Administration.Services.Core
 
         #region private methods
 
-        private static List<PageModel> GetPageTreeInternal(List<PageModel> pageTree, List<PageModel> pages, List<WidgetModel> widgets)
+        private static List<PageModel> GetPageTreeInternal(List<PageModel> pageTree, List<PageModel> pages, List<WidgetModel> widgets, ILogger _logger = null)
         {
+            var sw = new Stopwatch();
+            sw.Stop();
+
             var elements = pageTree;
             var makeTree = true;
             while (makeTree)
@@ -120,6 +130,10 @@ namespace QA.Engine.Administration.Services.Core
                 }
                 elements = tmp;
             }
+
+            sw.Stop();
+            if (_logger != null)
+                _logger.LogTrace($"Site Map Builder internal {sw.ElapsedMilliseconds}ms");
 
             return pageTree;
         }

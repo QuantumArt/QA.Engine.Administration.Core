@@ -128,7 +128,11 @@ namespace QA.Engine.Administration.Services.Core
             var pages = abstractItems.Where(x => x.IsPage).Select(x => _mapper.Map<PageModel>(x)).OrderBy(x => x.IndexOrder).ToList();
             var widgets = abstractItems.Where(x => !x.IsPage).Select(x => _mapper.Map<WidgetModel>(x)).OrderBy(x => x.IndexOrder).ToList();
 
-            var result = SiteMapStructureBuilder.GetPageTree(pages, widgets);
+            stopwatch.Reset();
+            stopwatch.Start();
+            var result = SiteMapStructureBuilder.GetPageTree(pages, widgets, _logger);
+            stopwatch.Stop();
+            _logger.LogTrace($"convert abstract items to tree {stopwatch.ElapsedMilliseconds}ms");
 
             return result;
         }
