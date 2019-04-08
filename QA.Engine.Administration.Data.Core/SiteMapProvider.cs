@@ -7,6 +7,7 @@ using QA.Engine.Administration.Data.Interfaces.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 
 namespace QA.Engine.Administration.Data.Core
@@ -225,18 +226,21 @@ ORDER BY ai.content_item_id";
         public List<AbstractItemData> GetAllItems(int siteId, bool isArchive, bool useRegion)
         {
             _logger.LogDebug($"getAllItems. siteId: {siteId}, isArchive: {isArchive}, useRegion: {useRegion}");
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
             string query;
             if (!useRegion)
             {
                 query = _netNameQueryAnalyzer.PrepareQueryExtabtion(_metaInfoRepository, CmdGetAllAbstractItems, siteId);
                 var result = _connection.Query<AbstractItemData>(query, new { Archive = isArchive }).ToList();
-                _logger.LogDebug($"getAllItems. count: {result.Count()}");
+                _logger.LogDebug($"getAllItems. count: {result.Count()}. {stopwatch.ElapsedMilliseconds}ms");
                 return result;
             }
 
+
             query = _netNameQueryAnalyzer.PrepareQueryExtabtion(_metaInfoRepository, CmdGetAllAbstractItemsWithRegions, siteId);
             var resultWithRegions = GetWithRegions(_connection, query, isArchive);
-            _logger.LogDebug($"getAllItems. count: {resultWithRegions.Count()}");
+            _logger.LogDebug($"getAllItems. count: {resultWithRegions.Count()}. {stopwatch.ElapsedMilliseconds}ms");
             return resultWithRegions;
         }
 

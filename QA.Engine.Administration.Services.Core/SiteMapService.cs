@@ -125,12 +125,13 @@ namespace QA.Engine.Administration.Services.Core
             stopwatch.Stop();
             _logger.LogTrace($"get all abstract items {stopwatch.ElapsedMilliseconds}ms");
 
+            stopwatch.Reset();
+            stopwatch.Start();
+
             var pages = abstractItems.Where(x => x.IsPage).Select(x => _mapper.Map<PageModel>(x)).OrderBy(x => x.IndexOrder).ToList();
             var widgets = abstractItems.Where(x => !x.IsPage).Select(x => _mapper.Map<WidgetModel>(x)).OrderBy(x => x.IndexOrder).ToList();
 
-            stopwatch.Reset();
-            stopwatch.Start();
-            var result = SiteMapStructureBuilder.GetPageTree(pages, widgets, _logger);
+            var result = SiteMapStructureBuilder.GetPageTree(pages, widgets);
             stopwatch.Stop();
             _logger.LogTrace($"convert abstract items to tree {stopwatch.ElapsedMilliseconds}ms");
 
@@ -139,7 +140,7 @@ namespace QA.Engine.Administration.Services.Core
 
         public PageModel GetSiteMapSubTree(int siteId, int itemId, int[] regionIds = null, bool? useHierarchyRegionFilter = null)
         {
-            _logger.LogTrace($"GetSiteMapStructure siteId={siteId}, regionIds={string.Join(", ", regionIds)}, useHierarchyRegionFilter={useHierarchyRegionFilter}");
+            _logger.LogTrace($"GetSiteMapSubStructure siteId={siteId}, regionIds={string.Join(", ", regionIds)}, useHierarchyRegionFilter={useHierarchyRegionFilter}");
             Func<AbstractItemData, bool> regionFilter = x => true;
             var useRegion = _settingsProvider.HasRegion(siteId);
             if (useRegion)
@@ -162,17 +163,22 @@ namespace QA.Engine.Administration.Services.Core
             stopwatch.Stop();
             _logger.LogTrace($"get all abstract items {stopwatch.ElapsedMilliseconds}ms");
 
+            stopwatch.Reset();
+            stopwatch.Start();
+
             var pages = abstractItems.Where(x => x.IsPage).Select(x => _mapper.Map<PageModel>(x)).OrderBy(x => x.IndexOrder).ToList();
             var widgets = abstractItems.Where(x => !x.IsPage).Select(x => _mapper.Map<WidgetModel>(x)).OrderBy(x => x.IndexOrder).ToList();
 
             var result = SiteMapStructureBuilder.GetPageSubTree(itemId, pages, widgets);
+            stopwatch.Stop();
+            _logger.LogTrace($"convert abstract items to tree {stopwatch.ElapsedMilliseconds}ms");
 
             return result.FirstOrDefault();
         }
 
         public List<ArchiveModel> GetArchiveTree(int siteId)
         {
-            _logger.LogTrace($"GetSiteMapStructure siteId={siteId}");
+            _logger.LogTrace($"GetArchiveStructure siteId={siteId}");
             var useRegion = _settingsProvider.HasRegion(siteId);
             var iconUrl = _settingsProvider.GetIconUrl(siteId);
 
@@ -183,16 +189,21 @@ namespace QA.Engine.Administration.Services.Core
             stopwatch.Stop();
             _logger.LogTrace($"get all archive abstract items {stopwatch.ElapsedMilliseconds}ms");
 
+            stopwatch.Reset();
+            stopwatch.Start();
+
             var archives = _mapper.Map<List<ArchiveModel>>(abstractItems).OrderBy(x => x.IndexOrder).ToList();
 
             var result = SiteMapStructureBuilder.GetArchiveTree(archives);
+            stopwatch.Stop();
+            _logger.LogTrace($"convert abstract items to tree {stopwatch.ElapsedMilliseconds}ms");
 
             return result;
         }
 
         public ArchiveModel GetArchiveSubTree(int siteId, int itemId)
         {
-            _logger.LogTrace($"GetSiteMapStructure siteId={siteId}");
+            _logger.LogTrace($"GetArchiveSubStructure siteId={siteId}, itemId={itemId}");
             var useRegion = _settingsProvider.HasRegion(siteId);
             var iconUrl = _settingsProvider.GetIconUrl(siteId);
 
@@ -203,9 +214,14 @@ namespace QA.Engine.Administration.Services.Core
             stopwatch.Stop();
             _logger.LogTrace($"get all archive abstract items {stopwatch.ElapsedMilliseconds}ms");
 
+            stopwatch.Reset();
+            stopwatch.Start();
+
             var archives = _mapper.Map<List<ArchiveModel>>(abstractItems).OrderBy(x => x.IndexOrder).ToList();
 
             var result = SiteMapStructureBuilder.GetArchiveSubTree(itemId, archives);
+            stopwatch.Stop();
+            _logger.LogTrace($"convert archive abstract items to tree {stopwatch.ElapsedMilliseconds}ms");
 
             return result.FirstOrDefault();
         }
