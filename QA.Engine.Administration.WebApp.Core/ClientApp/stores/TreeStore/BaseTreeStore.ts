@@ -76,13 +76,13 @@ export abstract class BaseTreeState<T extends {
     @observable protected expandLaunched: boolean = false;
     protected searchTimer: number;
 
-    @observable public selectedNode: T;
+    @observable.shallow public selectedNode: T;
     @observable public nodeCords = new Map<number, number>();
     @observable public pathMap = new Map<number, string>();
     @observable protected treeInternal: ITreeElement[];
     @observable protected searchedTreeInternal: ITreeElement[] = [];
-    @observable protected nodesMap = new Map<number, MapEntity<T>>();
-    @observable protected searchedNodesMap = new Map<number, MapEntity<T>>();
+    protected nodesMap = new Map<number, MapEntity<T>>();
+    protected searchedNodesMap = new Map<number, MapEntity<T>>();
     protected origTreeInternal: T[];
     protected origSearchedTreeInternal: T[] = [];
 
@@ -113,7 +113,7 @@ export abstract class BaseTreeState<T extends {
                     const results = new Set<T>();
                     const filterFunc = (node: T) => {
                         const query = this.query.toLowerCase();
-                        if (node.title.toLowerCase().includes(query) ||
+                        if ((node.title && node.title.toLowerCase().includes(query)) ||
                             node.id.toString().includes(query) ||
                             (node.alias !== null && node.alias.toLowerCase().includes(query))
                         ) {
