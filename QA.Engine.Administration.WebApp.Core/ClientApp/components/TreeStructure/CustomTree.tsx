@@ -1,5 +1,5 @@
-import classnames from 'classnames';
 import * as React from 'react';
+import classnames from 'classnames';
 import { inject, observer } from 'mobx-react';
 
 import { CustomTreeNode } from 'components/TreeStructure/CustomTreeNode';
@@ -39,9 +39,12 @@ export class CustomTree<T = {}> extends React.Component<Props<T>, {}> {
 
     private nodeRefs: { [nodeId: string]: HTMLElement } = {};
 
-    public componentDidUpdate(prevProps: Readonly<Props<T>>, prevState: Readonly<{}>, snapshot?: any): void {
-        const { tree } = this.props;
-        tree.setCordsUpdateStatus(true);
+    public componentDidUpdate(): void {
+        this.props.tree.setCordsUpdateStatus(true);
+    }
+
+    componentWillUnmount(): void {
+
     }
 
     public render() {
