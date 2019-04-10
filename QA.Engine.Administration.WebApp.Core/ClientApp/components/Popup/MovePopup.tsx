@@ -41,7 +41,11 @@ export default class MovePopup extends React.Component<Props, State> {
         popupStore.close();
     }
 
-    private changeNewParent = (e: ITreeElement) => this.setState({ newParent: e });
+    private changeNewParent = (e: ITreeElement) => {
+        const { treeStore } = this.props;
+        const moveTreeStore = treeStore.getMoveTreeStore();
+        this.setState({ newParent: moveTreeStore.selectedNode == null ? null : e });
+    }
 
     private cancelClick = () => this.props.popupStore.close();
 
@@ -71,6 +75,7 @@ export default class MovePopup extends React.Component<Props, State> {
         }
 
         const moveTreeStore = treeStore.getMoveTreeStore();
+        const { newParent } = this.state;
 
         return (
             <Card style={{ height: this.state.height }}>
@@ -82,7 +87,7 @@ export default class MovePopup extends React.Component<Props, State> {
                     onNodeClick={this.changeNewParent}
                 />
                 <ButtonGroup className="dialog-button-group">
-                    <Button text={textStore.texts[Texts.popupMoveButton]} icon="move" onClick={this.moveClick} intent={Intent.SUCCESS} />
+                    <Button text={textStore.texts[Texts.popupMoveButton]} icon="move" onClick={this.moveClick} intent={Intent.SUCCESS} disabled={newParent == null} />
                     <Button text={textStore.texts[Texts.popupCancelButton]} icon="undo" onClick={this.cancelClick} />
                 </ButtonGroup>
             </Card>

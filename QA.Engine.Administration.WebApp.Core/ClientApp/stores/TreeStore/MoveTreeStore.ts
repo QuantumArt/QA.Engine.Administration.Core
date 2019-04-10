@@ -12,35 +12,20 @@ export default class MoveTreeStore extends BaseTreeState<PageModel> {
         if (selectedNode == null) {
             return;
         }
-        this.origTreeInternal = JSON.parse(JSON.stringify(origTree)) as PageModel[];
-        const node = this.getNodeById(selectedNode.id);
-        if (node.parentId == null) {
-            const index = this.getIndex(this.origTreeInternal, selectedNode.id);
-            if (index > -1) {
-                this.origTreeInternal.splice(index, 1);
-            }
-        } else {
-            const parentNode = this.getNodeById(node.parentId);
-            const index = this.getIndex(parentNode.children, selectedNode.id);
-            if (index > -1) {
-                parentNode.children.splice(index, 1);
-            }
-        }
+        this.origTreeInternal = origTree;
 
         this.convertTree(this.origTreeInternal, 'treeInternal');
+        if (this.nodesMap.has(selectedNode.id)) {
+            const mapEntity = this.nodesMap.get(selectedNode.id);
+            this.expandToNode(mapEntity.mapped);
+            mapEntity.mapped.isExpanded = false;
+            mapEntity.mapped.isSelected = false;
+            mapEntity.mapped.disabled = true;
+        }
         this.selectedNode = null;
     }
 
     protected readonly contextMenuType: ContextMenuType = null;
     protected getTree = (): Promise<ApiResult<PageModel[]>> => null;
     protected getSubTree = (): Promise<ApiResult<PageModel>> => null;
-
-    private getIndex = (elements: PageModel[], id: number) => {
-        for (let i = 0; i < elements.length; i += 1) {
-            if (elements[i].id === id) {
-                return i;
-            }
-        }
-        return -1;
-    }
 }

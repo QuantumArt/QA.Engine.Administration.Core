@@ -45,7 +45,10 @@ namespace QA.Engine.Administration.WebApp.Core
                 {
                     opt.Filters.Add(typeof(QpAutorizationFilter));
                 })
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+                .AddJsonOptions(o => {
+                    o.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
+                });
 
             services.AddSwaggerGen(o =>
             {

@@ -115,7 +115,7 @@ export abstract class BaseTreeState<T extends {
                         const query = this.query.toLowerCase();
                         if ((node.title && node.title.toLowerCase().includes(query)) ||
                             node.id.toString().includes(query) ||
-                            (node.alias !== null && node.alias.toLowerCase().includes(query))
+                            (node.alias != null && node.alias.toLowerCase().includes(query))
                         ) {
                             const foundEl: T = {
                                 ...node,

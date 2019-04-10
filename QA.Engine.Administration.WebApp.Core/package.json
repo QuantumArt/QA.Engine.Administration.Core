@@ -10,7 +10,7 @@
     "clean": "rimraf wwwroot/*"
   },
   "dependencies": {
-    "@blueprintjs/core": "^3.12.0",
+    "@blueprintjs/core": "^3.15.1",
     "@blueprintjs/select": "^3.6.1",
     "classnames": "^2.2.6",
     "lodash.throttle": "^4.1.1",
