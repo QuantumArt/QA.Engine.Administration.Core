@@ -205,6 +205,7 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
             isVisible: x.isVisible,
             isPublished: x.published,
             isSelected: false,
+            disabled: false,
         });
         treeElement.label = React.createElement(NodeLabel, {
             node: treeElement,
