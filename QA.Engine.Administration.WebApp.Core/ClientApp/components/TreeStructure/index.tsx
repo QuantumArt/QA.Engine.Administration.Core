@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { inject, observer } from 'mobx-react';
 import lodashThrottle from 'lodash.throttle';
-import { autorun, toJS, when } from 'mobx';
+import { autorun } from 'mobx';
 import { Card, InputGroup, Navbar, NavbarDivider, Spinner, Switch } from '@blueprintjs/core';
 import Scrollbars from 'react-custom-scrollbars'; // tslint:disable-line
 import cn from 'classnames'; // tslint:disable-line
-import NavigationStore, { Pages, TabTypes } from 'stores/NavigationStore';
+import NavigationStore from 'stores/NavigationStore';
 import OperationState from 'enums/OperationState';
 import { ITreeElement } from 'stores/TreeStore/BaseTreeStore';
 import EditArticleStore from 'stores/EditArticleStore';
@@ -14,10 +14,8 @@ import { CustomTree } from 'components/TreeStructure/CustomTree';
 import SiteTreeStore from 'stores/TreeStore/SiteTreeStore';
 import RegionSelect from 'components/Select/RegionSelect';
 import RegionStore from 'stores/RegionStore';
-import ArchiveTreeStore from 'stores/TreeStore/ArchiveTreeStore';
 import TextStore from 'stores/TextStore';
 import Texts from 'constants/Texts';
-import { ToJSOptions } from 'mobx/lib/api/tojs';
 
 interface Props {
     type: TreeStructureType;
@@ -170,7 +168,7 @@ export default class SiteTree extends React.Component<Props, State> {
                         value={tree.query}
                         placeholder="Title/Alias/ID"
                     />
-                    <NavbarDivider />
+                    <NavbarDivider/>
                     <Switch
                         inline
                         label={textStore.texts[Texts.showID]}
@@ -189,7 +187,7 @@ export default class SiteTree extends React.Component<Props, State> {
                     }
                     {useRegions &&
                         <React.Fragment>
-                            <NavbarDivider className={cn({ hidden: tree.searchActive })} />
+                            <NavbarDivider className={cn({ hidden: tree.searchActive })}/>
                             <RegionSelect
                                 items={regions}
                                 filterable

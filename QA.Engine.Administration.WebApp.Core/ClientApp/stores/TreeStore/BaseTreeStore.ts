@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { action, computed, observable, toJS } from 'mobx';
+import { action, computed, observable } from 'mobx';
 import { IconName, ITreeNode } from '@blueprintjs/core';
 import InteractiveZone from 'components/TreeStructure/InteractiveZone';
 import ContextMenuType from 'enums/ContextMenuType';
@@ -79,11 +79,11 @@ export abstract class BaseTreeState<T extends {
     @observable.shallow public selectedNode: T;
     @observable public nodeCords = new Map<number, number>();
     @observable public pathMap = new Map<number, string>();
-    @observable protected treeInternal: ITreeElement[];
-    @observable protected searchedTreeInternal: ITreeElement[] = [];
+    @observable.ref protected treeInternal: ITreeElement[] = [];
+    @observable.ref protected searchedTreeInternal: ITreeElement[] = [];
     protected nodesMap = new Map<number, MapEntity<T>>();
     protected searchedNodesMap = new Map<number, MapEntity<T>>();
-    protected origTreeInternal: T[];
+    protected origTreeInternal: T[] = [];
     protected origSearchedTreeInternal: T[] = [];
 
     @computed
@@ -175,9 +175,18 @@ export abstract class BaseTreeState<T extends {
     }
 
     @action
-    public async fetchTree(): Promise<void> {
+    public clear() {
         this.treeInternal = [];
+        this.searchedTreeInternal = [];
+        this.origTreeInternal = [];
         this.origSearchedTreeInternal = [];
+        this.nodesMap.clear();
+        this.searchedNodesMap.clear();
+    }
+
+    @action
+    public async fetchTree(): Promise<void> {
+        this.clear();
         const response: ApiResult<T[]> = await this.getTree();
         if (response.isSuccess) {
             this.origTreeInternal = response.data;
@@ -357,22 +366,32 @@ export abstract class BaseTreeState<T extends {
     }
 
     protected mapElement(el: T): ITreeElement {
-        const treeElement = observable<ITreeElement>({
-            className: el.isVisible ? '' : 'not-visible',
-            id: el.id,
-            parentId: el.parentId,
-            versionOfId: el.versionOfId,
-            childNodes: [],
-            label: '',
-            title: el.title,
-            isExpanded: false,
-            icon: this.getIcon(el),
-            hasCaret: el.children && el.children.length > 0,
-            isContextMenuActive: false,
-            contextMenuType: this.contextMenuType,
-            isVisible: el.isVisible,
-            isPublished: el.published,
-        });
+        const treeElement = observable.object<ITreeElement>(
+            {
+                className: el.isVisible ? '' : 'not-visible',
+                id: el.id,
+                parentId: el.parentId,
+                versionOfId: el.versionOfId,
+                childNodes: [],
+                label: '',
+                secondaryLabel: '',
+                title: el.title,
+                isExpanded: false,
+                icon: this.getIcon(el),
+                hasCaret: el.children && el.children.length > 0,
+                isContextMenuActive: false,
+                contextMenuType: this.contextMenuType,
+                isVisible: el.isVisible,
+                isPublished: el.published,
+            },
+            {
+                label: observable.ref,
+                secondaryLabel: observable.ref,
+            },
+            {
+                deep: false,
+            },
+        );
         treeElement.secondaryLabel = React.createElement(InteractiveZone, {
             node: treeElement,
             type: this.type,
@@ -420,7 +439,7 @@ export abstract class BaseTreeState<T extends {
                 const treeEl = hMap.get(parentId);
                 if (treeEl != null) {
                     treeEl.childNodes.push(el);
-                    childNodes.set(+el.id, el);
+                    childNodes.set(el.id, el);
                     if (key === 'treeInternal') {
                         this.nodesMap.set(x.id, { original: x, mapped: el });
                         if (this.pathMap.has(el.parentId)) {
