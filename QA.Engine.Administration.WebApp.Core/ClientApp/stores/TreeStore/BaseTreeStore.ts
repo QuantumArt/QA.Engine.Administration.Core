@@ -16,6 +16,7 @@ export interface ITreeElement extends ITreeNode {
     contextMenuType: ContextMenuType;
     isVisible: boolean;
     isPublished: boolean;
+    disabled: boolean;
 }
 
 export interface ITreeIcons {
@@ -383,6 +384,7 @@ export abstract class BaseTreeState<T extends {
                 contextMenuType: this.contextMenuType,
                 isVisible: el.isVisible,
                 isPublished: el.published,
+                disabled: false,
             },
             {
                 label: observable.ref,
