@@ -191,22 +191,32 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
     }
 
     private mapWidgetZoneElement(x: WidgetModel, parentId?: number, id?: number): ITreeElement {
-        const treeElement = observable<ITreeElement>({
-            id: id || x.id,
-            childNodes: [],
-            label: '',
-            title: x.zoneName,
-            isExpanded: false,
-            icon: this.icons.node,
-            hasCaret: true,
-            isContextMenuActive: false,
-            parentId: parentId || x.parentId,
-            contextMenuType: null,
-            isVisible: x.isVisible,
-            isPublished: x.published,
-            isSelected: false,
-            disabled: false,
-        });
+        const treeElement = observable.object<ITreeElement>(
+            {
+                id: id || x.id,
+                childNodes: [],
+                label: '',
+                secondaryLabel: '',
+                title: x.zoneName,
+                isExpanded: false,
+                icon: this.icons.node,
+                hasCaret: true,
+                isContextMenuActive: false,
+                parentId: parentId || x.parentId,
+                contextMenuType: null,
+                isVisible: x.isVisible,
+                isPublished: x.published,
+                isSelected: false,
+                disabled: false,
+            },
+            {
+                label: observable.ref,
+                secondaryLabel: observable.ref,
+            },
+            {
+                deep: false,
+            },
+        );
         treeElement.label = React.createElement(NodeLabel, {
             node: treeElement,
             type: this.type,

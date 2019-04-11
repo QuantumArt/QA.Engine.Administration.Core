@@ -188,3 +188,36 @@ body {
         margin-left: 0;
     }
 }
+
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    top: 10px;
+}
+.pagination .bp3-tag {
+    min-height: 30px;
+    min-width: 30px;
+    border-radius: 0;
+    text-align: center;
+}
+.pagination .bp3-tag.left {
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+}
+.pagination .bp3-tag.right {
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+.pagination .bp3-input {
+    border-radius: 0;
+    box-shadow: none;
+    border-top: 1px solid #5c7080;
+    border-bottom: 1px solid #5c7080;
+    width: 50px;
+    text-align: center;
+}
+.pagination .bp3-button {
+    margin: 0 10px;
+}

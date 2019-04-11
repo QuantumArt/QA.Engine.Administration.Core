@@ -71,6 +71,9 @@ export abstract class BaseTreeState<T extends {
     @observable.ref public showIDs: boolean = false;
     @observable.ref public showPath: boolean = false;
 
+    @observable.ref page: number = -1;
+    @observable.ref pagesCount: number = null;
+
     @observable.ref public searchActive: boolean = false;
     @observable.ref public query: string = '';
     @observable.ref public cordsUpdated: boolean = false;
@@ -138,6 +141,7 @@ export abstract class BaseTreeState<T extends {
             500,
         );
     }
+
     protected searchInternal(results: Set<T>, query: string, node: T) {
     }
 
@@ -177,7 +181,7 @@ export abstract class BaseTreeState<T extends {
 
     @action
     public clear() {
-        console.log('%cclear base tree store', 'color: magenta');
+        this.selectedNode = null;
         this.treeInternal = [];
         this.searchedTreeInternal = [];
         this.origTreeInternal = [];
@@ -193,8 +197,7 @@ export abstract class BaseTreeState<T extends {
         const response: ApiResult<T[]> = await this.getTree();
         if (response.isSuccess) {
             this.origTreeInternal = response.data;
-            this.convertTree(response.data, 'treeInternal');
-            this.selectedNode = null;
+            this.convertTree(this.origTreeInternal, 'treeInternal');
         } else {
             throw response.error;
         }
