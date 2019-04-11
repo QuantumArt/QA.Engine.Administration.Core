@@ -29,7 +29,8 @@ export default class ArchiveTreeStore extends BaseTreeState<ArchiveModel> {
         return this.treeInternal;
     }
 
-    @action handlePagination(number: number = null) {
+    @action
+    handlePagination(number: number = null) {
         if (this.origTreeInternal.length > this.MAX_SIZE) {
             if (this.pagesCount === null) {
                 this.pagesCount = Math.round(this.origTreeInternal.length / this.MAX_SIZE);
