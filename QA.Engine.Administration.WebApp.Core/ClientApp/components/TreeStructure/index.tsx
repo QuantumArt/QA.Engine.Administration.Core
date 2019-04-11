@@ -291,7 +291,7 @@ export default class SiteTree extends React.Component<Props, State> {
                                     onValueChange={this.handleInputPage}
                                 />
                                 <Tag className="right" interactive onClick={this.handleLastPage}>{tree.pagesCount}</Tag>
-                                <Button icon="arrow-right" minimal onClick={this.handleNextPage}/>
+                                <Button icon="arrow-right" minimal onClick={this.handleNextPage} disabled={tree.page === tree.pagesCount}/>
                             </div>
                         }
                     </React.Fragment>
