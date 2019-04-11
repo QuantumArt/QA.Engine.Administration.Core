@@ -154,7 +154,7 @@ export default class SiteTree extends React.Component<Props, State> {
     private handlePrevPage = () => {
         const { treeStore } = this.props;
         const tree = treeStore.getArchiveTreeStore();
-        tree.handlePagination(tree.page - 1);
+        tree.handlePagination(tree.pageIndex - 1);
     }
 
     private handleLastPage = () => {
@@ -192,7 +192,7 @@ export default class SiteTree extends React.Component<Props, State> {
         const tree = treeStore.resolveTree(type);
         const isLoading = treeStore.state === OperationState.PENDING;
         const useRegions = type === 'main' && tree instanceof SiteTreeStore && regionStore.useRegions;
-        const usePagination = tree instanceof ArchiveTreeStore && tree.page > -1 && !tree.searchActive;
+        const usePagination = tree instanceof ArchiveTreeStore && tree.page !== null && !tree.searchActive;
         const regions = regionStore.regions != null && regionStore.regions.length > 0
             ? [{ id: null, title: '(No selection)' } as RegionModel].concat(regionStore.regions)
             : [];
@@ -280,18 +280,18 @@ export default class SiteTree extends React.Component<Props, State> {
                         </Scrollbars>
                         {usePagination &&
                             <div className="pagination">
-                                <Button icon="arrow-left" minimal onClick={this.handlePrevPage} disabled={tree.page === 0}/>
+                                <Button icon="arrow-left" minimal onClick={this.handlePrevPage} disabled={tree.page === 1}/>
                                 <Tag className="left" interactive onClick={this.handleFirstPage}>1</Tag>
                                 <NumericInput
-                                    max={tree.pagesCount}
-                                    min={0}
+                                    max={tree.pagesCount + 1}
+                                    min={1}
                                     buttonPosition="none"
                                     value={`${tree.page}`}
                                     clampValueOnBlur
                                     onValueChange={this.handleInputPage}
                                 />
-                                <Tag className="right" interactive onClick={this.handleLastPage}>{tree.pagesCount}</Tag>
-                                <Button icon="arrow-right" minimal onClick={this.handleNextPage} disabled={tree.page === tree.pagesCount}/>
+                                <Tag className="right" interactive onClick={this.handleLastPage}>{tree.pagesCount + 1}</Tag>
+                                <Button icon="arrow-right" minimal onClick={this.handleNextPage} disabled={tree.pageIndex === tree.pagesCount}/>
                             </div>
                         }
                     </React.Fragment>

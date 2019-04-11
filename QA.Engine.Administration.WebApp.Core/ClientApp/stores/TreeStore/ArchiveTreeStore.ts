@@ -36,23 +36,23 @@ export default class ArchiveTreeStore extends BaseTreeState<ArchiveModel> {
                 this.pagesCount = Math.round(this.origTreeInternal.length / this.MAX_SIZE);
             }
             if (number !== null) {
-                this.page = this.page < 0 ? -1 : number < 0 ? 0 : number;
+                this.pageIndex = this.pageIndex < 0 ? -1 : number < 0 ? 0 : number;
             } else {
-                this.page += 1;
+                this.pageIndex += 1;
             }
-            const maybePage = this.pagesMap.get(this.page);
+            const maybePage = this.pagesMap.get(this.pageIndex);
             if (maybePage) {
                 this.treeInternal = maybePage.mappedTree;
             } else {
-                const arr = this.origTreeInternal.splice(this.page, this.MAX_SIZE);
+                const arr = this.origTreeInternal.splice(this.pageIndex, this.MAX_SIZE);
                 this.convertTree(arr, 'treeInternal');
-                this.pagesMap.set(this.page, {
+                this.pagesMap.set(this.pageIndex, {
                     originalTree: arr,
                     mappedTree: this.treeInternal,
                 });
             }
         } else {
-            this.page = -1;
+            this.pageIndex = -1;
             this.convertTree(this.origTreeInternal, 'treeInternal');
         }
     }

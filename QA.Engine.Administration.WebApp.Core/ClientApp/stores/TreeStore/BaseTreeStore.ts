@@ -68,16 +68,23 @@ export abstract class BaseTreeState<T extends {
 
     public abstract type: TreeStoreType;
 
-    @observable.ref public showIDs: boolean = false;
-    @observable.ref public showPath: boolean = false;
+    @observable public showIDs: boolean = false;
+    @observable public showPath: boolean = false;
 
-    @observable.ref page: number = -1;
-    @observable.ref pagesCount: number = null;
+    @observable pageIndex: number = -1;
+    @computed
+    get page() {
+        if (this.pageIndex < 0) {
+            return null;
+        }
+        return this.pageIndex + 1;
+    }
+    @observable pagesCount: number = null;
 
-    @observable.ref public searchActive: boolean = false;
-    @observable.ref public query: string = '';
-    @observable.ref public cordsUpdated: boolean = false;
-    @observable.ref protected expandLaunched: boolean = false;
+    @observable public searchActive: boolean = false;
+    @observable public query: string = '';
+    @observable public cordsUpdated: boolean = false;
+    @observable protected expandLaunched: boolean = false;
     protected searchTimer: number;
 
     @observable.shallow public selectedNode: T;
@@ -181,7 +188,6 @@ export abstract class BaseTreeState<T extends {
 
     @action
     public clear() {
-        this.selectedNode = null;
         this.treeInternal = [];
         this.searchedTreeInternal = [];
         this.origTreeInternal = [];
@@ -247,7 +253,7 @@ export abstract class BaseTreeState<T extends {
     public handleNodeClick = (nodeData: ITreeElement) => {
         const targetNode = this.nodesMap.get(nodeData.id);
         const originallySelected = nodeData.isSelected;
-        if (this.selectedNode !== null) {
+        if (this.selectedNode != null) {
             if (this.searchActive) {
                 const node = this.searchedNodesMap.get(this.selectedNode.id);
                 if (node) {
