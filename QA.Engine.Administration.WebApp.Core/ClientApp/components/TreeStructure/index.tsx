@@ -2,7 +2,17 @@ import * as React from 'react';
 import { inject, observer } from 'mobx-react';
 import lodashThrottle from 'lodash.throttle';
 import { autorun } from 'mobx';
-import { Card, InputGroup, Navbar, NavbarDivider, Spinner, Switch } from '@blueprintjs/core';
+import {
+    Button,
+    Card,
+    InputGroup,
+    Navbar,
+    NavbarDivider,
+    NumericInput,
+    Spinner,
+    Switch,
+    Tag,
+} from '@blueprintjs/core';
 import Scrollbars from 'react-custom-scrollbars'; // tslint:disable-line
 import cn from 'classnames'; // tslint:disable-line
 import NavigationStore from 'stores/NavigationStore';
@@ -16,6 +26,7 @@ import RegionSelect from 'components/Select/RegionSelect';
 import RegionStore from 'stores/RegionStore';
 import TextStore from 'stores/TextStore';
 import Texts from 'constants/Texts';
+import ArchiveTreeStore from 'stores/TreeStore/ArchiveTreeStore';
 
 interface Props {
     type: TreeStructureType;
@@ -70,6 +81,8 @@ export default class SiteTree extends React.Component<Props, State> {
             editArticleStore.init(tree.selectedNode);
         });
     }
+
+    private paginationTimer: number;
 
     private sbRef = React.createRef<Scrollbars>();
 
@@ -132,6 +145,40 @@ export default class SiteTree extends React.Component<Props, State> {
         100,
     );
 
+    private handleNextPage = () => {
+        const { treeStore } = this.props;
+        const tree = treeStore.getArchiveTreeStore();
+        tree.handlePagination();
+    }
+
+    private handlePrevPage = () => {
+        const { treeStore } = this.props;
+        const tree = treeStore.getArchiveTreeStore();
+        tree.handlePagination(tree.page - 1);
+    }
+
+    private handleLastPage = () => {
+        const { treeStore } = this.props;
+        const tree = treeStore.getArchiveTreeStore();
+        tree.handlePagination(tree.pagesCount);
+    }
+
+    private handleFirstPage = () => {
+        const { treeStore } = this.props;
+        const tree = treeStore.getArchiveTreeStore();
+        tree.handlePagination(0);
+    }
+
+    private handleInputPage = (val: number) => {
+        const { treeStore } = this.props;
+        const tree = treeStore.getArchiveTreeStore();
+        clearTimeout(this.paginationTimer);
+        this.paginationTimer = window.setTimeout(
+            () => tree.handlePagination(val),
+            500,
+        );
+    }
+
     componentDidMount() {
         window.addEventListener('resize', this.handleResize);
     }
@@ -145,6 +192,7 @@ export default class SiteTree extends React.Component<Props, State> {
         const tree = treeStore.resolveTree(type);
         const isLoading = treeStore.state === OperationState.PENDING;
         const useRegions = type === 'main' && tree instanceof SiteTreeStore && regionStore.useRegions;
+        const usePagination = tree instanceof ArchiveTreeStore && tree.page > -1 && !tree.searchActive;
         const regions = regionStore.regions != null && regionStore.regions.length > 0
             ? [{ id: null, title: '(No selection)' } as RegionModel].concat(regionStore.regions)
             : [];
@@ -199,36 +247,54 @@ export default class SiteTree extends React.Component<Props, State> {
                 </Navbar>
                 {isLoading ?
                     <Spinner size={this.props.spinnerSize}/> :
-                    <Scrollbars
-                        ref={this.sbRef}
-                        hideTracksWhenNotNeeded
-                        autoHeight
-                        autoHide
-                        autoHeightMin={this.props.sbHeightMin}
-                        autoHeightMax={this.state.sbHeightMax}
-                        thumbMinSize={this.props.sbThumbSize}
-                        renderTrackVertical={(style: InternalStyle, ...props: InternalRestProps[]) => (
-                            <div
-                                className="track-vertical"
-                                {...props}
+                    <React.Fragment>
+                        <Scrollbars
+                            ref={this.sbRef}
+                            hideTracksWhenNotNeeded
+                            autoHeight
+                            autoHide
+                            autoHeightMin={this.props.sbHeightMin}
+                            autoHeightMax={usePagination ? this.state.sbHeightMax - 30 : this.state.sbHeightMax}
+                            thumbMinSize={this.props.sbThumbSize}
+                            renderTrackVertical={(style: InternalStyle, ...props: InternalRestProps[]) => (
+                                <div
+                                    className="track-vertical"
+                                    {...props}
+                                />
+                            )}
+                            renderThumbVertical={(style: InternalStyle, ...props: InternalRestProps[]) => (
+                                <div
+                                    className="thumb-vertical"
+                                    {...props}
+                                />
+                            )}
+                        >
+                            <CustomTree
+                                className="tree"
+                                contents={tree.searchActive ? tree.searchedTree : tree.tree}
+                                tree={tree}
+                                onNodeCollapse={tree.handleNodeCollapse}
+                                onNodeExpand={tree.handleNodeExpand}
+                                onNodeClick={this.handleNodeClick}
                             />
-                        )}
-                        renderThumbVertical={(style: InternalStyle, ...props: InternalRestProps[]) => (
-                            <div
-                                className="thumb-vertical"
-                                {...props}
-                            />
-                        )}
-                    >
-                        <CustomTree
-                            className="tree"
-                            contents={tree.searchActive ? tree.searchedTree : tree.tree}
-                            tree={tree}
-                            onNodeCollapse={tree.handleNodeCollapse}
-                            onNodeExpand={tree.handleNodeExpand}
-                            onNodeClick={this.handleNodeClick}
-                        />
-                    </Scrollbars>
+                        </Scrollbars>
+                        {usePagination &&
+                            <div className="pagination">
+                                <Button icon="arrow-left" minimal onClick={this.handlePrevPage} disabled={tree.page === 0}/>
+                                <Tag className="left" interactive onClick={this.handleFirstPage}>1</Tag>
+                                <NumericInput
+                                    max={tree.pagesCount}
+                                    min={0}
+                                    buttonPosition="none"
+                                    value={`${tree.page}`}
+                                    clampValueOnBlur
+                                    onValueChange={this.handleInputPage}
+                                />
+                                <Tag className="right" interactive onClick={this.handleLastPage}>{tree.pagesCount}</Tag>
+                                <Button icon="arrow-right" minimal onClick={this.handleNextPage}/>
+                            </div>
+                        }
+                    </React.Fragment>
                 }
             </Card>
         );
