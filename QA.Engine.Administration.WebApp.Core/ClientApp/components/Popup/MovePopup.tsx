@@ -1,7 +1,7 @@
 import * as React from 'react';
 import lodashThrottle from 'lodash.throttle';
 import TreeStore from 'stores/TreeStore';
-import { Card, ButtonGroup, Button, Intent } from '@blueprintjs/core';
+import { Card, ButtonGroup, Button, Intent, Spinner } from '@blueprintjs/core';
 import PopupStore from 'stores/PopupStore';
 import PopupType from 'enums/PopupType';
 import TextStore from 'stores/TextStore';
@@ -65,6 +65,7 @@ export default class MovePopup extends React.Component<Props, State> {
 
     componentWillUnmount() {
         window.removeEventListener('resize', this.handleResize);
+        this.props.treeStore.getMoveTreeStore().clear();
     }
 
     render() {
@@ -75,6 +76,15 @@ export default class MovePopup extends React.Component<Props, State> {
         }
 
         const moveTreeStore = treeStore.getMoveTreeStore();
+
+        if (moveTreeStore.loading) {
+            return (
+                <Card style={{ height: this.state.height }}>
+                    <Spinner size={100}/>
+                </Card>
+            );
+        }
+
         const { newParent } = this.state;
 
         return (

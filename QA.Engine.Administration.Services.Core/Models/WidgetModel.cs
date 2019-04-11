@@ -21,7 +21,7 @@ namespace QA.Engine.Administration.Services.Core.Models
         public string Discriminator { get; set; }
         public int DiscriminatorId { get; set; }
         public string DiscriminatorTitle { get; set; }
-        public string IconUrl { get; set; }
+        // public string IconUrl { get; set; }
 
         public List<WidgetModel> Children { get; set; }
         public List<int> RegionIds { get; set; }

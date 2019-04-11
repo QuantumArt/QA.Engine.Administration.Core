@@ -14,6 +14,10 @@ export default class Popup extends React.Component<Props> {
 
     private handleClose = () => this.props.popupStore.close();
 
+    componentWillUnmount() {
+
+    }
+
     render() {
         const { popupStore, children } = this.props;
         const isError = popupStore.state === OperationState.ERROR;

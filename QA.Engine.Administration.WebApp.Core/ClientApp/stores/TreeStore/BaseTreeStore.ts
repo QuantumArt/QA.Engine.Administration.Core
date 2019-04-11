@@ -68,18 +68,18 @@ export abstract class BaseTreeState<T extends {
 
     public abstract type: TreeStoreType;
 
-    @observable public showIDs: boolean = false;
-    @observable public showPath: boolean = false;
+    @observable.ref public showIDs: boolean = false;
+    @observable.ref public showPath: boolean = false;
 
-    @observable public searchActive: boolean = false;
-    @observable public query: string = '';
-    @observable public cordsUpdated: boolean = false;
-    @observable protected expandLaunched: boolean = false;
+    @observable.ref public searchActive: boolean = false;
+    @observable.ref public query: string = '';
+    @observable.ref public cordsUpdated: boolean = false;
+    @observable.ref protected expandLaunched: boolean = false;
     protected searchTimer: number;
 
     @observable.shallow public selectedNode: T;
-    @observable public nodeCords = new Map<number, number>();
-    @observable public pathMap = new Map<number, string>();
+    public nodeCords = new Map<number, number>();
+    public pathMap = new Map<number, string>();
     @observable.ref protected treeInternal: ITreeElement[] = [];
     @observable.ref protected searchedTreeInternal: ITreeElement[] = [];
     protected nodesMap = new Map<number, MapEntity<T>>();
@@ -177,17 +177,19 @@ export abstract class BaseTreeState<T extends {
 
     @action
     public clear() {
+        console.log('%cclear base tree store', 'color: magenta');
         this.treeInternal = [];
         this.searchedTreeInternal = [];
         this.origTreeInternal = [];
         this.origSearchedTreeInternal = [];
         this.nodesMap.clear();
         this.searchedNodesMap.clear();
+        this.pathMap.clear();
+        this.nodeCords.clear();
     }
 
     @action
     public async fetchTree(): Promise<void> {
-        this.clear();
         const response: ApiResult<T[]> = await this.getTree();
         if (response.isSuccess) {
             this.origTreeInternal = response.data;
@@ -445,7 +447,7 @@ export abstract class BaseTreeState<T extends {
                     if (key === 'treeInternal') {
                         this.nodesMap.set(x.id, { original: x, mapped: el });
                         if (this.pathMap.has(el.parentId)) {
-                            this.pathMap.set(el.id, `${this.pathMap.get(el.parentId)}/${hMap.get(el.parentId).title}`);
+                            this.pathMap.set(el.id, `${this.pathMap.get(el.parentId)}/${treeEl.title}`);
                         }
                     } else {
                         this.searchedNodesMap.set(x.id, { original: x, mapped: el });

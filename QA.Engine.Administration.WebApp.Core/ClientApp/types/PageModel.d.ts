@@ -18,7 +18,6 @@ declare interface PageModel {
   discriminator: string;
   discriminatorId: number;
   discriminatorTitle: string;
-  iconUrl: string;
   widgets: WidgetModel[];
   children: PageModel[];
   contentVersions: PageModel[];

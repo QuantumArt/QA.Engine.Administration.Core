@@ -55,12 +55,12 @@ namespace QA.Engine.Administration.Services.Core
                 .Where(regionFilter)
                 .Select(x => _mapper.Map<PageModel>(x))
                 .ToList();
-            items.ForEach(x => x.IconUrl = $"{iconUrl}/{x.IconUrl}");
+            // items.ForEach(x => x.IconUrl = $"{iconUrl}/{x.IconUrl}");
             var children = _siteMapProvider.GetItems(siteId, isArchive, items.Select(x => x.Id), useRegion)
                 .Where(regionFilter)
                 .Select(x => _mapper.Map<PageModel>(x))
                 .ToList();
-            children.ForEach(x => x.IconUrl = $"{iconUrl}/{x.IconUrl}");
+            // children.ForEach(x => x.IconUrl = $"{iconUrl}/{x.IconUrl}");
 
             foreach (var item in items)
                 item.Children = children.Where(x => x.ParentId == item.Id).ToList();
@@ -87,12 +87,12 @@ namespace QA.Engine.Administration.Services.Core
                 .Where(regionFilter)
                 .Select(x => _mapper.Map<WidgetModel>(x))
                 .ToList();
-            items.ForEach(x => x.IconUrl = $"{iconUrl}/{x.IconUrl}");
+            // items.ForEach(x => x.IconUrl = $"{iconUrl}/{x.IconUrl}");
             var children = _widgetProvider.GetItems(siteId, isArchive, items.Select(x => x.Id))
                 .Where(regionFilter)
                 .Select(x => _mapper.Map<WidgetModel>(x))
                 .ToList();
-            children.ForEach(x => x.IconUrl = $"{iconUrl}/{x.IconUrl}");
+            // children.ForEach(x => x.IconUrl = $"{iconUrl}/{x.IconUrl}");
 
             foreach (var item in items)
                 item.Children = children.Where(x => x.ParentId == item.Id).ToList();

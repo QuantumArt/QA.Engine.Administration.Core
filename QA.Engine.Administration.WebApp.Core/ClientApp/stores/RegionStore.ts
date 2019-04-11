@@ -25,7 +25,8 @@ export default class RegionStore extends ErrorHandler {
         try {
             const response: ApiResult<RegionModel[]> = await DictionaryService.getFlatRegions();
             if (response.isSuccess) {
-                this.regions = response.data;
+                this.regions = response.data
+                    .sort((a, b) => a.title > b.title ? 1 : -1);
                 this.state = OperationState.SUCCESS;
             } else {
                 throw response.error;

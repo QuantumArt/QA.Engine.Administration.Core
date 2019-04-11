@@ -17,7 +17,6 @@ declare interface WidgetModel {
   discriminator: string;
   discriminatorId: number;
   discriminatorTitle: string;
-  iconUrl: string;
   children: WidgetModel[];
   regionIds: number[];
   hasChildren: boolean;

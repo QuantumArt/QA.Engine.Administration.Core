@@ -25,12 +25,13 @@ export default class PopupStore extends ErrorHandler {
         const useContentVersions = [PopupType.ARCHIVE];
 
         if (useDiscriminators.indexOf(type) > -1) {
-            this.getDiscriminators(itemId, type, title, options);
+            await this.getDiscriminators(itemId, type, title, options);
         }
 
         if (useContentVersions.indexOf(type) > -1) {
-            this.getContentVersions(itemId, type, title, options);
+            await this.getContentVersions(itemId, type, title, options);
         }
+
         this.itemId = itemId;
         this.type = type;
         this.title = title;
@@ -54,7 +55,9 @@ export default class PopupStore extends ErrorHandler {
         try {
             const response: ApiResult<DiscriminatorModel[]> = await DictionaryService.getDiscriminators();
             if (response.isSuccess) {
-                this.discriminators = response.data.filter(x => x.isPage === isPage);
+                this.discriminators = response.data
+                    .filter(x => x.isPage === isPage)
+                    .sort((a, b) => a.title > b.title ? 1 : -1);
                 this.state = OperationState.SUCCESS;
             } else {
                 throw response.error;
@@ -74,7 +77,9 @@ export default class PopupStore extends ErrorHandler {
         try {
             const response: ApiResult<PageModel> = await SiteMapService.getSiteMapSubTree(itemId);
             if (response.isSuccess) {
-                this.contentVersions = response.data == null ? [] : response.data.contentVersions;
+                this.contentVersions = response.data == null
+                    ? []
+                    : response.data.contentVersions.sort((a, b) => a.title > b.title ? 1 : -1);
                 this.state = OperationState.SUCCESS;
             } else {
                 throw response.error;

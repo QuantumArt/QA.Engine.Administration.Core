@@ -22,7 +22,7 @@ namespace QA.Engine.Administration.Services.Core.Models
         public string Discriminator { get; set; }
         public int DiscriminatorId { get; set; }
         public string DiscriminatorTitle { get; set; }
-        public string IconUrl { get; set; }
+        // public string IconUrl { get; set; }
 
         public List<WidgetModel> Widgets { get; set; }
         public List<PageModel> Children { get; set; }
