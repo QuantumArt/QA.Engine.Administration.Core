@@ -33,7 +33,7 @@ export default class ArchiveTreeStore extends BaseTreeState<ArchiveModel> {
     handlePagination(number: number = null) {
         if (this.origTreeInternal.length > this.MAX_SIZE) {
             if (this.pagesCount === null) {
-                this.pagesCount = Math.round(this.origTreeInternal.length / this.MAX_SIZE);
+                this.pagesCount = Math.ceil(this.origTreeInternal.length / this.MAX_SIZE);
             }
             if (number !== null) {
                 this.pageIndex = this.pageIndex < 0 ? -1 : number < 0 ? 0 : number;
