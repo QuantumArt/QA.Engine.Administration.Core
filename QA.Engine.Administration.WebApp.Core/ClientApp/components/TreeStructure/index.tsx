@@ -12,6 +12,8 @@ import {
     Spinner,
     Switch,
     Tag,
+    ButtonGroup,
+    Intent,
 } from '@blueprintjs/core';
 import Scrollbars from 'react-custom-scrollbars'; // tslint:disable-line
 import cn from 'classnames'; // tslint:disable-line
@@ -179,6 +181,28 @@ export default class SiteTree extends React.Component<Props, State> {
         );
     }
 
+    private moveClick = async () => {
+        const { treeStore } = this.props;
+        const tree = treeStore.resolveMainTreeStore();
+        if (tree instanceof SiteTreeStore) {
+            const model: MoveModel = {
+                itemId: tree.moveItemId,
+                newParentId: tree.selectedNode.id,
+            };
+            await treeStore.move(model);
+            tree.cancelMoveTree();
+        }
+    }
+
+    private cancelMoveClick = () => {
+        const { navigationStore, treeStore } = this.props;
+        const tree = treeStore.resolveMainTreeStore();
+        if (tree instanceof SiteTreeStore) {
+            navigationStore.setDefaultTab(true);
+            tree.cancelMoveTree();
+        }
+    }
+
     componentDidMount() {
         window.addEventListener('resize', this.handleResize);
     }
@@ -196,6 +220,8 @@ export default class SiteTree extends React.Component<Props, State> {
         const regions = regionStore.regions != null && regionStore.regions.length > 0
             ? [{ id: null, title: '(No selection)' } as RegionModel].concat(regionStore.regions)
             : [];
+        const isMoveTreeMode = tree instanceof SiteTreeStore ? tree.moveTreeMode : false;
+        const isNewParentSelected = tree instanceof SiteTreeStore && tree.treeElement ? !tree.treeElement.isSelected : false;
         const scrollNodeId = tree.getNodeToScroll();
         if (scrollNodeId !== null) {
             setTimeout(
@@ -207,7 +233,7 @@ export default class SiteTree extends React.Component<Props, State> {
         }
 
         return (
-            <Card className={cn('tree-pane', this.props.className)}>
+            <Card className={cn('tree-pane', this.props.className)} style={isMoveTreeMode ? { width: '100%' } : null}>
                 <Navbar className="tree-navbar">
                     <InputGroup
                         leftIcon="search"
@@ -233,7 +259,7 @@ export default class SiteTree extends React.Component<Props, State> {
                             onChange={tree.togglePath}
                         />
                     }
-                    {useRegions &&
+                    {useRegions && !isMoveTreeMode &&
                         <React.Fragment>
                             <NavbarDivider className={cn({ hidden: tree.searchActive })}/>
                             <RegionSelect
@@ -242,6 +268,15 @@ export default class SiteTree extends React.Component<Props, State> {
                                 onChange={this.changeRegion}
                                 className={cn({ hidden: tree.searchActive })}
                             />
+                        </React.Fragment>
+                    }
+                    {isMoveTreeMode &&
+                        <React.Fragment>
+                            <NavbarDivider/>
+                            <ButtonGroup className="dialog-button-group" style={{ justifyContent: 'left' }}>
+                                <Button text={textStore.texts[Texts.popupMoveButton]} icon="move" onClick={this.moveClick} intent={Intent.SUCCESS} disabled={isNewParentSelected} />
+                                <Button text={textStore.texts[Texts.popupCancelButton]} icon="undo" onClick={this.cancelMoveClick} />
+                            </ButtonGroup>
                         </React.Fragment>
                     }
                 </Navbar>

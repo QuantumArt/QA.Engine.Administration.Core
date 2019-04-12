@@ -9,6 +9,7 @@ import TextStore from 'stores/TextStore';
 import Texts from 'constants/Texts';
 import TreeStore from 'stores/TreeStore';
 import { autorun } from 'mobx';
+import SiteTreeStore from 'stores/TreeStore/SiteTreeStore';
 
 interface Props {
     navigationStore?: NavigationStore;
@@ -41,7 +42,12 @@ export default class TabsContainer extends React.Component<Props> {
     }
 
     render() {
-        const { navigationStore, textStore } = this.props;
+        const { navigationStore, textStore, treeStore } = this.props;
+        const tree = treeStore.resolveMainTreeStore();
+        if (tree instanceof SiteTreeStore && tree.moveTreeMode) {
+            return null;
+        }
+
         return (
             <Card className="tabs-pane">
                 <Tabs

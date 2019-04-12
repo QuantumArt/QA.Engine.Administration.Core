@@ -5,6 +5,7 @@ import NavigationStore, { Pages } from 'stores/NavigationStore';
 import TreeStore from 'stores/TreeStore';
 import TextStore from 'stores/TextStore';
 import Texts from 'constants/Texts';
+import SiteTreeStore from 'stores/TreeStore/SiteTreeStore';
 
 interface Props {
     navigationStore?: NavigationStore;
@@ -33,7 +34,9 @@ export default class NavigationBar extends React.Component<Props> {
     }
 
     render() {
-        const { navigationStore: { currentPage }, textStore } = this.props;
+        const { navigationStore: { currentPage }, textStore, treeStore } = this.props;
+        const tree = treeStore.resolveMainTreeStore();
+        const isMoveTreeMode = tree instanceof SiteTreeStore ? tree.moveTreeMode : false;
         return (
             <Navbar fixedToTop>
                 <NavbarGroup align={Alignment.LEFT}>
@@ -51,6 +54,7 @@ export default class NavigationBar extends React.Component<Props> {
                         text={textStore.texts[Texts.archiveMenu]}
                         onClick={this.handleClick(Pages.ARCHIVE)}
                         intent={currentPage === Pages.ARCHIVE ? Intent.PRIMARY : Intent.NONE}
+                        disabled={isMoveTreeMode}
                     />
                 </NavbarGroup>
             </Navbar>

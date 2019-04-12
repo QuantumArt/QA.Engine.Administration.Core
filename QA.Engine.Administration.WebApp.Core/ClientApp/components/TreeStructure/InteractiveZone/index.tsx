@@ -11,6 +11,7 @@ import TreeStoreType from 'enums/TreeStoreType';
 import SiteTreeMenu from './SiteTreeMenu';
 import ArchiveTreeMenu from './ArchiveTreeMenu';
 import WidgetTreeMenu from './WidgetTreeMenu';
+import SiteTreeStore from 'stores/TreeStore/SiteTreeStore';
 
 interface Props {
     treeStore?: TreeStore;
@@ -108,10 +109,12 @@ export default class InteractiveZone extends React.Component<Props, State> {
     render() {
         const { node, treeStore, type } = this.props;
         const tree = treeStore.resolveTree(type);
+        let isMoveTreeMode = false;
         let elementMenu: JSX.Element;
         switch (node.contextMenuType) {
             case ContextMenuType.SITEMAP:
                 elementMenu = <SiteTreeMenu itemId={+node.id} node={node} />;
+                isMoveTreeMode = tree instanceof SiteTreeStore ? tree.moveTreeMode : false;
                 break;
             case ContextMenuType.ARCHIVE:
                 elementMenu = <ArchiveTreeMenu itemId={+node.id} node={node} />;
@@ -133,13 +136,12 @@ export default class InteractiveZone extends React.Component<Props, State> {
                         icon="diagram-tree"
                         minimal
                         onClick={this.handleExpandToNodeClick(node)}
-                        className={cn('context-button', {
-                            'expand-to-node': tree.type !== TreeStoreType.MOVE,
-                            'expand-to-node--active': node.isSelected && tree.type !== TreeStoreType.MOVE,
+                        className={cn('context-button expand-to-node', {
+                            'expand-to-node--active': node.isSelected && !isMoveTreeMode,
                         })}
                     />
                 }
-                {(node.isSelected && tree.type !== TreeStoreType.MOVE) &&
+                {(node.isSelected && !isMoveTreeMode) &&
                     <Popover
                         className="context-popover"
                         content={elementMenu}

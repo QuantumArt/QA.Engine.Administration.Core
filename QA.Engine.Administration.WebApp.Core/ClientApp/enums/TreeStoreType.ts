@@ -3,7 +3,6 @@ enum TreeStoreType {
     ARCHIVE = 1,
     CONTENTVERSION = 2,
     WIDGET = 3,
-    MOVE = 4,
 }
 
 export default TreeStoreType;

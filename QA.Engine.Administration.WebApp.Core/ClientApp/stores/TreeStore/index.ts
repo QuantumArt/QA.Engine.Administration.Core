@@ -8,11 +8,10 @@ import OperationState from 'enums/OperationState';
 import ErrorsTypes from 'constants/ErrorsTypes';
 import SiteMapService from 'services/SiteMapService';
 import ErrorHandler from 'stores/ErrorHandler';
-import MoveTreeStore from './MoveTreeStore';
 import TreeStoreType from 'enums/TreeStoreType';
 
-export type TreeType = SiteTreeStore | ArchiveTreeStore | ContentVersionTreeStore | WidgetTreeStore | MoveTreeStore;
-export type TreeStructureType = 'main' | 'widgets' | 'versions' | 'move';
+export type TreeType = SiteTreeStore | ArchiveTreeStore | ContentVersionTreeStore | WidgetTreeStore;
+export type TreeStructureType = 'main' | 'widgets' | 'versions';
 
 /**
  * @description Facade class to access a proper tree
@@ -23,7 +22,6 @@ export default class TreeStore extends ErrorHandler {
     private readonly archiveStore: ArchiveTreeStore;
     private readonly contentVersionsStore: ContentVersionTreeStore;
     private readonly widgetStore: WidgetTreeStore;
-    private readonly moveStore: MoveTreeStore;
     private readonly navigationStore: NavigationStore;
 
     constructor(navigationStore: NavigationStore) {
@@ -51,7 +49,6 @@ export default class TreeStore extends ErrorHandler {
             leaf: 'document',
             leafPublished: 'saved',
         });
-        this.moveStore = new MoveTreeStore();
         this.navigationStore = navigationStore;
     }
 
@@ -68,9 +65,6 @@ export default class TreeStore extends ErrorHandler {
     }
     public getWidgetTreeStore(): WidgetTreeStore {
         return this.widgetStore;
-    }
-    public getMoveTreeStore(): MoveTreeStore {
-        return this.moveStore;
     }
     public resolveMainTreeStore(): ArchiveTreeStore | SiteTreeStore {
         if (this.navigationStore.currentPage === Pages.ARCHIVE) {
@@ -91,9 +85,6 @@ export default class TreeStore extends ErrorHandler {
             case 'versions':
             case TreeStoreType.CONTENTVERSION:
                 return this.getContentVersionTreeStore();
-            case 'move':
-            case TreeStoreType.MOVE:
-                return this.getMoveTreeStore();
             default:
                 return null;
         }

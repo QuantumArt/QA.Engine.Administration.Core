@@ -1,8 +1,9 @@
 import SiteMapService from 'services/SiteMapService';
-import { BaseTreeState } from 'stores/TreeStore/BaseTreeStore';
+import { BaseTreeState, ITreeElement } from 'stores/TreeStore/BaseTreeStore';
 import ContextMenuType from 'enums/ContextMenuType';
 import TreeStoreType from 'enums/TreeStoreType';
 import DictionaryService from 'services/DictionaryService';
+import { action, computed, observable } from 'mobx';
 
 export default class SiteTreeStore extends BaseTreeState<PageModel> {
 
@@ -52,6 +53,67 @@ export default class SiteTreeStore extends BaseTreeState<PageModel> {
             }
         } catch (e) {
             this.rootPageDiscriminator = null;
+        }
+    }
+
+    @observable private moveTreeModeInternal: boolean = false;
+    @computed
+    public get moveTreeMode(): boolean {
+        return this.moveTreeModeInternal;
+    }
+
+    private moveItemIdInternal: number;
+    public get moveItemId(): number {
+        return this.moveItemIdInternal;
+    }
+    public get treeElement(): ITreeElement {
+        if (this.selectedNode != null && this.nodesMap.has(this.selectedNode.id)) {
+            return this.nodesMap.get(this.selectedNode.id).mapped;
+        }
+        return null;
+    }
+
+    @action
+    public startMoveTree() {
+        this.moveTreeModeInternal = true;
+        this.moveItemIdInternal = this.selectedNode.id;
+        if (this.nodesMap.has(this.moveItemIdInternal)) {
+            const mapEntity = this.nodesMap.get(this.moveItemIdInternal);
+            mapEntity.mapped.isExpanded = false;
+            mapEntity.mapped.isSelected = false;
+            mapEntity.mapped.disabled = true;
+        }
+    }
+
+    @action
+    public cancelMoveTree() {
+        if (this.nodesMap.has(this.moveItemIdInternal)) {
+            const mapEntity = this.nodesMap.get(this.moveItemIdInternal);
+            mapEntity.mapped.isSelected = true;
+            mapEntity.mapped.disabled = false;
+            if (this.selectedNode != null && this.selectedNode.id !== mapEntity.original.id) {
+                this.nodesMap.get(this.selectedNode.id).mapped.isSelected = false;
+                this.selectedNode = mapEntity.original;
+                this.expandToNode(mapEntity.mapped);
+
+            }
+        }
+        this.moveItemIdInternal = null;
+        this.moveTreeModeInternal = false;
+        if (this.query !== '') {
+            this.search('');
+        }
+    }
+
+    protected searchInternal(results: Set<PageModel>, query: string, node: PageModel) {
+        let del: PageModel;
+        results.forEach((x) => {
+            if (x.id === this.moveItemIdInternal) {
+                del = x;
+            }
+        });
+        if (del) {
+            results.delete(del);
         }
     }
 }
