@@ -188,6 +188,7 @@ export abstract class BaseTreeState<T extends {
 
     @action
     public clear() {
+        this.selectedNode = null;
         this.treeInternal = [];
         this.searchedTreeInternal = [];
         this.origTreeInternal = [];

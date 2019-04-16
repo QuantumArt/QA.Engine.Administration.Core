@@ -57,6 +57,13 @@ export default class ArchiveTreeStore extends BaseTreeState<ArchiveModel> {
         }
     }
 
+    @action
+    public clear() {
+        super.clear();
+        this.pagesMap.clear();
+        this.pageIndex = -1;
+    }
+
     protected contextMenuType: ContextMenuType = ContextMenuType.ARCHIVE;
 
     protected async getTree(): Promise<ApiResult<ArchiveModel[]>> {
