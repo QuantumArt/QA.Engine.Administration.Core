@@ -109,6 +109,7 @@ export default class InteractiveZone extends React.Component<Props, State> {
     render() {
         const { node, treeStore, type } = this.props;
         const tree = treeStore.resolveTree(type);
+        const showExpandBtn = tree.searchActive && type !== TreeStoreType.ARCHIVE;
         let isMoveTreeMode = false;
         let elementMenu: JSX.Element;
         switch (node.contextMenuType) {
@@ -131,7 +132,7 @@ export default class InteractiveZone extends React.Component<Props, State> {
 
         return (
             <React.Fragment>
-                {tree.searchActive &&
+                {showExpandBtn &&
                     <Button
                         icon="diagram-tree"
                         minimal

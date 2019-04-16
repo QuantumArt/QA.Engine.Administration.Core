@@ -113,10 +113,10 @@ export abstract class BaseTreeState<T extends {
     }
 
     @action
-    public search = (query: string) => {
+    public search(query: string) {
         this.searchedTreeInternal = [];
         this.query = query;
-        this.searchActive = query.length >= 2;
+        this.searchActive = query.length >= 3;
         clearTimeout(this.searchTimer);
         this.searchTimer = window.setTimeout(
             () => {

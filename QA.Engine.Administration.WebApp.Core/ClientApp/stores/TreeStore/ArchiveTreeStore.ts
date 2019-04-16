@@ -14,7 +14,6 @@ export default class ArchiveTreeStore extends BaseTreeState<ArchiveModel> {
 
     @action
     public async fetchTree(): Promise<void> {
-        this.clear();
         const response: ApiResult<ArchiveModel[]> = await this.getTree();
         if (response.isSuccess) {
             this.origTreeInternal = response.data;
@@ -55,6 +54,39 @@ export default class ArchiveTreeStore extends BaseTreeState<ArchiveModel> {
             this.pageIndex = -1;
             this.convertTree(this.origTreeInternal, 'treeInternal');
         }
+    }
+
+    @action
+    public search(query: string) {
+        if (this.selectedNode != null) {
+            const maybeCurNode = this.nodesMap.get(this.selectedNode.id);
+            if (maybeCurNode) {
+                maybeCurNode.mapped.isSelected = false;
+            }
+        }
+        this.selectedNode = null;
+        super.search(query);
+    }
+
+    @action
+    public handleNodeClick = (nodeData: ITreeElement) => {
+        const targetNode = this.nodesMap.get(nodeData.id) || this.searchedNodesMap.get(nodeData.id);
+        const originallySelected = nodeData.isSelected;
+        if (this.selectedNode != null) {
+            if (this.searchActive) {
+                const node = this.searchedNodesMap.get(this.selectedNode.id);
+                if (node) {
+                    node.mapped.isSelected = false;
+                }
+            } else {
+                const node = this.nodesMap.get(this.selectedNode.id);
+                if (node) {
+                    node.mapped.isSelected = false;
+                }
+            }
+        }
+        this.selectedNode = nodeData.isSelected === true ? null : targetNode.original;
+        nodeData.isSelected = originallySelected == null ? true : !originallySelected;
     }
 
     @action
