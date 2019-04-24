@@ -121,7 +121,7 @@ namespace QA.Engine.Administration.Services.Core
             var abstractItems = _siteMapProvider.GetAllItems(siteId, false, useRegion)
                 .Where(regionFilter)
                 .ToList();
-            abstractItems.ForEach(x => x.IconUrl = $"{iconUrl}/{x.IconUrl}");
+            // abstractItems.ForEach(x => x.IconUrl = $"{iconUrl}/{x.IconUrl}");
             stopwatch.Stop();
             _logger.LogTrace($"get all abstract items {stopwatch.ElapsedMilliseconds}ms");
 
@@ -159,7 +159,7 @@ namespace QA.Engine.Administration.Services.Core
             var abstractItems = _siteMapProvider.GetAllItems(siteId, false, useRegion)
                 .Where(regionFilter)
                 .ToList();
-            abstractItems.ForEach(x => x.IconUrl = $"{iconUrl}/{x.IconUrl}");
+            // abstractItems.ForEach(x => x.IconUrl = $"{iconUrl}/{x.IconUrl}");
             stopwatch.Stop();
             _logger.LogTrace($"get all abstract items {stopwatch.ElapsedMilliseconds}ms");
 
@@ -185,7 +185,7 @@ namespace QA.Engine.Administration.Services.Core
             var stopwatch = new Stopwatch();
             stopwatch.Start();
             var abstractItems = _siteMapProvider.GetAllItems(siteId, true, useRegion);
-            abstractItems.ForEach(x => x.IconUrl = $"{iconUrl}/{x.IconUrl}");
+            // abstractItems.ForEach(x => x.IconUrl = $"{iconUrl}/{x.IconUrl}");
             stopwatch.Stop();
             _logger.LogTrace($"get all archive abstract items {stopwatch.ElapsedMilliseconds}ms");
 
@@ -210,7 +210,7 @@ namespace QA.Engine.Administration.Services.Core
             var stopwatch = new Stopwatch();
             stopwatch.Start();
             var abstractItems = _siteMapProvider.GetAllItems(siteId, true, useRegion);
-            abstractItems.ForEach(x => x.IconUrl = $"{iconUrl}/{x.IconUrl}");
+            // abstractItems.ForEach(x => x.IconUrl = $"{iconUrl}/{x.IconUrl}");
             stopwatch.Stop();
             _logger.LogTrace($"get all archive abstract items {stopwatch.ElapsedMilliseconds}ms");
 

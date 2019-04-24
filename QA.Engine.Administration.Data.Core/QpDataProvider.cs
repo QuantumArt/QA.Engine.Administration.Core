@@ -306,19 +306,6 @@ namespace QA.Engine.Administration.Data.Core
             {
                 var siteName = _qpMetadataManager.GetSiteName(siteId);
 
-                // update content
-                var contentName = _qpMetadataManager.GetContentName(contentId);
-                _qpContentManager
-                    .Connect()
-                    .SiteName(siteName)
-                    .IsIncludeArchive(true)
-                    .IsShowSplittedArticle(true)
-                    .StatusName(_statusNames)
-                    .ContentId(contentId)
-                    .ContentName(contentName)
-                    .Where($"{ContentItemIdFieldName} in ({string.Join(",", items.Select(x => x.Id))}) AND Archive = 1")
-                    .Delete(userId);
-
                 //update extantion
                 var extantionValues = items
                     .Where(x => x.ExtensionId.HasValue)
@@ -337,6 +324,20 @@ namespace QA.Engine.Administration.Data.Core
                         .Where($"ItemId in ({string.Join(",", item.Select(x => x))})")
                         .Delete(userId);
                 }
+
+                // update content
+                var contentName = _qpMetadataManager.GetContentName(contentId);
+                _qpContentManager
+                    .Connect()
+                    .SiteName(siteName)
+                    .IsIncludeArchive(true)
+                    .IsShowSplittedArticle(true)
+                    .StatusName(_statusNames)
+                    .ContentId(contentId)
+                    .ContentName(contentName)
+                    .Where($"{ContentItemIdFieldName} in ({string.Join(",", items.Select(x => x.Id))}) AND Archive = 1")
+                    .Delete(userId);
+
                 _qpDbConnector.CommitTransaction();
             }
             catch (Exception e)
