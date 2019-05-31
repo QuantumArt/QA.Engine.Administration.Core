@@ -5,6 +5,7 @@ import InteractiveZone from 'components/TreeStructure/InteractiveZone';
 import ContextMenuType from 'enums/ContextMenuType';
 import TreeStoreType from 'enums/TreeStoreType';
 import NodeLabel from 'components/TreeStructure/NodeLabel';
+import DictionaryService from 'services/DictionaryService';
 
 export interface ITreeElement extends ITreeNode {
     title?: string;
@@ -60,6 +61,7 @@ export abstract class BaseTreeState<T extends {
     children: T[];
     isVisible?: boolean;
     published?: boolean;
+    discriminatorId?: number;
 }> {
 
     constructor(icons: ITreeIcons = defaultIcons) {
@@ -96,6 +98,7 @@ export abstract class BaseTreeState<T extends {
     protected searchedNodesMap = new Map<number, MapEntity<T>>();
     protected origTreeInternal: T[] = [];
     protected origSearchedTreeInternal: T[] = [];
+    protected discriminators: DiscriminatorModel[];
 
     @computed
     get tree(): ITreeElement[] {
@@ -152,6 +155,16 @@ export abstract class BaseTreeState<T extends {
     protected searchInternal(results: Set<T>, query: string, node: T) {
     }
 
+    private lastUpdate?: number;
+    protected async getDiscriminators() {
+        const timeout = 60 * 1000;
+        if (this.discriminators == null || this.lastUpdate == null || Date.now() - this.lastUpdate > timeout) {
+            const discriminators: ApiResult<DiscriminatorModel[]> = await DictionaryService.getDiscriminators();
+            this.discriminators = discriminators.isSuccess ? discriminators.data : null;
+            this.lastUpdate = Date.now();
+        }
+    }
+
     @action
     public resetSearch = () => {
         if (this.searchActive) {
@@ -202,6 +215,7 @@ export abstract class BaseTreeState<T extends {
     @action
     public async fetchTree(): Promise<void> {
         const response: ApiResult<T[]> = await this.getTree();
+        await this.getDiscriminators();
         if (response.isSuccess) {
             this.origTreeInternal = response.data;
             this.convertTree(this.origTreeInternal, 'treeInternal');
@@ -302,6 +316,7 @@ export abstract class BaseTreeState<T extends {
     @action
     public async updateSubTree(id: number): Promise<void> {
         const response: ApiResult<T> = await this.getSubTree(id);
+        await this.getDiscriminators();
         if (response.isSuccess) {
             const updateInternal = (tree: T[], key: 'searchedTreeInternal' | 'treeInternal') => {
                 const expanded: number[] = [];
@@ -354,6 +369,10 @@ export abstract class BaseTreeState<T extends {
     protected abstract contextMenuType: ContextMenuType;
 
     protected getIcon = (el: T): IconName => {
+        const discriminator = this.discriminators == null ? null : this.discriminators.filter(x => x.id === el.discriminatorId)[0];
+        if (discriminator != null) {
+            return <IconName>discriminator.iconClass;
+        }
         if (this.icons.checkPublication) {
             if (this.searchActive) {
                 return el.published ? this.icons.nodePublished : this.icons.node;

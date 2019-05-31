@@ -10,6 +10,8 @@
         public string Title { get; set; }
         public string Description { get; set; }
         public string IconUrl { get; set; }
+        public string IconClass { get; set; }
+        public string IconIntent { get; set; }
         public int? PreferredContentId { get; set; }
     }
 }

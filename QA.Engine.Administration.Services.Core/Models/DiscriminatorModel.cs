@@ -20,6 +20,10 @@ namespace QA.Engine.Administration.Services.Core.Models
 
         public string IconUrl { get; set; }
 
+        public string IconClass { get; set; }
+
+        public string IconIntent { get; set; }
+
         public int? PreferredContentId { get; set; }
     }
 }

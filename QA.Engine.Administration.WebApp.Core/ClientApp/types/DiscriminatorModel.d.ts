@@ -11,6 +11,8 @@ declare interface DiscriminatorModel {
   title: string;
   description: string;
   iconUrl: string;
+  iconClass: string;
+  iconIntent: string;
   preferredContentId?: null | number; // number 
 }
 
