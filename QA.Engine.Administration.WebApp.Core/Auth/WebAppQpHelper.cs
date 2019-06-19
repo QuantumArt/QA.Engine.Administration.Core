@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using QA.Engine.Administration.WebApp.Core.Business.Models;
+using ConnectionInfo = QA.Engine.Administration.WebApp.Core.Business.Models.ConnectionInfo;
 
 namespace QA.Engine.Administration.WebApp.Core.Auth
 {
@@ -40,6 +42,7 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
         /// </summary>
         string ConnectionString { get; }
 
+        ConnectionInfo ConnectionInfo { get; }
         /// <summary>
         /// Id пользователя
         /// </summary>
@@ -133,7 +136,8 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
             }
         }
 
-        public string ConnectionString => SiteConfiguration.Get(_httpContext).ConnectionString;
+        public string ConnectionString => SiteConfiguration.Get(_httpContext).ConnectionInfo.ConnectionString;
+        public ConnectionInfo ConnectionInfo => SiteConfiguration.Get(_httpContext).ConnectionInfo;
 
         public int UserId => _httpContext.Session.GetInt32(DBConnector.LastModifiedByKey) ?? 0;
     }

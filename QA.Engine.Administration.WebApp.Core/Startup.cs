@@ -1,12 +1,11 @@
 using AutoMapper;
 using System;
+using System.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
-using Microsoft.AspNetCore.SpaServices.Webpack;
 using QA.Engine.Administration.Services.Core;
 using QA.Engine.Administration.Services.Core.Interfaces;
 using QA.Engine.Administration.Data.Interfaces.Core;
@@ -19,6 +18,7 @@ using QA.Engine.Administration.Data.Core.Qp;
 using Swashbuckle.AspNetCore.Swagger;
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
+using Npgsql;
 using QA.Engin.Administration.Common.Core;
 
 namespace QA.Engine.Administration.WebApp.Core
@@ -41,12 +41,10 @@ namespace QA.Engine.Administration.WebApp.Core
             services.Configure<EnvironmentConfiguration>(Configuration);
 
             services
-                .AddMvc(opt =>
-                {
-                    opt.Filters.Add(typeof(QpAutorizationFilter));
-                })
+                .AddMvc(opt => { opt.Filters.Add(typeof(QpAutorizationFilter)); })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
-                .AddJsonOptions(o => {
+                .AddJsonOptions(o =>
+                {
                     o.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
                 });
 
@@ -70,19 +68,34 @@ namespace QA.Engine.Administration.WebApp.Core
             services.AddScoped<IWebAppQpHelper, WebAppQpHelper>();
 
             services.AddScoped<INetNameQueryAnalyzer, NetNameQueryAnalyzer>();
-            services.AddScoped<IUnitOfWork, UnitOfWork>(sp => new UnitOfWork(GetConnectionString(sp)));
+            services.AddScoped<IUnitOfWork, UnitOfWork>(sp => {
+                var config = Configuration.Get<EnvironmentConfiguration>();
+                if (config.UseFake)
+                {
+                    return new UnitOfWork(Configuration.GetConnectionString("QpConnection"),
+                        Configuration.GetConnectionString("DbType"));
+                }
+                var qpHelper = sp.GetService<IWebAppQpHelper>().ConnectionInfo;
+                return new UnitOfWork(qpHelper.ConnectionString, qpHelper.DatabaseType.ToString());
+            });
+
             services.AddScoped<IAbstractItemRepository, AbstractItemRepository>();
             services.AddScoped<IItemDefinitionRepository, ItemDefinitionRepository>();
             services.AddScoped<IMetaInfoRepository, MetaInfoRepository>();
 
             services.AddScoped<ISiteMapProvider, SiteMapProvider>();
+            //services.AddScoped<ISiteMapProvider, OldSiteMapProvider>();
             services.AddScoped<IWidgetProvider, WidgetProvider>();
             services.AddScoped<IDictionaryProvider, DictionaryProvider>();
             services.AddScoped<IQpDataProvider, QpDataProvider>();
             services.AddScoped<ISettingsProvider, SettingsProvider>();
             services.AddScoped<IItemExtensionProvider, ItemExtensionProvider>();
 
-            services.AddScoped<IQpDbConnector, QpDbConnector>(sp => new QpDbConnector(GetConnectionString(sp)));
+            services.AddScoped<IQpDbConnector, QpDbConnector>(sp =>
+            {
+                var uow = sp.GetService<IUnitOfWork>();
+                return new QpDbConnector(uow.Connection);
+            });
             services.AddScoped<IQpMetadataManager, QpMetadataManager>();
             services.AddScoped<IQpContentManager, QpContentManager>();
 
@@ -143,7 +156,7 @@ namespace QA.Engine.Administration.WebApp.Core
             var supportedCultures = new[]
             {
                 new CultureInfo(QpLanguage.Russian.GetDescription()),
-                new CultureInfo(QpLanguage.English.GetDescription()),
+                new CultureInfo(QpLanguage.English.GetDescription())
             };
             app.UseRequestLocalization(new RequestLocalizationOptions
             {
@@ -153,13 +166,18 @@ namespace QA.Engine.Administration.WebApp.Core
             });
         }
 
-        private string GetConnectionString(IServiceProvider sp)
+        private Business.Models.ConnectionInfo GetConnectionInfo(IServiceProvider sp)
         {
             var config = Configuration.Get<EnvironmentConfiguration>();
-            var connectionString = config.UseFake
-                ? Configuration.GetConnectionString("QpConnection")
-                : sp.GetService<IWebAppQpHelper>()?.ConnectionString;
-            return connectionString;
+            if (config.UseFake)
+            {
+                return new Business.Models.ConnectionInfo
+                {
+                    ConnectionString = Configuration.GetConnectionString("QpConnection")
+                };
+            }
+            var qpHelper = sp.GetService<IWebAppQpHelper>();
+            return qpHelper?.ConnectionInfo;
         }
     }
 }

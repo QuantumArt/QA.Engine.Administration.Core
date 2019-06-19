@@ -11,16 +11,12 @@ namespace QA.Engine.Administration.Data.Core
 {
     public class ItemExtensionProvider: IItemExtensionProvider
     {
-        private readonly IDbConnection _connection;
-        private readonly INetNameQueryAnalyzer _netNameQueryAnalyzer;
-        private readonly IMetaInfoRepository _metaInfoRepository;
+        private readonly IUnitOfWork _uow;
         private readonly ILogger<ItemExtensionProvider> _logger;
 
-        public ItemExtensionProvider(IUnitOfWork uow, INetNameQueryAnalyzer netNameQueryAnalyzer, IMetaInfoRepository metaInfoRepository, ILogger<ItemExtensionProvider> logger)
+        public ItemExtensionProvider(IUnitOfWork uow, ILogger<ItemExtensionProvider> logger)
         {
-            _connection = uow.Connection;
-            _netNameQueryAnalyzer = netNameQueryAnalyzer;
-            _metaInfoRepository = metaInfoRepository;
+            _uow = uow;
             _logger = logger;
         }
 
@@ -68,7 +64,7 @@ SELECT CONTENT_ITEM_ID AS ContentId, {1} AS Name FROM content_{0}_united WHERE {
         {
             _logger.LogDebug($"getItemExtensionFields. siteId: {siteId}, value: {value}, extensionId: {extensionId}");
             var query = string.Format(CmdGetExtantionItems, extensionId, value);
-            using (var multi = _connection.QueryMultiple(query))
+            using (var multi = _uow.Connection.QueryMultiple(query))
             {
                 var fieldNames = multi.Read<FieldAttributeData>().ToList();
                 var contentRow = multi.ReadFirstOrDefault<object>();
@@ -130,7 +126,7 @@ SELECT CONTENT_ITEM_ID AS ContentId, {1} AS Name FROM content_{0}_united WHERE {
         private ContentAttribute GetContentAttribute(int attributeId)
         {
             _logger.LogDebug($"GetContentAttribute. attributeId: {attributeId}");
-            var result = _connection.QuerySingleOrDefault<ContentAttribute>(CmdGetContentAttribute, new { attributeId });
+            var result = _uow.Connection.QuerySingleOrDefault<ContentAttribute>(CmdGetContentAttribute, new { attributeId });
             _logger.LogDebug($"GetContentAttribute. result: {SerializeData(result)}");
             return result;
         }
@@ -139,7 +135,7 @@ SELECT CONTENT_ITEM_ID AS ContentId, {1} AS Name FROM content_{0}_united WHERE {
         {
             _logger.LogDebug($"GetContentFieldValue. id: {id}, contentId: {contentId}, attributeName: {attributeName}");
             var query = string.Format(CmdGetContentFieldValue, contentId, attributeName);
-            var result = _connection.QuerySingleOrDefault<string>(query, new { id });
+            var result = _uow.Connection.QuerySingleOrDefault<string>(query, new { id });
             _logger.LogDebug($"GetContentFieldValue. result: {result}");
             return result?.ToString();
         }
@@ -148,7 +144,7 @@ SELECT CONTENT_ITEM_ID AS ContentId, {1} AS Name FROM content_{0}_united WHERE {
         {
             _logger.LogDebug($"GetContentFieldValue. contentId: {contentId}, titleAttributeName: {titleAttributeName}, attributeName: {attributeName}");
             var query = string.Format(CmdGetContentFieldValues, contentId, titleAttributeName, attributeName);
-            var result = _connection.Query<RelatedItem>(query, new { itemId }).ToDictionary(k => k.ContentId, v => v.Name);
+            var result = _uow.Connection.Query<RelatedItem>(query, new { itemId }).ToDictionary(k => k.ContentId, v => v.Name);
             _logger.LogDebug($"GetContentFieldValue. result: {SerializeData(result)}");
             return result;
         }
@@ -157,7 +153,7 @@ SELECT CONTENT_ITEM_ID AS ContentId, {1} AS Name FROM content_{0}_united WHERE {
         {
             _logger.LogDebug($"GetContentIdByItemId. id: {id}, contentId: {contentId}");
             var query = string.Format(CmdGetContentIdByItemId, contentId);
-            var result = _connection.QuerySingleOrDefault<int>(query, new { itemId = id });
+            var result = _uow.Connection.QuerySingleOrDefault<int>(query, new { itemId = id });
             _logger.LogDebug($"GetContentIdByItemId. result: {result}");
             return result;
         }

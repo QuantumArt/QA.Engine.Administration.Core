@@ -22,13 +22,10 @@ namespace QA.Engine.Administration.Data.Core.Qp
         /// <summary>
         /// Конструирует объект
         /// </summary>
-        /// <param name="connectionString">Название подключения</param>
-        public QpDbConnector(string connectionString)
+        /// <param name="connection">Подключение</param>
+        public QpDbConnector(IDbConnection connection)
         {
-            if (string.IsNullOrEmpty(connectionString))
-                throw new ArgumentNullException("connectionString");
-
-            _connection = new SqlConnection(connectionString);
+            _connection = connection ?? throw new ArgumentNullException(nameof(connection));
             DbConnector = new DBConnector(_connection);
         }
 

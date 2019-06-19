@@ -4,6 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml;
+using Microsoft.AspNetCore.Http.Internal;
+using Microsoft.EntityFrameworkCore.Internal;
+using QA.Engine.Administration.WebApp.Core.Business.Models;
+using ConnectionInfo = QA.Engine.Administration.WebApp.Core.Business.Models.ConnectionInfo;
 
 namespace QA.Engine.Administration.WebApp.Core.Auth
 {
@@ -12,7 +17,7 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
         public string Name { get; set; }
 
         public string ConnectionName { get; set; }
-        public string ConnectionString { get; set; }
+        public ConnectionInfo ConnectionInfo { get; set; }
 
         public string SiteDescription { get; set; }
 
@@ -57,12 +62,12 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
 
         public static SiteConfiguration Set(HttpContext httpContext, string customerCode, int siteId, bool useFake)
         {
-            var connectionString = GetConnectionString(customerCode, useFake);
+            var connectionInfo = GetConnectionInfo(customerCode, useFake);
             //var useHierarchyRegionsFilter = _qpSettingsService.GetSetting(connectionString, "USE_HIERARCHY_REGIONS_FILTER");
             var config = new SiteConfiguration
             {
                 // UseHierarchyRegionsFilter = useHierarchyRegionsFilter != null && useHierarchyRegionsFilter.ToLower() == "true",
-                ConnectionString = connectionString,
+                ConnectionInfo = connectionInfo,
                 SiteId = siteId,
                 PublishStatusImageUrl = "/Content/icons/pub.png",
                 CreatedStatusImageUrl = "/Content/icons/new.jpg",
@@ -73,11 +78,33 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
             return config;
         }
 
-        private static string GetConnectionString(string customerCode, bool useFake)
+        private static ConnectionInfo GetConnectionInfo(string customerCode, bool useFake)
         {
             if (useFake)
-                return string.Empty;
-            return DBConnector.GetConnectionString(customerCode);
+                return null;
+            XmlNode xmlNode = DBConnector.GetQpConfig().SelectSingleNode("configuration/customers/customer[@customer_name='" + customerCode + "']/db/text()");
+            if (xmlNode != null)
+            {
+                string database = "MsSql";
+                string connectionString = xmlNode.Value;
+                var databaseNode = xmlNode.Attributes?["database"];
+                if (databaseNode != null)
+                {
+                    database = databaseNode.Value;
+                }
+
+                if (database == "MsSql")
+                {
+                    connectionString = connectionString.Replace("Provider=SQLOLEDB;", "");
+                }
+                return new ConnectionInfo
+                {
+                    ConnectionString = connectionString,
+                    DatabaseType = database
+                };
+            }
+
+            throw new InvalidOperationException("Cannot load connection string from QP7 configuration file");
         }
     }
 }
