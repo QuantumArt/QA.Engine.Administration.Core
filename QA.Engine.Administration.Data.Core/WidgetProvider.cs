@@ -59,7 +59,7 @@ WHERE ai.archive={SqlQuerySyntaxHelper.ToBoolSql(_uow.DatabaseType, false)} AND 
             const int maxParentIdsPerRequest = 500;
 
             var idList = SqlQuerySyntaxHelper.IdList(_uow.DatabaseType, "@ParentIds", "parentIds");
-            var query = _netNameQueryAnalyzer.PrepareQuery(CmdGetAbstractWidgetItem($"IN (SELECT Id FROM {idList})"), siteId, false);
+            var query = _netNameQueryAnalyzer.PrepareQuery(CmdGetAbstractWidgetItem($"IN (SELECT Id FROM {idList})"), siteId, false, true);
             if (parentIds == null)
                 throw new ArgumentNullException(nameof(parentIds), "need not null and not empty parent ids");
             if (!parentIds.Any()) return new List<AbstractItemData>();

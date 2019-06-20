@@ -36,13 +36,6 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
         /// Идентификатор сайта
         /// </summary>
         int SiteId { get; }
-
-        /// <summary>
-        /// Строка подключения к БД
-        /// </summary>
-        string ConnectionString { get; }
-
-        ConnectionInfo ConnectionInfo { get; }
         /// <summary>
         /// Id пользователя
         /// </summary>
@@ -135,10 +128,6 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
                 return result;
             }
         }
-
-        public string ConnectionString => SiteConfiguration.Get(_httpContext).ConnectionInfo.ConnectionString;
-        public ConnectionInfo ConnectionInfo => SiteConfiguration.Get(_httpContext).ConnectionInfo;
-
         public int UserId => _httpContext.Session.GetInt32(DBConnector.LastModifiedByKey) ?? 0;
     }
 }

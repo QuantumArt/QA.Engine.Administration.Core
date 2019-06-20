@@ -31,11 +31,6 @@ namespace QA.Engine.Administration.Data.Core.Qp
         DataTable GetRealData(SqlCommand command);
 
         /// <summary>
-        /// Строка подключения
-        /// </summary>
-        string InstanceConnectionString { get; }
-
-        /// <summary>
         /// Вовзращает имя контента
         /// </summary>
         /// <param name="contentId">Идентификатор контента</param>

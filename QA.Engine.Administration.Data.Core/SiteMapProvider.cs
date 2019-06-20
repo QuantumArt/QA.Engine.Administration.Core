@@ -59,7 +59,7 @@ WHERE ai.archive={SqlQuerySyntaxHelper.ToBoolSql(_uow.DatabaseType, isArchive)}
   AND ai.visible={SqlQuerySyntaxHelper.ToBoolSql(_uow.DatabaseType, true)}
 ORDER BY ai.|QPAbstractItem.Parent|, ai.|QPAbstractItem.IndexOrder|, ai.content_item_id
 ";
-            return _netNameQueryAnalyzer.PrepareQuery(query, siteId, false);
+            return _netNameQueryAnalyzer.PrepareQuery(query, siteId, false, true);
         }
 
         #endregion
@@ -98,7 +98,7 @@ AND def.|QPDiscriminator.IsPage|={SqlQuerySyntaxHelper.ToBoolSql(_uow.DatabaseTy
     )
 ORDER BY ai.|QPAbstractItem.Parent|, ai.|QPAbstractItem.IndexOrder|, ai.content_item_id
 ";
-            return _netNameQueryAnalyzer.PrepareQuery(query, siteId, false);
+            return _netNameQueryAnalyzer.PrepareQuery(query, siteId, false, true);
         }
 
         #endregion
@@ -130,7 +130,7 @@ FROM |QPAbstractItem| ai
 INNER JOIN |QPDiscriminator| def on ai.|QPAbstractItem.Discriminator| = def.content_item_id
 WHERE ai.archive={SqlQuerySyntaxHelper.ToBoolSql(_uow.DatabaseType, isArchive)} AND ai.content_item_id IN @ItemIds
 ";
-            return _netNameQueryAnalyzer.PrepareQuery(query, siteId, false);
+            return _netNameQueryAnalyzer.PrepareQuery(query, siteId, false, true);
         }
 
         #endregion
@@ -171,7 +171,7 @@ ORDER BY ai.content_item_id";
             reg.|QPRegion.Title| AS Title
             FROM |QPRegion| reg
             WHERE reg.ARCHIVE = {SqlQuerySyntaxHelper.ToBoolSql(_uow.DatabaseType, isArchive)}";
-            return _netNameQueryAnalyzer.PrepareQuery(query, siteId, false);
+            return _netNameQueryAnalyzer.PrepareQuery(query, siteId, false, true);
         }
 
         private string GetRegionLinkIdQuery(int siteId)
@@ -180,7 +180,7 @@ ORDER BY ai.content_item_id";
                 $@"CAST((SELECT {SqlQuerySyntaxHelper.Top(_uow.DatabaseType, "1")} |QPAbstractItem.Regions| FROM |QPAbstractItem| WHERE |QPAbstractItem.Regions|
                 {SqlQuerySyntaxHelper.Limit(_uow.DatabaseType, "1")}
                 IS NOT NULL) AS VARCHAR(4))";
-            return _netNameQueryAnalyzer.PrepareQuery(query, siteId, false);
+            return _netNameQueryAnalyzer.PrepareQuery(query, siteId, false, true);
         }
 
         private string GetLinkItemIdQuery(int linkId)
@@ -197,7 +197,8 @@ ORDER BY ai.content_item_id";
             _logger.LogDebug($"getAllItems. siteId: {siteId}, isArchive: {isArchive}, useRegion: {useRegion}");
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            var items = _uow.Connection.Query<AbstractItemData>(GetAllAbstractItemsQuery(siteId, isArchive)).ToList();
+            string query = GetAllAbstractItemsQuery(siteId, isArchive);
+            var items = _uow.Connection.Query<AbstractItemData>(query).ToList();
             _logger.LogDebug($"getAllItems. count: {items.Count}. {stopwatch.ElapsedMilliseconds}ms");
             if (useRegion)
             {
@@ -313,7 +314,7 @@ ORDER BY ai.content_item_id";
         public AbstractItemData GetRootPage(int siteId)
         {
             _logger.LogDebug($"getRootPage. siteId: {siteId}");
-            var query = _netNameQueryAnalyzer.PrepareQuery(CmdGetRootPage, siteId, false);
+            var query = _netNameQueryAnalyzer.PrepareQuery(CmdGetRootPage, siteId, false, true);
             var result = _uow.Connection.Query<AbstractItemData>(query).FirstOrDefault();
             _logger.LogDebug($"getRootPage. result: {SerializeData(result)}");
             return result;

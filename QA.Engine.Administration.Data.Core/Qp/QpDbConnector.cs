@@ -51,17 +51,6 @@ namespace QA.Engine.Administration.Data.Core.Qp
         }
 
         /// <summary>
-        /// Строка подключения
-        /// </summary>
-        public string InstanceConnectionString
-        {
-            get
-            {
-                return DbConnector.InstanceConnectionString;
-            }
-        }
-
-        /// <summary>
         /// Вовзращает имя контента
         /// </summary>
         /// <param name="contentId">Идентификатор контента</param>

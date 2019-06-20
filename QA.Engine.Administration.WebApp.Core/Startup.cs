@@ -20,6 +20,8 @@ using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using Npgsql;
 using QA.Engin.Administration.Common.Core;
+using QP.ConfigurationService.Models;
+using Quantumart.QPublishing.Database;
 
 namespace QA.Engine.Administration.WebApp.Core
 {
@@ -75,8 +77,11 @@ namespace QA.Engine.Administration.WebApp.Core
                     return new UnitOfWork(Configuration.GetConnectionString("QpConnection"),
                         Configuration.GetConnectionString("DbType"));
                 }
-                var qpHelper = sp.GetService<IWebAppQpHelper>().ConnectionInfo;
-                return new UnitOfWork(qpHelper.ConnectionString, qpHelper.DatabaseType.ToString());
+                var qpHelper = sp.GetService<IWebAppQpHelper>();
+                DBConnector.ConfigServiceUrl = config.ConfigurationServiceUrl;
+                DBConnector.ConfigServiceToken = config.ConfigurationServiceToken;
+                CustomerConfiguration dbConfig = DBConnector.GetCustomerConfiguration(qpHelper.CustomerCode).Result;
+                return new UnitOfWork(dbConfig.ConnectionString, dbConfig.DbType.ToString());
             });
 
             services.AddScoped<IAbstractItemRepository, AbstractItemRepository>();
@@ -84,7 +89,6 @@ namespace QA.Engine.Administration.WebApp.Core
             services.AddScoped<IMetaInfoRepository, MetaInfoRepository>();
 
             services.AddScoped<ISiteMapProvider, SiteMapProvider>();
-            //services.AddScoped<ISiteMapProvider, OldSiteMapProvider>();
             services.AddScoped<IWidgetProvider, WidgetProvider>();
             services.AddScoped<IDictionaryProvider, DictionaryProvider>();
             services.AddScoped<IQpDataProvider, QpDataProvider>();
@@ -164,20 +168,6 @@ namespace QA.Engine.Administration.WebApp.Core
                 SupportedCultures = supportedCultures,
                 SupportedUICultures = supportedCultures
             });
-        }
-
-        private Business.Models.ConnectionInfo GetConnectionInfo(IServiceProvider sp)
-        {
-            var config = Configuration.Get<EnvironmentConfiguration>();
-            if (config.UseFake)
-            {
-                return new Business.Models.ConnectionInfo
-                {
-                    ConnectionString = Configuration.GetConnectionString("QpConnection")
-                };
-            }
-            var qpHelper = sp.GetService<IWebAppQpHelper>();
-            return qpHelper?.ConnectionInfo;
         }
     }
 }

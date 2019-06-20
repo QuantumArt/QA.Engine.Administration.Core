@@ -110,7 +110,7 @@ WHERE reg.ARCHIVE = {SqlQuerySyntaxHelper.ToBoolSql(_uow.DatabaseType, false)}
         public List<RegionData> GetAllRegions(int siteId)
         {
             _logger.LogDebug($"getAllRegions. siteId: {siteId}");
-            var query = _netNameQueryAnalyzer.PrepareQuery(GetAllRegionsQuery(), siteId, true);
+            var query = _netNameQueryAnalyzer.PrepareQuery(GetAllRegionsQuery(), siteId, true, true);
             var result = _uow.Connection.Query<RegionData>(query).ToList();
             _logger.LogDebug($"getAllRegions. total: {result.Count}");
             return result;
@@ -119,7 +119,7 @@ WHERE reg.ARCHIVE = {SqlQuerySyntaxHelper.ToBoolSql(_uow.DatabaseType, false)}
         public List<CultureData> GetAllCultures(int siteId)
         {
             _logger.LogDebug($"GetAllCultures. siteId: {siteId}");
-            var query = _netNameQueryAnalyzer.PrepareQuery(CmdGetAllCultures(), siteId, true);
+            var query = _netNameQueryAnalyzer.PrepareQuery(CmdGetAllCultures(), siteId, true, true);
             var result = _uow.Connection.Query<CultureData>(query).ToList();
             _logger.LogDebug($"GetAllCultures. total: {result.Count}");
             return result;

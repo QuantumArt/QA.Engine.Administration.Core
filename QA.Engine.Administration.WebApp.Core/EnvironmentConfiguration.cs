@@ -16,6 +16,9 @@ namespace QA.Engine.Administration.WebApp.Core
         public CustomAction CustomAction { get; set; }
         public string StartPageDiscriminator { get; set; }
         public string DatabaseType { get; set; }
+
+        public string ConfigurationServiceUrl { get; set; }
+        public string ConfigurationServiceToken { get; set; }
     }
 
     public class FakeData
