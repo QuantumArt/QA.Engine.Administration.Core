@@ -55,8 +55,8 @@ SELECT
     CASE WHEN ai.STATUS_TYPE_ID IN (SELECT st.STATUS_TYPE_ID FROM STATUS_TYPE st WHERE st.STATUS_TYPE_NAME=N'Published') THEN 1 ELSE 0 END AS Published
 FROM |QPAbstractItem| ai
 INNER JOIN |QPDiscriminator| def on ai.|QPAbstractItem.Discriminator| = def.content_item_id
-WHERE ai.archive={SqlQuerySyntaxHelper.ToBoolSql(_uow.DatabaseType, isArchive)} 
-  AND ai.visible={SqlQuerySyntaxHelper.ToBoolSql(_uow.DatabaseType, true)}
+WHERE ai.archive={(isArchive ? "1" : "0")} 
+  AND ai.visible=1
 ORDER BY ai.|QPAbstractItem.Parent|, ai.|QPAbstractItem.IndexOrder|, ai.content_item_id
 ";
             return _netNameQueryAnalyzer.PrepareQuery(query, siteId, false, true);
@@ -89,8 +89,8 @@ SELECT
     CASE WHEN ai.STATUS_TYPE_ID IN (SELECT st.STATUS_TYPE_ID FROM STATUS_TYPE st WHERE st.STATUS_TYPE_NAME=N'Published') THEN 1 ELSE 0 END AS Published
 FROM |QPAbstractItem| ai
 INNER JOIN |QPDiscriminator| def on ai.|QPAbstractItem.Discriminator| = def.content_item_id
-WHERE ai.archive={SqlQuerySyntaxHelper.ToBoolSql(_uow.DatabaseType, isArchive)} 
-AND def.|QPDiscriminator.IsPage|={SqlQuerySyntaxHelper.ToBoolSql(_uow.DatabaseType, true)} AND ai.|QPAbstractItem.VersionOf| is null 
+WHERE ai.archive={(isArchive ? "1" : "0")} 
+AND def.|QPDiscriminator.IsPage|=1 AND ai.|QPAbstractItem.VersionOf| is null 
     AND (
         ai.|QPAbstractItem.Parent| {parentExpression}
         OR EXISTS (SELECT 1 FROM |QPAbstractItem| ai1 
@@ -105,7 +105,7 @@ ORDER BY ai.|QPAbstractItem.Parent|, ai.|QPAbstractItem.IndexOrder|, ai.content_
 
         #region get abstract items by ids
 
-        private string GetCmdGetAbstractItemByIds(int siteId, bool isArchive)
+        private string GetCmdGetAbstractItemByIds(int siteId, bool isArchive, string idsExpression)
         {
             string query = $@"
 SELECT
@@ -125,10 +125,10 @@ SELECT
     def.|QPDiscriminator.IsPage| as IsPage,
     def.|QPDiscriminator.Title| as DiscriminatorTitle,
     def.|QPDiscriminator.IconUrl| as IconUrl,
-    CASE WHEN ai.[STATUS_TYPE_ID] IN (SELECT st.STATUS_TYPE_ID FROM STATUS_TYPE st WHERE st.STATUS_TYPE_NAME=N'Published') THEN 1 ELSE 0 END AS Published
+    CASE WHEN ai.STATUS_TYPE_ID IN (SELECT st.STATUS_TYPE_ID FROM STATUS_TYPE st WHERE st.STATUS_TYPE_NAME=N'Published') THEN 1 ELSE 0 END AS Published
 FROM |QPAbstractItem| ai
 INNER JOIN |QPDiscriminator| def on ai.|QPAbstractItem.Discriminator| = def.content_item_id
-WHERE ai.archive={SqlQuerySyntaxHelper.ToBoolSql(_uow.DatabaseType, isArchive)} AND ai.content_item_id IN @ItemIds
+WHERE ai.archive={(isArchive ? "1" : "0")} AND ai.content_item_id IN (SELECT Id FROM {idsExpression})
 ";
             return _netNameQueryAnalyzer.PrepareQuery(query, siteId, false, true);
         }
@@ -170,7 +170,7 @@ ORDER BY ai.content_item_id";
             reg.|QPRegion.ParentId| AS ParentId, 
             reg.|QPRegion.Title| AS Title
             FROM |QPRegion| reg
-            WHERE reg.ARCHIVE = {SqlQuerySyntaxHelper.ToBoolSql(_uow.DatabaseType, isArchive)}";
+            WHERE reg.ARCHIVE = {(isArchive ? "1" : "0")}";
             return _netNameQueryAnalyzer.PrepareQuery(query, siteId, false, true);
         }
 
@@ -259,7 +259,6 @@ ORDER BY ai.content_item_id";
 
             var idList = SqlQuerySyntaxHelper.IdList(_uow.DatabaseType, "@ParentIds", "parentIds");
             query = GetAbstractItemsQuery(siteId, isArchive, $"IN (SELECT Id FROM {idList})");
-            //query = GetAbstractItemsQuery(siteId, isArchive, "IN @ParentIds");
 
             if (_uow.DatabaseType == DatabaseType.SqlServer)
             {
@@ -304,9 +303,22 @@ ORDER BY ai.content_item_id";
             if (itemIds == null || !itemIds.Any()) throw new ArgumentNullException("itemIds");
             if (itemIds.Any(x => x <= 0)) throw new ArgumentException("itemId <= 0");
 
-            var query = GetCmdGetAbstractItemByIds(siteId, isArchive);
-            var result = _uow.Connection.Query<AbstractItemData>(query, new {ItemIds = itemIds})
-                .ToList();
+            var idList = SqlQuerySyntaxHelper.IdList(_uow.DatabaseType, "@ItemIds", "itemIds");
+            var query = GetCmdGetAbstractItemByIds(siteId, isArchive, idList);
+
+            List<AbstractItemData> result;
+            
+            if (_uow.DatabaseType == DatabaseType.SqlServer)
+            {
+                result = _uow.Connection.Query<AbstractItemData>(query,
+                        new {ItemIds = SqlQuerySyntaxHelper.IdsToDataTable(itemIds).AsTableValuedParameter("Ids")})
+                    .ToList();
+            }
+            else
+            {
+                result = _uow.Connection.Query<AbstractItemData>(query, new {ItemIds = itemIds}).ToList();
+            }
+            
             _logger.LogDebug($"getByIds. count: {result.Count}, result: {SerializeData(result)}");
             return result;
         }

@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QA.Engine.Administration.Da
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QA.Engine.Administration.Logger.Core", "QA.Engine.Administration.Logger.Core\QA.Engine.Administration.Logger.Core.csproj", "{FDCBD84F-9A3F-484F-89A7-9926520CB4E4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QA.Engin.Administration.Common.Core", "QA.Engin.Administration.Common.Core\QA.Engin.Administration.Common.Core.csproj", "{4EE8D5AB-10E5-4658-BAD8-72E900D97BBC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QA.Engine.Administration.Common.Core", "QA.Engine.Administration.Common.Core\QA.Engine.Administration.Common.Core.csproj", "{4EE8D5AB-10E5-4658-BAD8-72E900D97BBC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QA.Engine.Administration.Data.Core.Test", "QA.Engine.Administration.Data.Core.Test\QA.Engine.Administration.Data.Core.Test.csproj", "{1A6C4AE0-9B8C-4057-9965-A2C79C92D659}"
 EndProject

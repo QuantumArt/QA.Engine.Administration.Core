@@ -67,7 +67,6 @@ namespace QA.Engine.Administration.Data.Core
                 };
 
                 _logger.LogDebug($"edit. mass update. contentId: {contentId}, values: {SerializeData(value)}");
-
                 _qpDbConnector.DbConnector.MassUpdate(contentId, new[] { value }, userId);
 
                 _qpDbConnector.CommitTransaction();

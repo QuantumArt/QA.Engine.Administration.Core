@@ -2,7 +2,9 @@
 using Quantumart.QPublishing.Info;
 using System;
 using System.Data;
+using System.Data.Common;
 using System.Data.SqlClient;
+using QP.ConfigurationService.Models;
 
 namespace QA.Engine.Administration.Data.Core.Qp
 {
@@ -45,7 +47,7 @@ namespace QA.Engine.Administration.Data.Core.Qp
         /// </summary>
         /// <param name="command">Команда к БД</param>
         /// <returns></returns>
-        public DataTable GetRealData(SqlCommand command)
+        public DataTable GetRealData(DbCommand command)
         {
             return DbConnector.GetRealData(command);
         }
@@ -89,6 +91,11 @@ namespace QA.Engine.Administration.Data.Core.Qp
         public string GetContentItemLinkIDs(string fieldName, string values)
         {
             return DbConnector.GetContentItemLinkIDs(fieldName, values);
+        }
+        
+        public DbCommand CreateCommand(string text)
+        {
+            return DbConnector.CreateDbCommand(text);
         }
 
         public void BeginTransaction(IsolationLevel isolationLevel)

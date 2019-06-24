@@ -1,7 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Logging;
 using QA.DotNetCore.Engine.Persistent.Interfaces;
-using QA.Engin.Administration.Common.Core;
+using QA.Engine.Administration.Common.Core;
 using QA.Engine.Administration.Data.Interfaces.Core;
 using QA.Engine.Administration.Data.Interfaces.Core.Models;
 using System.Collections.Generic;
@@ -59,26 +59,26 @@ WHERE SITE_ID=@SiteId AND STATUS_TYPE_NAME=@Status
 
         private string GetAllRegionsQuery()
         {
-            return $@"
+            return @"
 SELECT 
     reg.CONTENT_ITEM_ID AS Id, 
     reg.|QPRegion.Alias| AS Alias, 
     reg.|QPRegion.ParentId| AS ParentId, 
     reg.|QPRegion.Title| AS Title
 FROM |QPRegion| reg
-WHERE reg.ARCHIVE = {SqlQuerySyntaxHelper.ToBoolSql(_uow.DatabaseType, false)}
+WHERE reg.ARCHIVE = 0
 ";
         }
 
         private string CmdGetAllCultures()
         {
-            return $@"
+            return @"
 SELECT 
     reg.CONTENT_ITEM_ID AS Id, 
     reg.|QPCulture.Title| AS Title, 
     reg.|QPCulture.Name| AS Name
 FROM |QPCulture| reg
-WHERE reg.ARCHIVE = {SqlQuerySyntaxHelper.ToBoolSql(_uow.DatabaseType, false)}
+WHERE reg.ARCHIVE = 0
 ";
         }
 

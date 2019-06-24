@@ -1,13 +1,15 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using QA.Engin.Administration.Common.Core;
+using QA.Engine.Administration.Common.Core;
 using Quantumart.QPublishing.Database;
 using Quantumart.QPublishing.OnScreen;
 using System;
 using System.Data;
 using System.Security.Claims;
 using QA.DotNetCore.Engine.Persistent.Interfaces;
+using QP.ConfigurationService.Models;
+using DatabaseType = QP.ConfigurationService.Models.DatabaseType;
 
 namespace QA.Engine.Administration.WebApp.Core.Auth
 {

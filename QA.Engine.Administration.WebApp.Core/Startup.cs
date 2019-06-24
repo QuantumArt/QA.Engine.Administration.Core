@@ -19,9 +19,10 @@ using Swashbuckle.AspNetCore.Swagger;
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using Npgsql;
-using QA.Engin.Administration.Common.Core;
+using QA.Engine.Administration.Common.Core;
 using QP.ConfigurationService.Models;
 using Quantumart.QPublishing.Database;
+using DatabaseType = QP.ConfigurationService.Models.DatabaseType;
 
 namespace QA.Engine.Administration.WebApp.Core
 {
@@ -75,7 +76,7 @@ namespace QA.Engine.Administration.WebApp.Core
                 if (config.UseFake)
                 {
                     return new UnitOfWork(Configuration.GetConnectionString("QpConnection"),
-                        Configuration.GetConnectionString("DbType"));
+                        config.DatabaseType);
                 }
                 var qpHelper = sp.GetService<IWebAppQpHelper>();
                 DBConnector.ConfigServiceUrl = config.ConfigurationServiceUrl;

@@ -1,4 +1,4 @@
-﻿using QA.Engin.Administration.Common.Core;
+﻿using QA.Engine.Administration.Common.Core;
 using System.Collections.Generic;
 
 namespace QA.Engine.Administration.Services.Core.Models

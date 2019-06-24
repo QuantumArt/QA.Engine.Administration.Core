@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using System;
+using Dapper;
 using Microsoft.Extensions.Logging;
 using QA.DotNetCore.Engine.Persistent.Interfaces;
 using QA.Engine.Administration.Data.Interfaces.Core;
@@ -6,6 +7,7 @@ using QA.Engine.Administration.Data.Interfaces.Core.Models;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using QA.DotNetCore.Engine.Persistent.Dapper;
 
 namespace QA.Engine.Administration.Data.Core
 {
@@ -20,18 +22,18 @@ namespace QA.Engine.Administration.Data.Core
             _logger = logger;
         }
 
-        private const string CmdGetExtantionItems = @"
+        private const string CmdGetFieldNames = @"
 SELECT 
     ca.ATTRIBUTE_NAME AS FieldName,
 	a.TYPE_NAME AS TypeName,
 	a.DESCRIPTION AS TypeDescription,
     ca.ATTRIBUTE_ID AS AttributeId
 FROM CONTENT_ATTRIBUTE ca JOIN ATTRIBUTE_TYPE a ON ca.ATTRIBUTE_TYPE_ID=a.ATTRIBUTE_TYPE_ID
-WHERE ca.CONTENT_ID={0} AND ca.ATTRIBUTE_NAME <> 'ItemId' AND (ca.REQUIRED=1 OR ca.view_in_list=1)
-
-SELECT * FROM content_{0}_united WHERE ItemId={1}
-
-SELECT b.ATTRIBUTE_NAME as 'FieldName', a.CONTENT_ID as 'ExtensionId'
+WHERE ca.CONTENT_ID={0} AND ca.ATTRIBUTE_NAME <> 'ItemId' AND (ca.REQUIRED=1 OR ca.view_in_list={1})";
+        
+        private const string CmdGetContentRow = @"SELECT * FROM content_{0}_united WHERE ItemId={1}";
+        private const string CmdGetExtentionItems = @"
+SELECT b.ATTRIBUTE_NAME as FieldName, a.CONTENT_ID as ExtensionId
 FROM CONTENT_ATTRIBUTE a JOIN (
 	SELECT ATTRIBUTE_ID, ATTRIBUTE_NAME, RELATED_ATTRIBUTE_ID, BACK_RELATED_ATTRIBUTE_ID 
 	FROM CONTENT_ATTRIBUTE 
@@ -63,25 +65,23 @@ SELECT CONTENT_ITEM_ID AS ContentId, {1} AS Name FROM content_{0}_united WHERE {
         public List<FieldAttributeData> GetItemExtensionFields(int siteId, int value, int extensionId)
         {
             _logger.LogDebug($"getItemExtensionFields. siteId: {siteId}, value: {value}, extensionId: {extensionId}");
-            var query = string.Format(CmdGetExtantionItems, extensionId, value);
-            using (var multi = _uow.Connection.QueryMultiple(query))
+            var fieldNamesQuery = string.Format(CmdGetFieldNames, extensionId, SqlQuerySyntaxHelper.ToBoolSql(_uow.DatabaseType, true));
+            var fieldNames = _uow.Connection.Query<FieldAttributeData>(fieldNamesQuery);
+            var contentRowsQuery = string.Format(CmdGetContentRow, extensionId, value);
+            var contentRow = _uow.Connection.Query<object>(contentRowsQuery);
+            var relatedFieldsQuery = string.Format(CmdGetExtentionItems, extensionId, value);
+            var relatedFields = _uow.Connection.Query<RelationExtension>(relatedFieldsQuery);
+            var dict = contentRow.FirstOrDefault() as IDictionary<string, object>;
+
+            foreach (var field in fieldNames)
             {
-                var fieldNames = multi.Read<FieldAttributeData>().ToList();
-                var contentRow = multi.ReadFirstOrDefault<object>();
-                var relatedFields = multi.Read<RelationExtension>().ToList();
-
-                var dict = contentRow as IDictionary<string, object>;
-
-                foreach (var field in fieldNames)
-                {
-                    field.Value = dict.Where(x => x.Key == field.FieldName).FirstOrDefault().Value;
-                    field.RelationExtensionId = relatedFields.FirstOrDefault(x => x.FieldName == field.FieldName)?.ExtensionId;
-                }
-
-                _logger.LogDebug($"getItemExtensionFields. fieldNames: {SerializeData(fieldNames)}");
-
-                return fieldNames;
+                field.Value = dict.FirstOrDefault(x => string.Equals(x.Key, field.FieldName, StringComparison.OrdinalIgnoreCase)).Value;
+                field.RelationExtensionId = relatedFields.FirstOrDefault(x => x.FieldName == field.FieldName)?.ExtensionId;
             }
+
+            _logger.LogDebug($"getItemExtensionFields. fieldNames: {SerializeData(fieldNames)}");
+
+            return fieldNames.ToList();
         }
 
         public string GetRelatedItemName(int siteId, int id, int attributeId)

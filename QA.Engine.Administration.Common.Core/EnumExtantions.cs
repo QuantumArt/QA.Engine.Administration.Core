@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 
-namespace QA.Engin.Administration.Common.Core
+namespace QA.Engine.Administration.Common.Core
 {
     public static class EnumExtantions
     {
