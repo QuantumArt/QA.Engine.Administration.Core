@@ -48,6 +48,11 @@ body {
     text-overflow: ellipsis;
 }
 
+.bp3-tree-node.bp3-tree-node-selected > .bp3-tree-node-content .bp3-tag.bp3-intent-success {
+    background-color: rgba(15, 153, 96, 0.5);
+    color: #ffffff;
+}
+
 .minor-tree-pane {
     width: 68%;
     align-self: flex-start;

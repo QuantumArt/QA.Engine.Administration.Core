@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { action, computed, observable } from 'mobx';
-import { IconName, ITreeNode } from '@blueprintjs/core';
+import { IconName, ITreeNode, Icon, Intent, MaybeElement, Tag } from '@blueprintjs/core';
 import InteractiveZone from 'components/TreeStructure/InteractiveZone';
 import ContextMenuType from 'enums/ContextMenuType';
 import TreeStoreType from 'enums/TreeStoreType';
@@ -243,10 +243,12 @@ export abstract class BaseTreeState<T extends {
     @action
     public handleNodeExpand = (nodeData: ITreeElement) => {
         if (nodeData.childNodes.length !== 0 && nodeData.parentId !== null) {
+            const nodeOpenPublished = this.discriminators == null ? this.icons.nodeOpenPublished : <IconName>nodeData.icon;
+            const nodeOpen = this.discriminators == null ? this.icons.nodeOpen : <IconName>nodeData.icon;
             if (this.icons.checkPublication && nodeData.isPublished) {
-                nodeData.icon = this.icons.nodeOpenPublished;
+                nodeData.icon = nodeOpenPublished;
             } else {
-                nodeData.icon = this.icons.nodeOpen;
+                nodeData.icon = nodeOpen;
             }
         }
         nodeData.isExpanded = true;
@@ -255,10 +257,12 @@ export abstract class BaseTreeState<T extends {
     @action
     public handleNodeCollapse = (nodeData: ITreeElement) => {
         if (nodeData.childNodes.length !== 0 && nodeData.parentId !== null) {
+            const nodePublished = this.discriminators == null ? this.icons.nodeOpenPublished : <IconName>nodeData.icon;
+            const node = this.discriminators == null ? this.icons.nodeOpen : <IconName>nodeData.icon;
             if (this.icons.checkPublication && nodeData.isPublished) {
-                nodeData.icon = this.icons.nodePublished;
+                nodeData.icon = nodePublished;
             } else {
-                nodeData.icon = this.icons.node;
+                nodeData.icon = node;
             }
         }
         nodeData.isExpanded = false;
@@ -368,11 +372,29 @@ export abstract class BaseTreeState<T extends {
 
     protected abstract contextMenuType: ContextMenuType;
 
-    protected getIcon = (el: T): IconName => {
+    protected getIcon = (el: T): (IconName | MaybeElement) => {
         const discriminator = this.discriminators == null ? null : this.discriminators.filter(x => x.id === el.discriminatorId)[0];
         if (discriminator != null) {
-            return <IconName>discriminator.iconClass;
+
+            const iconProps = {
+                icon: <IconName>discriminator.iconClass,
+                intent: <Intent>discriminator.iconIntent,
+                className: 'bp3-tree-node-icon',
+            };
+            const tagProps = {
+                minimal: true,
+                intent: Intent.SUCCESS,
+                className: 'bp3-tree-node-icon',
+            };
+            const icon = React.createElement(Icon, iconProps);
+            const tag = React.createElement(Tag, tagProps, 'new');
+
+            if (!el.published) {
+                return React.createElement(React.Fragment, {}, icon, tag);
+            }
+            return icon;
         }
+
         if (this.icons.checkPublication) {
             if (this.searchActive) {
                 return el.published ? this.icons.nodePublished : this.icons.node;
