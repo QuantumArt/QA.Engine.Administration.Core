@@ -15,6 +15,7 @@ export default class ArchiveTreeStore extends BaseTreeState<ArchiveModel> {
     @action
     public async fetchTree(): Promise<void> {
         const response: ApiResult<ArchiveModel[]> = await this.getTree();
+        await this.getDiscriminators();
         if (response.isSuccess) {
             this.origTreeInternal = response.data;
             this.handlePagination();

@@ -3,7 +3,7 @@ import { BaseTreeState, ITreeElement } from 'stores/TreeStore/BaseTreeStore';
 import ContextMenuType from 'enums/ContextMenuType';
 import { action, observable } from 'mobx';
 import TreeStoreType from 'enums/TreeStoreType';
-import { IconName } from '@blueprintjs/core';
+import { IconName, MaybeElement, Intent, Icon, Tag } from '@blueprintjs/core';
 import * as React from 'react';
 import NodeLabel from 'components/TreeStructure/NodeLabel';
 
@@ -81,9 +81,30 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
         return SiteMapService.getSiteMapSubTree(id);
     }
 
-    protected getIcon = (el: WidgetModel): IconName => {
+    protected getIcon = (el: WidgetModel): (IconName | MaybeElement) => {
         if (el.id < 0) {
             return this.icons.node;
+        }
+        const discriminator = this.discriminators == null ? null : this.discriminators.filter(x => x.id === el.discriminatorId)[0];
+        if (discriminator != null) {
+
+            const iconProps = {
+                icon: <IconName>discriminator.iconClass,
+                intent: <Intent>discriminator.iconIntent,
+                className: 'bp3-tree-node-icon',
+            };
+            const tagProps = {
+                minimal: true,
+                intent: Intent.SUCCESS,
+                className: 'bp3-tree-node-icon',
+            };
+            const icon = React.createElement(Icon, iconProps);
+            const tag = React.createElement(Tag, tagProps, 'new');
+
+            if (!el.published) {
+                return React.createElement(React.Fragment, {}, icon, tag);
+            }
+            return icon;
         }
         if (this.icons.checkPublication) {
             if (this.searchActive) {
@@ -176,11 +197,11 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
 
     private mapWidgetElement(el: WidgetModel, parentId?: number, id?: number): ITreeElement {
         const treeElement = super.mapElement(el);
-        if (this.icons.checkPublication) {
-            treeElement.icon = el.published ? this.icons.leafPublished : this.icons.leaf;
-        } else {
-            treeElement.icon = this.icons.leaf;
-        }
+        // if (this.icons.checkPublication) {
+        //     treeElement.icon = el.published ? this.icons.leafPublished : this.icons.leaf;
+        // } else {
+        //     treeElement.icon = this.icons.leaf;
+        // }
         if (parentId != null) {
             treeElement.parentId = parentId;
         }
