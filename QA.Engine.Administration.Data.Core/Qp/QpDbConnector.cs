@@ -98,7 +98,7 @@ namespace QA.Engine.Administration.Data.Core.Qp
             return DbConnector.CreateDbCommand(text);
         }
 
-        public void BeginTransaction(IsolationLevel isolationLevel)
+        public IDbTransaction BeginTransaction(IsolationLevel isolationLevel)
         {
             if (_transaction != null)
                 _transaction.Rollback();
@@ -106,6 +106,7 @@ namespace QA.Engine.Administration.Data.Core.Qp
                 _connection.Open();
             _transaction = _connection.BeginTransaction(isolationLevel);
             DbConnector.ExternalTransaction = _transaction;
+            return _transaction;
         }
 
         public void CommitTransaction()

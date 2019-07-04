@@ -34,7 +34,7 @@ namespace QA.Engine.Administration.Data.Core
             _logger = logger;
         }
 
-        public int GetContentId(int siteId)
+        public int GetContentId(int siteId, IDbTransaction transaction = null)
         {
             _logger.LogDebug($"getContent. siteId: {siteId}");
             var content = _metaInfoRepository.GetContent(AbstractItemNetName, siteId);
@@ -42,7 +42,7 @@ namespace QA.Engine.Administration.Data.Core
             return content.ContentId;
         }
 
-        public bool HasRegion(int siteId)
+        public bool HasRegion(int siteId, IDbTransaction transaction = null)
         {
             _logger.LogDebug($"hasRegion. siteId: {siteId}");
             var content = _metaInfoRepository.GetContent(RegionNetName, siteId);
@@ -50,7 +50,7 @@ namespace QA.Engine.Administration.Data.Core
             return content != null;
         }
 
-        public QpContentData GetContent(int siteId, string contentName)
+        public QpContentData GetContent(int siteId, string contentName, IDbTransaction transaction = null)
         {
             _logger.LogDebug($"getContent. siteId: {siteId}, contentName: {contentName}");
             var siteName = _qpMetadataManager.GetSiteName(siteId);
@@ -74,7 +74,7 @@ namespace QA.Engine.Administration.Data.Core
             return result.FirstOrDefault();
         }
 
-        public List<QpFieldData> GetFields(int siteId, int contentId)
+        public List<QpFieldData> GetFields(int siteId, int contentId, IDbTransaction transaction = null)
         {
             _logger.LogDebug($"getFields. siteId: {siteId}, contentId: {contentId}");
             var siteName = _qpMetadataManager.GetSiteName(siteId);
@@ -98,7 +98,7 @@ namespace QA.Engine.Administration.Data.Core
             return result;
         }
 
-        public string GetIconUrl(int siteId)
+        public string GetIconUrl(int siteId, IDbTransaction transaction = null)
         {
             _logger.LogDebug($"getIconUrl. siteId: {siteId}");
             var fieldId = _qpDbConnector.DbConnector.GetAttributeIdByNetNames(siteId, "QPDiscriminator", "IconUrl");
@@ -107,7 +107,7 @@ namespace QA.Engine.Administration.Data.Core
             return url;
         }
 
-        public CustomActionData GetCustomAction(string alias)
+        public CustomActionData GetCustomAction(string alias, IDbTransaction transaction = null)
         {
             _logger.LogDebug($"getCustomActionCode. alias: {alias}");
             var query = $"SELECT c.ID as Id, b.CODE as Code FROM CUSTOM_ACTION c JOIN BACKEND_ACTION b ON c.ACTION_ID=b.ID WHERE ALIAS='{alias.ToLower()}'";

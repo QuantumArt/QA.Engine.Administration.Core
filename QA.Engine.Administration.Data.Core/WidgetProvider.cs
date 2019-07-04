@@ -51,7 +51,7 @@ WHERE ai.archive={SqlQuerySyntaxHelper.ToBoolSql(_uow.DatabaseType, false)} AND 
 ";
         }
 
-        public List<AbstractItemData> GetItems(int siteId, bool isArchive, IEnumerable<int> parentIds)
+        public List<AbstractItemData> GetItems(int siteId, bool isArchive, IEnumerable<int> parentIds, IDbTransaction transaction = null)
         {
             _logger.LogDebug(
                 $"getItems. siteId: {siteId}, isArchive: {isArchive}, parentIds: {SerializeData(parentIds)}");
@@ -81,7 +81,7 @@ WHERE ai.archive={SqlQuerySyntaxHelper.ToBoolSql(_uow.DatabaseType, false)} AND 
                 var result = _uow.Connection
                     .Query<AbstractItemData>(
                         string.Format(query, SqlQuerySyntaxHelper.ToBoolSql(_uow.DatabaseType, isArchive)),
-                        new {Archive = isArchive, ParentIds = parentIds})
+                        new {Archive = isArchive, ParentIds = parentIds}, transaction)
                     .ToList();
                 _logger.LogDebug($"getItems. count: {result.Count}");
                 return result;

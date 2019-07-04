@@ -192,19 +192,19 @@ ORDER BY ai.content_item_id";
 
         #endregion
 
-        public List<AbstractItemData> GetAllItems(int siteId, bool isArchive, bool useRegion)
+        public List<AbstractItemData> GetAllItems(int siteId, bool isArchive, bool useRegion, IDbTransaction transaction = null)
         {
             _logger.LogDebug($"getAllItems. siteId: {siteId}, isArchive: {isArchive}, useRegion: {useRegion}");
             var stopwatch = new Stopwatch();
             stopwatch.Start();
             string query = GetAllAbstractItemsQuery(siteId, isArchive);
-            var items = _uow.Connection.Query<AbstractItemData>(query).ToList();
+            var items = _uow.Connection.Query<AbstractItemData>(query, transaction).ToList();
             _logger.LogDebug($"getAllItems. count: {items.Count}. {stopwatch.ElapsedMilliseconds}ms");
             if (useRegion)
             {
-                var regions = _uow.Connection.Query<RegionData>(GetRegionsQuery(siteId, isArchive)).ToList();
-                var regionLinkId = _uow.Connection.QueryFirst<int>(GetRegionLinkIdQuery(siteId));
-                var links = _uow.Connection.Query<LinkItem>(GetLinkItemIdQuery(regionLinkId))
+                var regions = _uow.Connection.Query<RegionData>(GetRegionsQuery(siteId, isArchive), transaction).ToList();
+                var regionLinkId = _uow.Connection.QueryFirst<int>(GetRegionLinkIdQuery(siteId), transaction);
+                var links = _uow.Connection.Query<LinkItem>(GetLinkItemIdQuery(regionLinkId), transaction)
                     .ToList()
                     .GroupBy(k => k.ItemId)
                     .ToDictionary(k => k.Key, v => v.Select(x => x.LinkedItemId).ToList());
@@ -222,7 +222,11 @@ ORDER BY ai.content_item_id";
             return items;
         }
 
-        public List<AbstractItemData> GetItems(int siteId, bool isArchive, IEnumerable<int> parentIds, bool useRegion)
+        public List<AbstractItemData> GetItems(int siteId, 
+            bool isArchive, 
+            IEnumerable<int> parentIds, 
+            bool useRegion, 
+            IDbTransaction transaction = null)
         {
             _logger.LogDebug(
                 $"getItems. siteId: {siteId}, isArchive: {isArchive}, useRegion: {useRegion}, parentIds: {SerializeData(parentIds)}");
@@ -234,7 +238,7 @@ ORDER BY ai.content_item_id";
             if (parentIds == null || !parentIds.Any())
             {
                 query = GetAbstractItemsQuery(siteId, isArchive, "IS NULL");
-                items = _uow.Connection.Query<AbstractItemData>(query).ToList();
+                items = _uow.Connection.Query<AbstractItemData>(query, transaction).ToList();
                 if (useRegion)
                 {
                     AddRegionInfo(siteId, isArchive, items);
@@ -263,12 +267,13 @@ ORDER BY ai.content_item_id";
             if (_uow.DatabaseType == DatabaseType.SqlServer)
             {
                 items = _uow.Connection.Query<AbstractItemData>(query,
-                        new {ParentIds = SqlQuerySyntaxHelper.IdsToDataTable(parentIds).AsTableValuedParameter("Ids")})
+                        new {ParentIds = SqlQuerySyntaxHelper.IdsToDataTable(parentIds).AsTableValuedParameter("Ids")},
+                        transaction)
                     .ToList();
             }
             else
             {
-                items = _uow.Connection.Query<AbstractItemData>(query, new {ParentIds = parentIds}).ToList();
+                items = _uow.Connection.Query<AbstractItemData>(query, new {ParentIds = parentIds}, transaction).ToList();
             }
 
             if (useRegion)
@@ -279,11 +284,11 @@ ORDER BY ai.content_item_id";
             return items;
         }
 
-        private void AddRegionInfo(int siteId, bool isArchive, List<AbstractItemData> items)
+        private void AddRegionInfo(int siteId, bool isArchive, List<AbstractItemData> items, IDbTransaction transaction = null)
         {
-            var regions = _uow.Connection.Query<RegionData>(GetRegionsQuery(siteId, isArchive)).ToList();
-            var regionLinkId = _uow.Connection.QueryFirst<int>(GetRegionLinkIdQuery(siteId));
-            var links = _uow.Connection.Query<LinkItem>(GetLinkItemIdQuery(regionLinkId))
+            var regions = _uow.Connection.Query<RegionData>(GetRegionsQuery(siteId, isArchive), transaction).ToList();
+            var regionLinkId = _uow.Connection.QueryFirst<int>(GetRegionLinkIdQuery(siteId), transaction);
+            var links = _uow.Connection.Query<LinkItem>(GetLinkItemIdQuery(regionLinkId), transaction)
                 .ToList()
                 .GroupBy(k => k.ItemId)
                 .ToDictionary(k => k.Key, v => v.Select(x => x.LinkedItemId).ToList());
@@ -296,7 +301,7 @@ ORDER BY ai.content_item_id";
             }
         }
 
-        public List<AbstractItemData> GetByIds(int siteId, bool isArchive, IEnumerable<int> itemIds)
+        public List<AbstractItemData> GetByIds(int siteId, bool isArchive, IEnumerable<int> itemIds, IDbTransaction transaction = null)
         {
             _logger.LogDebug($"getByIds. siteId: {siteId}, isArchive: {isArchive}, itemIds: {SerializeData(itemIds)}");
 
@@ -311,23 +316,24 @@ ORDER BY ai.content_item_id";
             if (_uow.DatabaseType == DatabaseType.SqlServer)
             {
                 result = _uow.Connection.Query<AbstractItemData>(query,
-                        new {ItemIds = SqlQuerySyntaxHelper.IdsToDataTable(itemIds).AsTableValuedParameter("Ids")})
+                        new {ItemIds = SqlQuerySyntaxHelper.IdsToDataTable(itemIds).AsTableValuedParameter("Ids")},
+                        transaction)
                     .ToList();
             }
             else
             {
-                result = _uow.Connection.Query<AbstractItemData>(query, new {ItemIds = itemIds}).ToList();
+                result = _uow.Connection.Query<AbstractItemData>(query, new {ItemIds = itemIds}, transaction).ToList();
             }
             
             _logger.LogDebug($"getByIds. count: {result.Count}, result: {SerializeData(result)}");
             return result;
         }
 
-        public AbstractItemData GetRootPage(int siteId)
+        public AbstractItemData GetRootPage(int siteId, IDbTransaction transaction = null)
         {
             _logger.LogDebug($"getRootPage. siteId: {siteId}");
             var query = _netNameQueryAnalyzer.PrepareQuery(CmdGetRootPage, siteId, false, true);
-            var result = _uow.Connection.Query<AbstractItemData>(query).FirstOrDefault();
+            var result = _uow.Connection.Query<AbstractItemData>(query, transaction).FirstOrDefault();
             _logger.LogDebug($"getRootPage. result: {SerializeData(result)}");
             return result;
         }

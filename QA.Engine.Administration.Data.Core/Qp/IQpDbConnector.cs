@@ -61,7 +61,7 @@ namespace QA.Engine.Administration.Data.Core.Qp
         string GetContentItemLinkIDs(string fieldName, string values);
 
         DbCommand CreateCommand(string text);
-        void BeginTransaction(IsolationLevel isolationLevel);
+        IDbTransaction BeginTransaction(IsolationLevel isolationLevel);
         void CommitTransaction();
         void RollbackTransaction();
     }

@@ -99,11 +99,11 @@ namespace QA.Engine.Administration.Data.Core
 
                 _qpDbConnector.DbConnector.MassUpdate(contentId, values, userId);
 
-                //update extantion
-                var extantionValues = items
+                //update extention
+                var extentionValues = items
                     .Where(x => x.ExtensionId.HasValue)
                     .GroupBy(x => x.ExtensionId.Value, x => x.Id);
-                foreach (var item in extantionValues)
+                foreach (var item in extentionValues)
                 {
                     var contentName = _qpMetadataManager.GetContentName(item.Key);
                     _qpContentManager
@@ -130,11 +130,11 @@ namespace QA.Engine.Administration.Data.Core
         {
             _logger.LogDebug($"reorder. siteId: {siteId}, contentId: {contentId}, userId: {userId}, items: {SerializeData(items.Select(x => new { x.Id, x.IndexOrder }))}");
 
-            _qpDbConnector.BeginTransaction(IsolationLevel.Serializable);
+            var transaction = _qpDbConnector.BeginTransaction(IsolationLevel.Serializable);
 
             try
             {
-                var columnName = GetColumnNameByNetName(siteId, "IndexOrder");
+                var columnName = GetColumnNameByNetName(siteId, "IndexOrder", transaction);
                 if (string.IsNullOrWhiteSpace(columnName))
                     throw new Exception("NetName for field IndexOrder not found");
 
@@ -164,11 +164,11 @@ namespace QA.Engine.Administration.Data.Core
         {
             _logger.LogDebug($"move. siteId: {siteId}, contentId: {contentId}, userId: {userId}, itemId: {itemId}, newParentId: {newParentId}");
 
-            _qpDbConnector.BeginTransaction(IsolationLevel.Serializable);
+            var transaction = _qpDbConnector.BeginTransaction(IsolationLevel.Serializable);
 
             try
             {
-                var columnName = GetColumnNameByNetName(siteId, "Parent");
+                var columnName = GetColumnNameByNetName(siteId, "Parent", transaction);
                 if (string.IsNullOrWhiteSpace(columnName))
                     throw new Exception("NetName for field Parent not found");
 
@@ -305,13 +305,13 @@ namespace QA.Engine.Administration.Data.Core
             {
                 var siteName = _qpMetadataManager.GetSiteName(siteId);
 
-                //update extantion
-                var extantionValues = items
+                //update extention
+                var extentionValues = items
                     .Where(x => x.ExtensionId.HasValue)
                     .GroupBy(x => x.ExtensionId.Value, x => x.Id);
-                foreach (var item in extantionValues)
+                foreach (var item in extentionValues)
                 {
-                    var contentExtantionName = _qpMetadataManager.GetContentName(item.Key);
+                    var contentExtentionName = _qpMetadataManager.GetContentName(item.Key);
                     _qpContentManager
                         .Connect()
                         .SiteName(siteName)
@@ -319,7 +319,7 @@ namespace QA.Engine.Administration.Data.Core
                         .IsShowSplittedArticle(true)
                         .StatusName(_statusNames)
                         .ContentId(item.Key)
-                        .ContentName(contentExtantionName)
+                        .ContentName(contentExtentionName)
                         .Where($"ItemId in ({string.Join(",", item.Select(x => x))})")
                         .Delete(userId);
                 }
@@ -389,9 +389,9 @@ namespace QA.Engine.Administration.Data.Core
             _qpDbConnector.DbConnector.MassUpdate(contentId, new[] { value }, userId);
         }
 
-        private string GetColumnNameByNetName(int siteId, string columnNetName)
+        private string GetColumnNameByNetName(int siteId, string columnNetName, IDbTransaction transaction)
         {
-            var contentMetaInfo = _metaInfoRepository.GetContent("QPAbstractItem", siteId);
+            var contentMetaInfo = _metaInfoRepository.GetContent("QPAbstractItem", siteId, transaction);
             if (contentMetaInfo == null)
             {
                 throw new Exception($"Content with netname 'QPAbstractItem' was not found for site {siteId}");

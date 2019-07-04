@@ -82,45 +82,47 @@ WHERE reg.ARCHIVE = 0
 ";
         }
 
-        public List<ItemDefinitionData> GetAllItemDefinitions(int siteId)
+        public List<ItemDefinitionData> GetAllItemDefinitions(int siteId, IDbTransaction transaction = null)
         {
             _logger.LogDebug($"getAllItemDefinitions. siteId: {siteId}");
             var query = _netNameQueryAnalyzer.PrepareQuery(CmdGetAllItemDefinitions, siteId, false);
-            var result = _uow.Connection.Query<ItemDefinitionData>(query).ToList();
+            var result = _uow.Connection.Query<ItemDefinitionData>(query, transaction).ToList();
             _logger.LogDebug($"getAllItemDefinitions. total: {result.Count}");
             return result;
         }
 
-        public List<StatusTypeData> GetAllStatusTypes(int siteId)
+        public List<StatusTypeData> GetAllStatusTypes(int siteId, IDbTransaction transaction = null)
         {
             _logger.LogDebug($"getAllStatusTypes. siteId: {siteId}");
-            var result = _uow.Connection.Query<StatusTypeData>(CmdGetAllStatusTypes, new { SiteId = siteId }).ToList();
+            var result = _uow.Connection.Query<StatusTypeData>(CmdGetAllStatusTypes, 
+                new { SiteId = siteId }, transaction).ToList();
             _logger.LogDebug($"getAllStatusTypes. total: {result.Count}");
             return result;
         }
 
-        public StatusTypeData GetStatusType(int siteId, QpContentItemStatus status)
+        public StatusTypeData GetStatusType(int siteId, QpContentItemStatus status, IDbTransaction transaction = null)
         {
             _logger.LogDebug($"getStatusType. siteId: {siteId}, status: {status}");
-            var result = _uow.Connection.QueryFirst<StatusTypeData>(CmdGetStatusTypeById, new { SiteId = siteId, Status = status.GetDescription() });
+            var result = _uow.Connection.QueryFirst<StatusTypeData>(CmdGetStatusTypeById, 
+                new { SiteId = siteId, Status = status.GetDescription() }, transaction);
             _logger.LogDebug($"getStatusType. statusId: {result.Id}, statusName: {result.Name}");
             return result;
         }
 
-        public List<RegionData> GetAllRegions(int siteId)
+        public List<RegionData> GetAllRegions(int siteId, IDbTransaction transaction = null)
         {
             _logger.LogDebug($"getAllRegions. siteId: {siteId}");
             var query = _netNameQueryAnalyzer.PrepareQuery(GetAllRegionsQuery(), siteId, true, true);
-            var result = _uow.Connection.Query<RegionData>(query).ToList();
+            var result = _uow.Connection.Query<RegionData>(query, transaction).ToList();
             _logger.LogDebug($"getAllRegions. total: {result.Count}");
             return result;
         }
 
-        public List<CultureData> GetAllCultures(int siteId)
+        public List<CultureData> GetAllCultures(int siteId, IDbTransaction transaction = null)
         {
             _logger.LogDebug($"GetAllCultures. siteId: {siteId}");
             var query = _netNameQueryAnalyzer.PrepareQuery(CmdGetAllCultures(), siteId, true, true);
-            var result = _uow.Connection.Query<CultureData>(query).ToList();
+            var result = _uow.Connection.Query<CultureData>(query, transaction).ToList();
             _logger.LogDebug($"GetAllCultures. total: {result.Count}");
             return result;
         }
