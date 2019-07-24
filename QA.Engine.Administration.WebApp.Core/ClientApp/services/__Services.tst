@@ -100,9 +100,10 @@ ${
     {
         var url = method.Url();
         var idx = url.IndexOf("?");
+        var virtualPath = "(<any>window).adminConfig.contextPath";
         if (idx < 0)
-            return $"const path = '/{url}';";
-        url = $"const path = `/{url.Substring(0, idx)}${{urlparams}}`;";
+            return $"const path = `${{{virtualPath}}}/{url}`;";
+        url = $"const path = `${{{virtualPath}}}/{url.Substring(0, idx)}${{urlparams}}`;";
         return url;
     }
 

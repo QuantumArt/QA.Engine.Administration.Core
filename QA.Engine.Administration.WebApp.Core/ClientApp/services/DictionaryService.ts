@@ -8,7 +8,7 @@ class DictionaryService {
     /** Тексты */
     public async getTexts(): Promise<ApiResult<{ [key: string]: string; }>> {
 
-        const path = '/api/Dictionary/getTexts';
+        const path = `${(<any>window).adminConfig.contextPath}/api/Dictionary/getTexts`;
         const headers = new Headers();
         headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
         const init = {
@@ -28,7 +28,7 @@ class DictionaryService {
     /** Возвращает типы контента */
     public async getDiscriminators(): Promise<ApiResult<DiscriminatorModel[]>> {
 
-        const path = '/api/Dictionary/getDiscriminators';
+        const path = `${(<any>window).adminConfig.contextPath}/api/Dictionary/getDiscriminators`;
         const headers = new Headers();
         headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
         const init = {
@@ -48,7 +48,7 @@ class DictionaryService {
     /** Дискриминатор стартовой страницы */
     public async getRootPageDiscriminator(): Promise<ApiResult<string>> {
 
-        const path = '/api/Dictionary/getRootPageDiscriminator';
+        const path = `${(<any>window).adminConfig.contextPath}/api/Dictionary/getRootPageDiscriminator`;
         const headers = new Headers();
         headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
         const init = {
@@ -68,7 +68,7 @@ class DictionaryService {
     /** Возвращает регионы списком */
     public async getFlatRegions(): Promise<ApiResult<RegionModel[]>> {
 
-        const path = '/api/Dictionary/getFlatRegions';
+        const path = `${(<any>window).adminConfig.contextPath}/api/Dictionary/getFlatRegions`;
         const headers = new Headers();
         headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
         const init = {
@@ -88,7 +88,7 @@ class DictionaryService {
     /** Возвращает дерево регионов */
     public async getRegionTree(): Promise<ApiResult<RegionModel[]>> {
 
-        const path = '/api/Dictionary/getRegionTree';
+        const path = `${(<any>window).adminConfig.contextPath}/api/Dictionary/getRegionTree`;
         const headers = new Headers();
         headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
         const init = {
@@ -111,7 +111,7 @@ class DictionaryService {
         let urlparams = '';
         urlparams += Array.isArray(contentName) && contentName.length === 0 ? '' : `&contentName=${contentName} `;
         urlparams = urlparams.length > 0 ? `?${urlparams.slice(1)}` : '';
-        const path = `/api/Dictionary/getQpContent${urlparams}`;
+        const path = `${(<any>window).adminConfig.contextPath}/api/Dictionary/getQpContent${urlparams}`;
         const headers = new Headers();
         headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
         const init = {
@@ -131,7 +131,7 @@ class DictionaryService {
     /** Возвращает культуры */
     public async getCultures(): Promise<ApiResult<CultureModel[]>> {
 
-        const path = '/api/Dictionary/getCultures';
+        const path = `${(<any>window).adminConfig.contextPath}/api/Dictionary/getCultures`;
         const headers = new Headers();
         headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
         const init = {
@@ -154,7 +154,7 @@ class DictionaryService {
         let urlparams = '';
         urlparams += Array.isArray(alias) && alias.length === 0 ? '' : `&alias=${alias} `;
         urlparams = urlparams.length > 0 ? `?${urlparams.slice(1)}` : '';
-        const path = `/api/Dictionary/getCustomAction${urlparams}`;
+        const path = `${(<any>window).adminConfig.contextPath}/api/Dictionary/getCustomAction${urlparams}`;
         const headers = new Headers();
         headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
         const init = {

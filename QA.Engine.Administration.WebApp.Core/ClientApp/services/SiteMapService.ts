@@ -11,7 +11,7 @@ class SiteMapService {
         let urlparams = '';
         urlparams += Array.isArray(regionIds) && regionIds.length === 0 ? '' : (regionIds == null ? '' : `&regionIds=${regionIds} `);
         urlparams = urlparams.length > 0 ? `?${urlparams.slice(1)}` : '';
-        const path = `/api/SiteMap/getSiteMapTree${urlparams}`;
+        const path = `${(<any>window).adminConfig.contextPath}/api/SiteMap/getSiteMapTree${urlparams}`;
         const headers = new Headers();
         headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
         const init = {
@@ -35,7 +35,7 @@ class SiteMapService {
         urlparams += Array.isArray(id) && id.length === 0 ? '' : `&id=${id} `;
         urlparams += Array.isArray(regionIds) && regionIds.length === 0 ? '' : (regionIds == null ? '' : `&regionIds=${regionIds} `);
         urlparams = urlparams.length > 0 ? `?${urlparams.slice(1)}` : '';
-        const path = `/api/SiteMap/getSiteMapSubTree${urlparams}`;
+        const path = `${(<any>window).adminConfig.contextPath}/api/SiteMap/getSiteMapSubTree${urlparams}`;
         const headers = new Headers();
         headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
         const init = {
@@ -55,7 +55,7 @@ class SiteMapService {
     /** Возвращает полное дерево архива */
     public async getArchiveTree(): Promise<ApiResult<ArchiveModel[]>> {
 
-        const path = '/api/SiteMap/getArchiveTree';
+        const path = `${(<any>window).adminConfig.contextPath}/api/SiteMap/getArchiveTree`;
         const headers = new Headers();
         headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
         const init = {
@@ -78,7 +78,7 @@ class SiteMapService {
         let urlparams = '';
         urlparams += Array.isArray(id) && id.length === 0 ? '' : `&id=${id} `;
         urlparams = urlparams.length > 0 ? `?${urlparams.slice(1)}` : '';
-        const path = `/api/SiteMap/getArchiveSubTree${urlparams}`;
+        const path = `${(<any>window).adminConfig.contextPath}/api/SiteMap/getArchiveSubTree${urlparams}`;
         const headers = new Headers();
         headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
         const init = {
@@ -103,7 +103,7 @@ class SiteMapService {
         urlparams += Array.isArray(parentId) && parentId.length === 0 ? '' : (parentId == null ? '' : `&regionIds=${parentId} `);
         urlparams += Array.isArray(regionIds) && regionIds.length === 0 ? '' : (regionIds == null ? '' : `&regionIds=${regionIds} `);
         urlparams = urlparams.length > 0 ? `?${urlparams.slice(1)}` : '';
-        const path = `/api/SiteMap/getPageTree${urlparams}`;
+        const path = `${(<any>window).adminConfig.contextPath}/api/SiteMap/getPageTree${urlparams}`;
         const headers = new Headers();
         headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
         const init = {
@@ -128,7 +128,7 @@ class SiteMapService {
         urlparams += Array.isArray(parentId) && parentId.length === 0 ? '' : `&parentId=${parentId} `;
         urlparams += Array.isArray(regionIds) && regionIds.length === 0 ? '' : (regionIds == null ? '' : `&regionIds=${regionIds} `);
         urlparams = urlparams.length > 0 ? `?${urlparams.slice(1)}` : '';
-        const path = `/api/SiteMap/getWidgetTree${urlparams}`;
+        const path = `${(<any>window).adminConfig.contextPath}/api/SiteMap/getWidgetTree${urlparams}`;
         const headers = new Headers();
         headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
         const init = {
@@ -152,7 +152,7 @@ class SiteMapService {
         urlparams += Array.isArray(id) && id.length === 0 ? '' : `&id=${id} `;
         urlparams += Array.isArray(extensionId) && extensionId.length === 0 ? '' : `&extensionId=${extensionId} `;
         urlparams = urlparams.length > 0 ? `?${urlparams.slice(1)}` : '';
-        const path = `/api/SiteMap/getExtensionFields${urlparams}`;
+        const path = `${(<any>window).adminConfig.contextPath}/api/SiteMap/getExtensionFields${urlparams}`;
         const headers = new Headers();
         headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
         const init = {
@@ -176,7 +176,7 @@ class SiteMapService {
         urlparams += Array.isArray(id) && id.length === 0 ? '' : `&id=${id} `;
         urlparams += Array.isArray(attributeId) && attributeId.length === 0 ? '' : `&attributeId=${attributeId} `;
         urlparams = urlparams.length > 0 ? `?${urlparams.slice(1)}` : '';
-        const path = `/api/SiteMap/getRelatedItemName${urlparams}`;
+        const path = `${(<any>window).adminConfig.contextPath}/api/SiteMap/getRelatedItemName${urlparams}`;
         const headers = new Headers();
         headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
         const init = {
@@ -201,7 +201,7 @@ class SiteMapService {
         urlparams += Array.isArray(value) && value.length === 0 ? '' : `&value=${value} `;
         urlparams += Array.isArray(attributeId) && attributeId.length === 0 ? '' : `&attributeId=${attributeId} `;
         urlparams = urlparams.length > 0 ? `?${urlparams.slice(1)}` : '';
-        const path = `/api/SiteMap/getManyToOneRelatedItemNames${urlparams}`;
+        const path = `${(<any>window).adminConfig.contextPath}/api/SiteMap/getManyToOneRelatedItemNames${urlparams}`;
         const headers = new Headers();
         headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
         const init = {
@@ -221,7 +221,7 @@ class SiteMapService {
     /** Опубликовать страницу */
     public async publish(itemIds: number[]): Promise<any> {
 
-        const path = '/api/SiteMap/publish';
+        const path = `${(<any>window).adminConfig.contextPath}/api/SiteMap/publish`;
         const headers = new Headers();
         headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
         headers.append('Content-Type', 'application/json');
@@ -243,7 +243,7 @@ class SiteMapService {
     /** Изменить порядок отображения страниц */
     public async reorder(model: ReorderModel): Promise<any> {
 
-        const path = '/api/SiteMap/reorder';
+        const path = `${(<any>window).adminConfig.contextPath}/api/SiteMap/reorder`;
         const headers = new Headers();
         headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
         headers.append('Content-Type', 'application/json');
@@ -265,7 +265,7 @@ class SiteMapService {
     /** Переместить страницу к новому родительскому элементу */
     public async move(model: MoveModel): Promise<any> {
 
-        const path = '/api/SiteMap/move';
+        const path = `${(<any>window).adminConfig.contextPath}/api/SiteMap/move`;
         const headers = new Headers();
         headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
         headers.append('Content-Type', 'application/json');
@@ -287,7 +287,7 @@ class SiteMapService {
     /** Редактировать */
     public async edit(model: EditModel): Promise<any> {
 
-        const path = '/api/SiteMap/edit';
+        const path = `${(<any>window).adminConfig.contextPath}/api/SiteMap/edit`;
         const headers = new Headers();
         headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
         headers.append('Content-Type', 'application/json');
@@ -309,7 +309,7 @@ class SiteMapService {
     /** Удаление элементов в архив */
     public async archive(model: RemoveModel): Promise<any> {
 
-        const path = '/api/SiteMap/archive';
+        const path = `${(<any>window).adminConfig.contextPath}/api/SiteMap/archive`;
         const headers = new Headers();
         headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
         headers.append('Content-Type', 'application/json');
@@ -331,7 +331,7 @@ class SiteMapService {
     /** Восстановление элементов */
     public async restore(model: RestoreModel): Promise<any> {
 
-        const path = '/api/SiteMap/restore';
+        const path = `${(<any>window).adminConfig.contextPath}/api/SiteMap/restore`;
         const headers = new Headers();
         headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
         headers.append('Content-Type', 'application/json');
@@ -353,7 +353,7 @@ class SiteMapService {
     /** Удаление элементов */
     public async delete(model: DeleteModel): Promise<any> {
 
-        const path = '/api/SiteMap/delete';
+        const path = `${(<any>window).adminConfig.contextPath}/api/SiteMap/delete`;
         const headers = new Headers();
         headers.append('Qp-Site-Params', JSON.stringify(this.getHeaderData()));
         headers.append('Content-Type', 'application/json');
