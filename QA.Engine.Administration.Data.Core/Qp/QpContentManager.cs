@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using QA.Engin.Administration.Common.Core;
+using QA.Engine.Administration.Common.Core;
 using QA.Engine.Administration.Data.Interfaces.Core.Models;
 using Quantumart.QPublishing.Database;
 using Quantumart.QPublishing.Info;
@@ -9,6 +9,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Globalization;
 using System.Linq;
+using QP.ConfigurationService.Models;
 
 namespace QA.Engine.Administration.Data.Core.Qp
 {
@@ -69,11 +70,11 @@ namespace QA.Engine.Administration.Data.Core.Qp
         /// </summary>
         /// <param name="connectionString">Строка подключения</param>
         /// <returns></returns>
-        public virtual IQpContentManager Connection(string connectionString)
+        public virtual IQpContentManager Connection(IDbConnection connection)
         {
-            if (string.IsNullOrEmpty(connectionString))
-                throw new ArgumentNullException("connectionString");
-            _query.DbConnector = new DBConnector(connectionString);
+            if (connection == null)
+                throw new ArgumentNullException(nameof(connection));
+            _query.DbConnector = new DBConnector(connection);
             return this;
         }
 
@@ -336,10 +337,10 @@ namespace QA.Engine.Administration.Data.Core.Qp
             if (string.IsNullOrEmpty(_query.Fields))
                 throw new ArgumentNullException("Query.Fields");
 
-            var command = new SqlCommand();
-            command.CommandText = "SELECT " + _query.Fields +
-                " FROM " + _query.ContentName +
-                (string.IsNullOrEmpty(_query.Where) ? "" : (" WHERE " + _query.Where));
+            string query = "SELECT " + _query.Fields +
+                           " FROM " + _query.ContentName +
+                           (string.IsNullOrEmpty(_query.Where) ? "" : " WHERE " + _query.Where);
+            var command = _dbConnection.CreateCommand(query);
 
             var result = new QpContentResult
             {

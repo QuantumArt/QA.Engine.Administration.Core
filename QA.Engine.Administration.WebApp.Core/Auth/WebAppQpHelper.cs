@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using QA.Engine.Administration.WebApp.Core.Business.Models;
+using ConnectionInfo = QA.Engine.Administration.WebApp.Core.Business.Models.ConnectionInfo;
 
 namespace QA.Engine.Administration.WebApp.Core.Auth
 {
@@ -34,12 +36,6 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
         /// Идентификатор сайта
         /// </summary>
         int SiteId { get; }
-
-        /// <summary>
-        /// Строка подключения к БД
-        /// </summary>
-        string ConnectionString { get; }
-
         /// <summary>
         /// Id пользователя
         /// </summary>
@@ -132,9 +128,6 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
                 return result;
             }
         }
-
-        public string ConnectionString => SiteConfiguration.Get(_httpContext).ConnectionString;
-
         public int UserId => _httpContext.Session.GetInt32(DBConnector.LastModifiedByKey) ?? 0;
     }
 }

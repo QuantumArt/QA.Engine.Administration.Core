@@ -1,6 +1,7 @@
 ﻿using Quantumart.QPublishing.Database;
 using Quantumart.QPublishing.Info;
 using System.Data;
+using System.Data.Common;
 using System.Data.SqlClient;
 
 namespace QA.Engine.Administration.Data.Core.Qp
@@ -28,12 +29,7 @@ namespace QA.Engine.Administration.Data.Core.Qp
         /// </summary>
         /// <param name="command">Команда к БД</param>
         /// <returns></returns>
-        DataTable GetRealData(SqlCommand command);
-
-        /// <summary>
-        /// Строка подключения
-        /// </summary>
-        string InstanceConnectionString { get; }
+        DataTable GetRealData(DbCommand command);
 
         /// <summary>
         /// Вовзращает имя контента
@@ -64,7 +60,8 @@ namespace QA.Engine.Administration.Data.Core.Qp
         /// <returns></returns>
         string GetContentItemLinkIDs(string fieldName, string values);
 
-        void BeginTransaction(IsolationLevel isolationLevel);
+        DbCommand CreateCommand(string text);
+        IDbTransaction BeginTransaction(IsolationLevel isolationLevel);
         void CommitTransaction();
         void RollbackTransaction();
     }

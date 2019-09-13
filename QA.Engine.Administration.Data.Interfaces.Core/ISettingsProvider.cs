@@ -1,15 +1,16 @@
 ﻿using QA.Engine.Administration.Data.Interfaces.Core.Models;
 using System.Collections.Generic;
+using System.Data;
 
 namespace QA.Engine.Administration.Data.Interfaces.Core
 {
     public interface ISettingsProvider
     {
-        int GetContentId(int siteId);
-        bool HasRegion(int siteId);
-        QpContentData GetContent(int siteId, string contentName);
-        List<QpFieldData> GetFields(int siteId, int contentId);
-        string GetIconUrl(int siteId);
-        CustomActionData GetCustomAction(string alias);
+        int GetContentId(int siteId, IDbTransaction transaction = null);
+        bool HasRegion(int siteId, IDbTransaction transaction = null);
+        QpContentData GetContent(int siteId, string contentName, IDbTransaction transaction = null);
+        List<QpFieldData> GetFields(int siteId, int contentId, IDbTransaction transaction = null);
+        string GetIconUrl(int siteId, IDbTransaction transaction = null);
+        CustomActionData GetCustomAction(string alias, IDbTransaction transaction = null);
     }
 }

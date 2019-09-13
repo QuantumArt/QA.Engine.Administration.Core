@@ -1,12 +1,15 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using QA.Engin.Administration.Common.Core;
+using QA.Engine.Administration.Common.Core;
 using Quantumart.QPublishing.Database;
 using Quantumart.QPublishing.OnScreen;
 using System;
 using System.Data;
 using System.Security.Claims;
+using QA.DotNetCore.Engine.Persistent.Interfaces;
+using QP.ConfigurationService.Models;
+using DatabaseType = QP.ConfigurationService.Models.DatabaseType;
 
 namespace QA.Engine.Administration.WebApp.Core.Auth
 {
@@ -15,19 +18,23 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
         protected static readonly string AuthenticationKey = "QP_Beeline_AuthenticationKey";
         protected static readonly string UserLanguageFieldName = "LANGUAGE_ID";
         public static readonly string UserLanguageKey = "QP_User_Language";
-        public static readonly string UserId = "QP_User_Id";
 
         private readonly HttpContext _httpContext;
         private readonly IWebAppQpHelper _webAppQpHelper;
         private readonly EnvironmentConfiguration _configuration;
         private readonly ILogger<QPSecurityChecker> _logger;
-
-        public QPSecurityChecker(IHttpContextAccessor httpContextAccessor, IWebAppQpHelper webAppQpHelper, IOptions<EnvironmentConfiguration> options, ILogger<QPSecurityChecker> logger)
+        private readonly IUnitOfWork _uow;
+        public QPSecurityChecker(IUnitOfWork uow,
+            IHttpContextAccessor httpContextAccessor,
+            IWebAppQpHelper webAppQpHelper,
+            IOptions<EnvironmentConfiguration> options,
+            ILogger<QPSecurityChecker> logger)
         {
             _httpContext = httpContextAccessor.HttpContext;
             _webAppQpHelper = webAppQpHelper;
             _configuration = options.Value;
             _logger = logger;
+            _uow = uow;
         }
 
         /// <summary>
@@ -56,11 +63,9 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
                 return true;
             }
 
-            var connectionString = _webAppQpHelper.ConnectionString;
-            if (string.IsNullOrEmpty(connectionString))
+            if (_uow.Connection == null)
                 return false;
-            var dBConnector = new DBConnector(connectionString);
-
+            var dBConnector = new DBConnector(_uow.Connection);
             var qScreen = new QScreen(dBConnector);
             var userId = qScreen.AuthenticateForCustomTab(dBConnector, _webAppQpHelper.BackendSid);
             var result = userId > 0;

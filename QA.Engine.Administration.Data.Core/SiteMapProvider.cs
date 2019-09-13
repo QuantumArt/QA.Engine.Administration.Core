@@ -9,332 +9,333 @@ using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
+using Microsoft.SqlServer.Server;
+using QA.DotNetCore.Engine.Persistent.Dapper;
 
 namespace QA.Engine.Administration.Data.Core
 {
-    public class SiteMapProvider: ISiteMapProvider
+    public class SiteMapProvider : ISiteMapProvider
     {
-        private readonly IDbConnection _connection;
+        private readonly IUnitOfWork _uow;
         private readonly INetNameQueryAnalyzer _netNameQueryAnalyzer;
-        private readonly IMetaInfoRepository _metaInfoRepository;
         private readonly ILogger<SiteMapProvider> _logger;
 
-        public SiteMapProvider(IUnitOfWork uow, INetNameQueryAnalyzer netNameQueryAnalyzer, IMetaInfoRepository metaInfoRepository, ILogger<SiteMapProvider> logger)
+        public SiteMapProvider(IUnitOfWork uow, INetNameQueryAnalyzer netNameQueryAnalyzer,
+            ILogger<SiteMapProvider> logger)
         {
-            _connection = uow.Connection;
             _netNameQueryAnalyzer = netNameQueryAnalyzer;
-            _metaInfoRepository = metaInfoRepository;
+            _uow = uow;
             _logger = logger;
         }
 
         #region запросы с использованием NetName таблиц и столбцов
 
         #region get all abstract items
-        private const string CmdGetAllAbstractItems = @"
+
+        private string GetAllAbstractItemsQuery(int siteId, bool isArchive)
+        {
+            string query = $@"
 SELECT
     ai.content_item_id AS Id,
     ai.archive AS IsArchive,
-    ai.[|QPAbstractItem.Name|] as Alias,
-    ai.[|QPAbstractItem.Title|] as Title,
-    ai.[|QPAbstractItem.Parent|] AS ParentId,
-    ai.[|QPAbstractItem.IsVisible|] AS IsVisible,
-    ai.[|QPAbstractItem.ZoneName|] AS ZoneName,
-    ai.[|QPAbstractItem.IndexOrder|] AS IndexOrder,
-    ai.[|QPAbstractItem.ExtensionId|] AS ExtensionId,
-    ai.[|QPAbstractItem.VersionOf|] AS VersionOfId,
-    ai.[|QPAbstractItem.IsInSiteMap|] AS IsInSiteMap,
+    ai.|QPAbstractItem.Name| as Alias,
+    ai.|QPAbstractItem.Title| as Title,
+    ai.|QPAbstractItem.Parent| AS ParentId,
+    ai.|QPAbstractItem.IsVisible| AS IsVisible,
+    ai.|QPAbstractItem.ZoneName| AS ZoneName,
+    ai.|QPAbstractItem.IndexOrder| AS IndexOrder,
+    ai.|QPAbstractItem.ExtensionId| AS ExtensionId,
+    ai.|QPAbstractItem.VersionOf| AS VersionOfId,
+    ai.|QPAbstractItem.IsInSiteMap| AS IsInSiteMap,
     def.content_item_id AS DiscriminatorId,
-    def.[|QPDiscriminator.Name|] as Discriminator,
-    def.[|QPDiscriminator.IsPage|] as IsPage,
-    def.[|QPDiscriminator.Title|] as DiscriminatorTitle,
-    def.[|QPDiscriminator.IconUrl|] as IconUrl,
-    CASE WHEN ai.[STATUS_TYPE_ID] = (SELECT TOP 1 st.STATUS_TYPE_ID FROM [STATUS_TYPE] st WHERE st.[STATUS_TYPE_NAME]=N'Published') THEN 1 ELSE 0 END AS Published
-FROM [|QPAbstractItem|] ai
-INNER JOIN [|QPDiscriminator|] def on ai.[|QPAbstractItem.Discriminator|] = def.content_item_id
-WHERE ai.archive=@Archive AND ai.visible=1
-ORDER BY ai.[|QPAbstractItem.Parent|], ai.[|QPAbstractItem.IndexOrder|], ai.content_item_id
+    def.|QPDiscriminator.Name| as Discriminator,
+    def.|QPDiscriminator.IsPage| as IsPage,
+    def.|QPDiscriminator.Title| as DiscriminatorTitle,
+    def.|QPDiscriminator.IconUrl| as IconUrl,
+    CASE WHEN ai.STATUS_TYPE_ID IN (SELECT st.STATUS_TYPE_ID FROM STATUS_TYPE st WHERE st.STATUS_TYPE_NAME=N'Published') THEN 1 ELSE 0 END AS Published
+FROM |QPAbstractItem| ai
+INNER JOIN |QPDiscriminator| def on ai.|QPAbstractItem.Discriminator| = def.content_item_id
+WHERE ai.archive={(isArchive ? "1" : "0")} 
+  AND ai.visible=1
+ORDER BY ai.|QPAbstractItem.Parent|, ai.|QPAbstractItem.IndexOrder|, ai.content_item_id
 ";
+            return _netNameQueryAnalyzer.PrepareQuery(query, siteId, false, true);
+        }
 
-        private const string CmdGetAllAbstractItemsWithRegions = @"
-SELECT
-    ai.content_item_id AS Id, 
-	ai.archive AS IsArchive, 
-	ai.[|QPAbstractItem.Name|] as Alias,
-    ai.[|QPAbstractItem.Title|] as Title,
-    ai.[|QPAbstractItem.Parent|] AS ParentId,
-    ai.[|QPAbstractItem.IsVisible|] AS IsVisible,
-    ai.[|QPAbstractItem.ZoneName|] AS ZoneName,
-    ai.[|QPAbstractItem.IndexOrder|] AS IndexOrder,
-    ai.[|QPAbstractItem.ExtensionId|] AS ExtensionId,
-    ai.[|QPAbstractItem.VersionOf|] AS VersionOfId,
-    ai.[|QPAbstractItem.IsInSiteMap|] AS IsInSiteMap,
-    def.content_item_id AS DiscriminatorId,
-    def.[|QPDiscriminator.Name|] as Discriminator,
-    def.[|QPDiscriminator.IsPage|] as IsPage,
-    def.[|QPDiscriminator.Title|] as DiscriminatorTitle,
-    def.[|QPDiscriminator.IconUrl|] as IconUrl,
-    CASE WHEN ai.[STATUS_TYPE_ID] = (SELECT TOP 1 st.STATUS_TYPE_ID FROM [STATUS_TYPE] st WHERE st.[STATUS_TYPE_NAME]=N'Published') THEN 1 ELSE 0 END AS Published
-FROM [|QPAbstractItem|] ai
-INNER JOIN [|QPDiscriminator|] def ON ai.[|QPAbstractItem.Discriminator|] = def.content_item_id
-WHERE ai.archive=@Archive AND ai.visible=1
-ORDER BY ai.[|QPAbstractItem.Parent|], ai.[|QPAbstractItem.IndexOrder|], ai.content_item_id
-
-SELECT 
-    reg.CONTENT_ITEM_ID AS Id, 
-    reg.[|QPRegion.Alias|] AS Alias, 
-    reg.[|QPRegion.ParentId|] AS ParentId, 
-    reg.[|QPRegion.Title|] AS Title
-FROM [|QPRegion|] reg
-WHERE reg.ARCHIVE = 0
-
-DECLARE @linkId VARCHAR(4) = CAST((SELECT TOP 1 [|QPAbstractItem.Regions|] FROM [|QPAbstractItem|] WHERE [|QPAbstractItem.Regions|] IS NOT NULL) AS VARCHAR(4))
-DECLARE @query NVARCHAR(MAX) = N'SELECT item_id AS ItemId, linked_item_id AS LinkedItemId FROM link_' + @linkId + '_united'
-exec dbo.SP_EXECUTESQL @query
-
-";
         #endregion
 
         #region get abstract items with parent
-        private const string CmdGetAbstractItems = @"
+
+        private string GetAbstractItemsQuery(int siteId, bool isArchive, string parentExpression)
+        {
+            var query = $@"
 SELECT
     ai.content_item_id AS Id,
     ai.archive AS IsArchive,
-    ai.[|QPAbstractItem.Name|] as Alias,
-    ai.[|QPAbstractItem.Title|] as Title,
-    ai.[|QPAbstractItem.Parent|] AS ParentId,
-    ai.[|QPAbstractItem.IsVisible|] AS IsVisible,
-    ai.[|QPAbstractItem.ZoneName|] AS ZoneName,
-    ai.[|QPAbstractItem.IndexOrder|] AS IndexOrder,
-    ai.[|QPAbstractItem.ExtensionId|] AS ExtensionId,
-    ai.[|QPAbstractItem.VersionOf|] AS VersionOfId,
-    ai.[|QPAbstractItem.IsInSiteMap|] AS IsInSiteMap,
+    ai.|QPAbstractItem.Name| as Alias,
+    ai.|QPAbstractItem.Title| as Title,
+    ai.|QPAbstractItem.Parent| AS ParentId,
+    ai.|QPAbstractItem.IsVisible| AS IsVisible,
+    ai.|QPAbstractItem.ZoneName| AS ZoneName,
+    ai.|QPAbstractItem.IndexOrder| AS IndexOrder,
+    ai.|QPAbstractItem.ExtensionId| AS ExtensionId,
+    ai.|QPAbstractItem.VersionOf| AS VersionOfId,
+    ai.|QPAbstractItem.IsInSiteMap| AS IsInSiteMap,
     def.content_item_id AS DiscriminatorId,
-    def.[|QPDiscriminator.Name|] as Discriminator,
-    def.[|QPDiscriminator.IsPage|] as IsPage,
-    def.[|QPDiscriminator.Title|] as DiscriminatorTitle,
-    def.[|QPDiscriminator.IconUrl|] as IconUrl,
-    CASE WHEN ai.[STATUS_TYPE_ID] = (SELECT TOP 1 st.STATUS_TYPE_ID FROM [STATUS_TYPE] st WHERE st.[STATUS_TYPE_NAME]=N'Published') THEN 1 ELSE 0 END AS Published
-FROM [|QPAbstractItem|] ai
-INNER JOIN [|QPDiscriminator|] def on ai.[|QPAbstractItem.Discriminator|] = def.content_item_id
-WHERE ai.archive=@Archive AND def.[|QPDiscriminator.IsPage|]=1 AND ai.[|QPAbstractItem.VersionOf|] is null 
+    def.|QPDiscriminator.Name| as Discriminator,
+    def.|QPDiscriminator.IsPage| as IsPage,
+    def.|QPDiscriminator.Title| as DiscriminatorTitle,
+    def.|QPDiscriminator.IconUrl| as IconUrl,
+    CASE WHEN ai.STATUS_TYPE_ID IN (SELECT st.STATUS_TYPE_ID FROM STATUS_TYPE st WHERE st.STATUS_TYPE_NAME=N'Published') THEN 1 ELSE 0 END AS Published
+FROM |QPAbstractItem| ai
+INNER JOIN |QPDiscriminator| def on ai.|QPAbstractItem.Discriminator| = def.content_item_id
+WHERE ai.archive={(isArchive ? "1" : "0")} 
+AND def.|QPDiscriminator.IsPage|=1 AND ai.|QPAbstractItem.VersionOf| is null 
     AND (
-        ai.[|QPAbstractItem.Parent|] {0}
-        OR EXISTS (SELECT 1 FROM [|QPAbstractItem|] ai1 
-            WHERE ai.[|QPAbstractItem.Parent|] {0} AND ai1.content_item_id=ai.[|QPAbstractItem.VersionOf|])
+        ai.|QPAbstractItem.Parent| {parentExpression}
+        OR EXISTS (SELECT 1 FROM |QPAbstractItem| ai1 
+            WHERE ai.|QPAbstractItem.Parent| {parentExpression} AND ai1.content_item_id=ai.|QPAbstractItem.VersionOf|)
     )
-ORDER BY ai.[|QPAbstractItem.Parent|], ai.[|QPAbstractItem.IndexOrder|], ai.content_item_id
+ORDER BY ai.|QPAbstractItem.Parent|, ai.|QPAbstractItem.IndexOrder|, ai.content_item_id
 ";
+            return _netNameQueryAnalyzer.PrepareQuery(query, siteId, false, true);
+        }
 
-        private const string CmdGetAbstractItemsWithRegions = @"
-SELECT
-    ai.content_item_id AS Id, 
-	ai.archive AS IsArchive, 
-	ai.[|QPAbstractItem.Name|] as Alias,
-    ai.[|QPAbstractItem.Title|] as Title,
-    ai.[|QPAbstractItem.Parent|] AS ParentId,
-    ai.[|QPAbstractItem.IsVisible|] AS IsVisible,
-    ai.[|QPAbstractItem.ZoneName|] AS ZoneName,
-    ai.[|QPAbstractItem.IndexOrder|] AS IndexOrder,
-    ai.[|QPAbstractItem.ExtensionId|] AS ExtensionId,
-    ai.[|QPAbstractItem.VersionOf|] AS VersionOfId,
-    ai.[|QPAbstractItem.IsInSiteMap|] AS IsInSiteMap,
-    def.content_item_id AS DiscriminatorId,
-    def.[|QPDiscriminator.Name|] as Discriminator,
-    def.[|QPDiscriminator.IsPage|] as IsPage,
-    def.[|QPDiscriminator.Title|] as DiscriminatorTitle,
-    def.[|QPDiscriminator.IconUrl|] as IconUrl,
-    CASE WHEN ai.[STATUS_TYPE_ID] = (SELECT TOP 1 st.STATUS_TYPE_ID FROM [STATUS_TYPE] st WHERE st.[STATUS_TYPE_NAME]=N'Published') THEN 1 ELSE 0 END AS Published
-FROM [|QPAbstractItem|] ai
-INNER JOIN [|QPDiscriminator|] def ON ai.[|QPAbstractItem.Discriminator|] = def.content_item_id
-WHERE ai.archive=@Archive AND def.[|QPDiscriminator.IsPage|]=1 AND ai.[|QPAbstractItem.VersionOf|] is null 
-    AND (
-        ai.[|QPAbstractItem.Parent|] {0}
-        OR EXISTS (SELECT 1 FROM [|QPAbstractItem|] ai1 
-            WHERE ai.[|QPAbstractItem.Parent|] {0} AND ai1.content_item_id=ai.[|QPAbstractItem.VersionOf|])
-    )
-ORDER BY ai.[|QPAbstractItem.Parent|], ai.[|QPAbstractItem.IndexOrder|], ai.content_item_id
-
-SELECT 
-    reg.CONTENT_ITEM_ID AS Id, 
-    reg.[|QPRegion.Alias|] AS Alias, 
-    reg.[|QPRegion.ParentId|] AS ParentId, 
-    reg.[|QPRegion.Title|] AS Title
-FROM [|QPRegion|] reg
-WHERE reg.ARCHIVE = 0
-
-DECLARE @linkId VARCHAR(4) = CAST((SELECT TOP 1 [|QPAbstractItem.Regions|] FROM [|QPAbstractItem|] WHERE [|QPAbstractItem.Regions|] IS NOT NULL) AS VARCHAR(4))
-DECLARE @query NVARCHAR(MAX) = N'SELECT item_id AS ItemId, linked_item_id AS LinkedItemId FROM link_' + @linkId + '_united'
-exec dbo.SP_EXECUTESQL @query
-
-";
         #endregion
 
         #region get abstract items by ids
-        private const string CmdGetAbstractItemByIds = @"
+
+        private string GetCmdGetAbstractItemByIds(int siteId, bool isArchive, string idsExpression)
+        {
+            string query = $@"
 SELECT
     ai.content_item_id AS Id,
     ai.archive AS IsArchive,
-    ai.[|QPAbstractItem.Name|] as Alias,
-    ai.[|QPAbstractItem.Title|] as Title,
-    ai.[|QPAbstractItem.Parent|] AS ParentId,
-    ai.[|QPAbstractItem.IsVisible|] AS IsVisible,
-    ai.[|QPAbstractItem.ZoneName|] AS ZoneName,
-    ai.[|QPAbstractItem.IndexOrder|] AS IndexOrder,
-    ai.[|QPAbstractItem.ExtensionId|] AS ExtensionId,
-    ai.[|QPAbstractItem.VersionOf|] AS VersionOfId,
-    ai.[|QPAbstractItem.IsInSiteMap|] AS IsInSiteMap,
+    ai.|QPAbstractItem.Name| as Alias,
+    ai.|QPAbstractItem.Title| as Title,
+    ai.|QPAbstractItem.Parent| AS ParentId,
+    ai.|QPAbstractItem.IsVisible| AS IsVisible,
+    ai.|QPAbstractItem.ZoneName| AS ZoneName,
+    ai.|QPAbstractItem.IndexOrder| AS IndexOrder,
+    ai.|QPAbstractItem.ExtensionId| AS ExtensionId,
+    ai.|QPAbstractItem.VersionOf| AS VersionOfId,
+    ai.|QPAbstractItem.IsInSiteMap| AS IsInSiteMap,
     def.content_item_id AS DiscriminatorId,
-    def.[|QPDiscriminator.Name|] as Discriminator,
-    def.[|QPDiscriminator.IsPage|] as IsPage,
-    def.[|QPDiscriminator.Title|] as DiscriminatorTitle,
-    def.[|QPDiscriminator.IconUrl|] as IconUrl,
-    CASE WHEN ai.[STATUS_TYPE_ID] = (SELECT TOP 1 st.STATUS_TYPE_ID FROM [STATUS_TYPE] st WHERE st.[STATUS_TYPE_NAME]=N'Published') THEN 1 ELSE 0 END AS Published
-FROM [|QPAbstractItem|] ai
-INNER JOIN [|QPDiscriminator|] def on ai.[|QPAbstractItem.Discriminator|] = def.content_item_id
-WHERE ai.archive=@Archive AND ai.content_item_id IN @ItemIds
+    def.|QPDiscriminator.Name| as Discriminator,
+    def.|QPDiscriminator.IsPage| as IsPage,
+    def.|QPDiscriminator.Title| as DiscriminatorTitle,
+    def.|QPDiscriminator.IconUrl| as IconUrl,
+    CASE WHEN ai.STATUS_TYPE_ID IN (SELECT st.STATUS_TYPE_ID FROM STATUS_TYPE st WHERE st.STATUS_TYPE_NAME=N'Published') THEN 1 ELSE 0 END AS Published
+FROM |QPAbstractItem| ai
+INNER JOIN |QPDiscriminator| def on ai.|QPAbstractItem.Discriminator| = def.content_item_id
+WHERE ai.archive={(isArchive ? "1" : "0")} AND ai.content_item_id IN (SELECT Id FROM {idsExpression})
 ";
+            return _netNameQueryAnalyzer.PrepareQuery(query, siteId, false, true);
+        }
+
         #endregion
 
         #region get root page
+
         private const string CmdGetRootPage = @"
 SELECT
     ai.content_item_id AS Id,
     ai.archive AS IsArchive,
-    ai.[|QPAbstractItem.Name|] as Alias,
-    ai.[|QPAbstractItem.Title|] as Title,
-    ai.[|QPAbstractItem.Parent|] AS ParentId,
-    ai.[|QPAbstractItem.IsVisible|] AS IsVisible,
-    ai.[|QPAbstractItem.ZoneName|] AS ZoneName,
-    ai.[|QPAbstractItem.IndexOrder|] AS IndexOrder,
-    ai.[|QPAbstractItem.ExtensionId|] AS ExtensionId,
-    ai.[|QPAbstractItem.VersionOf|] AS VersionOfId,
-    ai.[|QPAbstractItem.IsInSiteMap|] AS IsInSiteMap,
+    ai.|QPAbstractItem.Name| as Alias,
+    ai.|QPAbstractItem.Title| as Title,
+    ai.|QPAbstractItem.Parent| AS ParentId,
+    ai.|QPAbstractItem.IsVisible| AS IsVisible,
+    ai.|QPAbstractItem.ZoneName| AS ZoneName,
+    ai.|QPAbstractItem.IndexOrder| AS IndexOrder,
+    ai.|QPAbstractItem.ExtensionId| AS ExtensionId,
+    ai.|QPAbstractItem.VersionOf| AS VersionOfId,
+    ai.|QPAbstractItem.IsInSiteMap| AS IsInSiteMap,
     def.content_item_id AS DiscriminatorId,
-    def.[|QPDiscriminator.Name|] as Discriminator,
-    def.[|QPDiscriminator.IsPage|] as IsPage,
-    def.[|QPDiscriminator.Title|] as DiscriminatorTitle,
-    def.[|QPDiscriminator.IconUrl|] as IconUrl,
-    CASE WHEN ai.[STATUS_TYPE_ID] = (SELECT TOP 1 st.STATUS_TYPE_ID FROM [STATUS_TYPE] st WHERE st.[STATUS_TYPE_NAME]=N'Published') THEN 1 ELSE 0 END AS Published
-FROM [|QPAbstractItem|] ai
-INNER JOIN [|QPDiscriminator|] def on ai.[|QPAbstractItem.Discriminator|] = def.content_item_id
-WHERE ai.archive=0 AND ai.[|QPAbstractItem.Parent|] IS NULL AND ai.[|QPAbstractItem.VersionOf|] IS NULL AND def.[|QPDiscriminator.IsPage|]=1
+    def.|QPDiscriminator.Name| as Discriminator,
+    def.|QPDiscriminator.IsPage| as IsPage,
+    def.|QPDiscriminator.Title| as DiscriminatorTitle,
+    def.|QPDiscriminator.IconUrl| as IconUrl,
+    CASE WHEN ai.STATUS_TYPE_ID IN (SELECT st.STATUS_TYPE_ID FROM STATUS_TYPE st WHERE st.STATUS_TYPE_NAME=N'Published') THEN 1 ELSE 0 END AS Published
+FROM |QPAbstractItem| ai
+INNER JOIN |QPDiscriminator| def on ai.|QPAbstractItem.Discriminator| = def.content_item_id
+WHERE ai.archive=0 AND ai.|QPAbstractItem.Parent| IS NULL AND ai.|QPAbstractItem.VersionOf| IS NULL AND def.|QPDiscriminator.IsPage|=1
 ORDER BY ai.content_item_id";
-        #endregion
+
+        private string GetRegionsQuery(int siteId, bool isArchive = false)
+        {
+            string query = $@"
+            SELECT 
+            reg.CONTENT_ITEM_ID AS Id, 
+                reg.|QPRegion.Alias| AS Alias, 
+            reg.|QPRegion.ParentId| AS ParentId, 
+            reg.|QPRegion.Title| AS Title
+            FROM |QPRegion| reg
+            WHERE reg.ARCHIVE = {(isArchive ? "1" : "0")}";
+            return _netNameQueryAnalyzer.PrepareQuery(query, siteId, false, true);
+        }
+
+        private string GetRegionLinkIdQuery(int siteId)
+        {
+            string query =
+                $@"CAST((SELECT {SqlQuerySyntaxHelper.Top(_uow.DatabaseType, "1")} |QPAbstractItem.Regions| FROM |QPAbstractItem| WHERE |QPAbstractItem.Regions|
+                {SqlQuerySyntaxHelper.Limit(_uow.DatabaseType, "1")}
+                IS NOT NULL) AS VARCHAR(4))";
+            return _netNameQueryAnalyzer.PrepareQuery(query, siteId, false, true);
+        }
+
+        private string GetLinkItemIdQuery(int linkId)
+        {
+            return $@"SELECT item_id AS ItemId, linked_item_id AS LinkedItemId FROM link_' + {linkId} + '_united";
+        }
 
         #endregion
 
-        public List<AbstractItemData> GetAllItems(int siteId, bool isArchive, bool useRegion)
+        #endregion
+
+        public List<AbstractItemData> GetAllItems(int siteId, bool isArchive, bool useRegion, IDbTransaction transaction = null)
         {
             _logger.LogDebug($"getAllItems. siteId: {siteId}, isArchive: {isArchive}, useRegion: {useRegion}");
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            string query;
-            if (!useRegion)
+            string query = GetAllAbstractItemsQuery(siteId, isArchive);
+            var items = _uow.Connection.Query<AbstractItemData>(query, transaction).ToList();
+            _logger.LogDebug($"getAllItems. count: {items.Count}. {stopwatch.ElapsedMilliseconds}ms");
+            if (useRegion)
             {
-                query = _netNameQueryAnalyzer.PrepareQueryExtabtion(_metaInfoRepository, CmdGetAllAbstractItems, siteId);
-                var result = _connection.Query<AbstractItemData>(query, new { Archive = isArchive }).ToList();
-                _logger.LogDebug($"getAllItems. count: {result.Count()}. {stopwatch.ElapsedMilliseconds}ms");
-                return result;
-            }
-
-
-            query = _netNameQueryAnalyzer.PrepareQueryExtabtion(_metaInfoRepository, CmdGetAllAbstractItemsWithRegions, siteId);
-            var resultWithRegions = GetWithRegions(_connection, query, isArchive);
-            _logger.LogDebug($"getAllItems. count: {resultWithRegions.Count()}. {stopwatch.ElapsedMilliseconds}ms");
-            return resultWithRegions;
-        }
-
-        public List<AbstractItemData> GetItems(int siteId, bool isArchive, IEnumerable<int> parentIds, bool useRegion)
-        {
-            _logger.LogDebug($"getItems. siteId: {siteId}, isArchive: {isArchive}, useRegion: {useRegion}, parentIds: {SerializeData(parentIds)}");
-
-            const int maxParentIdsPerRequest = 500;
-
-            string query = useRegion 
-                ? _netNameQueryAnalyzer.PrepareQueryExtabtion(_metaInfoRepository, CmdGetAbstractItemsWithRegions, siteId)
-                : _netNameQueryAnalyzer.PrepareQueryExtabtion(_metaInfoRepository, CmdGetAbstractItems, siteId);
-
-            if (parentIds == null || !parentIds.Any())
-            {
-                query = string.Format(query, "IS NULL");
-
-                if (!useRegion)
-                    return _connection.Query<AbstractItemData>(query, new { Archive = isArchive }).ToList();
-                var resultWithRegions = GetWithRegions(_connection, query, isArchive);
-                _logger.LogDebug($"getItems. count: {resultWithRegions.Count()}");
-                return resultWithRegions;
-            }
-            else
-            {
-                if (parentIds.Count() > maxParentIdsPerRequest)
-                {
-                    var result = new List<AbstractItemData>();
-                    for (var i = 0; i < (float)parentIds.Count() / maxParentIdsPerRequest; i++)
-                    {
-                        int[] r = parentIds.Skip(i * maxParentIdsPerRequest).Take(maxParentIdsPerRequest).ToArray();
-                        result.AddRange(GetItems(siteId, isArchive, r, useRegion));
-                    }
-                    _logger.LogDebug($"getItems. count: {result.Count()}");
-                    return result;
-                }
-                else
-                {
-                    query = string.Format(query, "IN @ParentIds");
-                    if (!useRegion)
-                        return _connection.Query<AbstractItemData>(query, new { Archive = isArchive, ParentIds = parentIds }).ToList();
-                    var resultWithRegions = GetWithRegions(_connection, query, isArchive, parentIds);
-                    _logger.LogDebug($"getItems. count: {resultWithRegions.Count()}");
-                    return resultWithRegions;
-                }
-            }
-        }
-
-        public List<AbstractItemData> GetByIds(int siteId, bool isArchive, IEnumerable<int> itemIds)
-        {
-            _logger.LogDebug($"getByIds. siteId: {siteId}, isArchive: {isArchive}, itemIds: {SerializeData(itemIds)}");
-
-            if (itemIds == null || !itemIds.Any())
-                throw new ArgumentNullException("itemIds");
-            if (itemIds.Any(x => x <= 0))
-                throw new ArgumentException("itemId <= 0");
-
-            var query = _netNameQueryAnalyzer.PrepareQueryExtabtion(_metaInfoRepository, CmdGetAbstractItemByIds, siteId);
-            var result = _connection.Query<AbstractItemData>(query, new { Archive = isArchive, ItemIds = itemIds }).ToList();
-            _logger.LogDebug($"getByIds. count: {result.Count()}, result: {SerializeData(result)}");
-            return result;
-        }
-
-        public AbstractItemData GetRootPage(int siteId)
-        {
-            _logger.LogDebug($"getRootPage. siteId: {siteId}");
-            var query = _netNameQueryAnalyzer.PrepareQueryExtabtion(_metaInfoRepository, CmdGetRootPage, siteId);
-            var result = _connection.Query<AbstractItemData>(query).FirstOrDefault();
-            _logger.LogDebug($"getRootPage. result: {SerializeData(result)}");
-            return result;
-        }
-
-        private static List<AbstractItemData> GetWithRegions(IDbConnection connection, string query, bool isArchive, IEnumerable<int> parentIds = null)
-        {
-            using (var multi = connection.QueryMultiple(query, new { Archive = isArchive, ParentIds = parentIds }))
-            {
-                var abstractItems = multi.Read<AbstractItemData>().ToList();
-                var regions = multi.Read<RegionData>().ToList();
-                var links = multi.Read<LinkItem>()
+                var regions = _uow.Connection.Query<RegionData>(GetRegionsQuery(siteId, isArchive), transaction).ToList();
+                var regionLinkId = _uow.Connection.QueryFirst<int>(GetRegionLinkIdQuery(siteId), transaction);
+                var links = _uow.Connection.Query<LinkItem>(GetLinkItemIdQuery(regionLinkId), transaction)
+                    .ToList()
                     .GroupBy(k => k.ItemId)
-                    .ToDictionary(
-                        k => k.Key,
-                        v => v.Select(x => x.LinkedItemId).ToList());
+                    .ToDictionary(k => k.Key, v => v.Select(x => x.LinkedItemId).ToList());
 
-                foreach (var abstractItem in abstractItems)
+                foreach (var abstractItem in items)
                 {
                     if (links.TryGetValue(abstractItem.Id, out List<int> regionIds))
-                        abstractItem.RegionIds = regions.Where(x => regionIds.Contains(x.Id)).Select(x => x.Id).ToList();
+                        abstractItem.RegionIds =
+                            regions.Where(x => regionIds.Contains(x.Id)).Select(x => x.Id).ToList();
                     else
                         abstractItem.RegionIds = new List<int>();
                 }
-
-                return abstractItems;
             }
+
+            return items;
+        }
+
+        public List<AbstractItemData> GetItems(int siteId, 
+            bool isArchive, 
+            IEnumerable<int> parentIds, 
+            bool useRegion, 
+            IDbTransaction transaction = null)
+        {
+            _logger.LogDebug(
+                $"getItems. siteId: {siteId}, isArchive: {isArchive}, useRegion: {useRegion}, parentIds: {SerializeData(parentIds)}");
+
+            const int maxParentIdsPerRequest = 500;
+
+            List<AbstractItemData> items;
+            string query;
+            if (parentIds == null || !parentIds.Any())
+            {
+                query = GetAbstractItemsQuery(siteId, isArchive, "IS NULL");
+                items = _uow.Connection.Query<AbstractItemData>(query, transaction).ToList();
+                if (useRegion)
+                {
+                    AddRegionInfo(siteId, isArchive, items);
+                }
+
+                _logger.LogDebug($"getItems. count: {items.Count}");
+                return items;
+            }
+
+            if (parentIds.Count() > maxParentIdsPerRequest)
+            {
+                items = new List<AbstractItemData>();
+                for (var i = 0; i < (float) parentIds.Count() / maxParentIdsPerRequest; i++)
+                {
+                    int[] r = parentIds.Skip(i * maxParentIdsPerRequest).Take(maxParentIdsPerRequest).ToArray();
+                    items.AddRange(GetItems(siteId, isArchive, r, useRegion));
+                }
+
+                _logger.LogDebug($"getItems. count: {items.Count}");
+                return items;
+            }
+
+            var idList = SqlQuerySyntaxHelper.IdList(_uow.DatabaseType, "@ParentIds", "parentIds");
+            query = GetAbstractItemsQuery(siteId, isArchive, $"IN (SELECT Id FROM {idList})");
+
+            if (_uow.DatabaseType == DatabaseType.SqlServer)
+            {
+                items = _uow.Connection.Query<AbstractItemData>(query,
+                        new {ParentIds = SqlQuerySyntaxHelper.IdsToDataTable(parentIds).AsTableValuedParameter("Ids")},
+                        transaction)
+                    .ToList();
+            }
+            else
+            {
+                items = _uow.Connection.Query<AbstractItemData>(query, new {ParentIds = parentIds}, transaction).ToList();
+            }
+
+            if (useRegion)
+            {
+                AddRegionInfo(siteId, isArchive, items);
+            }
+
+            return items;
+        }
+
+        private void AddRegionInfo(int siteId, bool isArchive, List<AbstractItemData> items, IDbTransaction transaction = null)
+        {
+            var regions = _uow.Connection.Query<RegionData>(GetRegionsQuery(siteId, isArchive), transaction).ToList();
+            var regionLinkId = _uow.Connection.QueryFirst<int>(GetRegionLinkIdQuery(siteId), transaction);
+            var links = _uow.Connection.Query<LinkItem>(GetLinkItemIdQuery(regionLinkId), transaction)
+                .ToList()
+                .GroupBy(k => k.ItemId)
+                .ToDictionary(k => k.Key, v => v.Select(x => x.LinkedItemId).ToList());
+
+            foreach (var abstractItem in items)
+            {
+                abstractItem.RegionIds = links.TryGetValue(abstractItem.Id, out List<int> regionIds)
+                    ? regions.Where(x => regionIds.Contains(x.Id)).Select(x => x.Id).ToList()
+                    : Enumerable.Empty<int>().ToList();
+            }
+        }
+
+        public List<AbstractItemData> GetByIds(int siteId, bool isArchive, IEnumerable<int> itemIds, IDbTransaction transaction = null)
+        {
+            _logger.LogDebug($"getByIds. siteId: {siteId}, isArchive: {isArchive}, itemIds: {SerializeData(itemIds)}");
+
+            if (itemIds == null || !itemIds.Any()) throw new ArgumentNullException("itemIds");
+            if (itemIds.Any(x => x <= 0)) throw new ArgumentException("itemId <= 0");
+
+            var idList = SqlQuerySyntaxHelper.IdList(_uow.DatabaseType, "@ItemIds", "itemIds");
+            var query = GetCmdGetAbstractItemByIds(siteId, isArchive, idList);
+
+            List<AbstractItemData> result;
+            
+            if (_uow.DatabaseType == DatabaseType.SqlServer)
+            {
+                result = _uow.Connection.Query<AbstractItemData>(query,
+                        new {ItemIds = SqlQuerySyntaxHelper.IdsToDataTable(itemIds).AsTableValuedParameter("Ids")},
+                        transaction)
+                    .ToList();
+            }
+            else
+            {
+                result = _uow.Connection.Query<AbstractItemData>(query, new {ItemIds = itemIds}, transaction).ToList();
+            }
+            
+            _logger.LogDebug($"getByIds. count: {result.Count}, result: {SerializeData(result)}");
+            return result;
+        }
+
+        public AbstractItemData GetRootPage(int siteId, IDbTransaction transaction = null)
+        {
+            _logger.LogDebug($"getRootPage. siteId: {siteId}");
+            var query = _netNameQueryAnalyzer.PrepareQuery(CmdGetRootPage, siteId, false, true);
+            var result = _uow.Connection.Query<AbstractItemData>(query, transaction).FirstOrDefault();
+            _logger.LogDebug($"getRootPage. result: {SerializeData(result)}");
+            return result;
         }
 
         private static string SerializeData(object data) => Newtonsoft.Json.JsonConvert.SerializeObject(data);

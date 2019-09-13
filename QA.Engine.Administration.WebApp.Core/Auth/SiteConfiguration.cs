@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Quantumart.QPublishing.Database;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using QP.ConfigurationService.Models;
+using ConnectionInfo = QA.Engine.Administration.WebApp.Core.Business.Models.ConnectionInfo;
 
 namespace QA.Engine.Administration.WebApp.Core.Auth
 {
@@ -12,8 +11,6 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
         public string Name { get; set; }
 
         public string ConnectionName { get; set; }
-        public string ConnectionString { get; set; }
-
         public string SiteDescription { get; set; }
 
         public int SiteId { get; set; }
@@ -57,27 +54,17 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
 
         public static SiteConfiguration Set(HttpContext httpContext, string customerCode, int siteId, bool useFake)
         {
-            var connectionString = GetConnectionString(customerCode, useFake);
             //var useHierarchyRegionsFilter = _qpSettingsService.GetSetting(connectionString, "USE_HIERARCHY_REGIONS_FILTER");
             var config = new SiteConfiguration
             {
-                // UseHierarchyRegionsFilter = useHierarchyRegionsFilter != null && useHierarchyRegionsFilter.ToLower() == "true",
-                ConnectionString = connectionString,
                 SiteId = siteId,
                 PublishStatusImageUrl = "/Content/icons/pub.png",
-                CreatedStatusImageUrl = "/Content/icons/new.jpg",
+                CreatedStatusImageUrl = "/Content/icons/new.jpg"
             };
 
             httpContext.Items[StorageKey] = config;
 
             return config;
-        }
-
-        private static string GetConnectionString(string customerCode, bool useFake)
-        {
-            if (useFake)
-                return string.Empty;
-            return DBConnector.GetConnectionString(customerCode);
         }
     }
 }

@@ -2,7 +2,9 @@
 using Quantumart.QPublishing.Info;
 using System;
 using System.Data;
+using System.Data.Common;
 using System.Data.SqlClient;
+using QP.ConfigurationService.Models;
 
 namespace QA.Engine.Administration.Data.Core.Qp
 {
@@ -22,13 +24,10 @@ namespace QA.Engine.Administration.Data.Core.Qp
         /// <summary>
         /// Конструирует объект
         /// </summary>
-        /// <param name="connectionString">Название подключения</param>
-        public QpDbConnector(string connectionString)
+        /// <param name="connection">Подключение</param>
+        public QpDbConnector(IDbConnection connection)
         {
-            if (string.IsNullOrEmpty(connectionString))
-                throw new ArgumentNullException("connectionString");
-
-            _connection = new SqlConnection(connectionString);
+            _connection = connection ?? throw new ArgumentNullException(nameof(connection));
             DbConnector = new DBConnector(_connection);
         }
 
@@ -48,20 +47,9 @@ namespace QA.Engine.Administration.Data.Core.Qp
         /// </summary>
         /// <param name="command">Команда к БД</param>
         /// <returns></returns>
-        public DataTable GetRealData(SqlCommand command)
+        public DataTable GetRealData(DbCommand command)
         {
             return DbConnector.GetRealData(command);
-        }
-
-        /// <summary>
-        /// Строка подключения
-        /// </summary>
-        public string InstanceConnectionString
-        {
-            get
-            {
-                return DbConnector.InstanceConnectionString;
-            }
         }
 
         /// <summary>
@@ -104,8 +92,13 @@ namespace QA.Engine.Administration.Data.Core.Qp
         {
             return DbConnector.GetContentItemLinkIDs(fieldName, values);
         }
+        
+        public DbCommand CreateCommand(string text)
+        {
+            return DbConnector.CreateDbCommand(text);
+        }
 
-        public void BeginTransaction(IsolationLevel isolationLevel)
+        public IDbTransaction BeginTransaction(IsolationLevel isolationLevel)
         {
             if (_transaction != null)
                 _transaction.Rollback();
@@ -113,6 +106,7 @@ namespace QA.Engine.Administration.Data.Core.Qp
                 _connection.Open();
             _transaction = _connection.BeginTransaction(isolationLevel);
             DbConnector.ExternalTransaction = _transaction;
+            return _transaction;
         }
 
         public void CommitTransaction()

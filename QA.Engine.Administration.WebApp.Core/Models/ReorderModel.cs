@@ -1,4 +1,4 @@
-using QA.Engin.Administration.Common.Core;
+using QA.Engine.Administration.Common.Core;
 
 namespace QA.Engine.Administration.WebApp.Core.Models
 {
