@@ -6,9 +6,9 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
-    <PackageReference Include="QA.DotNetCore.Engine.Persistent.Dapper" Version="0.5.5-beta" />
-    <PackageReference Include="QA.DotNetCore.Engine.Persistent.Interfaces" Version="0.5.5-beta" />
-    <PackageReference Include="QA.DotNetCore.Engine.QpData" Version="0.5.5-beta" />
+    <PackageReference Include="QA.DotNetCore.Engine.Persistent.Dapper" Version="1.0.0" />
+    <PackageReference Include="QA.DotNetCore.Engine.Persistent.Interfaces" Version="1.0.0" />
+    <PackageReference Include="QA.DotNetCore.Engine.QpData" Version="1.0.0" />
     <PackageReference Include="Quantumart.AspNetCore" Version="4.0.0-beta37" />
   </ItemGroup>
 
