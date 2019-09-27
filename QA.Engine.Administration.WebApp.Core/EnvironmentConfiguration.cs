@@ -2,8 +2,6 @@ namespace QA.Engine.Administration.WebApp.Core
 {
     public class EnvironmentConfiguration
     {
-        public string ServiceName { get; set; }
-        public string ServiceVersion { get; set; }
         public string CustomerCodeParamName { get; set; }
         public string SiteIdParamName { get; set; }
         public string BackendSidParamName { get; set; }
