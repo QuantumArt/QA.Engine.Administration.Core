@@ -9,7 +9,7 @@ RUN apt-get update && \
     wget -qO- https://deb.nodesource.com/setup_8.x | bash - && \
     apt-get install -y build-essential nodejs
 
-COPY nuget.config .
+COPY .nuget .
 COPY ["QA.Engine.Administration.WebApp.Core/QA.Engine.Administration.WebApp.Core.csproj", "QA.Engine.Administration.WebApp.Core/"]
 COPY ["QA.Engine.Administration.Data.Core/QA.Engine.Administration.Data.Core.csproj", "QA.Engine.Administration.Data.Core/"]
 COPY ["QA.Engine.Administration.Data.Interfaces.Core/QA.Engine.Administration.Data.Interfaces.Core.csproj", "QA.Engine.Administration.Data.Interfaces.Core/"]
