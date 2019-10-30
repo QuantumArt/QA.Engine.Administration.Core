@@ -177,15 +177,14 @@ ORDER BY ai.content_item_id";
         private string GetRegionLinkIdQuery(int siteId)
         {
             string query =
-                $@"CAST((SELECT {SqlQuerySyntaxHelper.Top(_uow.DatabaseType, "1")} |QPAbstractItem.Regions| FROM |QPAbstractItem| WHERE |QPAbstractItem.Regions|
-                {SqlQuerySyntaxHelper.Limit(_uow.DatabaseType, "1")}
-                IS NOT NULL) AS VARCHAR(4))";
+                $@"SELECT {SqlQuerySyntaxHelper.Top(_uow.DatabaseType, "1")} |QPAbstractItem.Regions| FROM |QPAbstractItem| WHERE |QPAbstractItem.Regions|
+                IS NOT NULL {SqlQuerySyntaxHelper.Limit(_uow.DatabaseType, "1")}";
             return _netNameQueryAnalyzer.PrepareQuery(query, siteId, false, true);
         }
 
         private string GetLinkItemIdQuery(int linkId)
         {
-            return $@"SELECT item_id AS ItemId, linked_item_id AS LinkedItemId FROM link_' + {linkId} + '_united";
+            return $@"SELECT item_id AS ItemId, linked_item_id AS LinkedItemId FROM link_{linkId}_united";
         }
 
         #endregion
