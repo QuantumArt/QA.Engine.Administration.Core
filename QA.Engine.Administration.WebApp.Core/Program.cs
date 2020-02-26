@@ -1,16 +1,8 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using QA.Engine.Administration.Logger.Core;
-using QA.Engine.Administration.Logger.Core.Models;
+using NLog.Web;
 
 namespace QA.Engine.Administration.WebApp.Core
 {
@@ -18,18 +10,37 @@ namespace QA.Engine.Administration.WebApp.Core
     {
         public static void Main(string[] args)
         {
-            CreateWebHostBuilder(args).Build().Run();
+            var logger = NLog.LogManager.LoadConfiguration("NLogClient.config").GetCurrentClassLogger();
+            try
+            {
+                CreateWebHostBuilder(args).Build().Run();
+            }
+            catch (Exception exception)
+            {
+                logger.Error(exception, "Stopped program because of exception");
+                throw;
+            }
+            finally
+            {
+                NLog.LogManager.Shutdown();
+            }
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>()
-                .AddJsonLogger(new LoggerConfig
+                .ConfigureLogging((hostingContext, logging) =>
                 {
-                    LogFields = new[] {
-                            new JsonField("ip", "${aspnet-request-ip}")
-                        }
+                    logging.ClearProviders();
+                    logging.SetMinimumLevel(LogLevel.Trace);
+                    logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
+                    if (hostingContext.HostingEnvironment.IsDevelopment())
+                    {
+                        logging.AddConsole();
+                        logging.AddDebug();
+                    }
                 })
+                .UseNLog()
+                .UseStartup<Startup>()
                 .SuppressStatusMessages(true);
     }
 }

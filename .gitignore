@@ -253,3 +253,5 @@ npm-debug.log.*
 
 # Client
 */wwwroot/*
+
+**/appsettings.*.json
