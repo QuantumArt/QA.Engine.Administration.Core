@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
+using NLog;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using QA.Engine.Administration.WebApp.Core.Models;
@@ -13,12 +13,14 @@ namespace QA.Engine.Administration.WebApp.Core
     {
         private readonly RequestDelegate _next;
 
+        private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
+
         public ExceptionHandler(RequestDelegate next)
         {
             _next = next;
         }
 
-        public async Task Invoke(HttpContext context, ILogger<ExceptionHandler> logger)
+        public async Task Invoke(HttpContext context)
         {
             try
             {
@@ -26,7 +28,7 @@ namespace QA.Engine.Administration.WebApp.Core
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Exception occurred.");
+                Logger.Error(ex, "Exception occurred.");
                 await HandleExceptionAsync(context, ex);
             }
         }

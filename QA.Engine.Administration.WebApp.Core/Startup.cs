@@ -18,6 +18,7 @@ using QA.Engine.Administration.Data.Core.Qp;
 using Swashbuckle.AspNetCore.Swagger;
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.Extensions.Logging;
 using Npgsql;
 using QA.Engine.Administration.Common.Core;
 using QP.ConfigurationService.Models;
@@ -127,7 +128,7 @@ namespace QA.Engine.Administration.WebApp.Core
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory factory)
         {
             //app.UseHsts();
             app.UseMiddleware<ExceptionHandler>();
@@ -169,6 +170,17 @@ namespace QA.Engine.Administration.WebApp.Core
                 SupportedCultures = supportedCultures,
                 SupportedUICultures = supportedCultures
             });
+
+            LogStart(app, factory);
         }
+
+        private void LogStart(IApplicationBuilder app, ILoggerFactory loggerFactory)
+        {
+            var config = app.ApplicationServices.GetRequiredService<IConfiguration>();
+            var name = config["ServiceName"];
+            var logger = loggerFactory.CreateLogger(GetType());
+            logger.LogInformation("{appName} started", name);
+        }
+
     }
 }

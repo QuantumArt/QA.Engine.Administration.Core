@@ -46,6 +46,7 @@ namespace QA.Engine.Administration.Data.Core.Qp
                 (byte)0,
                 QpContentItemStatus.Published.GetDescription(),
                 (byte)0, (byte)0, false, 0.0, false, false);
+            _query.GetCount = false;
 
             _includes = new List<string>();
         }
@@ -311,10 +312,9 @@ namespace QA.Engine.Administration.Data.Core.Qp
         {
             ValidateQuery();
 
-            long totalRecords = 0;
             var result = new QpContentResult
             {
-                PrimaryContent = _dbConnection.GetContentData(_query, out totalRecords),
+                PrimaryContent = _dbConnection.GetContentData(_query, out _),
                 Query = _query,
                 DbConnection = _dbConnection
             };
@@ -428,8 +428,6 @@ namespace QA.Engine.Administration.Data.Core.Qp
 
                     if (!string.IsNullOrEmpty(values))
                     {
-                        long total = 0;
-
                         var query = new ContentDataQueryObject(
                             _dbConnection.DbConnector, _query.SiteName, contentName, "*",
                             string.Format(ContentItemIdFieldName + " in ({0})", values), null,
@@ -438,7 +436,7 @@ namespace QA.Engine.Administration.Data.Core.Qp
                             QpContentItemStatus.Published.GetDescription(),
                             (byte)0, (byte)0, false, 0.0, false, false);
 
-                        var contentData = _dbConnection.GetContentData(query, out total);
+                        var contentData = _dbConnection.GetContentData(query, out _);
                         var existsContentData = result.GetContent(contentName);
 
                         if (existsContentData != null)
@@ -477,9 +475,9 @@ namespace QA.Engine.Administration.Data.Core.Qp
             ValidateQuery();
 
             var values = new List<Dictionary<string, string>>();
-            var dataTable = _dbConnection.GetContentData(_query, out var totalRecords);
+            var dataTable = _dbConnection.GetContentData(_query, out _);
 
-            _logger.LogTrace($"archive. get content data. totalRecords: {totalRecords}, data rows: {SerializeData(dataTable.Rows)}");
+            _logger.LogTrace($"archive. get content data. data rows: {SerializeData(dataTable.Rows)}");
 
             foreach (DataRow row in dataTable.Rows)
             {
