@@ -154,7 +154,7 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
         data.forEach((x) => {
             const path: string[] = [];
             path.push(`[${x.zoneName ? x.zoneName : ''}]`, x.title);
-            let zoneEl = zones.find(z => z.label === x.zoneName);
+            let zoneEl = zones.find(z => z.title === x.zoneName);
             if (!zoneEl) {
                 zoneEl = this.mapWidgetZoneElement(x, null, -x.id);
                 this.nodesMap.set(zoneEl.id, { original: x, mapped: zoneEl });
@@ -178,7 +178,7 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
         el.children.forEach((x) => {
             const internalPath = Object.assign([], path);
             internalPath.push(`[${x.zoneName ? x.zoneName : ''}]`);
-            let zoneEl = zones.find(z => z.label === x.zoneName);
+            let zoneEl = zones.find(z => z.title === x.zoneName);
             if (!zoneEl) {
                 zoneEl = this.mapWidgetZoneElement(x, parent.id, -x.id);
                 this.nodesMap.set(zoneEl.id, { original: x, mapped: zoneEl });
