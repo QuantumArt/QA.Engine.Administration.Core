@@ -115,11 +115,19 @@ namespace QA.Engine.Administration.WebApp.Core
 
             services.AddDistributedMemoryCache();
 
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                options.Secure = CookieSecurePolicy.SameAsRequest;
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+            });
+
             services.AddSession(options =>
             {
                 // Set a short timeout for easy testing.
                 options.IdleTimeout = TimeSpan.FromMinutes(20);
                 options.Cookie.SameSite = SameSiteMode.None;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+                options.Cookie.IsEssential = true;
             });
 
             services.AddAuthorization();
