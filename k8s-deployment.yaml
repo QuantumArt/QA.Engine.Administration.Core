@@ -1,8 +1,8 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: wp-admin-deployment
-  namespace: widget-platform-ns
+  name: wp-admin
+  namespace: widget-platform
 spec:
   replicas: 1
   selector:
@@ -43,8 +43,8 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: wp-admin-service
-  namespace: widget-platform-ns
+  name: wp-admin
+  namespace: widget-platform
 spec:
   ports:
   - port: 80
