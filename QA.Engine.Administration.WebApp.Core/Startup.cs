@@ -117,7 +117,7 @@ namespace QA.Engine.Administration.WebApp.Core
 
             services.Configure<CookiePolicyOptions>(options =>
             {
-                options.Secure = CookieSecurePolicy.Always;
+                options.Secure = CookieSecurePolicy.SameAsRequest;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
@@ -126,7 +126,7 @@ namespace QA.Engine.Administration.WebApp.Core
                 // Set a short timeout for easy testing.
                 options.IdleTimeout = TimeSpan.FromMinutes(20);
                 options.Cookie.SameSite = SameSiteMode.None;
-                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
                 options.Cookie.IsEssential = true;
             });
 
