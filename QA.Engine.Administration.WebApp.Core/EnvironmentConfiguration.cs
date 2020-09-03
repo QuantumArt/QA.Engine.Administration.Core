@@ -3,6 +3,8 @@ namespace QA.Engine.Administration.WebApp.Core
     public class EnvironmentConfiguration
     {
         public string CustomerCodeParamName { get; set; }
+
+        public bool UseSameSiteNone { get; set; }
         public string SiteIdParamName { get; set; }
         public string BackendSidParamName { get; set; }
         public string HostIdParamName { get; set; }
