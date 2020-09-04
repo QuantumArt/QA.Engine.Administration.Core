@@ -24,9 +24,7 @@ export default class ContentVersionTreeMenu extends React.Component<Props> {
 
     private previewClick = async () => {
         const { qpIntegrationStore, itemId, treeStore } = this.props;
-        const tree = treeStore.getSiteTreeStore();
-        const root = await tree.getRootElement();
-        qpIntegrationStore.preview(itemId, root.alias.trim());
+        qpIntegrationStore.preview(itemId, '');
     }
 
     private editClick = () => {

@@ -27,7 +27,7 @@ export default class SiteTreeMenu extends React.Component<Props> {
         const { qpIntegrationStore, itemId, treeStore } = this.props;
         const tree = treeStore.getSiteTreeStore();
         const root = await tree.getRootElement();
-        qpIntegrationStore.preview(itemId, root.alias.trim());
+        qpIntegrationStore.preview(itemId, '');
     }
 
     private editClick = () => {
