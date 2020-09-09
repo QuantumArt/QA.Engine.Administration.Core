@@ -149,7 +149,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpGet("getCustomAction")]
         public ApiResult<CustomActionModel> GetCustomAction(string alias)
         {
-            alias = string.IsNullOrWhiteSpace(alias) ? _customActionConfig?.Alias : $"{_customActionConfig?.Alias}_{alias}";
+            alias = !string.IsNullOrWhiteSpace(alias) ? alias : _customActionConfig?.Alias;
             _logger.LogTrace($"getCustomActionCode alias={alias}, userId={_userId}");
             var customAction = _customActionService.GetCustomAction(alias);
             if (customAction == null)

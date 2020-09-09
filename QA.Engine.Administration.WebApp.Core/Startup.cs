@@ -19,6 +19,7 @@ using Swashbuckle.AspNetCore.Swagger;
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
 using Npgsql;
 using QA.Engine.Administration.Common.Core;
 using QP.ConfigurationService.Models;
@@ -43,18 +44,18 @@ namespace QA.Engine.Administration.WebApp.Core
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<EnvironmentConfiguration>(Configuration);
+            var config = Configuration.Get<EnvironmentConfiguration>();
 
             services
                 .AddMvc(opt => { opt.Filters.Add(typeof(QpAutorizationFilter)); })
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
-                .AddJsonOptions(o =>
+                .AddNewtonsoftJson(o =>
                 {
                     o.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
                 });
 
             services.AddSwaggerGen(o =>
             {
-                o.SwaggerDoc(SWAGGER_VERSION, new Info
+                o.SwaggerDoc(SWAGGER_VERSION, new OpenApiInfo()
                 {
                     Title = SWAGGER_TITLE,
                     Version = SWAGGER_VERSION
@@ -73,7 +74,6 @@ namespace QA.Engine.Administration.WebApp.Core
 
             services.AddScoped<INetNameQueryAnalyzer, NetNameQueryAnalyzer>();
             services.AddScoped<IUnitOfWork, UnitOfWork>(sp => {
-                var config = Configuration.Get<EnvironmentConfiguration>();
                 if (config.UseFake)
                 {
                     return new UnitOfWork(Configuration.GetConnectionString("QpConnection"),
@@ -118,14 +118,14 @@ namespace QA.Engine.Administration.WebApp.Core
             services.Configure<CookiePolicyOptions>(options =>
             {
                 options.Secure = CookieSecurePolicy.SameAsRequest;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
+                options.MinimumSameSitePolicy = config.UseSameSiteNone ? SameSiteMode.None : SameSiteMode.Lax;
             });
 
             services.AddSession(options =>
             {
                 // Set a short timeout for easy testing.
                 options.IdleTimeout = TimeSpan.FromMinutes(20);
-                options.Cookie.SameSite = SameSiteMode.None;
+                options.Cookie.SameSite = config.UseSameSiteNone ? SameSiteMode.None : SameSiteMode.Lax;
                 options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
                 options.Cookie.IsEssential = true;
             });
@@ -133,15 +133,24 @@ namespace QA.Engine.Administration.WebApp.Core
             services.AddAuthorization();
 
             services.AddLocalization(x => x.ResourcesPath = "Resources");
+
+
+            services.AddSpaStaticFiles(configuration =>
+            {
+                configuration.RootPath = "wwwroot/dist";
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory factory)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory factory)
         {
+            if (env == null) throw new ArgumentNullException(nameof(env));
             //app.UseHsts();
             app.UseMiddleware<ExceptionHandler>();
 
             app.UseStaticFiles();
+
+            app.UseRouting();
 
             app.UseSession();
             //app.UseAuthentication();
@@ -152,16 +161,15 @@ namespace QA.Engine.Administration.WebApp.Core
                 o.SwaggerEndpoint("/swagger/v1/swagger.json", $"{SWAGGER_TITLE} {SWAGGER_VERSION}");
             });
 
-            app.UseMvc(routes =>
+            app.UseEndpoints(endpoints  =>
             {
-                routes.MapRoute(
+                endpoints.MapControllerRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
-                routes.MapSpaFallbackRoute(
-                   name: "spa-fallback",
-                   defaults: new { controller = "Home", action = "Index" });
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapFallbackToController("Index", "Home");
             });
 
+            app.UseSpaStaticFiles();
             app.UseSpa(spa =>
             {
                 spa.Options.SourcePath = "ClientApp";
