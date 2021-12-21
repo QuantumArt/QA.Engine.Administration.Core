@@ -26,19 +26,20 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
         public void OnAuthorization(AuthorizationFilterContext context)
         {
             var httpContext = context.HttpContext;
+            var isAuthorized = false;
 
-            if (string.IsNullOrWhiteSpace(_webAppQpHelper.CustomerCode))
-                throw new Exception("Customer code should not be empty");
+            if (!string.IsNullOrWhiteSpace(_webAppQpHelper.CustomerCode))
+            {
+                SiteConfiguration.Set(httpContext, _webAppQpHelper.CustomerCode, _webAppQpHelper.SiteId, _configuration.UseFake);
 
-            SiteConfiguration.Set(httpContext, _webAppQpHelper.CustomerCode, _webAppQpHelper.SiteId, _configuration.UseFake);
+                isAuthorized = _securityChecker.CheckAuthorization();
 
-            var isAuthorize = _securityChecker.CheckAuthorization();
+                var ci = new CultureInfo(httpContext.Session.GetString(QPSecurityChecker.UserLanguageKey) ?? QpLanguage.Default.GetDescription());
+                Thread.CurrentThread.CurrentCulture = ci;
+                Thread.CurrentThread.CurrentUICulture = ci;
+            }
 
-            var ci = new CultureInfo(httpContext.Session.GetString(QPSecurityChecker.UserLanguageKey) ?? QpLanguage.Default.GetDescription());
-            Thread.CurrentThread.CurrentCulture = ci;
-            Thread.CurrentThread.CurrentUICulture = ci;
-
-            if (!isAuthorize)
+            if (!isAuthorized)
                 context.Result = new UnauthorizedObjectResult(ApiResult.Fail(new Exception("Unauthorized")));
         }
 

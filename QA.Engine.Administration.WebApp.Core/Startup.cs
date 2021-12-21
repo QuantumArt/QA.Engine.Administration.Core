@@ -82,8 +82,16 @@ namespace QA.Engine.Administration.WebApp.Core
                 var qpHelper = sp.GetService<IWebAppQpHelper>();
                 DBConnector.ConfigServiceUrl = config.ConfigurationServiceUrl;
                 DBConnector.ConfigServiceToken = config.ConfigurationServiceToken;
-                CustomerConfiguration dbConfig = DBConnector.GetCustomerConfiguration(qpHelper.CustomerCode).Result;
-                return new UnitOfWork(dbConfig.ConnectionString, dbConfig.DbType.ToString());
+                try
+                {
+                    CustomerConfiguration dbConfig = DBConnector.GetCustomerConfiguration(qpHelper.CustomerCode).Result;
+                    return new UnitOfWork(dbConfig.ConnectionString, dbConfig.DbType.ToString());
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+
             });
 
             services.AddScoped<IAbstractItemRepository, AbstractItemRepository>();
@@ -153,7 +161,6 @@ namespace QA.Engine.Administration.WebApp.Core
             app.UseRouting();
 
             app.UseSession();
-            //app.UseAuthentication();
 
             app.UseSwagger();
             app.UseSwaggerUI(o =>
