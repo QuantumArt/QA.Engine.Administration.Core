@@ -6,16 +6,13 @@ using Quantumart.QPublishing.Database;
 using Quantumart.QPublishing.OnScreen;
 using System;
 using System.Data;
-using System.Security.Claims;
 using QA.DotNetCore.Engine.Persistent.Interfaces;
-using QP.ConfigurationService.Models;
-using DatabaseType = QP.ConfigurationService.Models.DatabaseType;
 
 namespace QA.Engine.Administration.WebApp.Core.Auth
 {
     public class QPSecurityChecker
     {
-        protected static readonly string AuthenticationKey = "QP_Beeline_AuthenticationKey";
+        protected static readonly string AuthenticationKey = "QP_ManagePages_AuthenticationKey";
         protected static readonly string UserLanguageFieldName = "LANGUAGE_ID";
         public static readonly string UserLanguageKey = "QP_User_Language";
 
