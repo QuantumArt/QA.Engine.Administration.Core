@@ -28,6 +28,7 @@
   <ItemGroup>
     <Content Update="wwwroot\dist\*.html">
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 

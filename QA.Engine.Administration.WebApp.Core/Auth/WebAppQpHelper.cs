@@ -5,7 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using QA.Engine.Administration.WebApp.Core.Business.Models;
+using QP.ConfigurationService.Models;
 using ConnectionInfo = QA.Engine.Administration.WebApp.Core.Business.Models.ConnectionInfo;
 
 namespace QA.Engine.Administration.WebApp.Core.Auth
@@ -16,10 +19,9 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
         /// Id бэкенда
         /// </summary>
         string BackendSid { get; }
-        /// <summary>
-        /// Код поставщика
-        /// </summary>
-        string CustomerCode { get; }
+
+        CustomerConfiguration GetCurrentCustomerConfiguration();
+
         /// <summary>
         /// Id хоста
         /// </summary>
@@ -40,18 +42,30 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
         /// Id пользователя
         /// </summary>
         int UserId { get; }
+        string CustomerCode { get; }
     }
 
     public class WebAppQpHelper : IWebAppQpHelper
     {
-        HttpContext _httpContext;
-        QpHelper _qpHelper;
-        Lazy<SerializableQpViewModelBase> _serializableQpViewModelBaseLazy;
+        private HttpContext _httpContext;
+        private QpHelper _qpHelper;
+        private Lazy<SerializableQpViewModelBase> _serializableQpViewModelBaseLazy;
+        private EnvironmentConfiguration _config;
+        private ILogger<WebAppQpHelper> _logger;
 
-        public WebAppQpHelper(IHttpContextAccessor httpContextAccessor, QpHelper qpHelper)
+        private const string SiteIdKey = "SiteId";
+
+
+        public WebAppQpHelper(IHttpContextAccessor httpContextAccessor, QpHelper qpHelper, IOptions<EnvironmentConfiguration> options, ILogger<WebAppQpHelper> logger)
         {
+
+
+
+
             _httpContext = httpContextAccessor.HttpContext;
             _qpHelper = qpHelper;
+            _config = options.Value;
+            _logger = logger;
             _serializableQpViewModelBaseLazy = new Lazy<SerializableQpViewModelBase>(() =>
             {
                 var httpContext = _httpContext;
@@ -74,6 +88,28 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
             });
         }
 
+        public CustomerConfiguration GetCurrentCustomerConfiguration()
+        {
+            CustomerConfiguration result = null;
+
+            if (!string.IsNullOrEmpty(CustomerCode))
+            {
+                DBConnector.ConfigServiceUrl = Config.ConfigurationServiceUrl;
+                DBConnector.ConfigServiceToken = Config.ConfigurationServiceToken;
+                try
+                {
+                    result = DBConnector.GetCustomerConfiguration(CustomerCode).Result;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Error while receiving customer codes");
+                }
+            }
+
+            return result;
+        }
+
+
         public bool IsQpMode => _qpHelper.IsQpMode;
 
         public string HostId
@@ -93,6 +129,8 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
                 return obj != null ? obj.CustomerCode : _qpHelper.CustomerCode;
             }
         }
+
+        public EnvironmentConfiguration Config => _config;
 
         public string BackendSid
         {
@@ -116,15 +154,16 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
         {
             get
             {
-                var siteConfiguration = SiteConfiguration.Get(_httpContext);
-                if (siteConfiguration != null)
-                    return siteConfiguration.SiteId;
-
+                var idObj = _httpContext.Session.GetInt32(SiteIdKey);
+                if (idObj != null)
+                {
+                    return idObj.Value;
+                }
                 var obj = _serializableQpViewModelBaseLazy.Value;
                 var siteId = obj != null ? obj.SiteId : _qpHelper.SiteId;
                 if (!int.TryParse(siteId, out int result))
                     throw new Exception("Site Id should not be empty");
-
+                _httpContext.Session.SetInt32(SiteIdKey, result);
                 return result;
             }
         }

@@ -33,12 +33,15 @@ namespace QA.Engine.Administration.WebApp.Core
         const string SWAGGER_VERSION = "v1";
         const string SWAGGER_TITLE = "Administration Web App";
 
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, ILoggerFactory factory)
         {
             Configuration = configuration;
+            LoggerFactory = factory;
         }
 
         public IConfiguration Configuration { get; }
+
+        public ILoggerFactory LoggerFactory { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -47,7 +50,7 @@ namespace QA.Engine.Administration.WebApp.Core
             var config = Configuration.Get<EnvironmentConfiguration>();
 
             services
-                .AddMvc(opt => { opt.Filters.Add(typeof(QpAutorizationFilter)); })
+                .AddMvc()
                 .AddNewtonsoftJson(o =>
                 {
                     o.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
@@ -74,24 +77,13 @@ namespace QA.Engine.Administration.WebApp.Core
 
             services.AddScoped<INetNameQueryAnalyzer, NetNameQueryAnalyzer>();
             services.AddScoped<IUnitOfWork, UnitOfWork>(sp => {
-                if (config.UseFake)
+                if (config.UseFake && config.FakeData != null)
                 {
-                    return new UnitOfWork(Configuration.GetConnectionString("QpConnection"),
-                        config.DatabaseType);
+                    return new UnitOfWork(config.FakeData.ConnectionString, config.FakeData.DatabaseType);
                 }
                 var qpHelper = sp.GetService<IWebAppQpHelper>();
-                DBConnector.ConfigServiceUrl = config.ConfigurationServiceUrl;
-                DBConnector.ConfigServiceToken = config.ConfigurationServiceToken;
-                try
-                {
-                    CustomerConfiguration dbConfig = DBConnector.GetCustomerConfiguration(qpHelper.CustomerCode).Result;
-                    return new UnitOfWork(dbConfig.ConnectionString, dbConfig.DbType.ToString());
-                }
-                catch (Exception)
-                {
-                    return null;
-                }
-
+                var dbConfig = qpHelper.GetCurrentCustomerConfiguration();
+                return dbConfig != null ? new UnitOfWork(dbConfig.ConnectionString, dbConfig.DbType.ToString()) : null;
             });
 
             services.AddScoped<IAbstractItemRepository, AbstractItemRepository>();
@@ -138,35 +130,28 @@ namespace QA.Engine.Administration.WebApp.Core
                 options.Cookie.IsEssential = true;
             });
 
-            services.AddAuthorization();
-
             services.AddLocalization(x => x.ResourcesPath = "Resources");
-
-
-            services.AddSpaStaticFiles(configuration =>
-            {
-                configuration.RootPath = "wwwroot/dist";
-            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory factory)
         {
             if (env == null) throw new ArgumentNullException(nameof(env));
-            //app.UseHsts();
             app.UseMiddleware<ExceptionHandler>();
-
-            app.UseStaticFiles();
 
             app.UseRouting();
 
             app.UseSession();
+
+            app.UseMiddleware<QpAuthorizationMiddleware>();
 
             app.UseSwagger();
             app.UseSwaggerUI(o =>
             {
                 o.SwaggerEndpoint("/swagger/v1/swagger.json", $"{SWAGGER_TITLE} {SWAGGER_VERSION}");
             });
+
+            app.UseStaticFiles();
 
             app.UseEndpoints(endpoints  =>
             {
@@ -176,23 +161,15 @@ namespace QA.Engine.Administration.WebApp.Core
                 endpoints.MapFallbackToController("Index", "Home");
             });
 
-            app.UseSpaStaticFiles();
-            app.UseSpa(spa =>
+            app.Use( async (context, next) =>
             {
-                spa.Options.SourcePath = "ClientApp";
+                var ci = new CultureInfo(context.Session.GetString(QPSecurityChecker.UserLanguageKey) ??
+                                         QpLanguage.Default.GetDescription());
+                CultureInfo.CurrentCulture = ci;
+                CultureInfo.CurrentUICulture = ci;
+                await next.Invoke();
             });
 
-            var supportedCultures = new[]
-            {
-                new CultureInfo(QpLanguage.Russian.GetDescription()),
-                new CultureInfo(QpLanguage.English.GetDescription())
-            };
-            app.UseRequestLocalization(new RequestLocalizationOptions
-            {
-                DefaultRequestCulture = new RequestCulture(QpLanguage.Default.GetDescription()),
-                SupportedCultures = supportedCultures,
-                SupportedUICultures = supportedCultures
-            });
 
             LogStart(app, factory);
         }
