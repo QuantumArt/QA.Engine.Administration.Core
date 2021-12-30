@@ -14,10 +14,11 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
 {
     public class QPSecurityChecker
     {
-        protected static readonly string AuthenticationKey = "QP_ManagePages_AuthenticationKey";
-        protected const string ConnectionStringKey = "QP_ManagePages_ConnectionString";
-        protected const string CustomerCodeKey = "QP_ManagePages_CustomerCode";
-        protected const string DbTypeKey = "QP_ManagePages_DbType";
+        private static readonly string AuthenticationKey = "QP_ManagePages_AuthenticationKey";
+        private const string ConnectionStringKey = "QP_ManagePages_ConnectionString";
+        private const string CustomerCodeKey = "QP_ManagePages_CustomerCode";
+        private const string DbTypeKey = "QP_ManagePages_DbType";
+        public static readonly string SiteIdKey = "QP_ManagePages_SiteId";
         public static readonly string UserLanguageKey = "QP_ManagePages_Language";
 
         protected static readonly string UserLanguageFieldName = "LANGUAGE_ID";
@@ -100,7 +101,11 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
             var result = 0;
             if (_httpContext.Session.Get(AuthenticationKey) != null)
             {
-                result = _httpContext.Session.GetInt32(DBConnector.LastModifiedByKey) ?? 0;
+                var code = _webAppQpHelper.CustomerCode;
+                if (string.IsNullOrEmpty(code) || _httpContext.Session.GetString(CustomerCodeKey) == code)
+                {
+                    result = _httpContext.Session.GetInt32(DBConnector.LastModifiedByKey) ?? 0;
+                }
             }
             return result;
         }
@@ -111,6 +116,7 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
             _httpContext.Session.SetString(UserLanguageKey, langName);
             _httpContext.Session.SetString(ConnectionStringKey, dBConnector.CustomConnectionString);
             _httpContext.Session.SetString(CustomerCodeKey, _webAppQpHelper.CustomerCode);
+            _httpContext.Session.SetInt32(SiteIdKey, _webAppQpHelper.SiteId);
             _httpContext.Session.SetInt32(DbTypeKey, (int) dBConnector.DatabaseType);
             _httpContext.Session.Set(AuthenticationKey, BitConverter.GetBytes(true));
         }

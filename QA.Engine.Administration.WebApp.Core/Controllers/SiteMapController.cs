@@ -9,6 +9,7 @@ using QA.Engine.Administration.WebApp.Core.Auth;
 using QA.Engine.Administration.WebApp.Core.Models;
 using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
 
 namespace QA.Engine.Administration.WebApp.Core.Controllers
 {
@@ -24,7 +25,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         private readonly ISiteMapModifyService _siteMapModifyService;
         private readonly IMapper _mapper;
         private readonly ILogger<SiteMapController> _logger;
-        
+
         private readonly int _siteId;
         private readonly int _step;
         private readonly int _userId;
@@ -42,7 +43,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
             _mapper = mapper;
             _logger = logger;
 
-            _siteId = webAppQpHelper.SiteId;
+            _siteId = webAppQpHelper.SavedSiteId;
             _userId = webAppQpHelper.UserId;
             _step = options.Value.IndexOrderStep;
             _useHierarchyRegionFilter = options.Value?.UseHierarchyRegionFilter ?? false;
@@ -273,5 +274,5 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
 
     }
 
-    
+
 }

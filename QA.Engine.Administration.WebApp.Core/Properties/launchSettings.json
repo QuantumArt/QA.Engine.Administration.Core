@@ -23,7 +23,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Dev"
       },
-      "applicationUrl": "http://localhost:5300;https://localhost:5301"
+      "applicationUrl": "http://*:5300;https://*:5301"
     },
     "QA.Engine.Administration.WebApp.Core.Bee": {
       "commandName": "Project",

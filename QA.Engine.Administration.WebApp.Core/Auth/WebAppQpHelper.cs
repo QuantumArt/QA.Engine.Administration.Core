@@ -13,38 +13,6 @@ using ConnectionInfo = QA.Engine.Administration.WebApp.Core.Business.Models.Conn
 
 namespace QA.Engine.Administration.WebApp.Core.Auth
 {
-    public interface IWebAppQpHelper
-    {
-        /// <summary>
-        /// Id бэкенда
-        /// </summary>
-        string BackendSid { get; }
-
-        CustomerConfiguration GetCurrentCustomerConfiguration();
-
-        /// <summary>
-        /// Id хоста
-        /// </summary>
-        string HostId { get; }
-        /// <summary>
-        /// Признак запуска через Custom Action Qp
-        /// </summary>
-        bool IsQpMode { get; }
-        /// <summary>
-        /// Ключ
-        /// </summary>
-        string QpKey { get; }
-        /// <summary>
-        /// Идентификатор сайта
-        /// </summary>
-        int SiteId { get; }
-        /// <summary>
-        /// Id пользователя
-        /// </summary>
-        int UserId { get; }
-        string CustomerCode { get; }
-    }
-
     public class WebAppQpHelper : IWebAppQpHelper
     {
         private HttpContext _httpContext;
@@ -53,15 +21,8 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
         private EnvironmentConfiguration _config;
         private ILogger<WebAppQpHelper> _logger;
 
-        private const string SiteIdKey = "SiteId";
-
-
         public WebAppQpHelper(IHttpContextAccessor httpContextAccessor, QpHelper qpHelper, IOptions<EnvironmentConfiguration> options, ILogger<WebAppQpHelper> logger)
         {
-
-
-
-
             _httpContext = httpContextAccessor.HttpContext;
             _qpHelper = qpHelper;
             _config = options.Value;
@@ -154,19 +115,14 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
         {
             get
             {
-                var idObj = _httpContext.Session.GetInt32(SiteIdKey);
-                if (idObj != null)
-                {
-                    return idObj.Value;
-                }
                 var obj = _serializableQpViewModelBaseLazy.Value;
-                var siteId = obj != null ? obj.SiteId : _qpHelper.SiteId;
-                if (!int.TryParse(siteId, out int result))
-                    throw new Exception("Site Id should not be empty");
-                _httpContext.Session.SetInt32(SiteIdKey, result);
-                return result;
+                var result = obj != null ? obj.SiteId : _qpHelper.SiteId;
+                return Int32.TryParse(result, out var intResult) ? intResult : 0;
             }
         }
+
+        public int SavedSiteId => _httpContext.Session.GetInt32(QPSecurityChecker.SiteIdKey) ?? 0;
+
         public int UserId => _httpContext.Session.GetInt32(DBConnector.LastModifiedByKey) ?? 0;
     }
 }

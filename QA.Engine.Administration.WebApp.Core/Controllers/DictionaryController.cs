@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -54,7 +55,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
             _customActionConfig = options.Value?.CustomAction;
             _rootPageDiscriminator = options.Value?.StartPageDiscriminator;
 
-            _siteId = webAppQpHelper.SiteId;
+            _siteId = webAppQpHelper.SavedSiteId;
             _userId = webAppQpHelper.UserId;
         }
 
@@ -66,7 +67,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         public ApiResult<Dictionary<string, string>> GetTexts()
         {
             var assemblyName = Assembly.GetAssembly(typeof(DictionaryController));
-            var localizer = _stringLocalizerFactory.Create("Texts", assemblyName.FullName).WithCulture(Thread.CurrentThread.CurrentUICulture);
+            var localizer = _stringLocalizerFactory.Create("Texts", assemblyName.FullName).WithCulture(CultureInfo.CurrentUICulture);
             var result = localizer.GetAllStrings().ToDictionary(x => x.Name, x => x.Value);
             return ApiResult<Dictionary<string, string>>.Success(result);
         }

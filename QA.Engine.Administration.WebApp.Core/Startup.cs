@@ -153,13 +153,6 @@ namespace QA.Engine.Administration.WebApp.Core
 
             app.UseStaticFiles();
 
-            app.UseEndpoints(endpoints  =>
-            {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
-                endpoints.MapFallbackToController("Index", "Home");
-            });
 
             app.Use( async (context, next) =>
             {
@@ -170,6 +163,13 @@ namespace QA.Engine.Administration.WebApp.Core
                 await next.Invoke();
             });
 
+            app.UseEndpoints(endpoints  =>
+            {
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapFallbackToController("Index", "Home");
+            });
 
             LogStart(app, factory);
         }
