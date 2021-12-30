@@ -29,6 +29,10 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
         int SiteId { get; }
 
         int SavedSiteId { get; }
+
+        string SavedConnectionString { get; }
+
+        DatabaseType SavedDbType { get; }
         /// <summary>
         /// Id пользователя
         /// </summary>

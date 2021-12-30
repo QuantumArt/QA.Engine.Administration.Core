@@ -67,6 +67,11 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
                 }
             }
 
+            if (result.DbType == DatabaseType.SqlServer && !result.ConnectionString.Contains("Persist Security Info"))
+            {
+                result.ConnectionString += ";Persist Security Info=True";
+            }
+
             return result;
         }
 
@@ -122,6 +127,10 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
         }
 
         public int SavedSiteId => _httpContext.Session.GetInt32(QPSecurityChecker.SiteIdKey) ?? 0;
+
+        public string SavedConnectionString => _httpContext.Session.GetString(QPSecurityChecker.ConnectionStringKey);
+
+        public DatabaseType SavedDbType => (DatabaseType)(_httpContext.Session.GetInt32(QPSecurityChecker.DbTypeKey) ?? 0);
 
         public int UserId => _httpContext.Session.GetInt32(DBConnector.LastModifiedByKey) ?? 0;
     }

@@ -15,9 +15,9 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
     public class QPSecurityChecker
     {
         private static readonly string AuthenticationKey = "QP_ManagePages_AuthenticationKey";
-        private const string ConnectionStringKey = "QP_ManagePages_ConnectionString";
+        public const string ConnectionStringKey = "QP_ManagePages_ConnectionString";
         private const string CustomerCodeKey = "QP_ManagePages_CustomerCode";
-        private const string DbTypeKey = "QP_ManagePages_DbType";
+        public const string DbTypeKey = "QP_ManagePages_DbType";
         public static readonly string SiteIdKey = "QP_ManagePages_SiteId";
         public static readonly string UserLanguageKey = "QP_ManagePages_Language";
 
