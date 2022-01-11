@@ -17,12 +17,19 @@
         <NoWarn>1701;1702;1705;1591</NoWarn>
     </PropertyGroup>
 
-    <ItemGroup>
+  <ItemGroup>
     <None Remove="ClientApp\constants\QpAbstractItemFields.ts" />
     <None Remove="ClientApp\constants\QpActionCodes.ts" />
     <None Remove="ClientApp\enums\TreeState.ts" />
     <None Remove="ClientApp\stores\ArchiveStore.ts" />
     <None Remove="ClientApp\stores\QpIntegrationStore.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="wwwroot\dist\*.html">
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>

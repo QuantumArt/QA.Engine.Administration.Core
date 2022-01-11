@@ -1,3 +1,5 @@
+using System;
+
 namespace QA.Engine.Administration.WebApp.Core
 {
     public class EnvironmentConfiguration
@@ -10,12 +12,11 @@ namespace QA.Engine.Administration.WebApp.Core
         public string HostIdParamName { get; set; }
         public int IndexOrderStep { get; set; } = 1;
         public bool UseHierarchyRegionFilter { get; set; }
-        public bool IgnoreQPSecurityChecker { get; set; } = false;
-        public bool UseFake { get; set; } = false;
+        public bool IgnoreQPSecurityChecker { get; set; }
+        public bool UseFake { get; set; }
         public FakeData FakeData { get; set; }
         public CustomAction CustomAction { get; set; }
         public string StartPageDiscriminator { get; set; }
-        public string DatabaseType { get; set; }
 
         public string ConfigurationServiceUrl { get; set; }
         public string ConfigurationServiceToken { get; set; }
@@ -23,8 +24,10 @@ namespace QA.Engine.Administration.WebApp.Core
 
     public class FakeData
     {
+        public string DatabaseType { get; set; } = String.Empty;
         public int UserId { get; set; }
         public string LangName { get; set; }
+        public string ConnectionString { get; set; }
     }
 
     public class CustomAction

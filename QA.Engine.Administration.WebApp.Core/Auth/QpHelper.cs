@@ -17,10 +17,10 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
             _configuration = configuration.Value;
         }
 
-        protected string QpCustomerCodeParamName { get { return _configuration.CustomerCodeParamName; } }
-        protected string QpSiteIdParamName { get { return _configuration.SiteIdParamName; } }
-        protected string QpBackendSidParamName { get { return _configuration.BackendSidParamName; } }
-        protected string QpHostIdParamName { get { return _configuration.HostIdParamName ?? "hostUID"; } }
+        protected string QpCustomerCodeParamName => _configuration.CustomerCodeParamName;
+        protected string QpSiteIdParamName => _configuration.SiteIdParamName;
+        protected string QpBackendSidParamName => _configuration.BackendSidParamName;
+        protected string QpHostIdParamName => _configuration.HostIdParamName ?? "hostUID";
 
         private const string CustomerCodeParamName = "CustomerCode";
         private const string SiteIdParamName = "SiteId";
@@ -73,8 +73,8 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
             get
             {
                 var param = GetParam(QpBackendSidParamName);
-                return string.IsNullOrEmpty(param) 
-                    ? GetParam(BackendSidParamName) 
+                return string.IsNullOrEmpty(param)
+                    ? GetParam(BackendSidParamName)
                     : param;
             }
         }
@@ -87,8 +87,8 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
             get
             {
                 var param = GetParam(QpHostIdParamName);
-                return string.IsNullOrEmpty(param) 
-                    ? GetParam(HostIdParamName) 
+                return string.IsNullOrEmpty(param)
+                    ? GetParam(HostIdParamName)
                     : param;
             }
         }

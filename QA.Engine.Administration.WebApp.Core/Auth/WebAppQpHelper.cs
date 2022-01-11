@@ -5,53 +5,28 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using QA.Engine.Administration.WebApp.Core.Business.Models;
+using QP.ConfigurationService.Models;
 using ConnectionInfo = QA.Engine.Administration.WebApp.Core.Business.Models.ConnectionInfo;
 
 namespace QA.Engine.Administration.WebApp.Core.Auth
 {
-    public interface IWebAppQpHelper
-    {
-        /// <summary>
-        /// Id бэкенда
-        /// </summary>
-        string BackendSid { get; }
-        /// <summary>
-        /// Код поставщика
-        /// </summary>
-        string CustomerCode { get; }
-        /// <summary>
-        /// Id хоста
-        /// </summary>
-        string HostId { get; }
-        /// <summary>
-        /// Признак запуска через Custom Action Qp
-        /// </summary>
-        bool IsQpMode { get; }
-        /// <summary>
-        /// Ключ
-        /// </summary>
-        string QpKey { get; }
-        /// <summary>
-        /// Идентификатор сайта
-        /// </summary>
-        int SiteId { get; }
-        /// <summary>
-        /// Id пользователя
-        /// </summary>
-        int UserId { get; }
-    }
-
     public class WebAppQpHelper : IWebAppQpHelper
     {
-        HttpContext _httpContext;
-        QpHelper _qpHelper;
-        Lazy<SerializableQpViewModelBase> _serializableQpViewModelBaseLazy;
+        private HttpContext _httpContext;
+        private QpHelper _qpHelper;
+        private Lazy<SerializableQpViewModelBase> _serializableQpViewModelBaseLazy;
+        private EnvironmentConfiguration _config;
+        private ILogger<WebAppQpHelper> _logger;
 
-        public WebAppQpHelper(IHttpContextAccessor httpContextAccessor, QpHelper qpHelper)
+        public WebAppQpHelper(IHttpContextAccessor httpContextAccessor, QpHelper qpHelper, IOptions<EnvironmentConfiguration> options, ILogger<WebAppQpHelper> logger)
         {
             _httpContext = httpContextAccessor.HttpContext;
             _qpHelper = qpHelper;
+            _config = options.Value;
+            _logger = logger;
             _serializableQpViewModelBaseLazy = new Lazy<SerializableQpViewModelBase>(() =>
             {
                 var httpContext = _httpContext;
@@ -74,6 +49,33 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
             });
         }
 
+        public CustomerConfiguration GetCurrentCustomerConfiguration()
+        {
+            CustomerConfiguration result = null;
+
+            if (!string.IsNullOrEmpty(CustomerCode))
+            {
+                DBConnector.ConfigServiceUrl = Config.ConfigurationServiceUrl;
+                DBConnector.ConfigServiceToken = Config.ConfigurationServiceToken;
+                try
+                {
+                    result = DBConnector.GetCustomerConfiguration(CustomerCode).Result;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Error while receiving customer codes");
+                }
+            }
+
+            if (result.DbType == DatabaseType.SqlServer && !result.ConnectionString.Contains("Persist Security Info"))
+            {
+                result.ConnectionString += ";Persist Security Info=True";
+            }
+
+            return result;
+        }
+
+
         public bool IsQpMode => _qpHelper.IsQpMode;
 
         public string HostId
@@ -93,6 +95,8 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
                 return obj != null ? obj.CustomerCode : _qpHelper.CustomerCode;
             }
         }
+
+        public EnvironmentConfiguration Config => _config;
 
         public string BackendSid
         {
@@ -116,18 +120,18 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
         {
             get
             {
-                var siteConfiguration = SiteConfiguration.Get(_httpContext);
-                if (siteConfiguration != null)
-                    return siteConfiguration.SiteId;
-
                 var obj = _serializableQpViewModelBaseLazy.Value;
-                var siteId = obj != null ? obj.SiteId : _qpHelper.SiteId;
-                if (!int.TryParse(siteId, out int result))
-                    throw new Exception("Site Id should not be empty");
-
-                return result;
+                var result = obj != null ? obj.SiteId : _qpHelper.SiteId;
+                return Int32.TryParse(result, out var intResult) ? intResult : 0;
             }
         }
+
+        public int SavedSiteId => _httpContext.Session.GetInt32(QPSecurityChecker.SiteIdKey) ?? 0;
+
+        public string SavedConnectionString => _httpContext.Session.GetString(QPSecurityChecker.ConnectionStringKey);
+
+        public DatabaseType SavedDbType => (DatabaseType)(_httpContext.Session.GetInt32(QPSecurityChecker.DbTypeKey) ?? 0);
+
         public int UserId => _httpContext.Session.GetInt32(DBConnector.LastModifiedByKey) ?? 0;
     }
 }
