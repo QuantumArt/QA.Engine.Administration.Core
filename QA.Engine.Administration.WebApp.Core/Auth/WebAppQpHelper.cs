@@ -67,6 +67,12 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
                 }
             }
 
+            if (result == null)
+            {
+                _logger.LogWarning("Cannot find customer code");
+                return result;
+            }
+
             if (result.DbType == DatabaseType.SqlServer && !result.ConnectionString.Contains("Persist Security Info"))
             {
                 result.ConnectionString += ";Persist Security Info=True";
