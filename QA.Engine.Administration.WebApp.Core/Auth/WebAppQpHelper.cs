@@ -73,7 +73,7 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
                 return result;
             }
 
-            if (result.DbType == DatabaseType.SqlServer && !result.ConnectionString.Contains("Persist Security Info"))
+            if (!result.ConnectionString.Contains("Persist Security Info"))
             {
                 result.ConnectionString += ";Persist Security Info=True";
             }
