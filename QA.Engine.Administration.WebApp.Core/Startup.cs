@@ -81,11 +81,13 @@ namespace QA.Engine.Administration.WebApp.Core
                 {
                     return new UnitOfWork(config.FakeData.ConnectionString, config.FakeData.DatabaseType);
                 }
+
                 var qpHelper = sp.GetService<IWebAppQpHelper>();
-                if (!string.IsNullOrEmpty(qpHelper.SavedConnectionString))
+                if (!string.IsNullOrEmpty(qpHelper.SavedConnectionString) && string.IsNullOrEmpty(qpHelper.PassedCustomerCode))
                 {
                     return new UnitOfWork(qpHelper.SavedConnectionString, qpHelper.SavedDbType.ToString());
                 }
+
                 var dbConfig = qpHelper.GetCurrentCustomerConfiguration();
                 return dbConfig != null ? new UnitOfWork(dbConfig.ConnectionString, dbConfig.DbType.ToString()) : null;
             });

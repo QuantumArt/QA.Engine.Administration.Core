@@ -181,12 +181,8 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
             var customerCode = hasNewCustomerCode ? newCustomerCode : _httpContext.Session.GetString(CustomerCodeKey);
             var dbType = (DatabaseType) (_httpContext.Session.GetInt32(DbTypeKey) ?? 1);
             var isNewDbConfig = string.IsNullOrEmpty(connectionString) || string.IsNullOrEmpty(customerCode);
-            dbConfig = isNewDbConfig
-                ? _webAppQpHelper.GetCurrentCustomerConfiguration()
-                : new CustomerConfiguration()
-                {
-                    ConnectionString = connectionString, Name = customerCode, DbType = dbType
-                };
+            dbConfig = isNewDbConfig ? _webAppQpHelper.GetCurrentCustomerConfiguration() :
+                new CustomerConfiguration { ConnectionString = connectionString, Name = customerCode, DbType = dbType };
             return dbConfig;
         }
 
