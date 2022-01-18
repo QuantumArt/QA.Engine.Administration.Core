@@ -60,7 +60,7 @@ metadata:
   namespace: widget-platform
 spec:
   rules:
-  - host: admin.widget-platform.qsupport.ru
+  - host: __host__
     http:
       paths:
       - backend:
