@@ -12,9 +12,10 @@ spec:
     metadata:
       labels:
         app: wp-admin
+        logging: enabled        
     spec:
       containers:
-      - image: ||registry||/widget-platform/admin:||version||
+      - image: "||registry||/widget-platform/admin:||version||"
         name: wp-admin
         ports:
         - containerPort: 80
