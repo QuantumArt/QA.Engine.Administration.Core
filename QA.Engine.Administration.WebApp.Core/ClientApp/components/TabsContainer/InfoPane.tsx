@@ -47,7 +47,7 @@ const InfoPane = inject('treeStore', 'textStore')(observer((props: Props) => {
                 <Checkbox checked={selectedNode.published} disabled={true}>{textStore.texts[Texts.published]}</Checkbox>
             </div>
             <div className="tab-entity">
-                <Checkbox checked={selectedNode.isVisible} disabled={true}>{textStore.texts[Texts.isVisible]}</Checkbox>
+                <Checkbox checked={selectedNode.visible} disabled={true}>{textStore.texts[Texts.visible]}</Checkbox>
             </div>
         </Card>
     );

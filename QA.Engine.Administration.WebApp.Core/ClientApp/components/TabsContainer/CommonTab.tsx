@@ -112,7 +112,7 @@ export default class CommonTab extends React.Component<Props> {
                             <Checkbox checked={isInSiteMap} onChange={this.changeIsInSiteMap} disabled={!isEditable}>{textStore.texts[Texts.isInSiteMap]}</Checkbox>
                         </div>
                         <div className="tab-entity">
-                            <Checkbox checked={selectedNode.isVisible} disabled>{textStore.texts[Texts.isVisible]}</Checkbox>
+                            <Checkbox checked={selectedNode.visible} disabled>{textStore.texts[Texts.visible]}</Checkbox>
                         </div>
                         {isEditable && <ExtensionCard />}
                     </div>

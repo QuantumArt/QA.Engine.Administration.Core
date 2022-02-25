@@ -153,8 +153,8 @@
   <data name="IsInSiteMap" xml:space="preserve">
     <value>Показывать в структуре сайта</value>
   </data>
-  <data name="IsVisible" xml:space="preserve">
-    <value>Видимость</value>
+  <data name="Visible" xml:space="preserve">
+    <value>Видимый</value>
   </data>
   <data name="Move" xml:space="preserve">
     <value>Переместить</value>

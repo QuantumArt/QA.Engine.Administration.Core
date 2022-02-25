@@ -38,5 +38,7 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
         /// </summary>
         int UserId { get; }
         string CustomerCode { get; }
+
+        string PassedCustomerCode { get; }
     }
 }

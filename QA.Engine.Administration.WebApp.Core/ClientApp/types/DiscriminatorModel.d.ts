@@ -4,7 +4,8 @@
 
 declare interface DiscriminatorModel {
   id: number;
-  isArchive: boolean;
+  archive: boolean;
+  visible: boolean;
   discriminator: string;
   typeName: string;
   isPage: boolean;
@@ -13,6 +14,6 @@ declare interface DiscriminatorModel {
   iconUrl: string;
   iconClass: string;
   iconIntent: string;
-  preferredContentId?: null | number; // number 
+  preferredContentId?: null | number; // number
 }
 

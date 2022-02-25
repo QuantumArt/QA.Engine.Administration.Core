@@ -67,7 +67,13 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
                 }
             }
 
-            if (result.DbType == DatabaseType.SqlServer && !result.ConnectionString.Contains("Persist Security Info"))
+            if (result == null)
+            {
+                _logger.LogWarning("Cannot find customer code");
+                return result;
+            }
+
+            if (!result.ConnectionString.Contains("Persist Security Info"))
             {
                 result.ConnectionString += ";Persist Security Info=True";
             }
@@ -78,50 +84,23 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
 
         public bool IsQpMode => _qpHelper.IsQpMode;
 
-        public string HostId
-        {
-            get
-            {
-                var obj = _serializableQpViewModelBaseLazy.Value;
-                return obj != null ? obj.HostId : _qpHelper.HostId;
-            }
-        }
+        public string HostId => _serializableQpViewModelBaseLazy.Value?.HostId ?? _qpHelper.HostId;
 
-        public string CustomerCode
-        {
-            get
-            {
-                var obj = _serializableQpViewModelBaseLazy.Value;
-                return obj != null ? obj.CustomerCode : _qpHelper.CustomerCode;
-            }
-        }
+        public string CustomerCode => _serializableQpViewModelBaseLazy.Value?.CustomerCode ?? _qpHelper.CustomerCode;
+
+        public string PassedCustomerCode => _qpHelper.CustomerCode;
 
         public EnvironmentConfiguration Config => _config;
 
-        public string BackendSid
-        {
-            get
-            {
-                var obj = _serializableQpViewModelBaseLazy.Value;
-                return obj != null ? obj.BackendSid : _qpHelper.BackendSid;
-            }
-        }
+        public string BackendSid => _serializableQpViewModelBaseLazy.Value?.BackendSid ?? _qpHelper.BackendSid;
 
-        public string QpKey
-        {
-            get
-            {
-                var obj = _serializableQpViewModelBaseLazy.Value;
-                return obj != null ? obj.QpKey : _qpHelper.QpKey;
-            }
-        }
+        public string QpKey => _serializableQpViewModelBaseLazy.Value?.QpKey ?? _qpHelper.QpKey;
 
         public int SiteId
         {
             get
             {
-                var obj = _serializableQpViewModelBaseLazy.Value;
-                var result = obj != null ? obj.SiteId : _qpHelper.SiteId;
+                var result = _serializableQpViewModelBaseLazy.Value?.SiteId ?? _qpHelper.SiteId;
                 return Int32.TryParse(result, out var intResult) ? intResult : 0;
             }
         }

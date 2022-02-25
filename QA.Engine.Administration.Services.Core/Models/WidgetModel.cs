@@ -8,7 +8,9 @@ namespace QA.Engine.Administration.Services.Core.Models
     public class WidgetModel
     {
         public int Id { get; set; }
-        public bool IsArchive { get; set; }
+        public bool Archive { get; set; }
+        public bool Visible { get; set; }
+        
         public int? ParentId { get; set; }
         public string Alias { get; set; }
         public string Title { get; set; }

@@ -12,9 +12,10 @@ spec:
     metadata:
       labels:
         app: wp-admin
+        logging: enabled        
     spec:
       containers:
-      - image: spbdocker03:5000/widget-platform/admin:||version||
+      - image: "||registry||/widget-platform/admin:||version||"
         name: wp-admin
         ports:
         - containerPort: 80
@@ -51,3 +52,22 @@ spec:
     targetPort: 80
   selector:
     app: wp-admin
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+  name: wp-admin
+  namespace: widget-platform
+spec:
+  rules:
+  - host: __host__
+    http:
+      paths:
+      - backend:
+          service:
+            name: wp-admin
+            port:
+              number: 80
+        pathType: ImplementationSpecific
+
