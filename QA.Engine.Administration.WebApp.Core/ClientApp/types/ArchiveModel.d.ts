@@ -4,17 +4,18 @@
 
 declare interface ArchiveModel {
   id: number;
-  isArchive: boolean;
-  parentId?: null | number; // number 
+  archive: boolean;
+  visible: boolean;
+  parentId?: null | number; // number
   alias: string;
   title: string;
   zoneName: string;
-  extensionId?: null | number; // number 
-  indexOrder?: null | number; // number 
-  isVisible?: null | boolean; // boolean 
-  versionOfId?: null | number; // number 
+  extensionId?: null | number; // number
+  indexOrder?: null | number; // number
+  isVisible?: null | boolean; // boolean
+  versionOfId?: null | number; // number
   published: boolean;
-  isInSiteMap?: null | boolean; // boolean 
+  isInSiteMap?: null | boolean; // boolean
   isPage: boolean;
   discriminator: string;
   discriminatorId: number;

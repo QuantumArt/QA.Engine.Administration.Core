@@ -15,7 +15,7 @@ export interface ITreeElement extends ITreeNode {
     versionOfId?: number;
     isContextMenuActive: boolean;
     contextMenuType: ContextMenuType;
-    isVisible: boolean;
+    visible: boolean;
     isPublished: boolean;
     disabled: boolean;
 }
@@ -59,7 +59,7 @@ export abstract class BaseTreeState<T extends {
     versionOfId?: null | number;
     title: string;
     children: T[];
-    isVisible?: boolean;
+    visible: boolean;
     published?: boolean;
     discriminatorId?: number;
 }> {
@@ -422,7 +422,7 @@ export abstract class BaseTreeState<T extends {
     protected mapElement(el: T): ITreeElement {
         const treeElement = observable.object<ITreeElement>(
             {
-                className: el.isVisible ? '' : 'not-visible',
+                className: el.visible ? '' : 'not-visible',
                 id: el.id,
                 parentId: el.parentId,
                 versionOfId: el.versionOfId,
@@ -435,7 +435,7 @@ export abstract class BaseTreeState<T extends {
                 hasCaret: el.children && el.children.length > 0,
                 isContextMenuActive: false,
                 contextMenuType: this.contextMenuType,
-                isVisible: el.isVisible,
+                visible: el.visible,
                 isPublished: el.published,
                 disabled: false,
             },

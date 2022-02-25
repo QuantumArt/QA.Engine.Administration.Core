@@ -26,7 +26,7 @@ export default class EditArticleStore extends ErrorHandler {
         }
         this.title = node.title;
         this.isInSiteMap = node.isInSiteMap;
-        this.isEditable = !node.isArchive && node.extensionId != null;
+        this.isEditable = !node.archive && node.extensionId != null;
         this.isShowExtensionFields = false;
         this.relatedItems = new Map<number, string>();
         this.relatedManyToOneItems = new Map<number, Map<number, string>>();

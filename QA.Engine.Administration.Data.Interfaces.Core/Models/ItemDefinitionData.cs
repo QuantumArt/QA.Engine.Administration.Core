@@ -3,7 +3,8 @@
     public class ItemDefinitionData
     {
         public int Id { get; set; }
-        public bool IsArchive { get; set; }
+        public bool Archive { get; set; }
+        public bool Visible { get; set; }
         public string Discriminator { get; set; }
         public string TypeName { get; set; }
         public bool IsPage { get; set; }

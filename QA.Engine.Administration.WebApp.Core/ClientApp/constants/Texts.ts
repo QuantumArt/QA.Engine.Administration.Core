@@ -25,7 +25,7 @@ export default class Texts {
     static readonly typeName: string = 'TypeName';
     static readonly alias: string = 'Alias';
     static readonly isInSiteMap: string = 'IsInSiteMap';
-    static readonly isVisible: string = 'IsVisible';
+    static readonly visible: string = 'Visible';
     static readonly published: string = 'Published';
     static readonly showExtensionField: string = 'ShowExtensionField';
 

@@ -38,6 +38,7 @@ namespace QA.Engine.Administration.Data.Core
 SELECT
     ai.content_item_id AS Id,
     ai.archive AS IsArchive,
+    ai.visible As Visible,
     ai.|QPAbstractItem.Name| as Alias,
     ai.|QPAbstractItem.Title| as Title,
     ai.|QPAbstractItem.Parent| AS ParentId,
@@ -56,7 +57,6 @@ SELECT
 FROM |QPAbstractItem| ai
 INNER JOIN |QPDiscriminator| def on ai.|QPAbstractItem.Discriminator| = def.content_item_id
 WHERE ai.archive={(isArchive ? "1" : "0")} 
-  AND ai.visible=1
 ORDER BY ai.|QPAbstractItem.Parent|, ai.|QPAbstractItem.IndexOrder|, ai.content_item_id
 ";
             return _netNameQueryAnalyzer.PrepareQuery(query, siteId, false, true);
@@ -72,6 +72,7 @@ ORDER BY ai.|QPAbstractItem.Parent|, ai.|QPAbstractItem.IndexOrder|, ai.content_
 SELECT
     ai.content_item_id AS Id,
     ai.archive AS IsArchive,
+    ai.visible As Visible,
     ai.|QPAbstractItem.Name| as Alias,
     ai.|QPAbstractItem.Title| as Title,
     ai.|QPAbstractItem.Parent| AS ParentId,
@@ -140,7 +141,8 @@ WHERE ai.archive={(isArchive ? "1" : "0")} AND ai.content_item_id IN (SELECT Id 
         private const string CmdGetRootPage = @"
 SELECT
     ai.content_item_id AS Id,
-    ai.archive AS IsArchive,
+    ai.archive AS Archive,
+    ai.visible As Visible,
     ai.|QPAbstractItem.Name| as Alias,
     ai.|QPAbstractItem.Title| as Title,
     ai.|QPAbstractItem.Parent| AS ParentId,

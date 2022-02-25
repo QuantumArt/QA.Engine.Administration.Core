@@ -2,7 +2,7 @@ export default class QpAbstractItemFields {
     static readonly title: string = 'Title';
     static readonly contentName: string = 'Name';
     static readonly parent: string = 'Parent';
-    static readonly isVisible: string = 'IsVisible';
+    static readonly visible: string = 'visible';
     static readonly isPage: string = 'IsPage';
     static readonly zoneName: string = 'ZoneName';
     static readonly allowedUrlPatterns: string = 'AllowedUrlPatterns';
