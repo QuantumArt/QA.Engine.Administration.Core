@@ -36,10 +36,11 @@ export default class AddPopup extends React.Component<Props, State> {
         const { popupStore, qpIntegrationStore, treeStore } = this.props;
         const { discriminator, name, title } = this.state;
         const isNullOrWhitespace = (text: string): boolean => text == null || text.trim() === '';
-        if (isNullOrWhitespace(title) || isNullOrWhitespace(name) || discriminator == null) {
+        const isNamedOrWidgetPopup = popupStore.type === PopupType.ADDWIDGET || !isNullOrWhitespace(name);
+        if (isNullOrWhitespace(title) || !isNamedOrWidgetPopup || discriminator == null) {
             this.setState({
                 titleIntent: isNullOrWhitespace(title) ? Intent.DANGER : Intent.NONE,
-                nameIntent: isNullOrWhitespace(name) ? Intent.DANGER : Intent.NONE,
+                nameIntent: isNamedOrWidgetPopup ? Intent.NONE : Intent.DANGER,
                 discriminatorIntent: discriminator == null ? Intent.DANGER : Intent.NONE,
             });
             return;

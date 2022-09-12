@@ -16,7 +16,8 @@ RUN dotnet restore "QA.Engine.Administration.WebApp.Core/QA.Engine.Administratio
 
 WORKDIR /src/QA.Engine.Administration.WebApp.Core
 COPY QA.Engine.Administration.WebApp.Core/package.json .
-RUN npm install
+COPY QA.Engine.Administration.WebApp.Core/package-lock.json .
+RUN npm ci
 
 WORKDIR /src
 COPY . .
