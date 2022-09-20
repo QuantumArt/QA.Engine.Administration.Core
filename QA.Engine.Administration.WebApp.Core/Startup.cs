@@ -1,39 +1,31 @@
-using AutoMapper;
 using System;
 using System.Data;
+using System.Globalization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using QA.Engine.Administration.Services.Core;
-using QA.Engine.Administration.Services.Core.Interfaces;
-using QA.Engine.Administration.Data.Interfaces.Core;
-using QA.Engine.Administration.WebApp.Core.Auth;
-using Microsoft.AspNetCore.Http;
-using QA.DotNetCore.Engine.Persistent.Interfaces;
-using QA.DotNetCore.Engine.QpData.Persistent.Dapper;
-using QA.Engine.Administration.Data.Core;
-using QA.Engine.Administration.Data.Core.Qp;
-using Swashbuckle.AspNetCore.Swagger;
-using System.Globalization;
-using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using Npgsql;
+using QA.DotNetCore.Engine.Persistent.Interfaces;
+using QA.DotNetCore.Engine.QpData.Persistent.Dapper;
 using QA.Engine.Administration.Common.Core;
+using QA.Engine.Administration.Data.Core;
+using QA.Engine.Administration.Data.Core.Qp;
+using QA.Engine.Administration.Data.Interfaces.Core;
+using QA.Engine.Administration.Services.Core;
+using QA.Engine.Administration.Services.Core.Interfaces;
+using QA.Engine.Administration.Services.Core.Mapper.Extensions;
+using QA.Engine.Administration.WebApp.Core.Auth;
 using QP.ConfigurationService.Models;
-using Quantumart.QPublishing.Database;
-using DatabaseType = QP.ConfigurationService.Models.DatabaseType;
-using System.Reflection;
-using QA.Engine.Administration.Services.Core.Mapper;
 
 namespace QA.Engine.Administration.WebApp.Core
 {
     public class Startup
     {
-        const string SWAGGER_VERSION = "v1";
-        const string SWAGGER_TITLE = "Administration Web App";
+        private const string SWAGGER_VERSION = "v1";
+        private const string SWAGGER_TITLE = "Administration Web App";
 
         public Startup(IConfiguration configuration, ILoggerFactory factory)
         {
@@ -48,96 +40,89 @@ namespace QA.Engine.Administration.WebApp.Core
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<EnvironmentConfiguration>(Configuration);
-            var config = Configuration.Get<EnvironmentConfiguration>();
+            _ = services.Configure<EnvironmentConfiguration>(Configuration);
+            EnvironmentConfiguration config = Configuration.Get<EnvironmentConfiguration>();
 
-            services
+            _ = services
                 .AddMvc()
                 .AddNewtonsoftJson(o =>
                 {
                     o.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
                 });
 
-            services.AddSwaggerGen(o =>
+            _ = services.AddSwaggerGen(o =>
             {
                 o.SwaggerDoc(SWAGGER_VERSION, new OpenApiInfo()
                 {
                     Title = SWAGGER_TITLE,
                     Version = SWAGGER_VERSION
                 });
-                var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                var xmlPath = System.IO.Path.Combine(AppContext.BaseDirectory, xmlFile);
+                string xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                string xmlPath = System.IO.Path.Combine(AppContext.BaseDirectory, xmlFile);
                 o.IncludeXmlComments(xmlPath);
             });
 
-            services.AddAutoMapper(cfg =>
+            _ = services.RegisterMappings();
+
+            _ = services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            _ = services.AddScoped<QpHelper>();
+            _ = services.AddScoped<QPSecurityChecker>();
+            _ = services.AddScoped<IWebAppQpHelper, WebAppQpHelper>();
+
+            _ = services.AddScoped<INetNameQueryAnalyzer, NetNameQueryAnalyzer>();
+            _ = services.AddScoped<IUnitOfWork, UnitOfWork>(sp =>
             {
-                cfg.AddProfile<ArchiveProfile>();
-                cfg.AddProfile<DiscriminatorProfile>();
-                cfg.AddProfile<PageProfile>();
-                cfg.AddProfile<RegionProfile>();
-                cfg.AddProfile<WidgetProfile>();
-                cfg.AddProfile<EditProfile>();
-            });
-
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddScoped<QpHelper>();
-            services.AddScoped<QPSecurityChecker>();
-            services.AddScoped<IWebAppQpHelper, WebAppQpHelper>();
-
-            services.AddScoped<INetNameQueryAnalyzer, NetNameQueryAnalyzer>();
-            services.AddScoped<IUnitOfWork, UnitOfWork>(sp => {
                 if (config.UseFake && config.FakeData != null)
                 {
                     return new UnitOfWork(config.FakeData.ConnectionString, config.FakeData.DatabaseType);
                 }
 
-                var qpHelper = sp.GetService<IWebAppQpHelper>();
+                IWebAppQpHelper qpHelper = sp.GetService<IWebAppQpHelper>();
                 if (!string.IsNullOrEmpty(qpHelper.SavedConnectionString) && string.IsNullOrEmpty(qpHelper.PassedCustomerCode))
                 {
                     return new UnitOfWork(qpHelper.SavedConnectionString, qpHelper.SavedDbType.ToString());
                 }
 
-                var dbConfig = qpHelper.GetCurrentCustomerConfiguration();
+                CustomerConfiguration dbConfig = qpHelper.GetCurrentCustomerConfiguration();
                 return dbConfig != null ? new UnitOfWork(dbConfig.ConnectionString, dbConfig.DbType.ToString()) : null;
             });
 
-            services.AddScoped<IAbstractItemRepository, AbstractItemRepository>();
-            services.AddScoped<IItemDefinitionRepository, ItemDefinitionRepository>();
-            services.AddScoped<IMetaInfoRepository, MetaInfoRepository>();
+            _ = services.AddScoped<IAbstractItemRepository, AbstractItemRepository>();
+            _ = services.AddScoped<IItemDefinitionRepository, ItemDefinitionRepository>();
+            _ = services.AddScoped<IMetaInfoRepository, MetaInfoRepository>();
 
-            services.AddScoped<ISiteMapProvider, SiteMapProvider>();
-            services.AddScoped<IWidgetProvider, WidgetProvider>();
-            services.AddScoped<IDictionaryProvider, DictionaryProvider>();
-            services.AddScoped<IQpDataProvider, QpDataProvider>();
-            services.AddScoped<ISettingsProvider, SettingsProvider>();
-            services.AddScoped<IItemExtensionProvider, ItemExtensionProvider>();
+            _ = services.AddScoped<ISiteMapProvider, SiteMapProvider>();
+            _ = services.AddScoped<IWidgetProvider, WidgetProvider>();
+            _ = services.AddScoped<IDictionaryProvider, DictionaryProvider>();
+            _ = services.AddScoped<IQpDataProvider, QpDataProvider>();
+            _ = services.AddScoped<ISettingsProvider, SettingsProvider>();
+            _ = services.AddScoped<IItemExtensionProvider, ItemExtensionProvider>();
 
-            services.AddScoped<IQpDbConnector, QpDbConnector>(sp =>
+            _ = services.AddScoped<IQpDbConnector, QpDbConnector>(sp =>
             {
-                var uow = sp.GetService<IUnitOfWork>();
+                IUnitOfWork uow = sp.GetService<IUnitOfWork>();
                 return new QpDbConnector(uow.Connection);
             });
-            services.AddScoped<IQpMetadataManager, QpMetadataManager>();
-            services.AddScoped<IQpContentManager, QpContentManager>();
+            _ = services.AddScoped<IQpMetadataManager, QpMetadataManager>();
+            _ = services.AddScoped<IQpContentManager, QpContentManager>();
 
-            services.AddScoped<ISiteMapService, SiteMapService>();
-            services.AddScoped<ISiteMapModifyService, SiteMapModifyService>();
-            services.AddScoped<IItemDifinitionService, ItemDifinitionService>();
-            services.AddScoped<IRegionService, RegionService>();
-            services.AddScoped<ICultureService, CultureService>();
-            services.AddScoped<IContentService, ContentService>();
-            services.AddScoped<ICustomActionService, CustomActionService>();
+            _ = services.AddScoped<ISiteMapService, SiteMapService>();
+            _ = services.AddScoped<ISiteMapModifyService, SiteMapModifyService>();
+            _ = services.AddScoped<IItemDifinitionService, ItemDifinitionService>();
+            _ = services.AddScoped<IRegionService, RegionService>();
+            _ = services.AddScoped<ICultureService, CultureService>();
+            _ = services.AddScoped<IContentService, ContentService>();
+            _ = services.AddScoped<ICustomActionService, CustomActionService>();
 
-            services.AddDistributedMemoryCache();
+            _ = services.AddDistributedMemoryCache();
 
-            services.Configure<CookiePolicyOptions>(options =>
+            _ = services.Configure<CookiePolicyOptions>(options =>
             {
                 options.Secure = CookieSecurePolicy.SameAsRequest;
                 options.MinimumSameSitePolicy = config.UseSameSiteNone ? SameSiteMode.None : SameSiteMode.Lax;
             });
 
-            services.AddSession(options =>
+            _ = services.AddSession(options =>
             {
                 // Set a short timeout for easy testing.
                 options.IdleTimeout = TimeSpan.FromMinutes(20);
@@ -146,45 +131,44 @@ namespace QA.Engine.Administration.WebApp.Core
                 options.Cookie.IsEssential = true;
             });
 
-            services.AddLocalization(x => x.ResourcesPath = "Resources");
+            _ = services.AddLocalization(x => x.ResourcesPath = "Resources");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory factory)
         {
-            if (env == null) throw new ArgumentNullException(nameof(env));
-            app.UseMiddleware<ExceptionHandler>();
+            if (env == null)
+            {
+                throw new ArgumentNullException(nameof(env));
+            }
 
-            app.UseRouting();
-
-            app.UseSession();
-
-            app.UseMiddleware<QpAuthorizationMiddleware>();
-
-            app.UseSwagger();
-            app.UseSwaggerUI(o =>
+            _ = app.UseMiddleware<ExceptionHandler>();
+            _ = app.UseRouting();
+            _ = app.UseSession();
+            _ = app.UseMiddleware<QpAuthorizationMiddleware>();
+            _ = app.UseSwagger();
+            _ = app.UseSwaggerUI(o =>
             {
                 o.SwaggerEndpoint("/swagger/v1/swagger.json", $"{SWAGGER_TITLE} {SWAGGER_VERSION}");
             });
 
-            app.UseStaticFiles();
+            _ = app.UseStaticFiles();
 
-
-            app.Use( async (context, next) =>
+            _ = app.Use(async (context, next) =>
             {
-                var ci = new CultureInfo(context.Session.GetString(QPSecurityChecker.UserLanguageKey) ??
+                CultureInfo ci = new(context.Session.GetString(QPSecurityChecker.UserLanguageKey) ??
                                          QpLanguage.Default.GetDescription());
                 CultureInfo.CurrentCulture = ci;
                 CultureInfo.CurrentUICulture = ci;
                 await next.Invoke();
             });
 
-            app.UseEndpoints(endpoints  =>
+            _ = app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(
+                _ = endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
-                endpoints.MapFallbackToController("Index", "Home");
+                _ = endpoints.MapFallbackToController("Index", "Home");
             });
 
             LogStart(app, factory);
@@ -192,9 +176,9 @@ namespace QA.Engine.Administration.WebApp.Core
 
         private void LogStart(IApplicationBuilder app, ILoggerFactory loggerFactory)
         {
-            var config = app.ApplicationServices.GetRequiredService<IConfiguration>();
-            var name = config["ServiceName"];
-            var logger = loggerFactory.CreateLogger(GetType());
+            IConfiguration config = app.ApplicationServices.GetRequiredService<IConfiguration>();
+            string name = config["ServiceName"];
+            ILogger logger = loggerFactory.CreateLogger(GetType());
             logger.LogInformation("{appName} started", name);
         }
 
