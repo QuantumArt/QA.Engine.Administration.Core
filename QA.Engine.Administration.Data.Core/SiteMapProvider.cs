@@ -37,7 +37,7 @@ namespace QA.Engine.Administration.Data.Core
             string query = $@"
 SELECT
     ai.content_item_id AS Id,
-    ai.archive AS IsArchive,
+    ai.archive AS Archive,
     ai.visible As Visible,
     ai.|QPAbstractItem.Name| as Alias,
     ai.|QPAbstractItem.Title| as Title,
