@@ -25,6 +25,8 @@ using QA.Engine.Administration.Common.Core;
 using QP.ConfigurationService.Models;
 using Quantumart.QPublishing.Database;
 using DatabaseType = QP.ConfigurationService.Models.DatabaseType;
+using System.Reflection;
+using QA.Engine.Administration.Services.Core.Mapper;
 
 namespace QA.Engine.Administration.WebApp.Core
 {
@@ -68,7 +70,15 @@ namespace QA.Engine.Administration.WebApp.Core
                 o.IncludeXmlComments(xmlPath);
             });
 
-            services.AddAutoMapper();
+            services.AddAutoMapper(cfg =>
+            {
+                cfg.AddProfile<ArchiveProfile>();
+                cfg.AddProfile<DiscriminatorProfile>();
+                cfg.AddProfile<PageProfile>();
+                cfg.AddProfile<RegionProfile>();
+                cfg.AddProfile<WidgetProfile>();
+                cfg.AddProfile<EditProfile>();
+            });
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped<QpHelper>();

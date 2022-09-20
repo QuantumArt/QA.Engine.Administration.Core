@@ -67,7 +67,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         public ApiResult<Dictionary<string, string>> GetTexts()
         {
             var assemblyName = Assembly.GetAssembly(typeof(DictionaryController));
-            var localizer = _stringLocalizerFactory.Create("Texts", assemblyName.FullName).WithCulture(CultureInfo.CurrentUICulture);
+            var localizer = _stringLocalizerFactory.Create("Texts", assemblyName.FullName);
             var result = localizer.GetAllStrings().ToDictionary(x => x.Name, x => x.Value);
             return ApiResult<Dictionary<string, string>>.Success(result);
         }
