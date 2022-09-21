@@ -27,7 +27,7 @@ namespace QA.Engine.Administration.Data.Core
         private string CmdGetAllItemDefinitions = @"
 SELECT
     CONTENT_ITEM_ID as Id,
-    ARCHIVE AS IsArchive,
+    ARCHIVE AS Archive,
     |QPDiscriminator.Name| as Discriminator,
     |QPDiscriminator.IsPage| as IsPage,
     |QPDiscriminator.Title| as Title,
