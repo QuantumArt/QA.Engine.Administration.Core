@@ -143,6 +143,7 @@ namespace QA.Engine.Administration.WebApp.Core
             }
 
             _ = app.UseMiddleware<ExceptionHandler>();
+            _ = app.UseStaticFiles();
             _ = app.UseRouting();
             _ = app.UseSession();
             _ = app.UseMiddleware<QpAuthorizationMiddleware>();
@@ -152,7 +153,6 @@ namespace QA.Engine.Administration.WebApp.Core
                 o.SwaggerEndpoint("/swagger/v1/swagger.json", $"{SWAGGER_TITLE} {SWAGGER_VERSION}");
             });
 
-            _ = app.UseStaticFiles();
 
             _ = app.Use(async (context, next) =>
             {
