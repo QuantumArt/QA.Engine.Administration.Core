@@ -71,7 +71,7 @@ ORDER BY ai.|QPAbstractItem.Parent|, ai.|QPAbstractItem.IndexOrder|, ai.content_
             var query = $@"
 SELECT
     ai.content_item_id AS Id,
-    ai.archive AS IsArchive,
+    ai.archive AS Archive,
     ai.visible As Visible,
     ai.|QPAbstractItem.Name| as Alias,
     ai.|QPAbstractItem.Title| as Title,
@@ -111,7 +111,7 @@ ORDER BY ai.|QPAbstractItem.Parent|, ai.|QPAbstractItem.IndexOrder|, ai.content_
             string query = $@"
 SELECT
     ai.content_item_id AS Id,
-    ai.archive AS IsArchive,
+    ai.archive AS Archive,
     ai.|QPAbstractItem.Name| as Alias,
     ai.|QPAbstractItem.Title| as Title,
     ai.|QPAbstractItem.Parent| AS ParentId,
