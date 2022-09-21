@@ -57,17 +57,13 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
                 return true;
             }
 
-            var savedUserId = GetSavedUserIdFromSession();
-            if (savedUserId > 0)
-            {
-                return true;
-            }
-
             if (_configuration.UseFake && _configuration.FakeData != null)
             {
                 SaveFakeDataToSession();
                 return true;
             }
+
+            var userId = GetSavedUserIdFromSession();
 
             var dBConnector = GetDBConnector();
             if (dBConnector == null)
@@ -76,11 +72,15 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
                 return false;
             }
 
-            var userId = GetAuthUserId(dBConnector);
             if (userId <= 0)
             {
-                _logger.LogWarning($"Could not authenticate with backend SID: {_webAppQpHelper.BackendSid}");
-                return false;
+                userId = GetAuthUserId(dBConnector);
+
+                if (userId <= 0)
+                {
+                    _logger.LogWarning($"Could not authenticate with backend SID: {_webAppQpHelper.BackendSid}");
+                    return false;
+                }
             }
 
             var langName = GetLangName(userId, dBConnector);

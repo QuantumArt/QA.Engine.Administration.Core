@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using QA.Engine.Administration.Data.Interfaces.Core;
+using QA.Engine.Administration.Data.Interfaces.Core.Models;
 using QA.Engine.Administration.Services.Core.Interfaces;
 using QA.Engine.Administration.Services.Core.Models;
 using System.Collections.Generic;
@@ -21,7 +22,7 @@ namespace QA.Engine.Administration.Services.Core
         public List<DiscriminatorModel> GetAllItemDefinitions(int siteId)
         {
             return _dictionaryProvider.GetAllItemDefinitions(siteId)
-                .Select(x => _mapper.Map<DiscriminatorModel>(x))
+                .Select(x => _mapper.Map<ItemDefinitionData, DiscriminatorModel>(x))
                 .ToList();
         }
     }

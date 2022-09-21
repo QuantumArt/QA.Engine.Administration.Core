@@ -1,7 +1,7 @@
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build-env
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build-env
 LABEL stage=intermediate
 
-RUN curl -sL https://deb.nodesource.com/setup_10.x |  bash - && \
+RUN curl -sL https://deb.nodesource.com/setup_12.x |  bash - && \
     apt-get install -y nodejs
 
 WORKDIR /src
@@ -26,7 +26,7 @@ WORKDIR /src/QA.Engine.Administration.WebApp.Core
 RUN npm run build
 RUN dotnet publish "QA.Engine.Administration.WebApp.Core.csproj" -c Release -o /app/out
 
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1
+FROM mcr.microsoft.com/dotnet/aspnet:6.0
 ARG SERVICE_VERSION=0.0.0
 ENV ServiceVersion=${SERVICE_VERSION}
 WORKDIR /app
