@@ -57,6 +57,12 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
                 return true;
             }
 
+            if (_configuration.UseFake && _configuration.FakeData != null)
+            {
+                SaveFakeDataToSession();
+                return true;
+            }
+
             var userId = GetSavedUserIdFromSession();
 
             var dBConnector = GetDBConnector();
@@ -68,19 +74,15 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
 
             if (userId <= 0)
             {
-                if (_configuration.UseFake && _configuration.FakeData != null)
-                {
-                    SaveFakeDataToSession();
-                    return true;
-                }
-
                 userId = GetAuthUserId(dBConnector);
+
                 if (userId <= 0)
                 {
                     _logger.LogWarning($"Could not authenticate with backend SID: {_webAppQpHelper.BackendSid}");
                     return false;
                 }
             }
+
             var langName = GetLangName(userId, dBConnector);
             SaveAuthDataToSession(userId, langName, dBConnector);
 
