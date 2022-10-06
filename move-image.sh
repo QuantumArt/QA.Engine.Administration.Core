@@ -1,4 +1,4 @@
 #!/bin/sh
-docker pull '||registry-source||widget-admin:||version||' && \
-docker tag '||registry-source||widget-admin:||version||' '||registry-receiver||widget-admin:||version||' && \
-docker push '||registry-receiver||widget-admin:||version||'
+docker pull '||registry-source||/||image-source||:||version||' && \
+docker tag '||registry-source||/||image-source||:||version||' '||registry-receiver||/||image-receiver||:||version||' && \
+docker push '||registry-receiver||/||image-receiver||:||version||'
