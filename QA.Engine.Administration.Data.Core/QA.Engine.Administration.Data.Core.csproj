@@ -7,9 +7,9 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="QA.DotNetCore.Engine.Persistent.Dapper" Version="2.2.1" />
-    <PackageReference Include="QA.DotNetCore.Engine.Persistent.Interfaces" Version="2.2.1" />
-    <PackageReference Include="QA.DotNetCore.Engine.QpData" Version="2.2.1" />
+    <PackageReference Include="QA.DotNetCore.Engine.Persistent.Dapper" Version="1.5.11" />
+    <PackageReference Include="QA.DotNetCore.Engine.Persistent.Interfaces" Version="1.5.11" />
+    <PackageReference Include="QA.DotNetCore.Engine.QpData" Version="1.5.11" />
     <PackageReference Include="Quantumart.AspNetCore" Version="4.0.5" />
   </ItemGroup>
 
