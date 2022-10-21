@@ -1,6 +1,3 @@
-using System;
-using System.Data;
-using System.Globalization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -8,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using QA.DotNetCore.Caching.Interfaces;
 using QA.DotNetCore.Engine.Persistent.Interfaces;
 using QA.DotNetCore.Engine.QpData.Persistent.Dapper;
 using QA.Engine.Administration.Common.Core;
@@ -19,6 +17,9 @@ using QA.Engine.Administration.Services.Core.Interfaces;
 using QA.Engine.Administration.Services.Core.Mapper.Extensions;
 using QA.Engine.Administration.WebApp.Core.Auth;
 using QP.ConfigurationService.Models;
+using System;
+using System.Data;
+using System.Globalization;
 
 namespace QA.Engine.Administration.WebApp.Core
 {
@@ -69,7 +70,6 @@ namespace QA.Engine.Administration.WebApp.Core
             _ = services.AddScoped<QPSecurityChecker>();
             _ = services.AddScoped<IWebAppQpHelper, WebAppQpHelper>();
 
-            _ = services.AddScoped<INetNameQueryAnalyzer, NetNameQueryAnalyzer>();
             _ = services.AddScoped<IUnitOfWork, UnitOfWork>(sp =>
             {
                 if (config.UseFake && config.FakeData != null)
@@ -87,9 +87,7 @@ namespace QA.Engine.Administration.WebApp.Core
                 return dbConfig != null ? new UnitOfWork(dbConfig.ConnectionString, dbConfig.DbType.ToString()) : null;
             });
 
-            _ = services.AddScoped<IAbstractItemRepository, AbstractItemRepository>();
-            _ = services.AddScoped<IItemDefinitionRepository, ItemDefinitionRepository>();
-            _ = services.AddScoped<IMetaInfoRepository, MetaInfoRepository>();
+            services.TryAddSiteStructureRepositories();
 
             _ = services.AddScoped<ISiteMapProvider, SiteMapProvider>();
             _ = services.AddScoped<IWidgetProvider, WidgetProvider>();
@@ -181,6 +179,5 @@ namespace QA.Engine.Administration.WebApp.Core
             ILogger logger = loggerFactory.CreateLogger(GetType());
             logger.LogInformation("{appName} started", name);
         }
-
     }
 }
