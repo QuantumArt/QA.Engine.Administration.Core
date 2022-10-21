@@ -339,10 +339,10 @@ namespace QA.Engine.Administration.Data.Core
 
                 _qpDbConnector.CommitTransaction();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 _qpDbConnector.RollbackTransaction();
-                throw e;
+                throw;
             }
         }
 

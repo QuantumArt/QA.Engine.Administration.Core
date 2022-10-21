@@ -19,6 +19,9 @@ spec:
         name: wp-admin
         ports:
         - containerPort: 80
+        envFrom:
+          - configMapRef:
+              name: qp-config
         env:
         - name: ConfigurationServiceUrl
           valueFrom:
@@ -31,15 +34,25 @@ spec:
               name: qp-config
               key: CONFIGURATION_SERVICE_TOKEN
         volumeMounts:
-        - mountPath: /etc/localtime
-          name: tz-config              
+          - name: time-config
+            mountPath: /etc/localtime
+            subPathExpr: $(TZ)
+          - name: timezone-config
+            mountPath: /etc/timezone
+            subPath: TZ             
         resources: 
           limits:
             memory: "256Mi"
       volumes:
-      - name: tz-config
-        hostPath:
-          path: /usr/share/zoneinfo/Europe/Moscow            
+        - name: time-config
+          hostPath:
+            path: /usr/share/zoneinfo
+        - name: timezone-config
+          configMap: 
+            name: qp-config
+            items:
+            - key: TZ
+              path: TZ         
 ---
 apiVersion: v1
 kind: Service
