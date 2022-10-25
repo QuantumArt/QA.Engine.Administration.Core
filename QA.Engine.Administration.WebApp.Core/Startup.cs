@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using QA.DotNetCore.Caching.Interfaces;
+using QA.DotNetCore.Engine.Persistent.Configuration;
 using QA.DotNetCore.Engine.Persistent.Interfaces;
 using QA.DotNetCore.Engine.QpData.Persistent.Dapper;
 using QA.Engine.Administration.Common.Core;
