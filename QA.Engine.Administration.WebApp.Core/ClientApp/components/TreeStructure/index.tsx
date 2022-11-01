@@ -287,7 +287,7 @@ export default class SiteTree extends React.Component<Props, State> {
                             ref={this.sbRef}
                             hideTracksWhenNotNeeded
                             autoHeight
-                            autoHide
+                            // autoHide
                             autoHeightMin={this.props.sbHeightMin}
                             autoHeightMax={usePagination ? this.state.sbHeightMax - 30 : this.state.sbHeightMax}
                             thumbMinSize={this.props.sbThumbSize}

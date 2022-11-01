@@ -15,7 +15,7 @@ interface Props {
     treeStore?: TreeStore;
     textStore?: TextStore;
     itemId: number;
-    node: ITreeElement;
+    node?: ITreeElement;
 }
 
 @inject('qpIntegrationStore', 'popupStore', 'treeStore', 'textStore')
@@ -49,7 +49,9 @@ export default class WidgetTreeMenu extends React.Component<Props> {
 
     private handleClick = (e: React.MouseEvent<HTMLElement>, cb: () => void) => {
         e.stopPropagation();
-        this.props.node.isContextMenuActive = false;
+        if (this.props.node) {
+                this.props.node.isContextMenuActive = false;
+        }
         cb();
     }
 
