@@ -11,8 +11,8 @@ import {
 } from "@blueprintjs/core";
 import { isFunction } from "util";
 import TreeStore, { TreeType } from "stores/TreeStore";
-import RightClickContextMenu from "components/RightClickContextMenu";
 import TreeStoreType from "enums/TreeStoreType";
+import RightClickMenu from "components/RightClickContextMenu";
 import WidgetTreeMenu from "./InteractiveZone/WidgetTreeMenu";
 import QpIntegrationStore from "stores/QpIntegrationStore";
 import PopupStore from "stores/PopupStore";
@@ -67,7 +67,6 @@ export class CustomTree<T = {}> extends React.Component<Props<T>, {}> {
 
     public componentDidUpdate(): void {
         this.props.tree.setCordsUpdateStatus(true);
-        this.props.qpIntegrationStore;
     }
 
     componentWillUnmount(): void {}
@@ -100,42 +99,56 @@ export class CustomTree<T = {}> extends React.Component<Props<T>, {}> {
             // tslint:disable-next-line:variable-name
             const TypedTreeNode = CustomTreeNode.ofType<T>();
             return [
-                <TypedTreeNode
-                    {...node}
-                    key={node.id}
-                    contentRef={this.handleContentRef(+node.id)}
-                    depth={elementPath.length - 1}
-                    onClick={this.handleNodeClick}
-                    onContextMenu={this.handleNodeContextMenu}
-                    onCollapse={this.handleNodeCollapse}
-                    onDoubleClick={this.handleNodeDoubleClick}
-                    onExpand={this.handleNodeExpand}
-                    onMouseEnter={this.handleNodeMouseEnter}
-                    onMouseLeave={this.handleNodeMouseLeave}
-                    path={elementPath}
-                />,
+                this.props.tree.type === TreeStoreType.WIDGET && !node.childNodes.length ? (
+                    <RightClickMenu
+                        key={node.id}
+                        content={
+                            <Provider
+                                qpIntegrationStore={
+                                    this.props.qpIntegrationStore
+                                }
+                                popupStore={this.props.popupStore}
+                                treeStore={this.props.treeStore}
+                                textStore={this.props.textStore}
+                            >
+                                <WidgetTreeMenu itemId={+node.id} />
+                            </Provider>
+                        }
+                    >
+                        <TypedTreeNode
+                            {...node}
+                            key={node.id}
+                            contentRef={this.handleContentRef(+node.id)}
+                            depth={elementPath.length - 1}
+                            onClick={this.handleNodeClick}
+                            onContextMenu={this.handleNodeContextMenu}
+                            onCollapse={this.handleNodeCollapse}
+                            onDoubleClick={this.handleNodeDoubleClick}
+                            onExpand={this.handleNodeExpand}
+                            onMouseEnter={this.handleNodeMouseEnter}
+                            onMouseLeave={this.handleNodeMouseLeave}
+                            path={elementPath}
+                        />
+                    </RightClickMenu>
+                ) : (
+                    <TypedTreeNode
+                        {...node}
+                        key={node.id}
+                        contentRef={this.handleContentRef(+node.id)}
+                        depth={elementPath.length - 1}
+                        onClick={this.handleNodeClick}
+                        onContextMenu={this.handleNodeContextMenu}
+                        onCollapse={this.handleNodeCollapse}
+                        onDoubleClick={this.handleNodeDoubleClick}
+                        onExpand={this.handleNodeExpand}
+                        onMouseEnter={this.handleNodeMouseEnter}
+                        onMouseLeave={this.handleNodeMouseLeave}
+                        path={elementPath}
+                    />
+                ),
                 node.isExpanded ? (
                     <React.Fragment key={`${node.id}-r`}>
-                        {this.props.tree.type === TreeStoreType.WIDGET ? (
-                            <RightClickContextMenu
-                                content={
-                                    <Provider
-                                        qpIntegrationStore={
-                                            this.props.qpIntegrationStore
-                                        }
-                                        popupStore={this.props.popupStore}
-                                        treeStore={this.props.treeStore}
-                                        textStore={this.props.textStore}
-                                    >
-                                        <WidgetTreeMenu itemId={+node.id} />
-                                    </Provider>
-                                }
-                            >
-                                {this.renderNodes(node.childNodes, elementPath)}
-                            </RightClickContextMenu>
-                        ) : (
-                            this.renderNodes(node.childNodes, elementPath)
-                        )}
+                        {this.renderNodes(node.childNodes, elementPath)}
                     </React.Fragment>
                 ) : null,
             ];
