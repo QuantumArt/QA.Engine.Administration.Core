@@ -241,6 +241,12 @@ export abstract class BaseTreeState<T extends {
     }
 
     @action
+    public hidePathAndIDs = () => {
+        this.showIDs = false;
+        this.showPath = false;
+    }
+
+    @action
     public handleNodeExpand = (nodeData: ITreeElement) => {
         if (nodeData.childNodes.length !== 0 && nodeData.parentId !== null) {
             const nodeOpenPublished = this.discriminators == null ? this.icons.nodeOpenPublished : <IconName>nodeData.icon;

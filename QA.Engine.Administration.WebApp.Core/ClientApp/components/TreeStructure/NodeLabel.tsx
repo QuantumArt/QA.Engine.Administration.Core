@@ -1,17 +1,19 @@
-import * as React from 'react';
-import { inject, observer } from 'mobx-react';
-import TreeStore from 'stores/TreeStore';
-import { ITreeElement } from 'stores/TreeStore/BaseTreeStore';
-import TreeStoreType from 'enums/TreeStoreType';
-import { Position, Tooltip } from '@blueprintjs/core';
+import * as React from "react";
+import { inject, observer } from "mobx-react";
+import TreeStore from "stores/TreeStore";
+import { ITreeElement } from "stores/TreeStore/BaseTreeStore";
+import TreeStoreType from "enums/TreeStoreType";
+import { Position, Tooltip } from "@blueprintjs/core";
+import QpIntegrationStore from "stores/QpIntegrationStore";
 
 interface Props {
     treeStore?: TreeStore;
+    qpIntegrationStore?: QpIntegrationStore;
     type: TreeStoreType;
     node: ITreeElement;
 }
 
-@inject('treeStore')
+@inject("treeStore", 'qpIntegrationStore')
 @observer
 export default class NodeLabel extends React.Component<Props> {
     render() {
@@ -22,22 +24,35 @@ export default class NodeLabel extends React.Component<Props> {
             return null;
         }
         if (tree.showIDs && node.id > 0) {
-            return <span className="bp3-tree-node-label">{`${node.title} - ${node.id}`}</span>;
+            return (
+                <span className="bp3-tree-node-label">{`${node.title} - ${node.id}`}</span>
+            );
         }
-        if (tree.searchActive && tree.showPath) {
+        if (tree.showPath) {
             return (
                 <Tooltip
-                    content={`${pathPrefix || ''}/${node.title}`}
+                    content={`${pathPrefix || ""}/${node.title}`}
                     boundary="viewport"
                     position={Position.BOTTOM}
                     modifiers={{
                         arrow: { enabled: false },
                     }}
                 >
-                    <span className="bp3-tree-node-label">{`${pathPrefix || ''}/${node.title}`}</span>
+                    <span className="bp3-tree-node-label">{`${
+                        pathPrefix || ""
+                    }/${node.title}`}</span>
                 </Tooltip>
             );
         }
-        return <span className="bp3-tree-node-label">{node.title}</span>;
+        return tree.type === TreeStoreType.WIDGET && !node.childNodes.length ? (
+            <a
+                className="bp3-tree-node-label"
+                onClick={() => this.props.qpIntegrationStore.edit(node.id)}
+            >
+                {node.title}
+            </a>
+        ) : (
+            <span className="bp3-tree-node-label">{node.title}</span>
+        );
     }
 }
