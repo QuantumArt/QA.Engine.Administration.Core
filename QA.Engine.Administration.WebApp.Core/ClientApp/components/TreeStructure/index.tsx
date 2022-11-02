@@ -319,7 +319,6 @@ export default class SiteTree extends React.Component<Props, State> {
                             ref={this.sbRef}
                             hideTracksWhenNotNeeded
                             autoHeight
-                            // autoHide
                             autoHeightMin={this.props.sbHeightMin}
                             autoHeightMax={
                                 usePagination
