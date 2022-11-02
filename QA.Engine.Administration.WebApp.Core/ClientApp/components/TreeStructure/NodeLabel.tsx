@@ -13,9 +13,15 @@ interface Props {
     node: ITreeElement;
 }
 
-@inject("treeStore", 'qpIntegrationStore')
+@inject("treeStore", "qpIntegrationStore")
 @observer
 export default class NodeLabel extends React.Component<Props> {
+    editHandler() {
+        const { node, qpIntegrationStore } = this.props;
+
+        qpIntegrationStore.edit(node.id);
+    }
+
     render() {
         const { node, treeStore, type } = this.props;
         const tree = treeStore.resolveTree(type);
@@ -24,7 +30,15 @@ export default class NodeLabel extends React.Component<Props> {
             return null;
         }
         if (tree.showIDs && node.id > 0) {
-            return (
+            return TreeStoreType.WIDGET && !node.childNodes.length ? (
+                <a
+                    className="bp3-tree-node-label"
+                    onClick={() => this.editHandler()}
+                >
+                    {" "}
+                    {`${node.title} - ${node.id}`}
+                </a>
+            ) : (
                 <span className="bp3-tree-node-label">{`${node.title} - ${node.id}`}</span>
             );
         }
@@ -47,7 +61,7 @@ export default class NodeLabel extends React.Component<Props> {
         return tree.type === TreeStoreType.WIDGET && !node.childNodes.length ? (
             <a
                 className="bp3-tree-node-label"
-                onClick={() => this.props.qpIntegrationStore.edit(node.id)}
+                onClick={() => this.editHandler()}
             >
                 {node.title}
             </a>
