@@ -236,6 +236,7 @@ body {
 .node-selected:hover {
     color: white;
 }
+
 .bp3-tag {
     flex-shrink: 0;
 }
