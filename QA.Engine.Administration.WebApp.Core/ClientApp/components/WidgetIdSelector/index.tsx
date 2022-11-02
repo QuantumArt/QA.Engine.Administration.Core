@@ -49,11 +49,11 @@ export default class WidgetIdSelector extends React.Component<Props, State> {
         items: {
             widget: [...this.commonItems,
                 {
-                    id: 3,
+                    id: 2,
                     title: "Показать alias",
                     onSelectHandler: () => {
-                        if (!this.props.tree.showPath) {
-                            this.props.tree.toggleAlias(); // !!!
+                        if (!this.props.tree.showAlias) {
+                            this.props.tree.toggleAlias();
                         }
                     },
                 },
@@ -61,7 +61,7 @@ export default class WidgetIdSelector extends React.Component<Props, State> {
             site: [
                 ...this.commonItems,
                 {
-                    id: 3,
+                    id: 2,
                     title: "Показать путь",
                     onSelectHandler: () => {
                         if (!this.props.tree.showPath) {

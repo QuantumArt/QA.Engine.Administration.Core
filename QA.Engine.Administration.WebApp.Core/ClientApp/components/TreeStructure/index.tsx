@@ -10,12 +10,11 @@ import {
     NavbarDivider,
     NumericInput,
     Spinner,
-    Switch,
     Tag,
     ButtonGroup,
     Intent,
 } from "@blueprintjs/core";
-import Scrollbars from "react-custom-scrollbars"; // tslint:disable-line
+import { Scrollbars } from 'react-custom-scrollbars-2'; // tslint:disable-line
 import cn from "classnames"; // tslint:disable-line
 import NavigationStore from "stores/NavigationStore";
 import OperationState from "enums/OperationState";
@@ -29,7 +28,6 @@ import RegionStore from "stores/RegionStore";
 import TextStore from "stores/TextStore";
 import Texts from "constants/Texts";
 import ArchiveTreeStore from "stores/TreeStore/ArchiveTreeStore";
-import TreeStoreType from "enums/TreeStoreType";
 import WidgetIdSelector from "components/WidgetIdSelector";
 
 interface Props {
@@ -68,7 +66,6 @@ interface InternalRestProps
     extends JSX.IntrinsicAttributes,
         React.ClassAttributes<HTMLDivElement>,
         React.HTMLAttributes<HTMLDivElement> {}
-
 @inject(
     "navigationStore",
     "editArticleStore",
@@ -318,6 +315,7 @@ export default class SiteTree extends React.Component<Props, State> {
                         <Scrollbars
                             ref={this.sbRef}
                             hideTracksWhenNotNeeded
+                            autoHide
                             autoHeight
                             autoHeightMin={this.props.sbHeightMin}
                             autoHeightMax={

@@ -70,8 +70,6 @@ export class CustomTree<T = {}> extends React.Component<Props<T>, {}> {
         this.props.tree.setCordsUpdateStatus(true);
     }
 
-    componentWillUnmount(): void {}
-
     public render() {
         return (
             <div className={classnames(Classes.TREE, this.props.className)}>
