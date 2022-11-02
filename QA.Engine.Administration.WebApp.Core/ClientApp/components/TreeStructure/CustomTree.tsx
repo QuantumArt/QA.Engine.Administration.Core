@@ -99,7 +99,8 @@ export class CustomTree<T = {}> extends React.Component<Props<T>, {}> {
             // tslint:disable-next-line:variable-name
             const TypedTreeNode = CustomTreeNode.ofType<T>();
             return [
-                this.props.tree.type === TreeStoreType.WIDGET && !node.childNodes.length ? (
+                this.props.tree.type === TreeStoreType.WIDGET &&
+                !node.childNodes.length ? (
                     <RightClickMenu
                         key={node.id}
                         content={
