@@ -1,18 +1,27 @@
-import React from 'react'
-import {ContextMenuTarget} from '@blueprintjs/core/lib/esnext/components/context-menu/contextMenuTarget.js';
+import React, { ComponentClass } from "react";
+import { ContextMenuTarget } from "@blueprintjs/core/lib/esnext/components/context-menu/contextMenuTarget.js";
+import { ContextMenu } from "@blueprintjs/core";
 
 type Props = {
     content: JSX.Element;
+};
+
+class RightClickMenu extends React.PureComponent<Props> {
+    render() {
+        return (
+            <div onContextMenu={this.showContextMenu}>
+                {this.props.children}
+            </div>
+        );
+    }
+
+    private showContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        ContextMenu.show(this.props.content, {
+            left: e.clientX,
+            top: e.clientY,
+        });
+    };
 }
 
-const RightClickMenu = ContextMenuTarget(class RightClickContextMenu extends React.Component<Props> {
-    public render() {
-        return <div>{this.props.children}</div>;
-    }
- 
-    public renderContextMenu() {
-        return this.props.content;
-    }
-});
-
-export default RightClickMenu
+export default RightClickMenu;

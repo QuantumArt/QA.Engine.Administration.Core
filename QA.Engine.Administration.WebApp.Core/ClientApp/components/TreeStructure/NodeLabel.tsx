@@ -30,12 +30,11 @@ export default class NodeLabel extends React.Component<Props> {
             return null;
         }
         if (tree.showIDs && node.id > 0) {
-            return TreeStoreType.WIDGET && !node.childNodes.length ? (
+            return tree.type === TreeStoreType.WIDGET && !node.childNodes.length ? (
                 <a
                     className="bp3-tree-node-label"
                     onClick={() => this.editHandler()}
                 >
-                    {" "}
                     {`${node.title} - ${node.id}`}
                 </a>
             ) : (

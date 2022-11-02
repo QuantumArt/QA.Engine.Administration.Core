@@ -1,5 +1,11 @@
 import * as React from "react";
-import { Intent, Menu, MenuDivider, MenuItem } from "@blueprintjs/core";
+import {
+    ContextMenu,
+    Intent,
+    Menu,
+    MenuDivider,
+    MenuItem,
+} from "@blueprintjs/core";
 import { observer, inject } from "mobx-react";
 import QpIntegrationStore from "stores/QpIntegrationStore";
 import PopupStore from "stores/PopupStore";
@@ -61,6 +67,8 @@ export default class WidgetTreeMenu extends React.Component<Props> {
         e.stopPropagation();
         if (this.props.node) {
             this.props.node.isContextMenuActive = false;
+        } else {
+            ContextMenu.hide();
         }
         cb();
     };
