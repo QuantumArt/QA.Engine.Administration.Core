@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Intent, Menu, MenuDivider, MenuItem } from '@blueprintjs/core';
+import { ContextMenu, Intent, Menu, MenuDivider, MenuItem } from '@blueprintjs/core';
 import { observer, inject } from 'mobx-react';
 import QpIntegrationStore from 'stores/QpIntegrationStore';
 import PopupStore from 'stores/PopupStore';
@@ -16,7 +16,7 @@ interface Props {
     treeStore?: TreeStore;
     textStore?: TextStore;
     itemId: number;
-    node: ITreeElement;
+    node?: ITreeElement;
 }
 
 @inject('qpIntegrationStore', 'popupStore', 'treeStore', 'textStore')
@@ -77,7 +77,11 @@ export default class SiteTreeMenu extends React.Component<Props> {
 
     private handleClick = (e: React.MouseEvent<HTMLElement>, cb: () => void) => {
         e.stopPropagation();
+       if (this.props.node) {
         this.props.node.isContextMenuActive = false;
+       } else {
+        ContextMenu.hide()
+       } 
         cb();
     }
 

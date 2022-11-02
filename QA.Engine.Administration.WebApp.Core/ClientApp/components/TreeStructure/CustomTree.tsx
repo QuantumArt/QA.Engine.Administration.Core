@@ -17,6 +17,7 @@ import WidgetTreeMenu from "./InteractiveZone/WidgetTreeMenu";
 import QpIntegrationStore from "stores/QpIntegrationStore";
 import PopupStore from "stores/PopupStore";
 import TextStore from "stores/TextStore";
+import SiteTreeMenu from "./InteractiveZone/SiteTreeMenu";
 
 const DISPLAYNAME_PREFIX = "Blueprint3";
 class Classes {
@@ -95,11 +96,11 @@ export class CustomTree<T = {}> extends React.Component<Props<T>, {}> {
         }
 
         const nodeItems = treeNodes.map((node, i) => {
+            const { tree } = this.props;
             const elementPath = currentPath.concat(i);
             // tslint:disable-next-line:variable-name
             const TypedTreeNode = CustomTreeNode.ofType<T>();
             return [
-                this.props.tree.type === TreeStoreType.WIDGET &&
                 !node.childNodes.length ? (
                     <RightClickMenu
                         key={node.id}
@@ -112,7 +113,11 @@ export class CustomTree<T = {}> extends React.Component<Props<T>, {}> {
                                 treeStore={this.props.treeStore}
                                 textStore={this.props.textStore}
                             >
-                                <WidgetTreeMenu itemId={+node.id} />
+                                {tree.type === TreeStoreType.WIDGET ? (
+                                    <WidgetTreeMenu itemId={+node.id} />
+                                ) : tree.type === TreeStoreType.SITE ? (
+                                    <SiteTreeMenu itemId={+node.id} />
+                                ) : null}
                             </Provider>
                         }
                     >

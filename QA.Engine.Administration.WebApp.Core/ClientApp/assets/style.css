@@ -18,7 +18,7 @@ body {
 }
 
 .not-visible {
-    opacity: .5;
+    opacity: 0.5;
 }
 
 .tree-pane {
@@ -48,7 +48,9 @@ body {
     text-overflow: ellipsis;
 }
 
-.bp3-tree-node.bp3-tree-node-selected > .bp3-tree-node-content .bp3-tag.bp3-intent-success {
+.bp3-tree-node.bp3-tree-node-selected
+    > .bp3-tree-node-content
+    .bp3-tag.bp3-intent-success {
     background-color: rgba(15, 153, 96, 0.5);
     color: #ffffff;
 }
@@ -225,4 +227,15 @@ body {
 }
 .pagination .bp3-button {
     margin: 0 10px;
+}
+
+.node-selected {
+    color: white;
+}
+
+.node-selected:hover {
+    color: white;
+}
+.bp3-tag {
+    flex-shrink: 0;
 }

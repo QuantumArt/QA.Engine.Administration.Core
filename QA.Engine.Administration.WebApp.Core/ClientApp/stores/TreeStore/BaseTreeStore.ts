@@ -72,6 +72,7 @@ export abstract class BaseTreeState<T extends {
 
     @observable public showIDs: boolean = false;
     @observable public showPath: boolean = false;
+    @observable public showAlias: boolean = false;
 
     @observable pageIndex: number = -1;
     @computed
@@ -226,8 +227,9 @@ export abstract class BaseTreeState<T extends {
 
     @action
     public toggleIDs = () => {
-        if (this.showPath) {
+        if (this.showPath || this.showAlias ) {
             this.showPath = false;
+            this.showAlias = false;
         }
         this.showIDs = !this.showIDs;
     }
@@ -241,9 +243,18 @@ export abstract class BaseTreeState<T extends {
     }
 
     @action
+    public toggleAlias = () => {
+        if (this.showIDs) {
+            this.showIDs = false;
+        }
+        this.showAlias = !this.showAlias
+    }
+
+    @action
     public hidePathAndIDs = () => {
         this.showIDs = false;
         this.showPath = false;
+        this.showAlias = false;
     }
 
     @action
