@@ -309,4 +309,7 @@
   <data name="WidgetTab" xml:space="preserve">
     <value>Widgets</value>
   </data>
+  <data name="ShowAlias" xml:space="preserve">
+      <value>Show alias</value>
+  </data>
 </root>

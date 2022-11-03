@@ -10,8 +10,8 @@
 
 namespace QA.Engine.Administration.WebApp.Core.Resources {
     using System;
-    
-    
+
+
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -23,15 +23,15 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Texts {
-        
+
         private static global::System.Resources.ResourceManager resourceMan;
-        
+
         private static global::System.Globalization.CultureInfo resourceCulture;
-        
+
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         internal Texts() {
         }
-        
+
         /// <summary>
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
@@ -45,7 +45,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return resourceMan;
             }
         }
-        
+
         /// <summary>
         ///   Overrides the current thread's CurrentUICulture property for all
         ///   resource lookups using this strongly typed resource class.
@@ -59,7 +59,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 resourceCulture = value;
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Добавить.
         /// </summary>
@@ -68,7 +68,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("Add", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Добавить подраздел.
         /// </summary>
@@ -77,7 +77,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("AddItem", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Добавить версию.
         /// </summary>
@@ -86,7 +86,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("AddVersionItem", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Alias.
         /// </summary>
@@ -95,7 +95,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("Alias", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Архивировать.
         /// </summary>
@@ -104,7 +104,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("Archive", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Архив.
         /// </summary>
@@ -113,7 +113,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("ArchiveMenu", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Инфо.
         /// </summary>
@@ -122,7 +122,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("CommonTab", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Контентные версии.
         /// </summary>
@@ -131,7 +131,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("ContentVersionTab", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Удалить.
         /// </summary>
@@ -140,7 +140,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("Delete", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Редактировать.
         /// </summary>
@@ -149,7 +149,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("Edit", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to История изменений.
         /// </summary>
@@ -158,7 +158,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("History", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Показывать в структуре сайта.
         /// </summary>
@@ -167,7 +167,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("IsInSiteMap", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Видимость.
         /// </summary>
@@ -176,7 +176,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("IsVisible", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Переместить.
         /// </summary>
@@ -185,7 +185,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("Move", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Тип действия.
         /// </summary>
@@ -194,7 +194,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("PopupActionType", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Добавить.
         /// </summary>
@@ -203,7 +203,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("PopupAddButton", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Добавить раздел.
         /// </summary>
@@ -212,7 +212,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("PopupAddItemTitle", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Добавить версию.
         /// </summary>
@@ -221,7 +221,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("PopupAddVersionItemTitle", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Добавить виджет.
         /// </summary>
@@ -230,7 +230,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("PopupAddWidgetTitle", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Архивировать.
         /// </summary>
@@ -239,7 +239,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("PopupArchive", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Архивировать все версии.
         /// </summary>
@@ -248,7 +248,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("PopupArchiveAllVersion", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Архивировать.
         /// </summary>
@@ -257,7 +257,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("PopupArchiveButton", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Отправить в архив.
         /// </summary>
@@ -266,7 +266,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("PopupArchiveItemTitle", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Отмена.
         /// </summary>
@@ -275,7 +275,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("PopupCancelButton", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Удалить все версии.
         /// </summary>
@@ -284,7 +284,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("PopupDeleteAllVersion", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Удалить.
         /// </summary>
@@ -293,7 +293,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("PopupDeleteButton", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Delete item.
         /// </summary>
@@ -302,7 +302,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("PopupDeleteItemTitle", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Алиас.
         /// </summary>
@@ -311,7 +311,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("PopupFieldAlias", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to alias.
         /// </summary>
@@ -320,7 +320,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("PopupFieldAliasPlaceholder", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Тип контента.
         /// </summary>
@@ -329,7 +329,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("PopupFieldContentType", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Название.
         /// </summary>
@@ -338,7 +338,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("PopupFieldTitle", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Название раздела.
         /// </summary>
@@ -347,7 +347,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("PopupFieldTitlePlaceholder", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Версия.
         /// </summary>
@@ -356,7 +356,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("PopupFieldVersion", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Переместить.
         /// </summary>
@@ -365,7 +365,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("PopupMoveButton", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Переместить страницу.
         /// </summary>
@@ -374,7 +374,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("PopupMoveTitle", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Сменить версию.
         /// </summary>
@@ -383,7 +383,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("PopupMoveVersion", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Применить.
         /// </summary>
@@ -392,7 +392,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("PopupReorderButton", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to После.
         /// </summary>
@@ -401,7 +401,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("PopupReorderInsertAfter", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to До.
         /// </summary>
@@ -410,7 +410,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("PopupReorderInsertBefore", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Переместить.
         /// </summary>
@@ -419,7 +419,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("PopupReorderInsertLabel", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Изменить сортировку.
         /// </summary>
@@ -428,7 +428,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("PopupReorderTitle", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Восстановить версии.
         /// </summary>
@@ -437,7 +437,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("PopupRestoreAllVersion", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Восстановить.
         /// </summary>
@@ -446,7 +446,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("PopupRestoreButton", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Восстановить вложенные страницы.
         /// </summary>
@@ -455,7 +455,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("PopupRestoreChildren", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Восстановить контентные версии.
         /// </summary>
@@ -464,7 +464,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("PopupRestoreContentVersion", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Восстановить раздел.
         /// </summary>
@@ -473,7 +473,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("PopupRestoreItemTitle", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Восстановить виджеты.
         /// </summary>
@@ -482,7 +482,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("PopupRestoreWidget", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Контентная.
         /// </summary>
@@ -491,7 +491,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("PopupVersionContent", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Структурная.
         /// </summary>
@@ -500,7 +500,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("PopupVersionStructural", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Публиковать.
         /// </summary>
@@ -509,7 +509,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("Publish", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Опубликовано.
         /// </summary>
@@ -518,7 +518,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("Published", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Обновить.
         /// </summary>
@@ -527,7 +527,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("Refresh", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Сортировать.
         /// </summary>
@@ -536,7 +536,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("Reorder", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Восстановить.
         /// </summary>
@@ -545,7 +545,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("Restore", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Сохранить.
         /// </summary>
@@ -554,7 +554,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("Save", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Показать поля расширения.
         /// </summary>
@@ -563,7 +563,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("ShowExtensionField", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Показать ID.
         /// </summary>
@@ -572,7 +572,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("ShowID", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Показать путь.
         /// </summary>
@@ -581,7 +581,16 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("ShowPath", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Показать алиас.
+        /// </summary>
+        public static string ShowAlias {
+            get {
+                return ResourceManager.GetString("ShowAlias", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Управление Сайтом.
         /// </summary>
@@ -590,7 +599,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("SiteManagement", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Карта Сайта.
         /// </summary>
@@ -599,7 +608,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("SiteMapMenu", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Заголовок.
         /// </summary>
@@ -608,7 +617,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("Title", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Тип контента.
         /// </summary>
@@ -617,7 +626,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("TypeName", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Просмотр.
         /// </summary>
@@ -626,7 +635,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
                 return ResourceManager.GetString("View", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Виджеты.
         /// </summary>
