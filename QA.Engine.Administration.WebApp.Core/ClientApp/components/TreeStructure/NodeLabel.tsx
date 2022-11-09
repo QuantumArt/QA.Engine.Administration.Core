@@ -37,12 +37,10 @@ export default class NodeLabel extends React.Component<Props> {
             return null;
         }
         if (tree.showIDs && node.id > 0) {
-            return !node.childNodes.length ? (
+            return (
                 <a className={linkClasses} onClick={() => this.editHandler()}>
                     {`${node.title} - ${node.id}`}
                 </a>
-            ) : (
-                <span className="bp3-tree-node-label">{`${node.title} - ${node.id}`}</span>
             );
         }
         if (tree.showPath) {
@@ -55,16 +53,10 @@ export default class NodeLabel extends React.Component<Props> {
                         arrow: { enabled: false },
                     }}
                 >
-                    {!node.childNodes.length ? (
-                        <a
-                            className={linkClasses}
-                            onClick={() => this.editHandler()}
-                        >{`${pathPrefix || ""}/${node.title}`}</a>
-                    ) : (
-                        <span className="bp3-tree-node-label">{`${
-                            pathPrefix || ""
-                        }/${node.title}`}</span>
-                    )}
+                    <a
+                        className={linkClasses}
+                        onClick={() => this.editHandler()}
+                    >{`${pathPrefix || ""}/${node.title}`}</a>
                 </Tooltip>
             );
         }
@@ -78,20 +70,16 @@ export default class NodeLabel extends React.Component<Props> {
                 <span className="bp3-tree-node-label">{`${node.title}`}</span>
             );
 
-            return !node.childNodes.length ? (
+            return (
                 <a onClick={() => this.editHandler()} className={linkClasses}>
                     {text}
                 </a>
-            ) : (
-                text
             );
         }
-        return !node.childNodes.length ? (
+        return (
             <a className={linkClasses} onClick={() => this.editHandler()}>
                 {node.title}
             </a>
-        ) : (
-            <span className="bp3-tree-node-label">{node.title}</span>
         );
     }
 }
