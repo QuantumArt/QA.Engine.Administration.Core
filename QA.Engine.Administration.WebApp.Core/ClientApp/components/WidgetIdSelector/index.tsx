@@ -43,32 +43,40 @@ export default class WidgetIdSelector extends React.Component<Props, State> {
                 }
             },
         },
+        {
+            id: 2,
+            title: "Показать alias",
+            onSelectHandler: () => {
+                if (!this.props.tree.showAlias) {
+                    this.props.tree.toggleAlias();
+                }
+            },
+        },
+        {
+            id: 3,
+            title: "Показать путь",
+            onSelectHandler: () => {
+                if (!this.props.tree.showPath) {
+                    this.props.tree.togglePath();
+                }
+            },
+        },
     ];
 
     state = {
         items: {
-            widget: [...this.commonItems,
-                {
-                    id: 2,
-                    title: "Показать alias",
-                    onSelectHandler: () => {
-                        if (!this.props.tree.showAlias) {
-                            this.props.tree.toggleAlias();
-                        }
-                    },
-                },
-            ],
+            widget: [...this.commonItems],
             site: [
                 ...this.commonItems,
-                {
-                    id: 2,
-                    title: "Показать путь",
-                    onSelectHandler: () => {
-                        if (!this.props.tree.showPath) {
-                            this.props.tree.togglePath();
-                        }
-                    },
-                },
+                // {
+                //     id: 2,
+                //     title: "Показать путь",
+                //     onSelectHandler: () => {
+                //         if (!this.props.tree.showPath) {
+                //             this.props.tree.togglePath();
+                //         }
+                //     },
+                // },
             ],
         },
     };

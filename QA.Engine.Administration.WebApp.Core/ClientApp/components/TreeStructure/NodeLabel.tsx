@@ -37,10 +37,12 @@ export default class NodeLabel extends React.Component<Props> {
             return null;
         }
         if (tree.showIDs && node.id > 0) {
-            return (
+            return !node.childNodes.length || tree.type === TreeStoreType.SITE ? (
                 <a className={linkClasses} onClick={() => this.editHandler()}>
                     {`${node.title} - ${node.id}`}
                 </a>
+            ) : (
+                <span className="bp3-tree-node-label">{`${node.title} - ${node.id}`}</span>
             );
         }
         if (tree.showPath) {
@@ -53,10 +55,16 @@ export default class NodeLabel extends React.Component<Props> {
                         arrow: { enabled: false },
                     }}
                 >
-                    <a
-                        className={linkClasses}
-                        onClick={() => this.editHandler()}
-                    >{`${pathPrefix || ""}/${node.title}`}</a>
+                    {!node.childNodes.length || tree.type === TreeStoreType.SITE ? (
+                        <a
+                            className={linkClasses}
+                            onClick={() => this.editHandler()}
+                        >{`${pathPrefix || ""}/${node.title}`}</a>
+                    ) : (
+                        <span className="bp3-tree-node-label">{`${
+                            pathPrefix || ""
+                        }/${node.title}`}</span>
+                    )}
                 </Tooltip>
             );
         }
@@ -70,16 +78,20 @@ export default class NodeLabel extends React.Component<Props> {
                 <span className="bp3-tree-node-label">{`${node.title}`}</span>
             );
 
-            return (
+            return !node.childNodes.length || tree.type === TreeStoreType.SITE ? (
                 <a onClick={() => this.editHandler()} className={linkClasses}>
                     {text}
                 </a>
+            ) : (
+                text
             );
         }
-        return (
+        return !node.childNodes.length || tree.type === TreeStoreType.SITE ? (
             <a className={linkClasses} onClick={() => this.editHandler()}>
                 {node.title}
             </a>
+        ) : (
+            <span className="bp3-tree-node-label">{node.title}</span>
         );
     }
 }
