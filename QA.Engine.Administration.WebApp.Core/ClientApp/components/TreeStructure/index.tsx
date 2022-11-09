@@ -14,7 +14,7 @@ import {
     ButtonGroup,
     Intent,
 } from "@blueprintjs/core";
-import { Scrollbars } from 'react-custom-scrollbars-2'; // tslint:disable-line
+import { Scrollbars } from "react-custom-scrollbars-2"; // tslint:disable-line
 import cn from "classnames"; // tslint:disable-line
 import NavigationStore from "stores/NavigationStore";
 import OperationState from "enums/OperationState";
@@ -49,6 +49,8 @@ interface Props {
 interface State {
     shouldScroll: boolean;
     sbHeightMax: number;
+
+    expandCollapseСounter: number;
 }
 
 type DefaultProps =
@@ -87,6 +89,7 @@ export default class SiteTree extends React.Component<Props, State> {
         this.state = {
             shouldScroll: false,
             sbHeightMax: window.innerHeight - props.sbHeightDelta,
+            expandCollapseСounter: 0, // need for rerender Scrollbars component
         };
 
         autorun(() => {
@@ -99,6 +102,13 @@ export default class SiteTree extends React.Component<Props, State> {
     private paginationTimer: number;
 
     private sbRef = React.createRef<Scrollbars>();
+
+    // need for rerender Scrollbars component
+    private updateExpandCollapseСounter() {
+        this.setState((state) => ({
+            expandCollapseСounter: state.expandCollapseСounter + 1,
+        }));
+    }
 
     private handleMajorTreeNode = (e: ITreeElement) => {
         const { navigationStore, treeStore } = this.props;
@@ -267,7 +277,10 @@ export default class SiteTree extends React.Component<Props, State> {
                         placeholder="Title/Alias/ID"
                     />
                     <NavbarDivider />
-                    <WidgetIdSelector tree={tree} textStore={this.props.textStore}/>
+                    <WidgetIdSelector
+                        tree={tree}
+                        textStore={this.props.textStore}
+                    />
                     {useRegions && !isMoveTreeMode && (
                         <React.Fragment>
                             <NavbarDivider
@@ -315,7 +328,6 @@ export default class SiteTree extends React.Component<Props, State> {
                         <Scrollbars
                             ref={this.sbRef}
                             hideTracksWhenNotNeeded
-                            autoHide
                             autoHeight
                             autoHeightMin={this.props.sbHeightMin}
                             autoHeightMax={
@@ -344,6 +356,9 @@ export default class SiteTree extends React.Component<Props, State> {
                                 onNodeCollapse={tree.handleNodeCollapse}
                                 onNodeExpand={tree.handleNodeExpand}
                                 onNodeClick={this.handleNodeClick}
+                                updateScroll={() =>
+                                    this.updateExpandCollapseСounter()
+                                }
                             />
                         </Scrollbars>
                         {usePagination && (
