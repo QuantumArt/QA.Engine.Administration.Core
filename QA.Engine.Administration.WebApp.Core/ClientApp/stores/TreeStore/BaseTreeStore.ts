@@ -62,6 +62,8 @@ export abstract class BaseTreeState<T extends {
     visible: boolean;
     published?: boolean;
     discriminatorId?: number;
+    hasRegions?: boolean;
+    hasContentVersion?: boolean;
 }> {
 
     constructor(icons: ITreeIcons = defaultIcons) {
@@ -398,18 +400,40 @@ export abstract class BaseTreeState<T extends {
                 intent: <Intent>discriminator.iconIntent,
                 className: 'bp3-tree-node-icon',
             };
-            const tagProps = {
+            const icon = React.createElement(Icon, iconProps);
+
+            const newTagProps = {
                 minimal: true,
                 intent: Intent.SUCCESS,
                 className: 'bp3-tree-node-icon',
             };
-            const icon = React.createElement(Icon, iconProps);
-            const tag = React.createElement(Tag, tagProps, 'new');
+            const tagNew = React.createElement(Tag, newTagProps, 'new');
 
+
+            const regionsTagProps = {
+                minimal: true,
+                intent: Intent.WARNING,
+                className: 'bp3-tree-node-icon',
+            };
+            const tagRegions = React.createElement(Tag, regionsTagProps, 'regions');
+
+            const versionsTagProps = {
+                minimal: true,
+                intent: Intent.PRIMARY,
+                className: 'bp3-tree-node-icon',
+            };
+            const tagVersions = React.createElement(Tag, versionsTagProps, 'versions');
+
+            const activeTags = []
             if (!el.published) {
-                return React.createElement(React.Fragment, {}, icon, tag);
-            }
-            return icon;
+                activeTags.push(tagNew)
+            } else if (el.hasRegions) {
+                activeTags.push(tagRegions)
+            } else if (el.hasContentVersion) {
+                activeTags.push(tagVersions)
+            } 
+
+            return React.createElement(React.Fragment, {}, icon, ...activeTags);
         }
 
         if (this.icons.checkPublication) {

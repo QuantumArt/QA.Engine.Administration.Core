@@ -72,6 +72,7 @@ export class CustomTree<T = {}> extends React.Component<Props<T>, {}> {
     }
 
     public render() {
+
         return (
             <div className={classnames(Classes.TREE, this.props.className)}>
                 {this.renderNodes(this.props.contents, [], Classes.TREE_ROOT)}
