@@ -17,11 +17,11 @@ type State = {
 
 type Props = {
     tree: TreeType;
-    textStore?: TextStore
+    textStore?: TextStore;
     treeSearchActive?: boolean;
 };
 
-@inject('textStore')
+@inject("textStore")
 @observer
 export default class WidgetIdSelector extends React.Component<Props, State> {
     commonItems = [
@@ -77,6 +77,9 @@ export default class WidgetIdSelector extends React.Component<Props, State> {
                 const showPathRemoved = this.state.items.filter(
                     (item) => item.id !== 3
                 );
+                if (this.props.tree.showPath) {
+                    this.props.tree.togglePath();
+                }
                 this.setState({
                     items: showPathRemoved,
                 });

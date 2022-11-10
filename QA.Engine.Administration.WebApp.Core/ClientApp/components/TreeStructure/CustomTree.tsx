@@ -100,23 +100,42 @@ export class CustomTree<T = {}> extends React.Component<Props<T>, {}> {
             // tslint:disable-next-line:variable-name
             const TypedTreeNode = CustomTreeNode.ofType<T>();
             return [
-                <RightClickMenu
-                    key={node.id}
-                    content={
-                        <Provider
-                            qpIntegrationStore={this.props.qpIntegrationStore}
-                            popupStore={this.props.popupStore}
-                            treeStore={this.props.treeStore}
-                            textStore={this.props.textStore}
-                        >
-                            {tree.type === TreeStoreType.WIDGET ? (
-                                <WidgetTreeMenu itemId={+node.id} />
-                            ) : tree.type === TreeStoreType.SITE ? (
-                                <SiteTreeMenu itemId={+node.id} />
-                            ) : null}
-                        </Provider>
-                    }
-                >
+                tree.type === TreeStoreType.SITE || !node.childNodes.length ? (
+                    <RightClickMenu
+                        key={node.id}
+                        content={
+                            <Provider
+                                qpIntegrationStore={
+                                    this.props.qpIntegrationStore
+                                }
+                                popupStore={this.props.popupStore}
+                                treeStore={this.props.treeStore}
+                                textStore={this.props.textStore}
+                            >
+                                {tree.type === TreeStoreType.WIDGET ? (
+                                    <WidgetTreeMenu itemId={+node.id} />
+                                ) : tree.type === TreeStoreType.SITE ? (
+                                    <SiteTreeMenu itemId={+node.id} />
+                                ) : null}
+                            </Provider>
+                        }
+                    >
+                        <TypedTreeNode
+                            {...node}
+                            key={node.id}
+                            contentRef={this.handleContentRef(+node.id)}
+                            depth={elementPath.length - 1}
+                            onClick={this.handleNodeClick}
+                            onContextMenu={this.handleNodeContextMenu}
+                            onCollapse={this.handleNodeCollapse}
+                            onDoubleClick={this.handleNodeDoubleClick}
+                            onExpand={this.handleNodeExpand}
+                            onMouseEnter={this.handleNodeMouseEnter}
+                            onMouseLeave={this.handleNodeMouseLeave}
+                            path={elementPath}
+                        />
+                    </RightClickMenu>
+                ) : (
                     <TypedTreeNode
                         {...node}
                         key={node.id}
@@ -131,7 +150,7 @@ export class CustomTree<T = {}> extends React.Component<Props<T>, {}> {
                         onMouseLeave={this.handleNodeMouseLeave}
                         path={elementPath}
                     />
-                </RightClickMenu>,
+                ),
                 node.isExpanded ? (
                     <React.Fragment key={`${node.id}-r`}>
                         {this.renderNodes(node.childNodes, elementPath)}
