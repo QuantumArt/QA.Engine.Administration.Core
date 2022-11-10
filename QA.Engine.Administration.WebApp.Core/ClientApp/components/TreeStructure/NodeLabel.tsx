@@ -7,6 +7,7 @@ import TreeStoreType from "enums/TreeStoreType";
 import { Position, Tooltip } from "@blueprintjs/core";
 import QpIntegrationStore from "stores/QpIntegrationStore";
 import WidgetTreeStore from "stores/TreeStore/WidgetTreeStore";
+import SiteTreeStore from "stores/TreeStore/SiteTreeStore";
 
 interface Props {
     treeStore?: TreeStore;
@@ -45,7 +46,7 @@ export default class NodeLabel extends React.Component<Props> {
                 <span className="bp3-tree-node-label">{`${node.title} - ${node.id}`}</span>
             );
         }
-        if (tree.showPath) {
+        if (tree.showPath && tree.searchActive) {
             return (
                 <Tooltip
                     content={`${pathPrefix || ""}/${node.title}`}
@@ -69,8 +70,8 @@ export default class NodeLabel extends React.Component<Props> {
             );
         }
         if (tree.showAlias) {
-            const witgetStore = tree as WidgetTreeStore;
-            const alias = witgetStore.getAlias(node);
+            const treeStore = tree as WidgetTreeStore | SiteTreeStore;
+            const alias = treeStore.getAlias(node);
 
             const text = alias ? (
                 <span className="bp3-tree-node-label">{`${node.title} - ${alias}`}</span>

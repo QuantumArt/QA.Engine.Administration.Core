@@ -67,4 +67,6 @@ export default class Texts {
 
     static readonly showID: string = 'ShowID';
     static readonly showPath: string = 'ShowPath';
+    static readonly showAlias: string = 'ShowAlias';
+
 }

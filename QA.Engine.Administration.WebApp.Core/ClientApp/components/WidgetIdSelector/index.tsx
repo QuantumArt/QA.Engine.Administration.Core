@@ -2,9 +2,8 @@ import React from "react";
 import { inject, observer } from "mobx-react";
 import BaseSelect from "components/Select/BaseSelect";
 import { TreeType } from "stores/TreeStore";
-import TextStore from "stores/TextStore";
 import Texts from "constants/Texts";
-import TreeStoreType from "enums/TreeStoreType";
+import TextStore from "stores/TextStore";
 
 interface WidgetIdSelectModel {
     id: number;
@@ -13,17 +12,16 @@ interface WidgetIdSelectModel {
 }
 
 type State = {
-    items: {
-        site: WidgetIdSelectModel[];
-        widget: WidgetIdSelectModel[];
-    };
+    items: WidgetIdSelectModel[];
 };
 
 type Props = {
     tree: TreeType;
-    textStore: TextStore;
+    textStore?: TextStore
+    treeSearchActive?: boolean;
 };
 
+@inject('textStore')
 @observer
 export default class WidgetIdSelector extends React.Component<Props, State> {
     commonItems = [
@@ -36,7 +34,7 @@ export default class WidgetIdSelector extends React.Component<Props, State> {
         },
         {
             id: 1,
-            title: this.props.textStore.texts[Texts.showID] ?? "Показать ID",
+            title: this.props.textStore.texts[Texts.showID],
             onSelectHandler: () => {
                 if (!this.props.tree.showIDs) {
                     this.props.tree.toggleIDs();
@@ -45,60 +43,55 @@ export default class WidgetIdSelector extends React.Component<Props, State> {
         },
         {
             id: 2,
-            title: "Показать alias",
+            title: this.props.textStore.texts[Texts.showAlias],
             onSelectHandler: () => {
                 if (!this.props.tree.showAlias) {
                     this.props.tree.toggleAlias();
                 }
             },
         },
-        {
-            id: 3,
-            title: "Показать путь",
-            onSelectHandler: () => {
-                if (!this.props.tree.showPath) {
-                    this.props.tree.togglePath();
-                }
-            },
-        },
     ];
 
-    state = {
-        items: {
-            widget: [...this.commonItems],
-            site: [
-                ...this.commonItems,
-                // {
-                //     id: 2,
-                //     title: "Показать путь",
-                //     onSelectHandler: () => {
-                //         if (!this.props.tree.showPath) {
-                //             this.props.tree.togglePath();
-                //         }
-                //     },
-                // },
-            ],
+    showPathItem = {
+        id: 3,
+        title: this.props.textStore.texts[Texts.showPath],
+        onSelectHandler: () => {
+            if (!this.props.tree.showPath) {
+                this.props.tree.togglePath();
+            }
         },
     };
 
-    render() {
-        switch (this.props.tree.type) {
-            case TreeStoreType.WIDGET:
-                return (
-                    <BaseSelect
-                        items={this.state.items.widget}
-                        onChange={(e) => e.onSelectHandler()}
-                    />
+    state = {
+        items: this.commonItems,
+    };
+
+    componentDidUpdate(previousProps: Props) {
+        const { treeSearchActive } = this.props;
+        if (previousProps.treeSearchActive !== this.props.treeSearchActive) {
+            if (treeSearchActive) {
+                this.setState({
+                    items: [...this.state.items, this.showPathItem],
+                });
+            } else if (!treeSearchActive) {
+                const showPathRemoved = this.state.items.filter(
+                    (item) => item.id !== 3
                 );
-            case TreeStoreType.SITE:
-                return (
-                    <BaseSelect
-                        items={this.state.items.site}
-                        onChange={(e) => e.onSelectHandler()}
-                    />
-                );
-            default:
-                return null;
+                this.setState({
+                    items: showPathRemoved,
+                });
+            }
         }
+    }
+
+    render() {
+        return (
+            <BaseSelect
+                items={this.state.items}
+                onChange={(e) => {
+                    e.onSelectHandler();
+                }}
+            />
+        );
     }
 }

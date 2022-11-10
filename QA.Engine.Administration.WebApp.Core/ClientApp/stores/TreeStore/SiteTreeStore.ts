@@ -116,4 +116,8 @@ export default class SiteTreeStore extends BaseTreeState<PageModel> {
             results.delete(del);
         }
     }
+    public getAlias = (node: ITreeElement) => {
+        const targetNode = this.nodesMap.get(node.id);
+        return targetNode.original.alias;
+    };
 }

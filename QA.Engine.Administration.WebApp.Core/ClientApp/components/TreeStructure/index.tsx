@@ -277,10 +277,12 @@ export default class SiteTree extends React.Component<Props, State> {
                         placeholder="Title/Alias/ID"
                     />
                     <NavbarDivider />
-                    <WidgetIdSelector
-                        tree={tree}
-                        textStore={this.props.textStore}
-                    />
+                    {this.props.textStore.state === OperationState.SUCCESS && (
+                        <WidgetIdSelector
+                            tree={tree}
+                            treeSearchActive={tree.searchActive}
+                        />
+                    )}
                     {useRegions && !isMoveTreeMode && (
                         <React.Fragment>
                             <NavbarDivider
