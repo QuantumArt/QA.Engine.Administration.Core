@@ -8,7 +8,11 @@ import { Position, Tooltip } from "@blueprintjs/core";
 import QpIntegrationStore from "stores/QpIntegrationStore";
 import WidgetTreeStore from "stores/TreeStore/WidgetTreeStore";
 import SiteTreeStore from "stores/TreeStore/SiteTreeStore";
+import OverflowTooltip from "components/OverflowTooltip/OverflowTooltip";
 
+interface State {
+    overflowActive: boolean;
+}
 interface Props {
     treeStore?: TreeStore;
     qpIntegrationStore?: QpIntegrationStore;
@@ -18,12 +22,16 @@ interface Props {
 
 @inject("treeStore", "qpIntegrationStore")
 @observer
-export default class NodeLabel extends React.Component<Props> {
+export default class NodeLabel extends React.Component<Props, State> {
     editHandler() {
         const { node, qpIntegrationStore } = this.props;
 
         qpIntegrationStore.edit(node.id);
     }
+
+    state = {
+        overflowActive: false,
+    };
 
     render() {
         const { node, treeStore, type } = this.props;
@@ -38,35 +46,42 @@ export default class NodeLabel extends React.Component<Props> {
             return null;
         }
         if (tree.showIDs && node.id > 0) {
-            return !node.childNodes.length || tree.type === TreeStoreType.SITE ? (
-                <a className={linkClasses} onClick={() => this.editHandler()}>
-                    {`${node.title} - ${node.id}`}
-                </a>
-            ) : (
-                <span className="bp3-tree-node-label">{`${node.title} - ${node.id}`}</span>
-            );
-        }
-        if (tree.showPath && tree.searchActive) {
             return (
-                <Tooltip
-                    content={`${pathPrefix || ""}/${node.title}`}
-                    boundary="viewport"
-                    position={Position.BOTTOM}
-                    modifiers={{
-                        arrow: { enabled: false },
-                    }}
-                >
-                    {!node.childNodes.length || tree.type === TreeStoreType.SITE ? (
+                <OverflowTooltip title={`${node.title} - ${node.id}`}>
+                    {!node.childNodes.length ||
+                    tree.type === TreeStoreType.SITE ? (
                         <a
                             className={linkClasses}
                             onClick={() => this.editHandler()}
-                        >{`${pathPrefix || ""}/${node.title}`}</a>
+                        >
+                            {`${node.title} - ${node.id}`}
+                        </a>
                     ) : (
-                        <span className="bp3-tree-node-label">{`${
-                            pathPrefix || ""
-                        }/${node.title}`}</span>
+                        <span className="bp3-tree-node-label">{`${node.title} - ${node.id}`}</span>
                     )}
-                </Tooltip>
+                </OverflowTooltip>
+            );
+        }
+        if (tree.showPath && tree.searchActive) {
+            const pathText =
+                tree.type === TreeStoreType.SITE
+                    ? `${pathPrefix || ""}/${node.title}`
+                    : `${pathPrefix || ""}`;
+
+            return (
+                <OverflowTooltip title={pathText}>
+                    {!node.childNodes.length ||
+                    tree.type === TreeStoreType.SITE ? (
+                        <a
+                            className={linkClasses}
+                            onClick={() => this.editHandler()}
+                        >
+                            {pathText}
+                        </a>
+                    ) : (
+                        <span className="bp3-tree-node-label">{pathText}</span>
+                    )}
+                </OverflowTooltip>
             );
         }
         if (tree.showAlias) {
@@ -79,20 +94,37 @@ export default class NodeLabel extends React.Component<Props> {
                 <span className="bp3-tree-node-label">{`${node.title}`}</span>
             );
 
-            return !node.childNodes.length || tree.type === TreeStoreType.SITE ? (
-                <a onClick={() => this.editHandler()} className={linkClasses}>
-                    {text}
-                </a>
-            ) : (
-                text
+            return (
+                <OverflowTooltip
+                    title={alias ? `${node.title} - ${alias}` : `${node.title}`}
+                >
+                    {!node.childNodes.length ||
+                    tree.type === TreeStoreType.SITE ? (
+                        <a
+                            onClick={() => this.editHandler()}
+                            className={linkClasses}
+                        >
+                            {text}
+                        </a>
+                    ) : (
+                        text
+                    )}
+                </OverflowTooltip>
             );
         }
-        return !node.childNodes.length || tree.type === TreeStoreType.SITE ? (
-            <a className={linkClasses} onClick={() => this.editHandler()}>
-                {node.title}
-            </a>
-        ) : (
-            <span className="bp3-tree-node-label">{node.title}</span>
+        return (
+            <OverflowTooltip title={`${node.title}`}>
+                {!node.childNodes.length || tree.type === TreeStoreType.SITE ? (
+                    <a
+                        className={linkClasses}
+                        onClick={() => this.editHandler()}
+                    >
+                        {node.title}
+                    </a>
+                ) : (
+                    <span className="bp3-tree-node-label">{node.title}</span>
+                )}
+            </OverflowTooltip>
         );
     }
 }
