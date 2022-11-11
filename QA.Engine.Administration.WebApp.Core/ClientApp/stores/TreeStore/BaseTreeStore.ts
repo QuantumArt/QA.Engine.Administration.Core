@@ -103,6 +103,9 @@ export abstract class BaseTreeState<T extends {
     protected origSearchedTreeInternal: T[] = [];
     protected discriminators: DiscriminatorModel[];
 
+    protected siteDiscriminators: DiscriminatorModel[] = [];
+    protected widgetDiscriminators: DiscriminatorModel[] = [];
+
     @computed
     get tree(): ITreeElement[] {
         return this.treeInternal;
@@ -116,6 +119,31 @@ export abstract class BaseTreeState<T extends {
     @computed
     get searchedTree(): ITreeElement[] {
         return this.searchedTreeInternal;
+    }
+
+    @action
+    public selectDiscriminator(id: number) {
+        this.searchedTreeInternal = [];
+
+        this.searchActive = !!id;
+
+        const results = new Set<T>();
+                    const filterFunc = (node: T) => {
+                        if (node.discriminatorId === id)
+                         {
+                            console.log('NODA', node)
+                            const foundEl: T = {
+                                ...node,
+                                children: [],
+                                parentId: null,
+                            };
+                            results.add(foundEl);
+                        }
+                        this.searchDiscriminatorInternal(results, id, node);
+                    };
+                    this.forEachOrigNode(this.origTreeInternal, filterFunc);
+                    this.origSearchedTreeInternal = Array.from(results);
+                    this.convertTree(this.origSearchedTreeInternal, 'searchedTreeInternal');
     }
 
     @action
@@ -158,12 +186,24 @@ export abstract class BaseTreeState<T extends {
     protected searchInternal(results: Set<T>, query: string, node: T) {
     }
 
+    protected searchDiscriminatorInternal(results: Set<T>, id: number, node: T) {
+    }
+
     private lastUpdate?: number;
     protected async getDiscriminators() {
         const timeout = 60 * 1000;
         if (this.discriminators == null || this.lastUpdate == null || Date.now() - this.lastUpdate > timeout) {
             const discriminators: ApiResult<DiscriminatorModel[]> = await DictionaryService.getDiscriminators();
             this.discriminators = discriminators.isSuccess ? discriminators.data : null;
+
+            this.discriminators.forEach(discriminator => {
+                if (discriminator.isPage) {
+                    this.siteDiscriminators.push(discriminator)
+                } else {
+                    this.widgetDiscriminators.push(discriminator)
+                }
+            })
+
             this.lastUpdate = Date.now();
         }
     }
@@ -219,6 +259,7 @@ export abstract class BaseTreeState<T extends {
     public async fetchTree(): Promise<void> {
         const response: ApiResult<T[]> = await this.getTree();
         await this.getDiscriminators();
+
         if (response.isSuccess) {
             this.origTreeInternal = response.data;
             this.convertTree(this.origTreeInternal, 'treeInternal');

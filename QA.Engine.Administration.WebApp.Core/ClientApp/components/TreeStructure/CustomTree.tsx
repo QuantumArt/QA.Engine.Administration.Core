@@ -98,6 +98,9 @@ export class CustomTree<T = {}> extends React.Component<Props<T>, {}> {
         const nodeItems = treeNodes.map((node, i) => {
             const { tree } = this.props;
             const elementPath = currentPath.concat(i);
+            if(node.id < 0 && tree.type === TreeStoreType.WIDGET && tree.searchActive) {
+                return;
+            }
             // tslint:disable-next-line:variable-name
             const TypedTreeNode = CustomTreeNode.ofType<T>();
             return [

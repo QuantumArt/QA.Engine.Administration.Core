@@ -120,6 +120,16 @@ export default class TreeStore extends ErrorHandler {
     }
 
     @action
+    public getDiscriminators(treeType: TreeStoreType) {
+        if (treeType === TreeStoreType.WIDGET) {
+            return this.widgetStore.getWidgetDiscriminators()
+        }
+        if (treeType === TreeStoreType.SITE) {
+            return this.siteTreeStore.getSiteDiscriminators()
+        }
+    }
+
+    @action
     public async publish(itemIds: number[]): Promise<any> {
         await this.runAsync(
             async () => {

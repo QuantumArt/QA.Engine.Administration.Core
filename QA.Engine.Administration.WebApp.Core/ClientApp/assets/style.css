@@ -32,9 +32,22 @@ body {
 .tree-navbar {
     display: flex;
     margin-bottom: 20px;
-    align-items: center;
+    align-items: flex-start;
     justify-content: left;
     z-index: 1;
+    height: auto;
+    padding-top: 7px;
+    padding-bottom: 7px;
+}
+
+.tree-navbar-selectors {
+    display: flex;
+    margin-bottom: 5px;
+    align-items: center;
+}
+
+.site-navbar-discriminator {
+    margin-left: 21px;
 }
 
 .tree-switch {
