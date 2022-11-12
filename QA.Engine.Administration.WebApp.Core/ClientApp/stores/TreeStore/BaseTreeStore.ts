@@ -91,6 +91,7 @@ export abstract class BaseTreeState<T extends {
     @observable public cordsUpdated: boolean = false;
     @observable protected expandLaunched: boolean = false;
     protected searchTimer: number;
+    private searchedResults: T[] = [];
 
     @observable.shallow public selectedNode: T;
     public nodeCords = new Map<number, number>();
@@ -105,6 +106,10 @@ export abstract class BaseTreeState<T extends {
 
     protected siteDiscriminators: DiscriminatorModel[] = [];
     protected widgetDiscriminators: DiscriminatorModel[] = [];
+
+    @observable public selectedDiscriminatorsActive: boolean = false;
+    @observable private selectedDiscriminatorResults: T[] = [];
+    private selectedDiscriminatorId: number;
 
     @computed
     get tree(): ITreeElement[] {
@@ -123,27 +128,35 @@ export abstract class BaseTreeState<T extends {
 
     @action
     public selectDiscriminator(id: number) {
-        this.searchedTreeInternal = [];
 
-        this.searchActive = !!id;
+        if (id === null) {
+            this.selectedDiscriminatorResults = [];
+            this.selectedDiscriminatorsActive = false;
+            this.selectedDiscriminatorId = id 
+            this.search(this.query)
+            return;
+        }
+
+        this.selectedDiscriminatorsActive = true;
+        this.selectedDiscriminatorId = id 
 
         const results = new Set<T>();
-                    const filterFunc = (node: T) => {
-                        if (node.discriminatorId === id)
-                         {
-                            console.log('NODA', node)
-                            const foundEl: T = {
+        const filterFunc = (node: T) => {
+            if (node.discriminatorId === id) {
+                const foundEl: T = {
                                 ...node,
                                 children: [],
                                 parentId: null,
                             };
-                            results.add(foundEl);
-                        }
-                        this.searchDiscriminatorInternal(results, id, node);
-                    };
-                    this.forEachOrigNode(this.origTreeInternal, filterFunc);
-                    this.origSearchedTreeInternal = Array.from(results);
-                    this.convertTree(this.origSearchedTreeInternal, 'searchedTreeInternal');
+                results.add(foundEl);
+            };
+            this.searchDiscriminatorInternal(results, id, node);
+        };
+        this.forEachOrigNode(this.query.length >= 3  ? this.searchedResults : this.origTreeInternal , filterFunc);
+        this.origSearchedTreeInternal = Array.from(results);
+        this.convertTree(this.origSearchedTreeInternal, 'searchedTreeInternal');
+
+        this.selectedDiscriminatorResults = Array.from(results);
     }
 
     @action
@@ -171,12 +184,17 @@ export abstract class BaseTreeState<T extends {
                         }
                         this.searchInternal(results, query, node);
                     };
-                    this.forEachOrigNode(this.origTreeInternal, filterFunc);
+                    this.forEachOrigNode(this.selectedDiscriminatorResults.length > 0? this.selectedDiscriminatorResults : this.origTreeInternal, filterFunc);
                     this.origSearchedTreeInternal = Array.from(results);
                     this.convertTree(this.origSearchedTreeInternal, 'searchedTreeInternal');
+                    
+                    this.searchedResults = Array.from(results);
                 } else if (this.origSearchedTreeInternal.length > 0) {
                     this.origSearchedTreeInternal = [];
+                    this.selectDiscriminator(this.selectedDiscriminatorId);
                     clearTimeout(this.searchTimer);
+                } else {
+                    this.selectDiscriminator(this.selectedDiscriminatorId);
                 }
             },
             500,
@@ -333,7 +351,7 @@ export abstract class BaseTreeState<T extends {
         const targetNode = this.nodesMap.get(nodeData.id);
         const originallySelected = nodeData.isSelected;
         if (this.selectedNode != null) {
-            if (this.searchActive) {
+            if (this.searchActive || this.selectedDiscriminatorsActive) {
                 const node = this.searchedNodesMap.get(this.selectedNode.id);
                 if (node) {
                     node.mapped.isSelected = false;

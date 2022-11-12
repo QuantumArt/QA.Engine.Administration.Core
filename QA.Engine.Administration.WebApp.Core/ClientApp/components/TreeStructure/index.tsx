@@ -346,8 +346,11 @@ export default class SiteTree extends React.Component<Props, State> {
                                     <DiscriminatorSelect
                                         items={treeDiscriminators}
                                         onChange={(element) => {
-                                            console.log(element)
-                                            this.props.treeStore.resolveTree(this.props.type).selectDiscriminator(element.id)
+                                            this.props.treeStore
+                                                .resolveTree(this.props.type)
+                                                .selectDiscriminator(
+                                                    element.id
+                                                );
                                         }}
                                         filterable
                                     />
@@ -358,8 +361,9 @@ export default class SiteTree extends React.Component<Props, State> {
                             <DiscriminatorSelect
                                 items={treeDiscriminators}
                                 onChange={(element) => {
-                                    console.log(element)
-                                    this.props.treeStore.resolveTree(this.props.type).selectDiscriminator(element.id)
+                                    this.props.treeStore
+                                        .resolveTree(this.props.type)
+                                        .selectDiscriminator(element.id);
                                 }}
                                 className="site-navbar-discriminator"
                                 filterable
@@ -394,7 +398,7 @@ export default class SiteTree extends React.Component<Props, State> {
                             <CustomTree
                                 className="tree"
                                 contents={
-                                    tree.searchActive
+                                    tree.searchActive || tree.selectedDiscriminatorsActive
                                         ? tree.searchedTree
                                         : tree.tree
                                 }

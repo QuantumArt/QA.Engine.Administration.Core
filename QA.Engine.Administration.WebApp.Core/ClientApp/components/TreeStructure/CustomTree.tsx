@@ -72,7 +72,6 @@ export class CustomTree<T = {}> extends React.Component<Props<T>, {}> {
     }
 
     public render() {
-
         return (
             <div className={classnames(Classes.TREE, this.props.className)}>
                 {this.renderNodes(this.props.contents, [], Classes.TREE_ROOT)}
@@ -98,7 +97,11 @@ export class CustomTree<T = {}> extends React.Component<Props<T>, {}> {
         const nodeItems = treeNodes.map((node, i) => {
             const { tree } = this.props;
             const elementPath = currentPath.concat(i);
-            if(node.id < 0 && tree.type === TreeStoreType.WIDGET && tree.searchActive) {
+            if (
+                node.id < 0 &&
+                tree.type === TreeStoreType.WIDGET &&
+                (tree.searchActive || tree.selectedDiscriminatorsActive)
+            ) {
                 return;
             }
             // tslint:disable-next-line:variable-name
