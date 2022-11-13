@@ -7,6 +7,8 @@ import {
     IPopoverProps,
 } from "@blueprintjs/core";
 import { Select, ItemRenderer, ItemPredicate } from "@blueprintjs/select";
+import { TreeType } from "stores/TreeStore";
+import TreeStoreType from "enums/TreeStoreType";
 
 function getText<T extends { id: number; title: string; alias?: string }>(
     item: T
@@ -85,6 +87,7 @@ interface Props<T> {
     onChange: (x: T) => void;
     popoverProps?: IPopoverProps;
     className?: string;
+    tree?: TreeType;
 }
 
 interface State<T> {
@@ -111,7 +114,11 @@ export default abstract class BaseSelect<
             const pageInItems = this.props.items.some(
                 (item) => item.id === this.state.page.id
             );
-            if (!pageInItems) {
+            if (
+                !pageInItems ||
+                (this.props?.tree?.type === TreeStoreType.WIDGET &&
+                    !this.props?.tree?.selectedDiscriminatorsActive)
+            ) {
                 this.setState({
                     page: null,
                 });

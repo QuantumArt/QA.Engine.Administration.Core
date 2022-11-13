@@ -352,6 +352,7 @@ export default class SiteTree extends React.Component<Props, State> {
                                                     element.id
                                                 );
                                         }}
+                                        tree={tree}
                                         filterable
                                     />
                                 </>

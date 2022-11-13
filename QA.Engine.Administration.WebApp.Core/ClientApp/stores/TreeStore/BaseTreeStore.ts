@@ -160,6 +160,14 @@ export abstract class BaseTreeState<T extends {
     }
 
     @action
+    public resetDiscriminators = () => {
+        if (this.selectedDiscriminatorsActive) {
+            this.selectDiscriminator(null)
+        }
+    }
+
+
+    @action
     public search(query: string) {
         this.searchedTreeInternal = [];
         this.query = query;

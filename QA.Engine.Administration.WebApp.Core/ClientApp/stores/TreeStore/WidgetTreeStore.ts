@@ -24,6 +24,7 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
     @action
     public init(selectedNode: any) {
         this.resetSearch();
+        this.resetDiscriminators();
         this.selectedSiteTreeNode = selectedNode as PageModel;
         if (selectedNode == null || selectedNode.widgets == null) {
             this.widgetTree = [];
