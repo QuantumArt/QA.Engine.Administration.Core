@@ -13,6 +13,7 @@ import {
     Tag,
     ButtonGroup,
     Intent,
+    Switch,
 } from "@blueprintjs/core";
 import { Scrollbars } from "react-custom-scrollbars-2"; // tslint:disable-line
 import cn from "classnames"; // tslint:disable-line
@@ -249,9 +250,12 @@ export default class SiteTree extends React.Component<Props, State> {
             !tree.searchActive;
         const regions =
             regionStore.regions != null && regionStore.regions.length > 0
-                ? [{ id: SelectorsType.NO_SELECTION, title: "(No selection)" } as RegionModel].concat(
-                      regionStore.regions
-                  )
+                ? [
+                      {
+                          id: SelectorsType.NO_SELECTION,
+                          title: "(No selection)",
+                      } as RegionModel,
+                  ].concat(regionStore.regions)
                 : [];
         const isMoveTreeMode =
             tree instanceof SiteTreeStore ? tree.moveTreeMode : false;
@@ -266,10 +270,16 @@ export default class SiteTree extends React.Component<Props, State> {
             }, 0);
         }
 
-        const treeDiscriminators = [
-            { id: null, title: "(No selection)" } as DiscriminatorModel,
-            ...treeStore.getDiscriminators(tree.type),
-        ];
+        let treeDiscriminators: DiscriminatorModel[] = [];
+        if (
+            tree.type === TreeStoreType.SITE ||
+            tree.type === TreeStoreType.WIDGET
+        ) {
+            treeDiscriminators = [
+                { id: null, title: "(No selection)" } as DiscriminatorModel,
+                ...treeStore.getDiscriminators(tree.type),
+            ];
+        }
 
         return (
             <Card
@@ -288,12 +298,25 @@ export default class SiteTree extends React.Component<Props, State> {
                         <div className="tree-navbar-selectors">
                             <NavbarDivider />
                             {this.props.textStore.state ===
-                                OperationState.SUCCESS && (
+                                OperationState.SUCCESS &&
+                            (tree.type === TreeStoreType.SITE ||
+                                tree.type === TreeStoreType.WIDGET) ? (
                                 <WidgetIdSelector
                                     tree={tree}
                                     treeSearchActive={tree.searchActive}
                                 />
+                            ) : (
+                                <div className="tree-navbar-selectors__switch-wrapper">
+                                    <Switch
+                                        inline
+                                        label={textStore.texts[Texts.showID]}
+                                        className="tree-switch"
+                                        checked={tree.showIDs}
+                                        onChange={tree.toggleIDs}
+                                    />
+                                </div>
                             )}
+
                             {useRegions && !isMoveTreeMode && (
                                 <React.Fragment>
                                     <NavbarDivider
@@ -400,7 +423,8 @@ export default class SiteTree extends React.Component<Props, State> {
                             <CustomTree
                                 className="tree"
                                 contents={
-                                    tree.searchActive || tree.selectedDiscriminatorsActive
+                                    tree.searchActive ||
+                                    tree.selectedDiscriminatorsActive
                                         ? tree.searchedTree
                                         : tree.tree
                                 }
