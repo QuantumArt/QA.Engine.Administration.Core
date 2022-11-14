@@ -312,4 +312,14 @@
   <data name="ShowAlias" xml:space="preserve">
       <value>Показать алиас</value>
   </data>
+  <data name="SelectMode" xml:space="preserve">
+      <value>Выберите режим показа</value>
+  </data>
+  <data name="SelectRegion" xml:space="preserve">
+      <value>Выберите регион</value>
+  </data>
+  <data name="SelectType" xml:space="preserve">
+      <value>Выберите тип</value>
+  </data>
+
 </root>

@@ -312,4 +312,13 @@
   <data name="ShowAlias" xml:space="preserve">
       <value>Show alias</value>
   </data>
+  <data name="SelectMode" xml:space="preserve">
+      <value>Select show mode</value>
+  </data>
+  <data name="SelectRegion" xml:space="preserve">
+      <value>Select region</value>
+  </data>
+  <data name="SelectType" xml:space="preserve">
+      <value>Select type</value>
+  </data>
 </root>
