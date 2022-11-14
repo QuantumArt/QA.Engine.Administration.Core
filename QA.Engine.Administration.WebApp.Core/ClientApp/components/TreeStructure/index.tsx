@@ -314,6 +314,17 @@ export default class SiteTree extends React.Component<Props, State> {
                                         checked={tree.showIDs}
                                         onChange={tree.toggleIDs}
                                     />
+                                    {tree.searchActive && (
+                                        <Switch
+                                            inline
+                                            label={
+                                                textStore.texts[Texts.showPath]
+                                            }
+                                            className="tree-switch"
+                                            checked={tree.showPath}
+                                            onChange={tree.togglePath}
+                                        />
+                                    )}
                                 </div>
                             )}
 
