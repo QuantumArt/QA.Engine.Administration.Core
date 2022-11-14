@@ -174,7 +174,6 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
 
     protected searchDiscriminatorInternal(results: Set<WidgetModel>, id: number, node: WidgetModel) {
         if (node.discriminatorId === id) {
-            console.log('NODA', node)
             const foundEl: WidgetModel = {
                 ...node,
                 id: -node.id,
