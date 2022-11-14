@@ -31,6 +31,7 @@ import ArchiveTreeStore from "stores/TreeStore/ArchiveTreeStore";
 import WidgetIdSelector from "components/WidgetIdSelector";
 import DiscriminatorSelect from "components/Select/DiscriminatorSelect";
 import TreeStoreType from "enums/TreeStoreType";
+import SelectorsType from "enums/WidgetIdSelectorType";
 
 interface Props {
     type: TreeStructureType;
@@ -248,7 +249,7 @@ export default class SiteTree extends React.Component<Props, State> {
             !tree.searchActive;
         const regions =
             regionStore.regions != null && regionStore.regions.length > 0
-                ? [{ id: null, title: "(No selection)" } as RegionModel].concat(
+                ? [{ id: SelectorsType.NO_SELECTION, title: "(No selection)" } as RegionModel].concat(
                       regionStore.regions
                   )
                 : [];

@@ -6,6 +6,7 @@ import ContextMenuType from 'enums/ContextMenuType';
 import TreeStoreType from 'enums/TreeStoreType';
 import NodeLabel from 'components/TreeStructure/NodeLabel';
 import DictionaryService from 'services/DictionaryService';
+import SelectorsType from 'enums/WidgetIdSelectorType';
 
 export interface ITreeElement extends ITreeNode {
     title?: string;
@@ -162,7 +163,7 @@ export abstract class BaseTreeState<T extends {
     @action
     public resetDiscriminators = () => {
         if (this.selectedDiscriminatorsActive) {
-            this.selectDiscriminator(null)
+            this.selectDiscriminator(SelectorsType.NO_SELECTION)
         }
     }
 
@@ -313,8 +314,9 @@ export abstract class BaseTreeState<T extends {
 
     @action
     public toggleAlias = () => {
-        if (this.showIDs) {
+        if (this.showIDs || this.showPath) {
             this.showIDs = false;
+            this.showPath = false;
         }
         this.showAlias = !this.showAlias
     }

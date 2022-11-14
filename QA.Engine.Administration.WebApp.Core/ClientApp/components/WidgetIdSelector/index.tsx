@@ -4,6 +4,7 @@ import BaseSelect from "components/Select/BaseSelect";
 import { TreeType } from "stores/TreeStore";
 import Texts from "constants/Texts";
 import TextStore from "stores/TextStore";
+import SelectorsType from "enums/WidgetIdSelectorType";
 
 interface WidgetIdSelectModel {
     id: number;
@@ -26,14 +27,14 @@ type Props = {
 export default class WidgetIdSelector extends React.Component<Props, State> {
     commonItems = [
         {
-            id: 0,
+            id: SelectorsType.NO_SELECTION,
             title: "(No selection)",
             onSelectHandler: () => {
                 this.props.tree.hidePathAndIDs();
             },
         },
         {
-            id: 1,
+            id: SelectorsType.SHOWID,
             title: this.props.textStore.texts[Texts.showID],
             onSelectHandler: () => {
                 if (!this.props.tree.showIDs) {
@@ -42,7 +43,7 @@ export default class WidgetIdSelector extends React.Component<Props, State> {
             },
         },
         {
-            id: 2,
+            id: SelectorsType.SHOWALIAS,
             title: this.props.textStore.texts[Texts.showAlias],
             onSelectHandler: () => {
                 if (!this.props.tree.showAlias) {
@@ -53,7 +54,7 @@ export default class WidgetIdSelector extends React.Component<Props, State> {
     ];
 
     showPathItem = {
-        id: 3,
+        id: SelectorsType.SHOWPATH,
         title: this.props.textStore.texts[Texts.showPath],
         onSelectHandler: () => {
             if (!this.props.tree.showPath) {
