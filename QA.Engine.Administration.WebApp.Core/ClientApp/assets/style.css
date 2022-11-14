@@ -78,8 +78,8 @@ body {
 .bp3-tree-node.bp3-tree-node-selected
     > .bp3-tree-node-content
     .bp3-tag.bp3-intent-primary {
-    background-color: rgba(19, 124, 189, 0.5);
-    color: #ffffff;
+    background-color: white;
+    color: #137cbd;
 }
 
 .minor-tree-pane {
