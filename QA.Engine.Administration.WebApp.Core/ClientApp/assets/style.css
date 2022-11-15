@@ -274,3 +274,7 @@ body {
     display: flex;
     align-items: center;
 }
+
+button, input, optgroup, select, textarea {
+    line-height: normal;
+}
