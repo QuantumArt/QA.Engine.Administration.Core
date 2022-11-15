@@ -270,15 +270,23 @@ export default class SiteTree extends React.Component<Props, State> {
             }, 0);
         }
 
+        const selectRegionDefaultTitle =
+            textStore.texts[Texts.selectRegion] ?? "";
+
+        const widgetIdSelectorDefaultTitle =
+            textStore.texts[Texts.selectMode] ?? "";
+
         let treeDiscriminators: DiscriminatorModel[] = [];
+        const selectDiscriminatorsDefaultTitle =
+            textStore.texts[Texts.selectType] ?? "";
         if (
             tree.type === TreeStoreType.SITE ||
             tree.type === TreeStoreType.WIDGET
         ) {
-            treeDiscriminators = [
-                { id: null, title: "(No selection)" } as DiscriminatorModel,
-                ...treeStore.getDiscriminators(tree.type),
-            ];
+            treeDiscriminators = treeStore.getDiscriminators(
+                tree.type,
+                selectDiscriminatorsDefaultTitle
+            );
         }
 
         return (
@@ -294,8 +302,26 @@ export default class SiteTree extends React.Component<Props, State> {
                         value={tree.query}
                         placeholder="Title/Alias/ID"
                     />
-                    <div>
-                        <div className="tree-navbar-selectors">
+                    <div className="tree-navbar-selectors">
+                    {(tree.type === TreeStoreType.SITE || tree.type === TreeStoreType.WIDGET) && (
+                            <div className="tree-navbar-selectors__select-wrapper">
+                                <NavbarDivider />
+                                <DiscriminatorSelect
+                                    items={treeDiscriminators}
+                                    onChange={(element) => {
+                                        this.props.treeStore
+                                            .resolveTree(this.props.type)
+                                            .selectDiscriminator(element.id);
+                                    }}
+                                    tree={tree}
+                                    filterable
+                                    defaultTitle={
+                                        selectDiscriminatorsDefaultTitle
+                                    }
+                                />
+                            </div>
+                        )}
+                        <div className="tree-navbar-selectors__select-wrapper">
                             <NavbarDivider />
                             {this.props.textStore.state ===
                                 OperationState.SUCCESS &&
@@ -304,6 +330,10 @@ export default class SiteTree extends React.Component<Props, State> {
                                 <WidgetIdSelector
                                     tree={tree}
                                     treeSearchActive={tree.searchActive}
+                                    defaultTitle={widgetIdSelectorDefaultTitle}
+                                    selectedDiscriminatorsActive={
+                                        tree.selectedDiscriminatorsActive
+                                    }
                                 />
                             ) : (
                                 <div className="tree-navbar-selectors__switch-wrapper">
@@ -327,83 +357,54 @@ export default class SiteTree extends React.Component<Props, State> {
                                     )}
                                 </div>
                             )}
-
-                            {useRegions && !isMoveTreeMode && (
-                                <React.Fragment>
-                                    <NavbarDivider
-                                        className={cn({
-                                            hidden: tree.searchActive,
-                                        })}
-                                    />
-                                    <RegionSelect
-                                        items={regions}
-                                        filterable
-                                        onChange={this.changeRegion}
-                                        className={cn({
-                                            hidden: tree.searchActive,
-                                        })}
-                                    />
-                                </React.Fragment>
-                            )}
-                            {isMoveTreeMode && (
-                                <React.Fragment>
-                                    <NavbarDivider />
-                                    <ButtonGroup
-                                        className="dialog-button-group"
-                                        style={{ justifyContent: "left" }}
-                                    >
-                                        <Button
-                                            text={
-                                                textStore.texts[
-                                                    Texts.popupMoveButton
-                                                ]
-                                            }
-                                            icon="move"
-                                            onClick={this.moveClick}
-                                            intent={Intent.SUCCESS}
-                                            disabled={isNewParentSelected}
-                                        />
-                                        <Button
-                                            text={
-                                                textStore.texts[
-                                                    Texts.popupCancelButton
-                                                ]
-                                            }
-                                            icon="undo"
-                                            onClick={this.cancelMoveClick}
-                                        />
-                                    </ButtonGroup>
-                                </React.Fragment>
-                            )}
-                            {tree.type === TreeStoreType.WIDGET && (
-                                <>
-                                    <NavbarDivider />
-                                    <DiscriminatorSelect
-                                        items={treeDiscriminators}
-                                        onChange={(element) => {
-                                            this.props.treeStore
-                                                .resolveTree(this.props.type)
-                                                .selectDiscriminator(
-                                                    element.id
-                                                );
-                                        }}
-                                        tree={tree}
-                                        filterable
-                                    />
-                                </>
-                            )}
                         </div>
-                        {tree.type === TreeStoreType.SITE && (
-                            <DiscriminatorSelect
-                                items={treeDiscriminators}
-                                onChange={(element) => {
-                                    this.props.treeStore
-                                        .resolveTree(this.props.type)
-                                        .selectDiscriminator(element.id);
-                                }}
-                                className="site-navbar-discriminator"
-                                filterable
-                            />
+                        {useRegions && !isMoveTreeMode && (
+                            <div className="tree-navbar-selectors__select-wrapper">
+                                <NavbarDivider
+                                    className={cn({
+                                        hidden: tree.searchActive,
+                                    })}
+                                />
+                                <RegionSelect
+                                    items={regions}
+                                    filterable
+                                    onChange={this.changeRegion}
+                                    className={cn({
+                                        hidden: tree.searchActive,
+                                    })}
+                                    defaultTitle={selectRegionDefaultTitle}
+                                />
+                            </div>
+                        )}
+                        {isMoveTreeMode && (
+                            <div className="tree-navbar-selectors__select-wrapper">
+                                <NavbarDivider />
+                                <ButtonGroup
+                                    className="dialog-button-group"
+                                    style={{ justifyContent: "left" }}
+                                >
+                                    <Button
+                                        text={
+                                            textStore.texts[
+                                                Texts.popupMoveButton
+                                            ]
+                                        }
+                                        icon="move"
+                                        onClick={this.moveClick}
+                                        intent={Intent.SUCCESS}
+                                        disabled={isNewParentSelected}
+                                    />
+                                    <Button
+                                        text={
+                                            textStore.texts[
+                                                Texts.popupCancelButton
+                                            ]
+                                        }
+                                        icon="undo"
+                                        onClick={this.cancelMoveClick}
+                                    />
+                                </ButtonGroup>
+                            </div>
                         )}
                     </div>
                 </Navbar>

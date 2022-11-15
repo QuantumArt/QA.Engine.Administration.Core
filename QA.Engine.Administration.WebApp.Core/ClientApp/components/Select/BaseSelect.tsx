@@ -88,6 +88,7 @@ interface Props<T> {
     popoverProps?: IPopoverProps;
     className?: string;
     tree?: TreeType;
+    defaultTitle?: string;
 }
 
 interface State<T> {
@@ -116,8 +117,7 @@ export default abstract class BaseSelect<
             );
             if (
                 !pageInItems ||
-                (this.props?.tree?.type === TreeStoreType.WIDGET &&
-                    !this.props?.tree?.selectedDiscriminatorsActive)
+                !this.props?.tree?.selectedDiscriminatorsActive
             ) {
                 this.setState({
                     page: null,
@@ -127,8 +127,15 @@ export default abstract class BaseSelect<
     }
 
     render() {
-        const { items, disabled, filterable, intent, popoverProps, className } =
-            this.props;
+        const {
+            items,
+            disabled,
+            filterable,
+            intent,
+            popoverProps,
+            className,
+            defaultTitle,
+        } = this.props;
         const { page } = this.state;
 
         return (
@@ -149,7 +156,7 @@ export default abstract class BaseSelect<
             >
                 <Button
                     rightIcon="caret-down"
-                    text={page === null ? "(No selection)" : page.title}
+                    text={page === null ? defaultTitle : page.title}
                     disabled={disabled}
                     intent={intent}
                 />

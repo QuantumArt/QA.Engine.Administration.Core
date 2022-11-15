@@ -62,7 +62,7 @@ export default class NodeLabel extends React.Component<Props, State> {
                 </OverflowTooltip>
             );
         }
-        if (tree.showPath && tree.searchActive) {
+        if (tree.showPath) {
             const pathText =
                 tree.type === TreeStoreType.SITE
                     ? `${pathPrefix || ""}/${node.title}` : `${pathPrefix || ""}`;

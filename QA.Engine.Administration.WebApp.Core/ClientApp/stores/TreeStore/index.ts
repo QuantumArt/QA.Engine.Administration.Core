@@ -9,6 +9,8 @@ import ErrorsTypes from 'constants/ErrorsTypes';
 import SiteMapService from 'services/SiteMapService';
 import ErrorHandler from 'stores/ErrorHandler';
 import TreeStoreType from 'enums/TreeStoreType';
+import TextStore from 'stores/TextStore';
+import Texts from "constants/Texts";
 
 export type TreeType = SiteTreeStore | ArchiveTreeStore | ContentVersionTreeStore | WidgetTreeStore;
 export type TreeStructureType = 'main' | 'widgets' | 'versions';
@@ -24,7 +26,7 @@ export default class TreeStore extends ErrorHandler {
     private readonly widgetStore: WidgetTreeStore;
     private readonly navigationStore: NavigationStore;
 
-    constructor(navigationStore: NavigationStore) {
+    constructor(navigationStore: NavigationStore, private textStore: TextStore) {
         super();
         this.siteTreeStore = new SiteTreeStore();
         this.archiveStore = new ArchiveTreeStore();
@@ -120,12 +122,12 @@ export default class TreeStore extends ErrorHandler {
     }
 
     @action
-    public getDiscriminators(treeType: TreeStoreType) {
+    public getDiscriminators(treeType: TreeStoreType, title: string) {
         if (treeType === TreeStoreType.WIDGET) {
-            return this.widgetStore.getWidgetDiscriminators()
+            return [ { id: null, title } as DiscriminatorModel, ...this.widgetStore.getWidgetDiscriminators()]
         }
         if (treeType === TreeStoreType.SITE) {
-            return this.siteTreeStore.getSiteDiscriminators()
+            return [ { id: null, title  } as DiscriminatorModel, ...this.siteTreeStore.getSiteDiscriminators()]
         }
     }
 

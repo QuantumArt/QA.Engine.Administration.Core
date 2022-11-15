@@ -129,8 +129,7 @@ export abstract class BaseTreeState<T extends {
 
     @action
     public selectDiscriminator(id: number) {
-
-        if (id === null) {
+        if (id === null || id === undefined) {
             this.selectedDiscriminatorResults = [];
             this.selectedDiscriminatorsActive = false;
             this.selectedDiscriminatorId = id 

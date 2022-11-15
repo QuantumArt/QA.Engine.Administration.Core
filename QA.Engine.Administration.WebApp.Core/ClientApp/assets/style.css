@@ -44,10 +44,8 @@ body {
     display: flex;
     margin-bottom: 5px;
     align-items: center;
-}
-
-.site-navbar-discriminator {
-    margin-left: 21px;
+    flex-wrap: wrap;
+    row-gap: 5px;
 }
 
 .tree-switch {
@@ -272,4 +270,9 @@ body {
     display: flex;
     align-items: center;
     min-height: 30px;
+}
+
+.tree-navbar-selectors__select-wrapper {
+    display: flex;
+    align-items: center;
 }

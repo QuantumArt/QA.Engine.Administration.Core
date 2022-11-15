@@ -20,6 +20,8 @@ type Props = {
     tree: TreeType;
     textStore?: TextStore;
     treeSearchActive?: boolean;
+    selectedDiscriminatorsActive?: boolean;
+    defaultTitle?: string;
 };
 
 @inject("textStore")
@@ -28,7 +30,7 @@ export default class WidgetIdSelector extends React.Component<Props, State> {
     commonItems = [
         {
             id: SelectorsType.NO_SELECTION,
-            title: "(No selection)",
+            title: this.props.textStore.texts[Texts.selectMode],
             onSelectHandler: () => {
                 this.props.tree.hidePathAndIDs();
             },
@@ -68,15 +70,23 @@ export default class WidgetIdSelector extends React.Component<Props, State> {
     };
 
     componentDidUpdate(previousProps: Props) {
-        const { treeSearchActive } = this.props;
-        if (previousProps.treeSearchActive !== this.props.treeSearchActive) {
-            if (treeSearchActive) {
+        const { treeSearchActive, selectedDiscriminatorsActive } = this.props;
+        if (
+            previousProps.treeSearchActive !== this.props.treeSearchActive ||
+            previousProps.selectedDiscriminatorsActive !==
+                this.props.selectedDiscriminatorsActive
+        ) {
+            if (treeSearchActive || selectedDiscriminatorsActive) {
                 this.setState({
-                    items: [...this.state.items, this.showPathItem],
+                    items: this.state.items.some(
+                        (item) => item.id === SelectorsType.SHOWPATH
+                    )
+                        ? this.state.items
+                        : [...this.state.items, this.showPathItem],
                 });
-            } else if (!treeSearchActive) {
+            } else if (!treeSearchActive && !selectedDiscriminatorsActive) {
                 const showPathRemoved = this.state.items.filter(
-                    (item) => item.id !== 3
+                    (item) => item.id !== SelectorsType.SHOWPATH
                 );
                 if (this.props.tree.showPath) {
                     this.props.tree.togglePath();
@@ -95,6 +105,7 @@ export default class WidgetIdSelector extends React.Component<Props, State> {
                 onChange={(e) => {
                     e.onSelectHandler();
                 }}
+                defaultTitle={this.props.defaultTitle}
             />
         );
     }

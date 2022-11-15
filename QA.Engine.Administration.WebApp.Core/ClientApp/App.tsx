@@ -29,9 +29,9 @@ import RegionStore from 'stores/RegionStore';
 
 const app = hot(module)(() => {
     const navigationStoreInstance = new NavigationStore();
-    const treeStoreInstance = new TreeStore(navigationStoreInstance);
     const textStore = new TextStore();
     const regionStore = new RegionStore();
+    const treeStoreInstance = new TreeStore(navigationStoreInstance, textStore);
 
     return (
         <Provider
