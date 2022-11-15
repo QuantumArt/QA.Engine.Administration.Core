@@ -60,6 +60,17 @@
     <TypeScriptCompile Include="ClientApp\stores\ArchiveStore.ts" />
     <TypeScriptCompile Include="ClientApp\stores\QpIntegrationStore.ts" />
   </ItemGroup>
+  <ItemGroup>
+      <EmbeddedResource Update="Resources\Texts.resx">
+          <Generator>PublicResXFileCodeGenerator</Generator>
+          <LastGenOutput>Texts.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <Compile Update="Texts.Designer.cs">
+          <DesignTime>True</DesignTime>
+          <AutoGen>True</AutoGen>
+          <DependentUpon>Texts.resx</DependentUpon>
+      </Compile>
+  </ItemGroup>
 
   <ItemGroup>
     <None Update="ClientApp\services\DictionaryService.ts">
