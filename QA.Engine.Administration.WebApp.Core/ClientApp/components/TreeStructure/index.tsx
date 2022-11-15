@@ -248,12 +248,15 @@ export default class SiteTree extends React.Component<Props, State> {
             tree instanceof ArchiveTreeStore &&
             tree.page !== null &&
             !tree.searchActive;
+            const selectRegionDefaultTitle =
+            textStore.texts[Texts.selectRegion] ?? "";
+    
         const regions =
             regionStore.regions != null && regionStore.regions.length > 0
                 ? [
                       {
                           id: SelectorsType.NO_SELECTION,
-                          title: "(No selection)",
+                          title: selectRegionDefaultTitle,
                       } as RegionModel,
                   ].concat(regionStore.regions)
                 : [];
@@ -269,9 +272,6 @@ export default class SiteTree extends React.Component<Props, State> {
                 this.scrollTo(tree.nodeCords.get(scrollNodeId));
             }, 0);
         }
-
-        const selectRegionDefaultTitle =
-            textStore.texts[Texts.selectRegion] ?? "";
 
         const widgetIdSelectorDefaultTitle =
             textStore.texts[Texts.selectMode] ?? "";

@@ -156,7 +156,13 @@ export default abstract class BaseSelect<
             >
                 <Button
                     rightIcon="caret-down"
-                    text={page === null ? defaultTitle : page.title}
+                    text={
+                        page === null
+                            ? defaultTitle
+                                ? defaultTitle
+                                : "(No selection)"
+                            : page.title
+                    }
                     disabled={disabled}
                     intent={intent}
                 />
