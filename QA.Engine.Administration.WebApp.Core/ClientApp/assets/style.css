@@ -22,7 +22,6 @@ body {
 }
 
 .tree-pane {
-    width: 40%;
     min-width: 250px;
     min-height: 70px;
     padding-left: 14px;
@@ -81,7 +80,6 @@ body {
 }
 
 .minor-tree-pane {
-    width: 68%;
     align-self: flex-start;
 }
 
