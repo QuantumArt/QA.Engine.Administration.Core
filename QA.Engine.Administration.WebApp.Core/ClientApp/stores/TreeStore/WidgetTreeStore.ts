@@ -13,8 +13,9 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
     @observable public selectedSiteTreeNode: PageModel;
 
     @action
-    public handleNodeExpand = (nodeData: ITreeElement) =>
-        (nodeData.isExpanded = true);
+    public handleNodeExpand = (nodeData: ITreeElement) => {
+        return (nodeData.isExpanded = true);
+    };
 
     @action
     public handleNodeCollapse = (nodeData: ITreeElement) =>
@@ -23,6 +24,7 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
     @action
     public init(selectedNode: any) {
         this.resetSearch();
+        this.resetDiscriminators();
         this.selectedSiteTreeNode = selectedNode as PageModel;
         if (selectedNode == null || selectedNode.widgets == null) {
             this.widgetTree = [];
@@ -54,6 +56,11 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
         this.selectedNode = targetNode.original;
         this.selectedTreeElement = node;
     };
+
+    @action
+    public getWidgetDiscriminators() {
+        return this.widgetDiscriminators;
+    }
 
     @action
     public getAlias = (node: ITreeElement) => {
@@ -154,6 +161,19 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
         node: WidgetModel
     ) {
         if (node.zoneName && node.zoneName.toLowerCase().includes(query)) {
+            const foundEl: WidgetModel = {
+                ...node,
+                id: -node.id,
+                title: node.zoneName,
+                children: [],
+                parentId: null,
+            };
+            results.add(foundEl);
+        }
+    }
+
+    protected searchDiscriminatorInternal(results: Set<WidgetModel>, id: number, node: WidgetModel) {
+        if (node.discriminatorId === id) {
             const foundEl: WidgetModel = {
                 ...node,
                 id: -node.id,

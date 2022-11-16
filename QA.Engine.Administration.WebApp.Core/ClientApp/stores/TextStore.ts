@@ -7,7 +7,7 @@ import ErrorsTypes from 'constants/ErrorsTypes';
 export default class TextStore extends ErrorHandler {
 
     @observable public state: OperationState = OperationState.NONE;
-    @observable.ref public texts: { [key: string]: string; } = {};
+    @observable public texts: { [key: string]: string; } = {};
 
     constructor() {
         super();

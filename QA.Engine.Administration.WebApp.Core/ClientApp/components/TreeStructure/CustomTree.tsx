@@ -34,6 +34,7 @@ interface Props<T> extends ITreeProps<T> {
     popupStore?: PopupStore;
     treeStore?: TreeStore;
     textStore?: TextStore;
+    updateScroll?: () => void;
 }
 
 @inject(
@@ -96,10 +97,17 @@ export class CustomTree<T = {}> extends React.Component<Props<T>, {}> {
         const nodeItems = treeNodes.map((node, i) => {
             const { tree } = this.props;
             const elementPath = currentPath.concat(i);
+            if (
+                node.id < 0 &&
+                tree.type === TreeStoreType.WIDGET &&
+                (tree.searchActive || tree.selectedDiscriminatorsActive)
+            ) {
+                return;
+            }
             // tslint:disable-next-line:variable-name
             const TypedTreeNode = CustomTreeNode.ofType<T>();
             return [
-                !node.childNodes.length ? (
+                tree.type === TreeStoreType.SITE || !node.childNodes.length ? (
                     <RightClickMenu
                         key={node.id}
                         content={
@@ -169,6 +177,7 @@ export class CustomTree<T = {}> extends React.Component<Props<T>, {}> {
         node: TreeNode<T>,
         e: React.MouseEvent<HTMLElement>
     ) => {
+        this.props.updateScroll();
         this.handlerHelper(this.props.onNodeCollapse, node, e);
     };
 
@@ -211,6 +220,7 @@ export class CustomTree<T = {}> extends React.Component<Props<T>, {}> {
         node: TreeNode<T>,
         e: React.MouseEvent<HTMLElement>
     ) => {
+        this.props.updateScroll();
         this.handlerHelper(this.props.onNodeExpand, node, e);
     };
 

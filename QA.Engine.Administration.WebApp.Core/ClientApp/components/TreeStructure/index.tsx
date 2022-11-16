@@ -13,8 +13,9 @@ import {
     Tag,
     ButtonGroup,
     Intent,
+    Switch,
 } from "@blueprintjs/core";
-import { Scrollbars } from 'react-custom-scrollbars-2'; // tslint:disable-line
+import { Scrollbars } from "react-custom-scrollbars-2"; // tslint:disable-line
 import cn from "classnames"; // tslint:disable-line
 import NavigationStore from "stores/NavigationStore";
 import OperationState from "enums/OperationState";
@@ -29,6 +30,9 @@ import TextStore from "stores/TextStore";
 import Texts from "constants/Texts";
 import ArchiveTreeStore from "stores/TreeStore/ArchiveTreeStore";
 import WidgetIdSelector from "components/WidgetIdSelector";
+import DiscriminatorSelect from "components/Select/DiscriminatorSelect";
+import TreeStoreType from "enums/TreeStoreType";
+import SelectorsType from "enums/WidgetIdSelectorType";
 
 interface Props {
     type: TreeStructureType;
@@ -49,6 +53,8 @@ interface Props {
 interface State {
     shouldScroll: boolean;
     sbHeightMax: number;
+
+    expandCollapseСounter: number;
 }
 
 type DefaultProps =
@@ -87,6 +93,7 @@ export default class SiteTree extends React.Component<Props, State> {
         this.state = {
             shouldScroll: false,
             sbHeightMax: window.innerHeight - props.sbHeightDelta,
+            expandCollapseСounter: 0, // need for rerender Scrollbars component
         };
 
         autorun(() => {
@@ -99,6 +106,13 @@ export default class SiteTree extends React.Component<Props, State> {
     private paginationTimer: number;
 
     private sbRef = React.createRef<Scrollbars>();
+
+    // need for rerender Scrollbars component
+    private updateExpandCollapseСounter() {
+        this.setState((state) => ({
+            expandCollapseСounter: state.expandCollapseСounter + 1,
+        }));
+    }
 
     private handleMajorTreeNode = (e: ITreeElement) => {
         const { navigationStore, treeStore } = this.props;
@@ -234,11 +248,17 @@ export default class SiteTree extends React.Component<Props, State> {
             tree instanceof ArchiveTreeStore &&
             tree.page !== null &&
             !tree.searchActive;
+            const selectRegionDefaultTitle =
+            textStore.texts[Texts.selectRegion] ?? "";
+    
         const regions =
             regionStore.regions != null && regionStore.regions.length > 0
-                ? [{ id: null, title: "(No selection)" } as RegionModel].concat(
-                      regionStore.regions
-                  )
+                ? [
+                      {
+                          id: SelectorsType.NO_SELECTION,
+                          title: selectRegionDefaultTitle,
+                      } as RegionModel,
+                  ].concat(regionStore.regions)
                 : [];
         const isMoveTreeMode =
             tree instanceof SiteTreeStore ? tree.moveTreeMode : false;
@@ -251,6 +271,22 @@ export default class SiteTree extends React.Component<Props, State> {
             setTimeout(() => {
                 this.scrollTo(tree.nodeCords.get(scrollNodeId));
             }, 0);
+        }
+
+        const widgetIdSelectorDefaultTitle =
+            textStore.texts[Texts.selectMode] ?? "";
+
+        let treeDiscriminators: DiscriminatorModel[] = [];
+        const selectDiscriminatorsDefaultTitle =
+            textStore.texts[Texts.selectType] ?? "";
+        if (
+            tree.type === TreeStoreType.SITE ||
+            tree.type === TreeStoreType.WIDGET
+        ) {
+            treeDiscriminators = treeStore.getDiscriminators(
+                tree.type,
+                selectDiscriminatorsDefaultTitle
+            );
         }
 
         return (
@@ -266,47 +302,111 @@ export default class SiteTree extends React.Component<Props, State> {
                         value={tree.query}
                         placeholder="Title/Alias/ID"
                     />
-                    <NavbarDivider />
-                    <WidgetIdSelector tree={tree} textStore={this.props.textStore}/>
-                    {useRegions && !isMoveTreeMode && (
-                        <React.Fragment>
-                            <NavbarDivider
-                                className={cn({ hidden: tree.searchActive })}
-                            />
-                            <RegionSelect
-                                items={regions}
-                                filterable
-                                onChange={this.changeRegion}
-                                className={cn({ hidden: tree.searchActive })}
-                            />
-                        </React.Fragment>
-                    )}
-                    {isMoveTreeMode && (
-                        <React.Fragment>
+                    <div className="tree-navbar-selectors">
+                    {(tree.type === TreeStoreType.SITE || tree.type === TreeStoreType.WIDGET) && (
+                            <div className="tree-navbar-selectors__select-wrapper">
+                                <NavbarDivider />
+                                <DiscriminatorSelect
+                                    items={treeDiscriminators}
+                                    onChange={(element) => {
+                                        this.props.treeStore
+                                            .resolveTree(this.props.type)
+                                            .selectDiscriminator(element.id);
+                                    }}
+                                    tree={tree}
+                                    filterable
+                                    defaultTitle={
+                                        selectDiscriminatorsDefaultTitle
+                                    }
+                                />
+                            </div>
+                        )}
+                        <div className="tree-navbar-selectors__select-wrapper">
                             <NavbarDivider />
-                            <ButtonGroup
-                                className="dialog-button-group"
-                                style={{ justifyContent: "left" }}
-                            >
-                                <Button
-                                    text={
-                                        textStore.texts[Texts.popupMoveButton]
+                            {this.props.textStore.state ===
+                                OperationState.SUCCESS &&
+                            (tree.type === TreeStoreType.SITE ||
+                                tree.type === TreeStoreType.WIDGET) ? (
+                                <WidgetIdSelector
+                                    tree={tree}
+                                    treeSearchActive={tree.searchActive}
+                                    defaultTitle={widgetIdSelectorDefaultTitle}
+                                    selectedDiscriminatorsActive={
+                                        tree.selectedDiscriminatorsActive
                                     }
-                                    icon="move"
-                                    onClick={this.moveClick}
-                                    intent={Intent.SUCCESS}
-                                    disabled={isNewParentSelected}
                                 />
-                                <Button
-                                    text={
-                                        textStore.texts[Texts.popupCancelButton]
-                                    }
-                                    icon="undo"
-                                    onClick={this.cancelMoveClick}
+                            ) : (
+                                <div className="tree-navbar-selectors__switch-wrapper">
+                                    <Switch
+                                        inline
+                                        label={textStore.texts[Texts.showID]}
+                                        className="tree-switch"
+                                        checked={tree.showIDs}
+                                        onChange={tree.toggleIDs}
+                                    />
+                                    {tree.searchActive && (
+                                        <Switch
+                                            inline
+                                            label={
+                                                textStore.texts[Texts.showPath]
+                                            }
+                                            className="tree-switch"
+                                            checked={tree.showPath}
+                                            onChange={tree.togglePath}
+                                        />
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                        {useRegions && !isMoveTreeMode && (
+                            <div className="tree-navbar-selectors__select-wrapper">
+                                <NavbarDivider
+                                    className={cn({
+                                        hidden: tree.searchActive,
+                                    })}
                                 />
-                            </ButtonGroup>
-                        </React.Fragment>
-                    )}
+                                <RegionSelect
+                                    items={regions}
+                                    filterable
+                                    onChange={this.changeRegion}
+                                    className={cn({
+                                        hidden: tree.searchActive,
+                                    })}
+                                    defaultTitle={selectRegionDefaultTitle}
+                                />
+                            </div>
+                        )}
+                        {isMoveTreeMode && (
+                            <div className="tree-navbar-selectors__select-wrapper">
+                                <NavbarDivider />
+                                <ButtonGroup
+                                    className="dialog-button-group"
+                                    style={{ justifyContent: "left" }}
+                                >
+                                    <Button
+                                        text={
+                                            textStore.texts[
+                                                Texts.popupMoveButton
+                                            ]
+                                        }
+                                        icon="move"
+                                        onClick={this.moveClick}
+                                        intent={Intent.SUCCESS}
+                                        disabled={isNewParentSelected}
+                                    />
+                                    <Button
+                                        text={
+                                            textStore.texts[
+                                                Texts.popupCancelButton
+                                            ]
+                                        }
+                                        icon="undo"
+                                        onClick={this.cancelMoveClick}
+                                    />
+                                </ButtonGroup>
+                            </div>
+                        )}
+                    </div>
                 </Navbar>
                 {isLoading ? (
                     <Spinner size={this.props.spinnerSize} />
@@ -315,7 +415,6 @@ export default class SiteTree extends React.Component<Props, State> {
                         <Scrollbars
                             ref={this.sbRef}
                             hideTracksWhenNotNeeded
-                            autoHide
                             autoHeight
                             autoHeightMin={this.props.sbHeightMin}
                             autoHeightMax={
@@ -336,7 +435,8 @@ export default class SiteTree extends React.Component<Props, State> {
                             <CustomTree
                                 className="tree"
                                 contents={
-                                    tree.searchActive
+                                    tree.searchActive ||
+                                    tree.selectedDiscriminatorsActive
                                         ? tree.searchedTree
                                         : tree.tree
                                 }
@@ -344,6 +444,9 @@ export default class SiteTree extends React.Component<Props, State> {
                                 onNodeCollapse={tree.handleNodeCollapse}
                                 onNodeExpand={tree.handleNodeExpand}
                                 onNodeClick={this.handleNodeClick}
+                                updateScroll={() =>
+                                    this.updateExpandCollapseСounter()
+                                }
                             />
                         </Scrollbars>
                         {usePagination && (

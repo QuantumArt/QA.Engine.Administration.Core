@@ -74,6 +74,11 @@ export default class SiteTreeStore extends BaseTreeState<PageModel> {
     }
 
     @action
+    public getSiteDiscriminators() {
+        return this.siteDiscriminators;
+    }
+
+    @action
     public startMoveTree() {
         this.moveTreeModeInternal = true;
         this.moveItemIdInternal = this.selectedNode.id;
@@ -116,4 +121,21 @@ export default class SiteTreeStore extends BaseTreeState<PageModel> {
             results.delete(del);
         }
     }
+
+    public searchDiscriminatorInternal(results: Set<PageModel>, id: number, node: PageModel) {
+        let del: PageModel;
+        results.forEach((x) => {
+            if (x.id === this.moveItemIdInternal) {
+                del = x;
+            }
+        });
+        if (del) {
+            results.delete(del);
+        }
+    }
+
+    public getAlias = (node: ITreeElement) => {
+        const targetNode = this.nodesMap.get(node.id);
+        return targetNode.original.alias;
+    };
 }

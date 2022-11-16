@@ -97,6 +97,7 @@ export default class InteractiveZone extends React.Component<Props, State> {
         }
         tree.expandToNode(node);
         tree.resetSearch();
+        tree.resetDiscriminators();
     }
 
     componentWillUnmount() {
@@ -109,7 +110,7 @@ export default class InteractiveZone extends React.Component<Props, State> {
     render() {
         const { node, treeStore, type } = this.props;
         const tree = treeStore.resolveTree(type);
-        const showExpandBtn = tree.searchActive && type !== TreeStoreType.ARCHIVE;
+        const showExpandBtn = (tree.searchActive || tree.selectedDiscriminatorsActive) && type !== TreeStoreType.ARCHIVE;
         let isMoveTreeMode = false;
         let elementMenu: JSX.Element;
         switch (node.contextMenuType) {
