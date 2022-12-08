@@ -75,7 +75,6 @@ export default class WidgetTreeMenu extends React.Component<Props> {
 
     private handlerExample = () => {
         // example method for menu action. Will be taken from some store in the future.
-        console.log("click");
     };
 
     render() {

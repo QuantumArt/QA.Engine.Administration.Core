@@ -1,12 +1,11 @@
-import SiteMapService from 'services/SiteMapService';
-import { BaseTreeState, ITreeElement } from 'stores/TreeStore/BaseTreeStore';
-import ContextMenuType from 'enums/ContextMenuType';
-import TreeStoreType from 'enums/TreeStoreType';
-import DictionaryService from 'services/DictionaryService';
-import { action, computed, observable } from 'mobx';
+import SiteMapService from "services/SiteMapService";
+import { BaseTreeState, ITreeElement } from "stores/TreeStore/BaseTreeStore";
+import ContextMenuType from "enums/ContextMenuType";
+import TreeStoreType from "enums/TreeStoreType";
+import DictionaryService from "services/DictionaryService";
+import { action, computed, observable } from "mobx";
 
 export default class SiteTreeStore extends BaseTreeState<PageModel> {
-
     public type = TreeStoreType.SITE;
 
     private regionIds: number[] = [];
@@ -23,7 +22,10 @@ export default class SiteTreeStore extends BaseTreeState<PageModel> {
     public async getRootElement(): Promise<PageModel> {
         await this.getRootPageDiscriminator();
         let node = this.selectedNode;
-        while (node.parentId != null && node.discriminator !== this.rootPageDiscriminator) {
+        while (
+            node.parentId != null &&
+            node.discriminator !== this.rootPageDiscriminator
+        ) {
             node = this.nodesMap.get(node.parentId).original;
         }
         return node;
@@ -45,7 +47,8 @@ export default class SiteTreeStore extends BaseTreeState<PageModel> {
     private rootPageDiscriminator: string = null;
     private async getRootPageDiscriminator() {
         try {
-            const response: ApiResult<string> = await DictionaryService.getRootPageDiscriminator();
+            const response: ApiResult<string> =
+                await DictionaryService.getRootPageDiscriminator();
             if (response.isSuccess) {
                 this.rootPageDiscriminator = response.data;
             } else {
@@ -67,7 +70,10 @@ export default class SiteTreeStore extends BaseTreeState<PageModel> {
         return this.moveItemIdInternal;
     }
     public get treeElement(): ITreeElement {
-        if (this.selectedNode != null && this.nodesMap.has(this.selectedNode.id)) {
+        if (
+            this.selectedNode != null &&
+            this.nodesMap.has(this.selectedNode.id)
+        ) {
             return this.nodesMap.get(this.selectedNode.id).mapped;
         }
         return null;
@@ -96,21 +102,28 @@ export default class SiteTreeStore extends BaseTreeState<PageModel> {
             const mapEntity = this.nodesMap.get(this.moveItemIdInternal);
             mapEntity.mapped.isSelected = true;
             mapEntity.mapped.disabled = false;
-            if (this.selectedNode != null && this.selectedNode.id !== mapEntity.original.id) {
-                this.nodesMap.get(this.selectedNode.id).mapped.isSelected = false;
+            if (
+                this.selectedNode != null &&
+                this.selectedNode.id !== mapEntity.original.id
+            ) {
+                this.nodesMap.get(this.selectedNode.id).mapped.isSelected =
+                    false;
                 this.selectedNode = mapEntity.original;
                 this.expandToNode(mapEntity.mapped);
-
             }
         }
         this.moveItemIdInternal = null;
         this.moveTreeModeInternal = false;
-        if (this.query !== '') {
-            this.search('');
+        if (this.query !== "") {
+            this.search("");
         }
     }
 
-    protected searchInternal(results: Set<PageModel>, query: string, node: PageModel) {
+    protected searchInternal(
+        results: Set<PageModel>,
+        query: string,
+        node: PageModel
+    ) {
         let del: PageModel;
         results.forEach((x) => {
             if (x.id === this.moveItemIdInternal) {
@@ -122,7 +135,11 @@ export default class SiteTreeStore extends BaseTreeState<PageModel> {
         }
     }
 
-    public searchDiscriminatorInternal(results: Set<PageModel>, id: number, node: PageModel) {
+    public searchDiscriminatorInternal(
+        results: Set<PageModel>,
+        id: number,
+        node: PageModel
+    ) {
         let del: PageModel;
         results.forEach((x) => {
             if (x.id === this.moveItemIdInternal) {

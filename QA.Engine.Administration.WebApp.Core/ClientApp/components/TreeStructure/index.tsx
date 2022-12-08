@@ -260,6 +260,7 @@ export default class SiteTree extends React.Component<Props, State> {
                       } as RegionModel,
                   ].concat(regionStore.regions)
                 : [];
+
         const isMoveTreeMode =
             tree instanceof SiteTreeStore ? tree.moveTreeMode : false;
         const isNewParentSelected =
