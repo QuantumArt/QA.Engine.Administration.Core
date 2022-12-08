@@ -294,6 +294,7 @@ export abstract class BaseTreeState<T extends {
             this.origTreeInternal = response.data;
             this.convertTree(this.origTreeInternal, 'treeInternal');
         } else {
+            this.state = OperationState.ERROR
             throw response.error;
         }
     }
