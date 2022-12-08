@@ -239,7 +239,10 @@ export default class SiteTree extends React.Component<Props, State> {
     render() {
         const { treeStore, regionStore, textStore, type } = this.props;
         const tree = treeStore.resolveTree(type);
-        const isLoading = treeStore.state === OperationState.PENDING;
+        const isLoading =
+            treeStore.state === OperationState.PENDING ||
+            tree.state === OperationState.PENDING;
+
         const useRegions =
             type === "main" &&
             tree instanceof SiteTreeStore &&
@@ -248,9 +251,9 @@ export default class SiteTree extends React.Component<Props, State> {
             tree instanceof ArchiveTreeStore &&
             tree.page !== null &&
             !tree.searchActive;
-            const selectRegionDefaultTitle =
+        const selectRegionDefaultTitle =
             textStore.texts[Texts.selectRegion] ?? "";
-    
+
         const regions =
             regionStore.regions != null && regionStore.regions.length > 0
                 ? [
@@ -304,7 +307,8 @@ export default class SiteTree extends React.Component<Props, State> {
                         placeholder="Title/Alias/ID"
                     />
                     <div className="tree-navbar-selectors">
-                    {(tree.type === TreeStoreType.SITE || tree.type === TreeStoreType.WIDGET) && (
+                        {(tree.type === TreeStoreType.SITE ||
+                            tree.type === TreeStoreType.WIDGET) && (
                             <div className="tree-navbar-selectors__select-wrapper">
                                 <NavbarDivider />
                                 <DiscriminatorSelect

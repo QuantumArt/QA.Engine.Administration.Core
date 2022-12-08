@@ -7,6 +7,7 @@ import TreeStoreType from 'enums/TreeStoreType';
 import NodeLabel from 'components/TreeStructure/NodeLabel';
 import DictionaryService from 'services/DictionaryService';
 import SelectorsType from 'enums/WidgetIdSelectorType';
+import OperationState from 'enums/OperationState';
 
 export interface ITreeElement extends ITreeNode {
     title?: string;
@@ -280,13 +281,16 @@ export abstract class BaseTreeState<T extends {
         this.pathMap.clear();
         this.nodeCords.clear();
     }
+    @observable public state: OperationState = OperationState.NONE;
 
     @action
     public async fetchTree(): Promise<void> {
+        this.state = OperationState.PENDING
         const response: ApiResult<T[]> = await this.getTree();
         await this.getDiscriminators();
 
         if (response.isSuccess) {
+            this.state = OperationState.SUCCESS
             this.origTreeInternal = response.data;
             this.convertTree(this.origTreeInternal, 'treeInternal');
         } else {
