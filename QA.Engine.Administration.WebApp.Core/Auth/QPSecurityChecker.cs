@@ -149,6 +149,7 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
             _httpContext.Session.SetInt32(AuthenticationKey, 1);
             _httpContext.Session.SetInt32(DBConnector.LastModifiedByKey, _configuration.FakeData.UserId);
             _httpContext.Session.SetString(UserLanguageKey, _configuration.FakeData.LangName);
+            _httpContext.Session.SetInt32(SiteIdKey, _configuration.FakeData.SiteId);
         }
 
         private DBConnector GetDBConnector()

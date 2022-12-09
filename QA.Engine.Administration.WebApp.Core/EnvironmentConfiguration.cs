@@ -28,6 +28,7 @@ namespace QA.Engine.Administration.WebApp.Core
         public int UserId { get; set; }
         public string LangName { get; set; }
         public string ConnectionString { get; set; }
+        public int SiteId { get; set; }
     }
 
     public class CustomAction

@@ -65,7 +65,7 @@ export default class WidgetTab extends React.Component<Props> {
                         type="widgets"
                         className="minor-tree-pane"
                         tree={tree}
-                        sbHeightDelta={345}
+                        sbHeightDelta={245}
                     />
                     <InfoPane type="widgets"/>
                 </div>

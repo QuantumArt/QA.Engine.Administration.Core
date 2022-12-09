@@ -6,6 +6,8 @@ import ContextMenuType from 'enums/ContextMenuType';
 import TreeStoreType from 'enums/TreeStoreType';
 import NodeLabel from 'components/TreeStructure/NodeLabel';
 import DictionaryService from 'services/DictionaryService';
+import SelectorsType from 'enums/WidgetIdSelectorType';
+import OperationState from 'enums/OperationState';
 
 export interface ITreeElement extends ITreeNode {
     title?: string;
@@ -62,6 +64,8 @@ export abstract class BaseTreeState<T extends {
     visible: boolean;
     published?: boolean;
     discriminatorId?: number;
+    hasRegions?: boolean;
+    hasContentVersion?: boolean;
 }> {
 
     constructor(icons: ITreeIcons = defaultIcons) {
@@ -72,6 +76,7 @@ export abstract class BaseTreeState<T extends {
 
     @observable public showIDs: boolean = false;
     @observable public showPath: boolean = false;
+    @observable public showAlias: boolean = false;
 
     @observable pageIndex: number = -1;
     @computed
@@ -88,6 +93,7 @@ export abstract class BaseTreeState<T extends {
     @observable public cordsUpdated: boolean = false;
     @observable protected expandLaunched: boolean = false;
     protected searchTimer: number;
+    private searchedResults: T[] = [];
 
     @observable.shallow public selectedNode: T;
     public nodeCords = new Map<number, number>();
@@ -99,6 +105,13 @@ export abstract class BaseTreeState<T extends {
     protected origTreeInternal: T[] = [];
     protected origSearchedTreeInternal: T[] = [];
     protected discriminators: DiscriminatorModel[];
+
+    protected siteDiscriminators: DiscriminatorModel[] = [];
+    protected widgetDiscriminators: DiscriminatorModel[] = [];
+
+    @observable public selectedDiscriminatorsActive: boolean = false;
+    @observable private selectedDiscriminatorResults: T[] = [];
+    private selectedDiscriminatorId: number;
 
     @computed
     get tree(): ITreeElement[] {
@@ -114,6 +127,46 @@ export abstract class BaseTreeState<T extends {
     get searchedTree(): ITreeElement[] {
         return this.searchedTreeInternal;
     }
+
+    @action
+    public selectDiscriminator(id: number) {
+        if (id === null || id === undefined) {
+            this.selectedDiscriminatorResults = [];
+            this.selectedDiscriminatorsActive = false;
+            this.selectedDiscriminatorId = id 
+            this.search(this.query)
+            return;
+        }
+
+        this.selectedDiscriminatorsActive = true;
+        this.selectedDiscriminatorId = id 
+
+        const results = new Set<T>();
+        const filterFunc = (node: T) => {
+            if (node.discriminatorId === id) {
+                const foundEl: T = {
+                                ...node,
+                                children: [],
+                                parentId: null,
+                            };
+                results.add(foundEl);
+            };
+            this.searchDiscriminatorInternal(results, id, node);
+        };
+        this.forEachOrigNode(this.query.length >= 3  ? this.searchedResults : this.origTreeInternal , filterFunc);
+        this.origSearchedTreeInternal = Array.from(results);
+        this.convertTree(this.origSearchedTreeInternal, 'searchedTreeInternal');
+
+        this.selectedDiscriminatorResults = Array.from(results);
+    }
+
+    @action
+    public resetDiscriminators = () => {
+        if (this.selectedDiscriminatorsActive) {
+            this.selectDiscriminator(SelectorsType.NO_SELECTION)
+        }
+    }
+
 
     @action
     public search(query: string) {
@@ -140,12 +193,17 @@ export abstract class BaseTreeState<T extends {
                         }
                         this.searchInternal(results, query, node);
                     };
-                    this.forEachOrigNode(this.origTreeInternal, filterFunc);
+                    this.forEachOrigNode(this.selectedDiscriminatorResults.length > 0? this.selectedDiscriminatorResults : this.origTreeInternal, filterFunc);
                     this.origSearchedTreeInternal = Array.from(results);
                     this.convertTree(this.origSearchedTreeInternal, 'searchedTreeInternal');
+                    
+                    this.searchedResults = Array.from(results);
                 } else if (this.origSearchedTreeInternal.length > 0) {
                     this.origSearchedTreeInternal = [];
+                    this.selectDiscriminator(this.selectedDiscriminatorId);
                     clearTimeout(this.searchTimer);
+                } else {
+                    this.selectDiscriminator(this.selectedDiscriminatorId);
                 }
             },
             500,
@@ -155,12 +213,24 @@ export abstract class BaseTreeState<T extends {
     protected searchInternal(results: Set<T>, query: string, node: T) {
     }
 
+    protected searchDiscriminatorInternal(results: Set<T>, id: number, node: T) {
+    }
+
     private lastUpdate?: number;
     protected async getDiscriminators() {
         const timeout = 60 * 1000;
         if (this.discriminators == null || this.lastUpdate == null || Date.now() - this.lastUpdate > timeout) {
             const discriminators: ApiResult<DiscriminatorModel[]> = await DictionaryService.getDiscriminators();
             this.discriminators = discriminators.isSuccess ? discriminators.data : null;
+
+            this.discriminators.forEach(discriminator => {
+                if (discriminator.isPage) {
+                    this.siteDiscriminators.push(discriminator)
+                } else {
+                    this.widgetDiscriminators.push(discriminator)
+                }
+            })
+
             this.lastUpdate = Date.now();
         }
     }
@@ -211,33 +281,56 @@ export abstract class BaseTreeState<T extends {
         this.pathMap.clear();
         this.nodeCords.clear();
     }
+    @observable public state: OperationState = OperationState.NONE;
 
     @action
     public async fetchTree(): Promise<void> {
+        this.state = OperationState.PENDING
         const response: ApiResult<T[]> = await this.getTree();
         await this.getDiscriminators();
+
         if (response.isSuccess) {
+            this.state = OperationState.SUCCESS
             this.origTreeInternal = response.data;
             this.convertTree(this.origTreeInternal, 'treeInternal');
         } else {
+            this.state = OperationState.ERROR
             throw response.error;
         }
     }
 
     @action
     public toggleIDs = () => {
-        if (this.showPath) {
+        if (this.showPath || this.showAlias ) {
             this.showPath = false;
+            this.showAlias = false;
         }
         this.showIDs = !this.showIDs;
     }
 
     @action
     public togglePath = () => {
-        if (this.showIDs) {
+        if (this.showIDs || this.showAlias) {
             this.showIDs = false;
+            this.showAlias = false;
         }
         this.showPath = !this.showPath;
+    }
+
+    @action
+    public toggleAlias = () => {
+        if (this.showIDs || this.showPath) {
+            this.showIDs = false;
+            this.showPath = false;
+        }
+        this.showAlias = !this.showAlias
+    }
+
+    @action
+    public hidePathAndIDs = () => {
+        this.showIDs = false;
+        this.showPath = false;
+        this.showAlias = false;
     }
 
     @action
@@ -273,7 +366,7 @@ export abstract class BaseTreeState<T extends {
         const targetNode = this.nodesMap.get(nodeData.id);
         const originallySelected = nodeData.isSelected;
         if (this.selectedNode != null) {
-            if (this.searchActive) {
+            if (this.searchActive || this.selectedDiscriminatorsActive) {
                 const node = this.searchedNodesMap.get(this.selectedNode.id);
                 if (node) {
                     node.mapped.isSelected = false;
@@ -381,18 +474,42 @@ export abstract class BaseTreeState<T extends {
                 intent: <Intent>discriminator.iconIntent,
                 className: 'bp3-tree-node-icon',
             };
-            const tagProps = {
+            const icon = React.createElement(Icon, iconProps);
+
+            const newTagProps = {
                 minimal: true,
                 intent: Intent.SUCCESS,
                 className: 'bp3-tree-node-icon',
             };
-            const icon = React.createElement(Icon, iconProps);
-            const tag = React.createElement(Tag, tagProps, 'new');
+            const tagNew = React.createElement(Tag, newTagProps, 'new');
 
+
+            const regionsTagProps = {
+                minimal: true,
+                intent: Intent.WARNING,
+                className: 'bp3-tree-node-icon',
+            };
+            const tagRegions = React.createElement(Tag, regionsTagProps, 'regions');
+
+            const versionsTagProps = {
+                minimal: true,
+                intent: Intent.PRIMARY,
+                className: 'bp3-tree-node-icon',
+            };
+            const tagVersions = React.createElement(Tag, versionsTagProps, 'versions');
+
+            const activeTags = []
             if (!el.published) {
-                return React.createElement(React.Fragment, {}, icon, tag);
-            }
-            return icon;
+                activeTags.push(tagNew)
+            }  
+            if (el.hasRegions) {
+                activeTags.push(tagRegions)
+            }  
+            if (el.hasContentVersion) {
+                activeTags.push(tagVersions)
+            } 
+
+            return React.createElement(React.Fragment, {}, icon, ...activeTags);
         }
 
         if (this.icons.checkPublication) {
