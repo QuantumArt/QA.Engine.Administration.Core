@@ -44,7 +44,7 @@
     <PackageReference Include="NLog" Version="5.0.4" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="5.1.4" />
     <PackageReference Include="Npgsql" Version="6.0.7" />
-    <PackageReference Include="Quantumart.AspNetCore" Version="5.0.1" />
+    <PackageReference Include="Quantumart.AspNetCore" Version="6.0.0-beta1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 
