@@ -117,7 +117,8 @@ export default abstract class BaseSelect<
             );
             if (
                 !pageInItems ||
-                !this.props?.tree?.selectedDiscriminatorsActive
+                (!this.props?.tree?.selectedDiscriminatorsActive &&
+                    this.props?.tree?.type === TreeStoreType.WIDGET)
             ) {
                 this.setState({
                     page: null,
