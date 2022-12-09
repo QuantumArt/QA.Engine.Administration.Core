@@ -501,9 +501,11 @@ export abstract class BaseTreeState<T extends {
             const activeTags = []
             if (!el.published) {
                 activeTags.push(tagNew)
-            }  if (el.hasRegions) {
+            }  
+            if (el.hasRegions) {
                 activeTags.push(tagRegions)
-            }  if (el.hasContentVersion) {
+            }  
+            if (el.hasContentVersion) {
                 activeTags.push(tagVersions)
             } 
 
