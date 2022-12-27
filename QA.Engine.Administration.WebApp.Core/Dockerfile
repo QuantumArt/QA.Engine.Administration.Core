@@ -10,7 +10,6 @@ COPY ["QA.Engine.Administration.Data.Core/QA.Engine.Administration.Data.Core.csp
 COPY ["QA.Engine.Administration.Data.Interfaces.Core/QA.Engine.Administration.Data.Interfaces.Core.csproj", "QA.Engine.Administration.Data.Interfaces.Core/"]
 COPY ["QA.Engine.Administration.Common.Core/QA.Engine.Administration.Common.Core.csproj", "QA.Engine.Administration.Common.Core/"]
 COPY ["QA.Engine.Administration.Services.Core/QA.Engine.Administration.Services.Core.csproj", "QA.Engine.Administration.Services.Core/"]
-COPY ["QA.Engine.Administration.Logger.Core/QA.Engine.Administration.Logger.Core.csproj", "QA.Engine.Administration.Logger.Core/"]
 COPY .nuget .
 RUN dotnet restore "QA.Engine.Administration.WebApp.Core/QA.Engine.Administration.WebApp.Core.csproj"
 
