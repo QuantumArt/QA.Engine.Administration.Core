@@ -155,4 +155,8 @@ export default class SiteTreeStore extends BaseTreeState<PageModel> {
         const targetNode = this.nodesMap.get(node.id);
         return targetNode.original.alias;
     };
+
+    public getNode = (id: number) => {
+        return this.nodesMap.get(id).original;
+    };
 }

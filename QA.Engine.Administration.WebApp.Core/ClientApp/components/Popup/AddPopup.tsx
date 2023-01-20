@@ -47,7 +47,7 @@ export default class AddPopup extends React.Component<Props, State> {
         }
         let node: PageModel | WidgetModel;
         if (popupStore.type === PopupType.ADD) {
-            node = treeStore.getSiteTreeStore().selectedNode;
+            node = treeStore.getSiteTreeStore().getNode(popupStore.itemId);
         }
         if (popupStore.type === PopupType.ADDWIDGET) {
             const widgetTreeStore = treeStore.getWidgetTreeStore();
