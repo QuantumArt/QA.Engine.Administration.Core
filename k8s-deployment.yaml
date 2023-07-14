@@ -15,7 +15,7 @@ spec:
         logging: enabled        
     spec:
       containers:
-      - image: "||registry||/widget-platform/admin:||version||"
+      - image: "__registry__/qp8-widgets/admin:||version||"
         name: wp-admin
         ports:
         - containerPort: 80
