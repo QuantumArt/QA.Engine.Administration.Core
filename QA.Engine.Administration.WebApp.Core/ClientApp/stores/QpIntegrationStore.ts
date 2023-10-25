@@ -441,7 +441,6 @@ class QpIntegrationUtils {
             { fieldName: QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.discriminator), value: model.discriminatorId === 0 ? null : model.discriminatorId },
             { fieldName: QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.contentName), value: model.name },
             { fieldName: QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.title), value: model.title },
-            { fieldName: QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.isPage), value: true },
             { fieldName: 'Data.Schedule.ScheduleType', value: 'Visible' },
             { fieldName: QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.extensionId), value: model.extantionId === 0 ? null : model. extantionId },
         ];

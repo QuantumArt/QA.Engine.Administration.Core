@@ -5426,16 +5426,16 @@
     "iconv-lite" "0.4.24"
     "unpipe" "1.0.0"
 
-"react-custom-scrollbars@^4.2.1":
-  "integrity" "sha1-gw/ZUCkn6X6KeMIIaBOJmyqLZts="
-  "resolved" "https://registry.npmjs.org/react-custom-scrollbars/-/react-custom-scrollbars-4.2.1.tgz"
-  "version" "4.2.1"
+"react-custom-scrollbars-2@^4.5.0":
+  "integrity" "sha512-/z0nWAeXfMDr4+OXReTpYd1Atq9kkn4oI3qxq3iMXGQx1EEfwETSqB8HTAvg1X7dEqcCachbny1DRNGlqX5bDQ=="
+  "resolved" "https://registry.npmjs.org/react-custom-scrollbars-2/-/react-custom-scrollbars-2-4.5.0.tgz"
+  "version" "4.5.0"
   dependencies:
     "dom-css" "^2.0.0"
     "prop-types" "^15.5.10"
     "raf" "^3.1.0"
 
-"react-dom@^0.14.0 || ^15.0.0 || ^16.0.0", "react-dom@^15.0.0 || ^16.0.0", "react-dom@^15.3.0 || 16", "react-dom@^16.7.0", "react-dom@>=15.0.0":
+"react-dom@^0.14.0 || ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0", "react-dom@^15.0.0 || ^16.0.0", "react-dom@^15.3.0 || 16", "react-dom@^16.7.0", "react-dom@>=15.0.0":
   "integrity" "sha512-LMxFfAGrcS3kETtQaCkTKjMiifahaMySFDn71fZUNpPHZQEzmk/GiAeIT8JSOrHB23fnuCOMruL2a8NYlw+8Gw=="
   "resolved" "https://registry.npmjs.org/react-dom/-/react-dom-16.12.0.tgz"
   "version" "16.12.0"
@@ -5492,7 +5492,7 @@
     "prop-types" "^15.6.2"
     "react-lifecycles-compat" "^3.0.4"
 
-"react@^0.13.0 || ^0.14.0 || ^15.0.0 || ^16.0.0", "react@^0.14.0 || ^15.0.0 || ^16.0.0", "react@^15.0.0 || ^16.0.0", "react@^15.3.0 || 16", "react@^16.0.0", "react@^16.7.0", "react@>=15.0.0", "react@0.14.x || ^15.0.0 || ^16.0.0":
+"react@^0.13.0 || ^0.14.0 || ^15.0.0 || ^16.0.0", "react@^0.14.0 || ^15.0.0 || ^16.0.0", "react@^0.14.0 || ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0", "react@^15.0.0 || ^16.0.0", "react@^15.3.0 || 16", "react@^16.0.0", "react@^16.7.0", "react@>=15.0.0", "react@0.14.x || ^15.0.0 || ^16.0.0":
   "integrity" "sha512-fglqy3k5E+81pA8s+7K0/T3DBCF0ZDOher1elBFzF7O6arXJgzyu/FW+COxFvAWXJoJN9KIZbT2LXlukwphYTA=="
   "resolved" "https://registry.npmjs.org/react/-/react-16.12.0.tgz"
   "version" "16.12.0"
