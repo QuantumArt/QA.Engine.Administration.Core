@@ -92,7 +92,7 @@ export default class AddPopup extends React.Component<Props, State> {
                     <InputGroup placeholder={textStore.texts[Texts.popupFieldAliasPlaceholder]} value={name} onChange={this.changeName} intent={nameIntent} />
                 </FormGroup>
                 <FormGroup label={textStore.texts[Texts.popupFieldContentType]}>
-                    <DiscriminatorSelect items={popupStore.discriminators} onChange={this.changeDiscriminator} intent={discriminatorIntent} />
+                    <DiscriminatorSelect filterable items={popupStore.discriminators} onChange={this.changeDiscriminator} intent={discriminatorIntent} />
                 </FormGroup>
                 <ButtonGroup className="dialog-button-group">
                     <Button text={textStore.texts[Texts.popupAddButton]} icon="new-object" onClick={this.addClick} intent={Intent.SUCCESS} />
