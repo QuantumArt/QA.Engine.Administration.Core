@@ -406,7 +406,6 @@ class QpIntegrationUtils {
         const result = [
             QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.parent),
             QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.discriminator),
-            QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.isPage),
             // QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.zoneName),
             QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.extensionId),
             QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.versionOf),
