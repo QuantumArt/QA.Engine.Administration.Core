@@ -1,0 +1,31 @@
+# Докер-образ WP.Admin
+
+## Назначение
+
+Образ содержит приложение WP.Admin, которое устанавливается вместе с продуктом **QP8.WidgetPlatform**. Использование образа описано в [руководстве администратора QP8.WidgetPlatform](https://storage.qp.qsupport.ru/qa_official_site/images/downloads/qp8-widgets-admin-man.pdf) (в разделе **Установка продукта на Linux**).
+
+## Репозитории
+
+* [DockerHub](https://hub.docker.com/r/qpcms/widget-admin/tags): `qpcms/widget-admin`
+* QA Harbor: `registry.quantumart.ru/qp8-widgets/admin`
+
+## История тегов (версий)
+
+### 1.4.2.0
+
+* Добавлен поиск для выбора типа страницы при создании  (#172019)
+* Исправлена передача параметра isPage в QP
+
+### 1.4.1.0
+
+* Исправлены манифесты
+
+### 1.4.0.0
+
+* Доработки UI по итогам сравнения UX с предыдущей версией
+* Переход на .NET 6
+* Исправлена работа контекстного меню и диалога Add New Page (#170889)
+
+### 1.2.0.46
+
+* Переход на Node 16
