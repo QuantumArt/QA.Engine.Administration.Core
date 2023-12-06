@@ -70,7 +70,9 @@ namespace QA.Engine.Administration.Services.Core
             var archiveTree = archives
                 .Where(x => topLevelId == x.Id)
                 .ToList();
-            var archivesDict = archives.GroupBy(k => k.ParentId ?? k.VersionOfId).ToDictionary(k => k.Key, v => v.Select(x => x).ToList());
+            var archivesDict = archives.GroupBy(k => k.ParentId ?? k.VersionOfId)
+                .Where(x => x.Key != null)
+                .ToDictionary(k => k.Key, v => v.Select(x => x).ToList());
 
             var result = GetArchiveTreeInternal(archiveTree, archivesDict);
 
