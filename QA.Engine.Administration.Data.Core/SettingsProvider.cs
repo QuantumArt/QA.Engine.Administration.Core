@@ -74,30 +74,6 @@ namespace QA.Engine.Administration.Data.Core
             return result.FirstOrDefault();
         }
 
-        public List<QpFieldData> GetFields(int siteId, int contentId, IDbTransaction transaction = null)
-        {
-            _logger.LogDebug($"getFields. siteId: {siteId}, contentId: {contentId}");
-            var siteName = _qpMetadataManager.GetSiteName(siteId);
-            var fields = _qpContentManager
-                .Connect()
-                .SiteName(siteName)
-                .ContentName("CONTENT_ATTRIBUTE")
-                .Fields("ATTRIBUTE_ID, CONTENT_ID, ATTRIBUTE_NAME, NET_ATTRIBUTE_NAME")
-                .Where($"NET_ATTRIBUTE_NAME is not null AND CONTENT_ID = {contentId}")
-                .GetRealData();
-
-            var result = fields.PrimaryContent.Select()
-                .Select(x => new QpFieldData
-                {
-                    Id = int.Parse(x["ATTRIBUTE_ID"].ToString()),
-                    Name = x["NET_ATTRIBUTE_NAME"].ToString()
-                }).ToList();
-
-            _logger.LogDebug($"getFields. fields: {Newtonsoft.Json.JsonConvert.SerializeObject(result)}");
-
-            return result;
-        }
-
         public string GetIconUrl(int siteId, IDbTransaction transaction = null)
         {
             _logger.LogDebug($"getIconUrl. siteId: {siteId}");

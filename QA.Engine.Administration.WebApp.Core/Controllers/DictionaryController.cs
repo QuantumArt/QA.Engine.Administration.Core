@@ -1,14 +1,11 @@
-using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using NLog;
 using QA.Engine.Administration.Common.Core;
 using QA.Engine.Administration.Services.Core.Interfaces;
 using QA.Engine.Administration.Services.Core.Models;
@@ -31,7 +28,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         private readonly IContentService _contentService;
         private readonly ICustomActionService _customActionService;
         private readonly IMapper _mapper;
-        private readonly ILogger<SiteMapController> _logger;
+        private readonly ILogger _logger = LogManager.GetCurrentClassLogger();
         private readonly IStringLocalizerFactory _stringLocalizerFactory;
         private readonly CustomAction _customActionConfig;
         private readonly string _rootPageDiscriminator;
@@ -41,7 +38,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         public DictionaryController(
             IItemDifinitionService itemDifinitionService, IRegionService regionService, ICultureService cultureService, IContentService contentService,
             IOptions<EnvironmentConfiguration> options, IWebAppQpHelper webAppQpHelper, ICustomActionService customActionService,
-            IMapper mapper, ILogger<SiteMapController> logger, IStringLocalizerFactory stringLocalizerFactory)
+            IMapper mapper, IStringLocalizerFactory stringLocalizerFactory)
         {
             _itemDifinitionService = itemDifinitionService;
             _regionService = regionService;
@@ -49,7 +46,6 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
             _contentService = contentService;
             _customActionService = customActionService;
             _mapper = mapper;
-            _logger = logger;
             _stringLocalizerFactory = stringLocalizerFactory;
 
             _customActionConfig = options.Value?.CustomAction;
@@ -79,7 +75,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpGet("getDiscriminators")]
         public ApiResult<List<DiscriminatorModel>> GetDiscriminators()
         {
-            _logger.LogTrace($"getDiscriminators userId={_userId}");
+            _logger.Trace($"getDiscriminators userId={_userId}");
             var discriminators = _itemDifinitionService.GetAllItemDefinitions(_siteId);
             return ApiResult<List<DiscriminatorModel>>.Success(discriminators);
         }
@@ -91,7 +87,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpGet("getRootPageDiscriminator")]
         public ApiResult<string> GetRootPageDiscriminator()
         {
-            _logger.LogTrace($"getRootPageDiscriminator userId={_userId}");
+            _logger.Trace($"getRootPageDiscriminator userId={_userId}");
             return ApiResult<string>.Success(_rootPageDiscriminator);
         }
 
@@ -102,7 +98,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpGet("getFlatRegions")]
         public ApiResult<List<RegionModel>> GetFlatRegions()
         {
-            _logger.LogTrace($"getFlatRegions userId={_userId}");
+            _logger.Trace($"getFlatRegions userId={_userId}");
             var regions = _regionService.GetRegions(_siteId);
             return ApiResult<List<RegionModel>>.Success(regions);
         }
@@ -114,7 +110,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpGet("getRegionTree")]
         public ApiResult<List<RegionModel>> GetRegionTree()
         {
-            _logger.LogTrace($"getRegionTree userId={_userId}");
+            _logger.Trace($"getRegionTree userId={_userId}");
             var regions = _regionService.GetRegionStructure(_siteId);
             return ApiResult<List<RegionModel>>.Success(regions);
         }
@@ -126,7 +122,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpGet("getQpContent")]
         public ApiResult<QpContentModel> GetQpContent(string contentName)
         {
-            _logger.LogTrace($"getRegionTree contentName={contentName}, userId={_userId}");
+            _logger.Trace($"getRegionTree contentName={contentName}, userId={_userId}");
             var content = _contentService.GetQpContent(_siteId, contentName);
             return ApiResult<QpContentModel>.Success(content);
         }
@@ -138,7 +134,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpGet("getCultures")]
         public ApiResult<List<CultureModel>> GetCultures()
         {
-            _logger.LogTrace($"getCultures userId={_userId}");
+            _logger.Trace($"getCultures userId={_userId}");
             var cultures = _cultureService.GetCultures(_siteId);
             return ApiResult<List<CultureModel>>.Success(cultures);
         }
@@ -151,7 +147,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         public ApiResult<CustomActionModel> GetCustomAction(string alias)
         {
             alias = !string.IsNullOrWhiteSpace(alias) ? alias : _customActionConfig?.Alias;
-            _logger.LogTrace($"getCustomActionCode alias={alias}, userId={_userId}");
+            _logger.Trace($"getCustomActionCode alias={alias}, userId={_userId}");
             var customAction = _customActionService.GetCustomAction(alias);
             if (customAction == null)
                 return ApiResult<CustomActionModel>.Success(null);

@@ -5,8 +5,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="NLog" Version="5.2.7" />
     <PackageReference Include="QA.DotNetCore.Engine.Persistent.Configuration" Version="3.1.4" />
-    <PackageReference Include="Quantumart.AspNetCore" Version="6.0.0" />
+    <PackageReference Include="Quantumart.QP8.BLL" Version="3.3.9" />
   </ItemGroup>
 
   <ItemGroup>

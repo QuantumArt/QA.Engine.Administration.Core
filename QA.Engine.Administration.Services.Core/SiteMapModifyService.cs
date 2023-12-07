@@ -202,7 +202,7 @@ namespace QA.Engine.Administration.Services.Core
 
             var contentId = _settingsProvider.GetContentId(siteId);
 
-            _qpDataProvider.Remove(siteId, contentId, userId, itemsToArchive, moveContentVersion);
+            _qpDataProvider.Archive(siteId, contentId, userId, itemsToArchive, moveContentVersion);
         }
 
         public void RestoreSiteMapItems(

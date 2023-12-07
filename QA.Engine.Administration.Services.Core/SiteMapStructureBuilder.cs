@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using QA.Engine.Administration.Services.Core.Models;
+﻿using QA.Engine.Administration.Services.Core.Models;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;

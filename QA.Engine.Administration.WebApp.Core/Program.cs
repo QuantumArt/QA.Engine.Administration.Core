@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog.Web;
+using NLog;
+using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace QA.Engine.Administration.WebApp.Core
 {
@@ -11,7 +13,7 @@ namespace QA.Engine.Administration.WebApp.Core
     {
         public static void Main(string[] args)
         {
-            var logger = NLog.LogManager.LoadConfiguration("NLogClient.config").GetCurrentClassLogger();
+            var logger = LogManager.Setup().LoadConfigurationFromFile("NLogClient.config").GetCurrentClassLogger();
             try
             {
                 CreateWebHostBuilder(args).Build().Run();
@@ -23,7 +25,7 @@ namespace QA.Engine.Administration.WebApp.Core
             }
             finally
             {
-                NLog.LogManager.Shutdown();
+                LogManager.Shutdown();
             }
         }
 

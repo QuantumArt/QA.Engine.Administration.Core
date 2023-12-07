@@ -1,15 +1,13 @@
-﻿using Microsoft.Extensions.Logging;
-using QA.Engine.Administration.Common.Core;
+﻿using QA.Engine.Administration.Common.Core;
 using QA.Engine.Administration.Data.Interfaces.Core.Models;
 using Quantumart.QPublishing.Database;
 using Quantumart.QPublishing.Info;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.Globalization;
 using System.Linq;
-using QP.ConfigurationService.Models;
+using NLog;
 
 namespace QA.Engine.Administration.Data.Core.Qp
 {
@@ -21,7 +19,8 @@ namespace QA.Engine.Administration.Data.Core.Qp
         private readonly ContentDataQueryObject _query;
         private readonly IQpDbConnector _dbConnection;
         private readonly List<string> _includes;
-        private readonly ILogger<IQpContentManager> _logger;
+        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+
 
         /// <summary>
         /// Название поля ключа записей
@@ -35,10 +34,9 @@ namespace QA.Engine.Administration.Data.Core.Qp
         /// <summary>
         /// Конструирует объект
         /// </summary>
-        public QpContentManager(IQpDbConnector dbConnector, ILogger<IQpContentManager> logger)
+        public QpContentManager(IQpDbConnector dbConnector)
         {
             _dbConnection = dbConnector;
-            _logger = logger;
 
             _query = new ContentDataQueryObject(
                 null, null, null, null, null, null,
@@ -477,7 +475,7 @@ namespace QA.Engine.Administration.Data.Core.Qp
             var values = new List<Dictionary<string, string>>();
             var dataTable = _dbConnection.GetContentData(_query, out _);
 
-            _logger.LogTrace($"archive. get content data. data rows: {SerializeData(dataTable.Rows)}");
+            _logger.Trace($"archive. get content data. data rows: {SerializeData(dataTable.Rows)}");
 
             foreach (DataRow row in dataTable.Rows)
             {
@@ -490,7 +488,7 @@ namespace QA.Engine.Administration.Data.Core.Qp
 
             if (values.Any())
             {
-                _logger.LogDebug($"archive. mass update. contentId: {_query.ContentId}, values: {SerializeData(values)}");
+                _logger.Debug($"archive. mass update. contentId: {_query.ContentId}, values: {SerializeData(values)}");
                 _query.DbConnector.MassUpdate(_query.ContentId, values, userId);
             }
         }
@@ -505,7 +503,7 @@ namespace QA.Engine.Administration.Data.Core.Qp
             var values = new List<Dictionary<string, string>>();
             var dataTable = _dbConnection.GetContentData(_query, out var totalRecords);
 
-            _logger.LogTrace($"restore. get content data. totalRecords: {totalRecords}, data rows: {SerializeData(dataTable.Rows)}");
+            _logger.Trace($"restore. get content data. totalRecords: {totalRecords}, data rows: {SerializeData(dataTable.Rows)}");
 
             foreach (DataRow row in dataTable.Rows)
             {
@@ -518,7 +516,7 @@ namespace QA.Engine.Administration.Data.Core.Qp
 
             if (values.Any())
             {
-                _logger.LogDebug($"restore. mass update. contentId: {_query.ContentId}, values: {SerializeData(values)}");
+                _logger.Debug($"restore. mass update. contentId: {_query.ContentId}, values: {SerializeData(values)}");
                 _query.DbConnector.MassUpdate(_query.ContentId, values, userId);
             }
         }
@@ -533,12 +531,12 @@ namespace QA.Engine.Administration.Data.Core.Qp
             var values = new List<Dictionary<string, string>>();
             var dataTable = _dbConnection.GetContentData(_query, out var totalRecords);
 
-            _logger.LogTrace($"delete. get content data. totalRecords: {totalRecords}, data rows: {SerializeData(dataTable.Rows)}");
+            _logger.Trace($"delete. get content data. totalRecords: {totalRecords}, data rows: {SerializeData(dataTable.Rows)}");
 
             foreach (DataRow row in dataTable.Rows)
             {
                 var id = int.Parse(row[ContentItemIdFieldName].ToString());
-                _logger.LogDebug($"delete. id: {id}");
+                _logger.Debug($"delete. id: {id}");
                 _dbConnection.DeleteContentItem(id);
             }
         }
@@ -553,7 +551,7 @@ namespace QA.Engine.Administration.Data.Core.Qp
             var values = new List<Dictionary<string, string>>();
             var dataTable = _dbConnection.GetContentData(_query, out var totalRecords);
 
-            _logger.LogTrace($"changeStatus. get content data. totalRecords: {totalRecords}, data rows: {SerializeData(dataTable.Rows)}");
+            _logger.Trace($"changeStatus. get content data. totalRecords: {totalRecords}, data rows: {SerializeData(dataTable.Rows)}");
 
             foreach (DataRow row in dataTable.Rows)
             {
@@ -566,7 +564,7 @@ namespace QA.Engine.Administration.Data.Core.Qp
 
             if (values.Any())
             {
-                _logger.LogDebug($"changeStatus. mass update. contentId: {_query.ContentId}, values: {SerializeData(values)}");
+                _logger.Debug($"changeStatus. mass update. contentId: {_query.ContentId}, values: {SerializeData(values)}");
                 _query.DbConnector.MassUpdate(_query.ContentId, values, userId);
             }
         }
