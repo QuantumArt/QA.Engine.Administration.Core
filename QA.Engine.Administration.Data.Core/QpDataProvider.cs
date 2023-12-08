@@ -47,7 +47,7 @@ namespace QA.Engine.Administration.Data.Core
                 .Property("contentId", contentId)
                 .Property("userId", userId)
                 .Property("editData", editData)
-                .Callsite();
+                .Log();
 
             var fields = GetFields(siteId, contentId)
                 .ToDictionary(k => k.Name, v => v.Id);
@@ -76,7 +76,7 @@ namespace QA.Engine.Administration.Data.Core
                 .Property("contentId", contentId)
                 .Property("userId", userId)
                 .Property("itemIds", itemIds)
-                .Callsite();                
+                .Log();              
 
             var result = GetArticleService(userId).Publish(contentId, itemIds.Select(n => n.Id).ToArray());
             if (result != null && result.Type == ActionMessageType.Error)
@@ -94,7 +94,7 @@ namespace QA.Engine.Administration.Data.Core
                 .Property("contentId", contentId)
                 .Property("userId", userId)
                 .Property("data", data)
-                .Callsite();                
+                .Log();               
             
             var fields = GetFields(siteId, contentId)
                 .ToDictionary(k => k.Name, v => v.Id);
@@ -123,7 +123,7 @@ namespace QA.Engine.Administration.Data.Core
                 .Property("userId", userId)
                 .Property("itemId", itemId)
                 .Property("newParentId", newParentId)
-                .Callsite();                
+                .Log();              
 
             var fields = GetFields(siteId, contentId)
                 .ToDictionary(k => k.Name, v => v.Id);
@@ -150,7 +150,7 @@ namespace QA.Engine.Administration.Data.Core
                 .Property("userId", userId)
                 .Property("itemIds", itemIds)
                 .Property("moveContentVersion", moveContentVersion)
-                .Callsite();
+                .Log();
             
             var ids = itemIds.Select(n => n.Id).ToArray();
             var result = GetArticleService(userId).SetArchiveFlag(contentId, ids, true);
@@ -174,7 +174,7 @@ namespace QA.Engine.Administration.Data.Core
                 .Property("contentId", contentId)
                 .Property("userId", userId)
                 .Property("itemIds", itemIds)
-                .Callsite();
+                .Log();
             
             var ids = itemIds.Select(n => n.Id).ToArray();
             var result = GetArticleService(userId).SetArchiveFlag(contentId, ids, false);
@@ -193,7 +193,7 @@ namespace QA.Engine.Administration.Data.Core
                 .Property("contentId", contentId)
                 .Property("userId", userId)
                 .Property("items", itemIds)
-                .Callsite();
+                .Log();
             
             var result = GetArticleService(userId).Delete(contentId, itemIds);
             if (result.Type == ActionMessageType.Error)
@@ -225,7 +225,7 @@ namespace QA.Engine.Administration.Data.Core
                 .Property("siteId", siteId)
                 .Property("contentId", contentId)
                 .Property("result", result)
-                .Callsite();
+                .Log();
 
             return result;
         }
@@ -240,7 +240,7 @@ namespace QA.Engine.Administration.Data.Core
                 .Property("id", item.Id)
                 .Property("alias", item.Alias)
                 .Property("parentId", item.ParentId)
-                .Callsite();
+                .Log();
             
             var fields = GetFields(siteId, contentId)
                 .ToDictionary(k => k.Name, v => v.Id);
