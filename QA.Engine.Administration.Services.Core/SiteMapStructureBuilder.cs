@@ -44,7 +44,9 @@ namespace QA.Engine.Administration.Services.Core
 
             widgetTree.ForEach(x => widgets.Remove(x));
 
-            var widgetsDict = widgets.GroupBy(k => k.ParentId).ToDictionary(k => k.Key, v => v.Select(x => x).ToList());
+            var widgetsDict = widgets.GroupBy(k => k.ParentId)
+                .Where(x => x.Key != null)
+                .ToDictionary(k => k.Key, v => v.Select(x => x).ToList());
 
             var result = GetWidgetTreeInternal(widgetTree, widgetsDict);
 
@@ -56,7 +58,10 @@ namespace QA.Engine.Administration.Services.Core
             var archivesDict = archives.GroupBy(k => k.ParentId ?? k.VersionOfId)
                 .Where(x => x.Key != null)
                 .ToDictionary(k => k.Key, v => v.Select(x => x).ToList());
-            var archiveTree = archivesDict.Where(x => !archives.Any(y => y.Id == x.Key)).SelectMany(x => x.Value).ToList();
+            var archiveTree = archivesDict
+                .Where(x => !archives.Any(y => y.Id == x.Key))
+                .SelectMany(x => x.Value).ToList();
+            
             archiveTree.AddRange(archives.Where(x => (x.ParentId ?? x.VersionOfId) == null));
 
             var result = GetArchiveTreeInternal(archiveTree, archivesDict);
