@@ -6,8 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NLog;
-using NLog.Fluent;
-using QA.DotNetCore.Engine.Persistent.Interfaces;
 using QP.ConfigurationService.Models;
 using Quantumart.QP8.BLL.Services.API.Models;
 using Quantumart.QP8.Configuration;

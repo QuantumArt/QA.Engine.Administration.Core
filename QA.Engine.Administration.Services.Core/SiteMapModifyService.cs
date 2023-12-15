@@ -111,7 +111,7 @@ namespace QA.Engine.Administration.Services.Core
             _qpDataProvider.Move(siteId, contentId, userId, itemId, newParentId);
         }
 
-        public void RemoveSiteMapItems(
+        public void ArchiveSiteMapItems(
             int siteId, int userId, int itemId,
             bool isDeleteAllVersions, bool isDeleteContentVersion, int? contentVersionId)
         {
