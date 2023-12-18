@@ -115,7 +115,7 @@ namespace QA.Engine.Administration.Data.Core
         public void Move(int siteId, int contentId, int userId, int itemId, int newParentId)
         {
             Logger.ForDebugEvent()
-                .Message("Edit")
+                .Message("Move")
                 .Property("siteId", siteId)
                 .Property("contentId", contentId)
                 .Property("userId", userId)
@@ -132,7 +132,7 @@ namespace QA.Engine.Administration.Data.Core
             {
                 new ArticleData { ContentId = contentId, Id = itemId, Fields = new List<FieldData>()
                 {
-                    new() { Id = fields["Parent"], Value = newParentId.ToString() },
+                    new() { Id = fields["Parent"], ArticleIds = new[]{ newParentId } },
                 } }
             };
             GetArticleService(userId).BatchUpdate(articleData, true);
@@ -230,6 +230,19 @@ namespace QA.Engine.Administration.Data.Core
 
         private void MoveUpContentVersion(int siteId, int contentId, int userId, AbstractItemData item)
         {
+            if (!item.ParentId.HasValue)
+            {
+                Logger.ForErrorEvent()
+                    .Message("item.ParentId is null in moveUpContentVersion")
+                    .Property("siteId", siteId)
+                    .Property("contentId", contentId)
+                    .Property("userId", userId)
+                    .Property("id", item.Id)
+                    .Property("alias", item.Alias)
+                    .Log();
+                return;
+            }
+            
             Logger.ForDebugEvent()
                 .Message("moveUpContentVersion")
                 .Property("siteId", siteId)
@@ -255,9 +268,9 @@ namespace QA.Engine.Administration.Data.Core
             {
                 new ArticleData { ContentId = contentId, Id = item.Id, Fields = new List<FieldData>
                 {
-                    new() { Id = fields["Parent"], Value = item.ParentId.ToString() },
+                    new() { Id = fields["Parent"], ArticleIds = new[]{ item.ParentId.Value } },
                     new() { Id = fields["Name"], Value = item.Alias },
-                    new() { Id = fields["VersionOf"], Value = null },
+                    new() { Id = fields["VersionOf"] },
                     new() { Id = fields["IsPage"], Value = "1" },
                 } }
             };
