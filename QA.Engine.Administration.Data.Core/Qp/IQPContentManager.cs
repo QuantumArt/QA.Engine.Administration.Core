@@ -1,8 +1,5 @@
 ﻿using QA.Engine.Administration.Data.Interfaces.Core.Models;
-using Quantumart.QPublishing.Info;
-using System.Collections.Generic;
 using System.Data;
-using QP.ConfigurationService.Models;
 
 namespace QA.Engine.Administration.Data.Core.Qp
 {
@@ -23,14 +20,13 @@ namespace QA.Engine.Administration.Data.Core.Qp
         /// <summary>
         /// Устанавливает подключение к QP
         /// </summary>
-        /// <param name="connectionString">Строка подключения</param>
         /// <returns></returns>
         IQpContentManager Connect();
 
         /// <summary>
         /// Устанавливает подключение к QP
         /// </summary>
-        /// <param name="connectionString">Строка подключения</param>
+        /// <param name="connection">Подключение</param>
         /// <returns></returns>
         IQpContentManager Connection(IDbConnection connection);
 

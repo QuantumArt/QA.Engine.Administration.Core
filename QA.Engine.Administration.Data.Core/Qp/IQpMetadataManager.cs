@@ -1,5 +1,4 @@
-﻿using Quantumart.QPublishing.Database;
-using Quantumart.QPublishing.Info;
+﻿using Quantumart.QPublishing.Info;
 using System.Collections.Generic;
 
 namespace QA.Engine.Administration.Data.Core.Qp

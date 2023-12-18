@@ -7,7 +7,6 @@ using QA.Engine.Administration.Data.Interfaces.Core.Models;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using QA.DotNetCore.Engine.Persistent.Dapper;
 
 namespace QA.Engine.Administration.Data.Core
 {

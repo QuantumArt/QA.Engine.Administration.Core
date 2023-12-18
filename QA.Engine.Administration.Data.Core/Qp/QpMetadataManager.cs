@@ -18,7 +18,7 @@ namespace QA.Engine.Administration.Data.Core.Qp
         /// <summary>
         /// Конструирует объект
         /// </summary>
-        /// <param name="connectionString">Строка подключения</param>
+        /// <param name="dbConnector">Объект dbConnector</param>
         public QpMetadataManager(IQpDbConnector dbConnector)
         {
             _dbConnection = dbConnector.DbConnector;

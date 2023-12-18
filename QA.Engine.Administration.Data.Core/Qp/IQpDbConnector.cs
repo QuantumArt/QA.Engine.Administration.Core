@@ -2,7 +2,6 @@
 using Quantumart.QPublishing.Info;
 using System.Data;
 using System.Data.Common;
-using System.Data.SqlClient;
 
 namespace QA.Engine.Administration.Data.Core.Qp
 {

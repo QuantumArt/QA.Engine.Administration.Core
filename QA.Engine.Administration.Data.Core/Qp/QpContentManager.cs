@@ -19,7 +19,7 @@ namespace QA.Engine.Administration.Data.Core.Qp
         private readonly ContentDataQueryObject _query;
         private readonly IQpDbConnector _dbConnection;
         private readonly List<string> _includes;
-        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+        private readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
 
         /// <summary>
@@ -40,10 +40,10 @@ namespace QA.Engine.Administration.Data.Core.Qp
 
             _query = new ContentDataQueryObject(
                 null, null, null, null, null, null,
-                (long)0, (long)0,
-                (byte)0,
+                0, 0,
+                0,
                 QpContentItemStatus.Published.GetDescription(),
-                (byte)0, (byte)0, false, 0.0, false, false);
+                0, 0, false, 0.0, false, false);
             _query.GetCount = false;
 
             _includes = new List<string>();
@@ -333,7 +333,7 @@ namespace QA.Engine.Administration.Data.Core.Qp
             ValidateQuery();
 
             if (string.IsNullOrEmpty(_query.Fields))
-                throw new ArgumentNullException("Query.Fields");
+                throw new ArgumentNullException("_query.Fields");
 
             string query = "SELECT " + _query.Fields +
                            " FROM " + _query.ContentName +
@@ -367,9 +367,13 @@ namespace QA.Engine.Administration.Data.Core.Qp
 
                 foreach (var path in _includes)
                 {
-                    var attr = attributes.Where(w => w.Name == path).SingleOrDefault();
+                    var attr = attributes.SingleOrDefault(w => w.Name == path);
+                    if (attr?.RelatedContentId == null)
+                    {
+                        continue;
+                    }
+                    
                     string contentName = _dbConnection.GetContentName(attr.RelatedContentId.Value);
-
                     string values = string.Empty;
 
                     if (attr.LinkId == null)
@@ -378,7 +382,7 @@ namespace QA.Engine.Administration.Data.Core.Qp
                         {
                             if (contentName == _query.ContentName & !string.IsNullOrEmpty(row[path].ToString()))
                             {
-                                if (result.PrimaryContent.Select(ContentItemIdFieldName + " = " + row[path].ToString()).Any())
+                                if (result.PrimaryContent.Select(ContentItemIdFieldName + " = " + row[path]).Any())
                                 {
                                     continue;
                                 }
@@ -428,7 +432,7 @@ namespace QA.Engine.Administration.Data.Core.Qp
                     {
                         var query = new ContentDataQueryObject(
                             _dbConnection.DbConnector, _query.SiteName, contentName, "*",
-                            string.Format(ContentItemIdFieldName + " in ({0})", values), null,
+                            ContentItemIdFieldName + $" in ({values})", null,
                             (long)0, (long)0,
                             (byte)0,
                             QpContentItemStatus.Published.GetDescription(),
@@ -528,14 +532,13 @@ namespace QA.Engine.Administration.Data.Core.Qp
         {
             ValidateQuery();
 
-            var values = new List<Dictionary<string, string>>();
             var dataTable = _dbConnection.GetContentData(_query, out var totalRecords);
 
             _logger.Trace($"delete. get content data. totalRecords: {totalRecords}, data rows: {SerializeData(dataTable.Rows)}");
 
             foreach (DataRow row in dataTable.Rows)
             {
-                var id = int.Parse(row[ContentItemIdFieldName].ToString());
+                var id = int.Parse(row[ContentItemIdFieldName].ToString() ?? "0");
                 _logger.Debug($"delete. id: {id}");
                 _dbConnection.DeleteContentItem(id);
             }

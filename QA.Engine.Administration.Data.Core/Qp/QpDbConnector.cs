@@ -3,8 +3,6 @@ using Quantumart.QPublishing.Info;
 using System;
 using System.Data;
 using System.Data.Common;
-using System.Data.SqlClient;
-using QP.ConfigurationService.Models;
 
 namespace QA.Engine.Administration.Data.Core.Qp
 {
