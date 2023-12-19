@@ -45,7 +45,7 @@ namespace QA.Engine.Administration.Data.Core.Qp
         public DataTable GetContent(string contentName)
         {
             if (string.IsNullOrEmpty(contentName))
-                throw new ArgumentNullException("contentName");
+                throw new ArgumentNullException(nameof(contentName));
 
             if (Contents == null || Contents.Count == 0)
                 return null;

@@ -5,9 +5,7 @@ using Quantumart.QPublishing.Info;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Globalization;
 using System.Linq;
-using NLog;
 
 namespace QA.Engine.Administration.Data.Core.Qp
 {
@@ -19,15 +17,12 @@ namespace QA.Engine.Administration.Data.Core.Qp
         private readonly ContentDataQueryObject _query;
         private readonly IQpDbConnector _dbConnection;
         private readonly List<string> _includes;
-        private readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
 
         /// <summary>
         /// Название поля ключа записей
         /// </summary>
-        protected const string ContentItemIdFieldName = "CONTENT_ITEM_ID";
-        protected const string ArchiveFieldName = "ARCHIVE";
-        protected const string StatusTypeIdFieldName = "STATUS_TYPE_ID";
+        private const string ContentItemIdFieldName = "CONTENT_ITEM_ID";
 
         #region Constructors
 
@@ -43,8 +38,10 @@ namespace QA.Engine.Administration.Data.Core.Qp
                 0, 0,
                 0,
                 QpContentItemStatus.Published.GetDescription(),
-                0, 0, false, 0.0, false, false);
-            _query.GetCount = false;
+                0, 0, false, 0.0, false, false)
+            {
+                GetCount = false
+            };
 
             _includes = new List<string>();
         }
@@ -56,7 +53,6 @@ namespace QA.Engine.Administration.Data.Core.Qp
         /// <summary>
         /// Устанавливает подключение к QP
         /// </summary>
-        /// <param name="connectionString">Строка подключения</param>
         /// <returns></returns>
         public virtual IQpContentManager Connect()
         {
@@ -67,7 +63,7 @@ namespace QA.Engine.Administration.Data.Core.Qp
         /// <summary>
         /// Устанавливает подключение к QP
         /// </summary>
-        /// <param name="connectionString">Строка подключения</param>
+        /// <param name="connection">подключение</param>
         /// <returns></returns>
         public virtual IQpContentManager Connection(IDbConnection connection)
         {
@@ -85,7 +81,7 @@ namespace QA.Engine.Administration.Data.Core.Qp
         public virtual IQpContentManager SiteName(string siteName)
         {
             if (string.IsNullOrEmpty(siteName))
-                throw new ArgumentNullException("siteName");
+                throw new ArgumentNullException(nameof(siteName));
 
             _query.SiteName = siteName;
             return this;
@@ -99,7 +95,7 @@ namespace QA.Engine.Administration.Data.Core.Qp
         public virtual IQpContentManager ContentName(string contentName)
         {
             if (string.IsNullOrEmpty(contentName))
-                throw new ArgumentNullException("contentName");
+                throw new ArgumentNullException(nameof(contentName));
 
             _query.ContentName = contentName;
             return this;
@@ -113,11 +109,11 @@ namespace QA.Engine.Administration.Data.Core.Qp
         public virtual IQpContentManager Fields(string fields)
         {
             if (string.IsNullOrEmpty(fields))
-                throw new ArgumentNullException("fields");
+                throw new ArgumentNullException(nameof(fields));
 
             var fieldList = new List<string>();
 
-            var fieldArray = fields.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+            var fieldArray = fields.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries);
 
             foreach (var f in fieldArray)
             {
@@ -218,11 +214,11 @@ namespace QA.Engine.Administration.Data.Core.Qp
         /// <summary>
         /// Признак показа расщепленной версии записи
         /// </summary>
-        /// <param name="isShowSplittedArticle"></param>
+        /// <param name="showSplittedArticle"></param>
         /// <returns></returns>
-        public virtual IQpContentManager IsShowSplittedArticle(bool isShowSplittedArticle)
+        public virtual IQpContentManager ShowSplittedArticle(bool showSplittedArticle)
         {
-            _query.ShowSplittedArticle = (byte)(isShowSplittedArticle ? 1 : 0);
+            _query.ShowSplittedArticle = (byte)(showSplittedArticle ? 1 : 0);
             return this;
         }
 
@@ -288,7 +284,6 @@ namespace QA.Engine.Administration.Data.Core.Qp
         /// <returns></returns>
         public virtual IQpContentManager Include(string path)
         {
-            // TODO: последовательность через точку
             if (_includes.Contains(path))
             {
                 return this;
@@ -333,7 +328,7 @@ namespace QA.Engine.Administration.Data.Core.Qp
             ValidateQuery();
 
             if (string.IsNullOrEmpty(_query.Fields))
-                throw new ArgumentNullException("_query.Fields");
+                throw new InvalidOperationException("_query.Fields is null");
 
             string query = "SELECT " + _query.Fields +
                            " FROM " + _query.ContentName +
@@ -433,10 +428,10 @@ namespace QA.Engine.Administration.Data.Core.Qp
                         var query = new ContentDataQueryObject(
                             _dbConnection.DbConnector, _query.SiteName, contentName, "*",
                             ContentItemIdFieldName + $" in ({values})", null,
-                            (long)0, (long)0,
-                            (byte)0,
+                            0, 0,
+                            0,
                             QpContentItemStatus.Published.GetDescription(),
-                            (byte)0, (byte)0, false, 0.0, false, false);
+                            0, 0, false, 0.0, false, false);
 
                         var contentData = _dbConnection.GetContentData(query, out _);
                         var existsContentData = result.GetContent(contentName);
@@ -460,119 +455,13 @@ namespace QA.Engine.Administration.Data.Core.Qp
         protected virtual void ValidateQuery()
         {
             if (_dbConnection == null)
-                throw new ArgumentNullException("DbConnection");
+                throw new InvalidOperationException("DbConnection is null");
             if (_query.DbConnector == null)
-                throw new ArgumentNullException("Query.DbConnector");
+                throw new InvalidOperationException("Query.DbConnector is null");
             if (_query.SiteName == null)
-                throw new ArgumentNullException("Query.SiteName");
+                throw new InvalidOperationException("Query.SiteName is null");
             if (_query.ContentName == null)
-                throw new ArgumentNullException("Query.ContentName");
+                throw new InvalidOperationException("Query.ContentName is null");
         }
-
-        /// <summary>
-        /// Отправляет элементы в архив
-        /// </summary>
-        public void Archive(int userId)
-        {
-            ValidateQuery();
-
-            var values = new List<Dictionary<string, string>>();
-            var dataTable = _dbConnection.GetContentData(_query, out _);
-
-            _logger.Trace($"archive. get content data. data rows: {SerializeData(dataTable.Rows)}");
-
-            foreach (DataRow row in dataTable.Rows)
-            {
-                values.Add(new Dictionary<string, string>
-                {
-                    { ContentItemIdFieldName, row[ContentItemIdFieldName].ToString() },
-                    { ArchiveFieldName, "1" }
-                });
-            }
-
-            if (values.Any())
-            {
-                _logger.Debug($"archive. mass update. contentId: {_query.ContentId}, values: {SerializeData(values)}");
-                _query.DbConnector.MassUpdate(_query.ContentId, values, userId);
-            }
-        }
-
-        /// <summary>
-        /// Восстанавливает элементы из архива
-        /// </summary>
-        public void Restore(int userId)
-        {
-            ValidateQuery();
-
-            var values = new List<Dictionary<string, string>>();
-            var dataTable = _dbConnection.GetContentData(_query, out var totalRecords);
-
-            _logger.Trace($"restore. get content data. totalRecords: {totalRecords}, data rows: {SerializeData(dataTable.Rows)}");
-
-            foreach (DataRow row in dataTable.Rows)
-            {
-                values.Add(new Dictionary<string, string>
-                {
-                    { ContentItemIdFieldName, row[ContentItemIdFieldName].ToString() },
-                    { ArchiveFieldName, "0" }
-                });
-            }
-
-            if (values.Any())
-            {
-                _logger.Debug($"restore. mass update. contentId: {_query.ContentId}, values: {SerializeData(values)}");
-                _query.DbConnector.MassUpdate(_query.ContentId, values, userId);
-            }
-        }
-
-        /// <summary>
-        /// Удаляет элемент из БД
-        /// </summary>
-        public void Delete(int userId)
-        {
-            ValidateQuery();
-
-            var dataTable = _dbConnection.GetContentData(_query, out var totalRecords);
-
-            _logger.Trace($"delete. get content data. totalRecords: {totalRecords}, data rows: {SerializeData(dataTable.Rows)}");
-
-            foreach (DataRow row in dataTable.Rows)
-            {
-                var id = int.Parse(row[ContentItemIdFieldName].ToString() ?? "0");
-                _logger.Debug($"delete. id: {id}");
-                _dbConnection.DeleteContentItem(id);
-            }
-        }
-
-        /// <summary>
-        /// Изменяет статус элементов
-        /// </summary>
-        public void ChangeStatus(int userId, int statusId)
-        {
-            ValidateQuery();
-
-            var values = new List<Dictionary<string, string>>();
-            var dataTable = _dbConnection.GetContentData(_query, out var totalRecords);
-
-            _logger.Trace($"changeStatus. get content data. totalRecords: {totalRecords}, data rows: {SerializeData(dataTable.Rows)}");
-
-            foreach (DataRow row in dataTable.Rows)
-            {
-                values.Add(new Dictionary<string, string>
-                {
-                    { ContentItemIdFieldName, row[ContentItemIdFieldName].ToString() },
-                    { StatusTypeIdFieldName, statusId.ToString(CultureInfo.InvariantCulture) }
-                });
-            }
-
-            if (values.Any())
-            {
-                _logger.Debug($"changeStatus. mass update. contentId: {_query.ContentId}, values: {SerializeData(values)}");
-                _query.DbConnector.MassUpdate(_query.ContentId, values, userId);
-            }
-        }
-
-        private static string SerializeData(object data) => Newtonsoft.Json.JsonConvert.SerializeObject(data);
-
     }
 }

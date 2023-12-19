@@ -39,9 +39,9 @@ namespace QA.Engine.Administration.Data.Core.Qp
             string contentName)
         {
             if (string.IsNullOrEmpty(siteName))
-                throw new ArgumentNullException("siteName");
+                throw new ArgumentNullException(nameof(siteName));
             if (string.IsNullOrEmpty(contentName))
-                throw new ArgumentNullException("contentName");
+                throw new ArgumentNullException(nameof(contentName));
 
             return GetContentAttributes(GetContentId(
                 siteName, contentName));
@@ -74,11 +74,11 @@ namespace QA.Engine.Administration.Data.Core.Qp
             string fieldName)
         {
             if (string.IsNullOrEmpty(siteName))
-                throw new ArgumentNullException("siteName");
+                throw new ArgumentNullException(nameof(siteName));
             if (string.IsNullOrEmpty(contentName))
-                throw new ArgumentNullException("contentName");
+                throw new ArgumentNullException(nameof(contentName));
             if (string.IsNullOrEmpty(fieldName))
-                throw new ArgumentNullException("fieldName");
+                throw new ArgumentNullException(nameof(fieldName));
 
             int fieldId = _dbConnection.GetAttributeIdByNetName(
                 GetContentId(
@@ -99,9 +99,9 @@ namespace QA.Engine.Administration.Data.Core.Qp
             string contentName)
         {
             if (string.IsNullOrEmpty(siteName))
-                throw new ArgumentNullException("siteName");
+                throw new ArgumentNullException(nameof(siteName));
             if (string.IsNullOrEmpty(contentName))
-                throw new ArgumentNullException("contentName");
+                throw new ArgumentNullException(nameof(contentName));
 
             int contentId = _dbConnection.GetContentId(
                 GetSiteId(siteName), contentName);
@@ -133,7 +133,7 @@ namespace QA.Engine.Administration.Data.Core.Qp
         public virtual int GetSiteId(string siteName)
         {
             if (string.IsNullOrEmpty(siteName))
-                throw new ArgumentNullException("siteName");
+                throw new ArgumentNullException(nameof(siteName));
 
             int siteId = _dbConnection.GetSiteId(siteName);
             return siteId;

@@ -75,9 +75,9 @@ namespace QA.Engine.Administration.Data.Core.Qp
         /// <summary>
         /// Устанаваливает признак показа расщепленной версии записи
         /// </summary>
-        /// <param name="isShowSplittedArticle"></param>
+        /// <param name="showSplittedArticle"></param>
         /// <returns></returns>
-        IQpContentManager IsShowSplittedArticle(bool isShowSplittedArticle);
+        IQpContentManager ShowSplittedArticle(bool showSplittedArticle);
 
         /// <summary>
         /// Устанавливает использование клиентской выборки
@@ -163,26 +163,5 @@ namespace QA.Engine.Administration.Data.Core.Qp
         /// <returns></returns>
         QpContentResult GetRealData();
 
-        /// <summary>
-        /// Отправляет элементы в архив
-        /// </summary>
-        /// <param name="userId"></param>
-        void Archive(int userId);
-
-        /// <summary>
-        /// Восстанавливает элементы из архива
-        /// </summary>
-        void Restore(int userId);
-
-        /// <summary>
-        /// Удаляет элемент из БД
-        /// </summary>
-        /// <param name="userId"></param>
-        void Delete(int userId);
-
-        /// <summary>
-        /// Изменяет статус элементов
-        /// </summary>
-        void ChangeStatus(int userId, int statusId);
-    }
+   }
 }

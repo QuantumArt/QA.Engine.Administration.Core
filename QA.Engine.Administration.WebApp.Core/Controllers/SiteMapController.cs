@@ -49,7 +49,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpGet("getSiteMapTree")]
         public ApiResult<List<PageModel>> GetSiteMapTree([FromQuery]int[] regionIds = null)
         {
-            _logger.ForDebugEvent().Message("getSiteMapTree")
+            _logger.ForDebugEvent().Message("GET /getSiteMapTree")
                 .Property("regionIds", string.Join(", ", regionIds ?? Array.Empty<int>()))
                 .Property("userId", _userId)
                 .Log();
@@ -65,7 +65,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpGet("getSiteMapSubTree")]
         public ApiResult<PageModel> GetSiteMapSubTree(int id, [FromQuery]int[] regionIds = null)
         {
-            _logger.ForDebugEvent().Message("getSiteMapSubTree")
+            _logger.ForDebugEvent().Message("GET /getSiteMapSubTree")
                 .Property("regionIds", string.Join(", ", regionIds ?? Array.Empty<int>()))
                 .Property("userId", _userId)
                 .Log();
@@ -81,7 +81,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpGet("getArchiveTree")]
         public ApiResult<List<ArchiveModel>> GetArchiveTree()
         {
-            _logger.ForDebugEvent().Message("getArchiveTree")
+            _logger.ForDebugEvent().Message("GET /getArchiveTree")
                 .Property("userId", _userId)
                 .Log();
             var archive = _siteMapService.GetArchiveTree(_siteId);
@@ -95,7 +95,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpGet("getArchiveSubTree")]
         public ApiResult<ArchiveModel> GetArchiveSubTree(int id)
         {
-            _logger.ForDebugEvent().Message("getArchiveSubTree")
+            _logger.ForDebugEvent().Message("GET /getArchiveSubTree")
                 .Property("userId", _userId)
                 .Property("id", id)
                 .Log();
@@ -114,7 +114,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpGet("getPageTree")]
         public ApiResult<List<PageModel>> GetPageTree(bool isArchive, int? parentId, [FromQuery]int[] regionIds = null)
         {
-            _logger.ForDebugEvent().Message("getPageTree")
+            _logger.ForDebugEvent().Message("GET /getPageTree")
                 .Property("userId", _userId)
                 .Property("parentId", parentId)
                 .Property("isArchive", isArchive)
@@ -135,7 +135,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpGet("getWidgetTree")]
         public ApiResult<List<WidgetModel>> GetWidgetTree(bool isArchive, int parentId, [FromQuery]int[] regionIds = null)
         {
-            _logger.ForDebugEvent().Message("getWidgetTree")
+            _logger.ForDebugEvent().Message("GET /getWidgetTree")
                 .Property("userId", _userId)
                 .Property("parentId", parentId)
                 .Property("isArchive", isArchive)
@@ -155,7 +155,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpGet("getExtensionFields")]
         public ApiResult<List<ExtensionFieldModel>> GetExtensionFields(int id, int extensionId)
         {
-            _logger.ForDebugEvent().Message("getExtensionFields")
+            _logger.ForDebugEvent().Message("GET /getExtensionFields")
                 .Property("userId", _userId)
                 .Property("id", id)
                 .Property("extensionId", extensionId)
@@ -174,7 +174,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpGet("getRelatedItemName")]
         public ApiResult<string> GetRelatedItemName(int id, int attributeId)
         {
-            _logger.ForDebugEvent().Message("getRelatedItemName")
+            _logger.ForDebugEvent().Message("GET /getRelatedItemName")
                 .Property("userId", _userId)
                 .Property("id", id)
                 .Property("attributeId", attributeId)
@@ -194,7 +194,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpGet("getManyToOneRelatedItemNames")]
         public ApiResult<Dictionary<int, string>> GetManyToOneRelatedItemNames(int id, int value, int attributeId)
         {
-            _logger.ForDebugEvent().Message("getRelatedItemName")
+            _logger.ForDebugEvent().Message("GET /getManyToOneRelatedItemNames")
                 .Property("userId", _userId)
                 .Property("id", id)
                 .Property("value", value)
@@ -213,7 +213,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpPost("publish")]
         public ApiResult Publish([FromBody]List<int> itemIds)
         {
-            _logger.ForDebugEvent().Message("publish")
+            _logger.ForDebugEvent().Message("POST /publish")
                 .Property("userId", _userId)
                 .Property("itemIds", itemIds)
                 .Log();
@@ -230,7 +230,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpPost("reorder")]
         public ApiResult Reorder([FromBody]ReorderModel model)
         {
-            _logger.ForDebugEvent().Message("reorder")
+            _logger.ForDebugEvent().Message("POST /reorder")
                 .Property("userId", _userId)
                 .Property("model", model)
                 .Log();
@@ -247,7 +247,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpPost("move")]
         public ApiResult Move([FromBody]MoveModel model)
         {
-            _logger.ForDebugEvent().Message("move")
+            _logger.ForDebugEvent().Message("POST /move")
                 .Property("userId", _userId)
                 .Property("model", model)
                 .Log();
@@ -264,7 +264,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpPost("edit")]
         public ApiResult Edit([FromBody]EditModel model)
         {
-            _logger.ForDebugEvent().Message("edit")
+            _logger.ForDebugEvent().Message("POST /edit")
                 .Property("userId", _userId)
                 .Property("model", model)
                 .Log();
@@ -281,7 +281,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpPost("archive")]
         public ApiResult Archive([FromBody]RemoveModel model)
         {
-            _logger.ForDebugEvent().Message("archive")
+            _logger.ForDebugEvent().Message("POST /archive")
                 .Property("userId", _userId)
                 .Property("model", model)
                 .Log();
@@ -305,7 +305,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpPost("restore")]
         public ApiResult Restore([FromBody]RestoreModel model)
         {
-            _logger.ForDebugEvent().Message("restore")
+            _logger.ForDebugEvent().Message("POST /restore")
                 .Property("userId", _userId)
                 .Property("model", model)
                 .Log();
@@ -330,7 +330,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpPost("delete")]
         public ApiResult Delete([FromBody]DeleteModel model)
         {
-            _logger.ForDebugEvent().Message("delete")
+            _logger.ForDebugEvent().Message("POST /delete")
                 .Property("userId", _userId)
                 .Property("model", model)
                 .Log();

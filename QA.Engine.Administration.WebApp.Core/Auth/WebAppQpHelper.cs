@@ -2,31 +2,26 @@
 using Microsoft.Extensions.Primitives;
 using Quantumart.QPublishing.Database;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using QA.Engine.Administration.WebApp.Core.Business.Models;
+using NLog;
 using QP.ConfigurationService.Models;
-using ConnectionInfo = QA.Engine.Administration.WebApp.Core.Business.Models.ConnectionInfo;
 
 namespace QA.Engine.Administration.WebApp.Core.Auth
 {
     public class WebAppQpHelper : IWebAppQpHelper
     {
-        private HttpContext _httpContext;
-        private QpHelper _qpHelper;
-        private Lazy<SerializableQpViewModelBase> _serializableQpViewModelBaseLazy;
-        private EnvironmentConfiguration _config;
-        private ILogger<WebAppQpHelper> _logger;
+        private readonly HttpContext _httpContext;
+        private readonly QpHelper _qpHelper;
+        private readonly Lazy<SerializableQpViewModelBase> _serializableQpViewModelBaseLazy;
+        private readonly EnvironmentConfiguration _config;
+        private readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
-        public WebAppQpHelper(IHttpContextAccessor httpContextAccessor, QpHelper qpHelper, IOptions<EnvironmentConfiguration> options, ILogger<WebAppQpHelper> logger)
+        public WebAppQpHelper(IHttpContextAccessor httpContextAccessor, QpHelper qpHelper, IOptions<EnvironmentConfiguration> options)
         {
             _httpContext = httpContextAccessor.HttpContext;
             _qpHelper = qpHelper;
             _config = options.Value;
-            _logger = logger;
             _serializableQpViewModelBaseLazy = new Lazy<SerializableQpViewModelBase>(() =>
             {
                 var httpContext = _httpContext;
@@ -63,14 +58,14 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarning(ex, "Error while receiving customer codes");
+                    _logger.Warn(ex, "Error while receiving customer codes");
                 }
             }
 
             if (result == null)
             {
-                _logger.LogWarning("Cannot find customer code");
-                return result;
+                _logger.Warn("Cannot find customer code");
+                return null;
             }
 
             if (!result.ConnectionString.Contains("Persist Security Info"))

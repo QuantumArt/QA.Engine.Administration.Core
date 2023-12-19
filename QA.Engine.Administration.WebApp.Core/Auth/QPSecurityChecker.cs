@@ -1,11 +1,12 @@
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using QA.Engine.Administration.Common.Core;
 using Quantumart.QPublishing.Database;
 using Quantumart.QPublishing.OnScreen;
 using System;
 using System.Data;
+using Microsoft.AspNetCore.Http.Features;
+using NLog;
 using QA.DotNetCore.Engine.Persistent.Interfaces;
 using QP.ConfigurationService.Models;
 using DatabaseType = QP.ConfigurationService.Models.DatabaseType;
@@ -26,18 +27,16 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
         private readonly HttpContext _httpContext;
         private readonly IWebAppQpHelper _webAppQpHelper;
         private readonly EnvironmentConfiguration _configuration;
-        private readonly ILogger<QPSecurityChecker> _logger;
+        private readonly ILogger _logger = LogManager.GetCurrentClassLogger();
         private readonly IUnitOfWork _uow;
         public QPSecurityChecker(IUnitOfWork uow,
             IHttpContextAccessor httpContextAccessor,
             IWebAppQpHelper webAppQpHelper,
-            IOptions<EnvironmentConfiguration> options,
-            ILogger<QPSecurityChecker> logger)
+            IOptions<EnvironmentConfiguration> options)
         {
             _httpContext = httpContextAccessor.HttpContext;
             _webAppQpHelper = webAppQpHelper;
             _configuration = options.Value;
-            _logger = logger;
             _uow = uow;
         }
 
@@ -46,9 +45,9 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
         /// </summary>
         public bool CheckAuthorization()
         {
-            if (_httpContext.Session == null)
+            if (_httpContext.Features.Get<ISessionFeature>()?.Session == null)
             {
-                _logger.LogError("Session is not enabled");
+                _logger.Error("Session is not enabled");
                 return false;
             }
 
@@ -65,10 +64,10 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
 
             var userId = GetSavedUserIdFromSession();
 
-            var dBConnector = GetDBConnector();
+            var dBConnector = GetDbConnector();
             if (dBConnector == null)
             {
-                _logger.LogWarning($"Customer code not found: {_webAppQpHelper.CustomerCode}");
+                _logger.Warn($"Customer code not found: {_webAppQpHelper.CustomerCode}");
                 return false;
             }
 
@@ -78,7 +77,7 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
 
                 if (userId <= 0)
                 {
-                    _logger.LogWarning($"Could not authenticate with backend SID: {_webAppQpHelper.BackendSid}");
+                    _logger.Warn($"Could not authenticate with backend SID: {_webAppQpHelper.BackendSid}");
                     return false;
                 }
             }
@@ -127,7 +126,7 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
             try
             {
                 var userInfo = GetUserInfo(userId, dBConnector);
-                if (userInfo != null && userInfo.Rows.Count > 0)
+                if (userInfo is {Rows.Count: > 0})
                 {
                     var lang = userInfo.Rows[0][UserLanguageFieldName].ToString();
                     int.TryParse(lang, out var langId);
@@ -137,7 +136,7 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message, ex);
+                _logger.Error(ex);
                 langName = QpLanguage.Default.GetDescription();
             }
 
@@ -152,7 +151,7 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
             _httpContext.Session.SetInt32(SiteIdKey, _configuration.FakeData.SiteId);
         }
 
-        private DBConnector GetDBConnector()
+        private DBConnector GetDbConnector()
         {
             DBConnector result;
 
@@ -187,10 +186,9 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
             return dbConfig;
         }
 
-        private static DataTable GetUserInfo(int user_id, DBConnector dBConnector)
+        private static DataTable GetUserInfo(int userId, DBConnector dBConnector)
         {
-            string str = string.Concat("select * from users where user_id = ", user_id.ToString());
-            return dBConnector.GetCachedData(str);
+            return dBConnector.GetCachedData($"select * from users where user_id = {userId}");
         }
     }
 }

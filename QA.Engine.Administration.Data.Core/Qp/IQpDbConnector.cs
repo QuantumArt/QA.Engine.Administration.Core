@@ -41,27 +41,10 @@ namespace QA.Engine.Administration.Data.Core.Qp
         /// Возвращает идентификаторы связанных записей
         /// </summary>
         /// <param name="fieldName">Имя поля</param>
-        /// <param name="itemId">Ид. записи, для которой необходимо получить данные</param>
-        /// <returns></returns>
-        string GetContentItemLinkIDs(string fieldName, int itemId);
-
-        /// <summary>
-        /// Удаляет элемент из БД
-        /// </summary>
-        /// <param name="contentItemId"></param>
-        void DeleteContentItem(int contentItemId);
-
-        /// <summary>
-        /// Возвращает идентификаторы связанных записей
-        /// </summary>
-        /// <param name="fieldName">Имя поля</param>
         /// <param name="values">Ид'ы записей, для которой необходимо получить данные</param>
         /// <returns></returns>
         string GetContentItemLinkIDs(string fieldName, string values);
 
         DbCommand CreateCommand(string text);
-        IDbTransaction BeginTransaction(IsolationLevel isolationLevel);
-        void CommitTransaction();
-        void RollbackTransaction();
     }
 }
