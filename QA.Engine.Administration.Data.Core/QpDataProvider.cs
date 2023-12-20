@@ -194,7 +194,7 @@ namespace QA.Engine.Administration.Data.Core
                 .Log();
             
             var result = GetArticleService(userId).Delete(contentId, itemIds);
-            if (result.Type == ActionMessageType.Error)
+            if (result != null && result.Type == ActionMessageType.Error)
             {
                 throw new ApplicationException(result.Text);
             }
@@ -263,6 +263,8 @@ namespace QA.Engine.Administration.Data.Core
                 throw new Exception("NetName for field VersionOf not found");
             if (!fields.ContainsKey("IsPage"))
                 throw new Exception("NetName for field IsPage not found");
+            if (!fields.ContainsKey("IndexOrder"))
+                throw new Exception("NetName for field IndexOrder not found");            
 
             var articleData = new[]
             {
@@ -270,6 +272,7 @@ namespace QA.Engine.Administration.Data.Core
                 {
                     new() { Id = fields["Parent"], ArticleIds = new[]{ item.ParentId.Value } },
                     new() { Id = fields["Name"], Value = item.Alias },
+                    new() { Id = fields["IndexOrder"], Value = item.IndexOrder?.ToString() },
                     new() { Id = fields["VersionOf"] },
                     new() { Id = fields["IsPage"], Value = "1" },
                 } }
