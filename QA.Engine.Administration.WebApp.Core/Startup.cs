@@ -115,7 +115,6 @@ namespace QA.Engine.Administration.WebApp.Core
                 return new QpDbConnector(uow.Connection);
             });
             _ = services.AddScoped<IQpMetadataManager, QpMetadataManager>();
-            _ = services.AddScoped<IQpContentManager, QpContentManager>();
 
             _ = services.AddScoped<ISiteMapService, SiteMapService>();
             _ = services.AddScoped<ISiteMapModifyService, SiteMapModifyService>();

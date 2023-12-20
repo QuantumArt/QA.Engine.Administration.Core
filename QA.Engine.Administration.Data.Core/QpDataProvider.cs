@@ -4,6 +4,7 @@ using QA.Engine.Administration.Data.Interfaces.Core.Models;
 using Quantumart.QP8.BLL.Services.API;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using NLog;
 using QP.ConfigurationService.Models;
@@ -18,13 +19,11 @@ namespace QA.Engine.Administration.Data.Core
     {
         private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
         private readonly IQpMetadataManager _qpMetadataManager;
-        private readonly IQpContentManager _qpContentManager;
         private readonly CustomerConfiguration _configuration;
 
-        public QpDataProvider(IQpMetadataManager qpMetadataManager, IQpContentManager qpContentManager, CustomerConfiguration configuration)
+        public QpDataProvider(IQpMetadataManager qpMetadataManager, CustomerConfiguration configuration)
         {
             _qpMetadataManager = qpMetadataManager;
-            _qpContentManager = qpContentManager;
             _configuration = configuration;
         }
 
@@ -202,16 +201,12 @@ namespace QA.Engine.Administration.Data.Core
         
         public List<QpFieldData> GetFields(int siteId, int contentId)
         {
-            var siteName = _qpMetadataManager.GetSiteName(siteId);
-            var fields = _qpContentManager
-                .Connect()
-                .SiteName(siteName)
-                .ContentName("CONTENT_ATTRIBUTE")
-                .Fields("ATTRIBUTE_ID, CONTENT_ID, ATTRIBUTE_NAME, NET_ATTRIBUTE_NAME")
-                .Where($"NET_ATTRIBUTE_NAME is not null AND CONTENT_ID = {contentId}")
-                .GetRealData();
-
-            var result = fields.PrimaryContent.Select()
+            var result = _qpMetadataManager.GetRealData(
+                    "CONTENT_ATTRIBUTE",
+                    "ATTRIBUTE_ID, CONTENT_ID, ATTRIBUTE_NAME, NET_ATTRIBUTE_NAME",
+                    $"NET_ATTRIBUTE_NAME is not null AND CONTENT_ID = {contentId}"
+                )
+                .AsEnumerable()
                 .Select(x => new QpFieldData
                 {
                     Id = int.Parse(x["ATTRIBUTE_ID"].ToString() ?? "0"),

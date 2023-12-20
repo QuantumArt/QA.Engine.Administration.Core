@@ -13,7 +13,6 @@ namespace QA.Engine.Administration.Data.Core
     {
         private readonly IMetaInfoRepository _metaInfoRepository;
         private readonly IQpMetadataManager _qpMetadataManager;
-        private readonly IQpContentManager _qpContentManager;
         private readonly IQpDbConnector _qpDbConnector;
         private readonly IUnitOfWork _uow;
         private readonly ILogger _logger = LogManager.GetCurrentClassLogger();
@@ -22,12 +21,11 @@ namespace QA.Engine.Administration.Data.Core
         private string RegionNetName => "QPRegion";
 
         public SettingsProvider(
-            IMetaInfoRepository metaInfoRepository, IQpMetadataManager qpMetadataManager, IQpContentManager qpContentManager,
+            IMetaInfoRepository metaInfoRepository, IQpMetadataManager qpMetadataManager,
             IUnitOfWork uow, IQpDbConnector qpDbConnector)
         {
             _metaInfoRepository = metaInfoRepository;
             _qpMetadataManager = qpMetadataManager;
-            _qpContentManager = qpContentManager;
             _qpDbConnector = qpDbConnector;
             _uow = uow;
         }
@@ -55,15 +53,12 @@ namespace QA.Engine.Administration.Data.Core
                 .Property("siteId", siteId)
                 .Property("contentName", contentName)
                 .Log();
-            var siteName = _qpMetadataManager.GetSiteName(siteId);
-            var contents = _qpContentManager.Connect()
-                    .SiteName(siteName)
-                    .ContentName("CONTENT")
-                    .Fields("CONTENT_ID, CONTENT_NAME, NET_CONTENT_NAME")
-                    .Where($"NET_CONTENT_NAME = '{contentName}'")
-                    .GetRealData();
-
-            var result = contents.PrimaryContent.Select()
+            var result = _qpMetadataManager.GetRealData(
+                    "CONTENT",
+                    "CONTENT_ID, CONTENT_NAME, NET_CONTENT_NAME",
+                        $"NET_CONTENT_NAME = '{contentName}'"
+                )
+                .AsEnumerable()
                 .Select(x => new QpContentData
                 {
                     Id = int.Parse(x["CONTENT_ID"].ToString() ?? "0"),
