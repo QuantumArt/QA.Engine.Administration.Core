@@ -233,7 +233,8 @@ ORDER BY ai.content_item_id";
         public List<AbstractItemData> GetItems(int siteId, 
             bool isArchive, 
             IEnumerable<int> parentIds, 
-            bool useRegion, 
+            bool useRegion,
+            bool loadChildren = false,
             IDbTransaction transaction = null)
         {
             var parentIdsArr = parentIds?.ToArray() ?? Array.Empty<int>();
@@ -242,6 +243,7 @@ ORDER BY ai.content_item_id";
                 .Property("siteId", siteId)
                 .Property("isArchive", isArchive)
                 .Property("useRegion", useRegion)
+                .Property("loadChildren", loadChildren)
                 .Property("parentIds", parentIdsArr)
                 .Log();
 
@@ -263,11 +265,16 @@ ORDER BY ai.content_item_id";
 
             if (parentIdsArr.Length > maxParentIdsPerRequest)
             {
+                _logger.ForDebugEvent().Message("GetItems: limit exceeded")
+                    .Property("limit", parentIdsArr.Length)
+                    .Property("Length", maxParentIdsPerRequest)
+                    .Log();
+
                 items = new List<AbstractItemData>();
                 for (var i = 0; i < (float) parentIdsArr.Length / maxParentIdsPerRequest; i++)
                 {
                     int[] r = parentIdsArr.Skip(i * maxParentIdsPerRequest).Take(maxParentIdsPerRequest).ToArray();
-                    items.AddRange(GetItems(siteId, isArchive, r, useRegion));
+                    items.AddRange(GetItems(siteId, isArchive, r, useRegion, loadChildren));
                 }
 
                 _logger.ForDebugEvent().Message("GetItems").Property("count", items.Count).Log();
@@ -294,6 +301,13 @@ ORDER BY ai.content_item_id";
                 AddRegionInfo(siteId, isArchive, items);
             }
 
+            if (items.Any() && loadChildren)
+            {
+                var ids = items.Select(n => n.Id).ToArray();
+                var children = GetItems(siteId, isArchive, ids, useRegion, true);
+                items.AddRange(children);
+            }
+
             return items;
         }
 
@@ -314,7 +328,13 @@ ORDER BY ai.content_item_id";
             }
         }
 
-        public List<AbstractItemData> GetByIds(int siteId, bool isArchive, IEnumerable<int> itemIds, IDbTransaction transaction = null)
+        public List<AbstractItemData> GetByIds(
+            int siteId, 
+            bool isArchive, 
+            IEnumerable<int> itemIds,
+            bool useRegion = false, 
+            bool loadChildren = false, 
+            IDbTransaction transaction = null)
         {
             var itemIdsArr = itemIds?.ToArray() ?? Array.Empty<int>();
             if (!itemIdsArr.Any()) throw new ArgumentNullException(nameof(itemIds));
@@ -323,6 +343,7 @@ ORDER BY ai.content_item_id";
             _logger.ForDebugEvent().Message("GetByIds")
                 .Property("siteId", siteId)
                 .Property("isArchive", isArchive)
+                .Property("loadChildren", loadChildren)
                 .Property("itemIds", itemIdsArr)
                 .Log();
 
@@ -346,6 +367,13 @@ ORDER BY ai.content_item_id";
                 .Property("count", result.Count)
                 .Property("result", result)
                 .Log();
+
+            if (result.Any() && loadChildren)
+            {
+                var children = GetItems(siteId, isArchive, itemIdsArr, useRegion, true);
+                result.AddRange(children);
+            }
+            
             return result;
         }
 

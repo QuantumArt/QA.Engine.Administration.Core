@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
@@ -22,12 +21,11 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
     [TypeScriptController]
     public class DictionaryController : ControllerBase
     {
-        private readonly IItemDifinitionService _itemDifinitionService;
+        private readonly IItemDifinitionService _itemDefinitionService;
         private readonly IRegionService _regionService;
         private readonly ICultureService _cultureService;
         private readonly IContentService _contentService;
         private readonly ICustomActionService _customActionService;
-        private readonly IMapper _mapper;
         private readonly ILogger _logger = LogManager.GetCurrentClassLogger();
         private readonly IStringLocalizerFactory _stringLocalizerFactory;
         private readonly CustomAction _customActionConfig;
@@ -36,16 +34,14 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         private readonly int _userId;
 
         public DictionaryController(
-            IItemDifinitionService itemDifinitionService, IRegionService regionService, ICultureService cultureService, IContentService contentService,
-            IOptions<EnvironmentConfiguration> options, IWebAppQpHelper webAppQpHelper, ICustomActionService customActionService,
-            IMapper mapper, IStringLocalizerFactory stringLocalizerFactory)
+            IItemDifinitionService itemDefinitionService, IRegionService regionService, ICultureService cultureService, IContentService contentService,
+            IOptions<EnvironmentConfiguration> options, IWebAppQpHelper webAppQpHelper, ICustomActionService customActionService, IStringLocalizerFactory stringLocalizerFactory)
         {
-            _itemDifinitionService = itemDifinitionService;
+            _itemDefinitionService = itemDefinitionService;
             _regionService = regionService;
             _cultureService = cultureService;
             _contentService = contentService;
             _customActionService = customActionService;
-            _mapper = mapper;
             _stringLocalizerFactory = stringLocalizerFactory;
 
             _customActionConfig = options.Value?.CustomAction;
@@ -75,8 +71,8 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpGet("getDiscriminators")]
         public ApiResult<List<DiscriminatorModel>> GetDiscriminators()
         {
-            _logger.Trace($"getDiscriminators userId={_userId}");
-            var discriminators = _itemDifinitionService.GetAllItemDefinitions(_siteId);
+            _logger.ForDebugEvent().Message("GET /getDiscriminators").Log();
+            var discriminators = _itemDefinitionService.GetAllItemDefinitions(_siteId);
             return ApiResult<List<DiscriminatorModel>>.Success(discriminators);
         }
 
@@ -87,7 +83,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpGet("getRootPageDiscriminator")]
         public ApiResult<string> GetRootPageDiscriminator()
         {
-            _logger.Trace($"getRootPageDiscriminator userId={_userId}");
+            _logger.ForDebugEvent().Message("GET /getRootPageDiscriminator").Log();
             return ApiResult<string>.Success(_rootPageDiscriminator);
         }
 
@@ -98,7 +94,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpGet("getFlatRegions")]
         public ApiResult<List<RegionModel>> GetFlatRegions()
         {
-            _logger.Trace($"getFlatRegions userId={_userId}");
+            _logger.ForDebugEvent().Message("GET /getFlatRegions").Log();
             var regions = _regionService.GetRegions(_siteId);
             return ApiResult<List<RegionModel>>.Success(regions);
         }
@@ -110,7 +106,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpGet("getRegionTree")]
         public ApiResult<List<RegionModel>> GetRegionTree()
         {
-            _logger.Trace($"getRegionTree userId={_userId}");
+            _logger.ForDebugEvent().Message("GET /getRegionTree").Log();
             var regions = _regionService.GetRegionStructure(_siteId);
             return ApiResult<List<RegionModel>>.Success(regions);
         }
@@ -122,7 +118,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpGet("getQpContent")]
         public ApiResult<QpContentModel> GetQpContent(string contentName)
         {
-            _logger.Trace($"getRegionTree contentName={contentName}, userId={_userId}");
+            _logger.ForDebugEvent().Message("GET /getQpContent").Property("contentName", contentName).Log();
             var content = _contentService.GetQpContent(_siteId, contentName);
             return ApiResult<QpContentModel>.Success(content);
         }
@@ -134,7 +130,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpGet("getCultures")]
         public ApiResult<List<CultureModel>> GetCultures()
         {
-            _logger.Trace($"getCultures userId={_userId}");
+            _logger.ForDebugEvent().Message("GET /getCultures").Property("userId", _userId).Log();
             var cultures = _cultureService.GetCultures(_siteId);
             return ApiResult<List<CultureModel>>.Success(cultures);
         }
@@ -146,8 +142,11 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         [HttpGet("getCustomAction")]
         public ApiResult<CustomActionModel> GetCustomAction(string alias)
         {
+            _logger.ForDebugEvent().Message("GET /getCustomAction")
+                .Property("alias", alias)
+                .Property("configAlias", _customActionConfig?.Alias)
+                .Log();
             alias = !string.IsNullOrWhiteSpace(alias) ? alias : _customActionConfig?.Alias;
-            _logger.Trace($"getCustomActionCode alias={alias}, userId={_userId}");
             var customAction = _customActionService.GetCustomAction(alias);
             if (customAction == null)
                 return ApiResult<CustomActionModel>.Success(null);

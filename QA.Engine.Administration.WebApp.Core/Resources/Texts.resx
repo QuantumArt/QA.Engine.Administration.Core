@@ -274,7 +274,7 @@
     <value>Обновить</value>
   </data>
   <data name="Reorder" xml:space="preserve">
-    <value>Сортировать</value>
+    <value>Изменить порядок</value>
   </data>
   <data name="Restore" xml:space="preserve">
     <value>Восстановить</value>

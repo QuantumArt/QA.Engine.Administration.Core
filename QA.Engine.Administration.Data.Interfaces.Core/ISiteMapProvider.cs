@@ -13,11 +13,14 @@ namespace QA.Engine.Administration.Data.Interfaces.Core
         List<AbstractItemData> GetItems(int siteId, 
             bool isArchive, 
             IEnumerable<int> parentId, 
-            bool useRegion, 
+            bool useRegion,
+            bool loadChildren = false,
             IDbTransaction transaction = null);
         List<AbstractItemData> GetByIds(int siteId, 
-            bool isArchive, 
-            IEnumerable<int> itemIds, 
+            bool isArchive,
+            IEnumerable<int> itemIds,
+            bool useRegion = false,
+            bool loadChildren = false,
             IDbTransaction transaction = null);
         AbstractItemData GetRootPage(int siteId, IDbTransaction transaction = null);
     }
