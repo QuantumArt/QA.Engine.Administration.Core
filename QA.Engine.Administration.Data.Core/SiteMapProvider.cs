@@ -62,8 +62,11 @@ ORDER BY ai.|QPAbstractItem.Parent|, ai.|QPAbstractItem.IndexOrder|, ai.content_
 
         #region get abstract items with parent
 
-        private string GetAbstractItemsQuery(int siteId, bool isArchive, string parentExpression)
+        private string GetAbstractItemsQuery(int siteId, bool isArchive, string parentExpression, bool onlyPages)
         {
+            var onlyPagesFilter = onlyPages
+                ? "AND def.|QPDiscriminator.IsPage|=1 AND ai.|QPAbstractItem.VersionOf| is null"
+                : "";
             var query = $@"
 SELECT
     ai.content_item_id AS Id,
@@ -87,12 +90,8 @@ SELECT
 FROM |QPAbstractItem| ai
 INNER JOIN |QPDiscriminator| def on ai.|QPAbstractItem.Discriminator| = def.content_item_id
 WHERE ai.archive={(isArchive ? "1" : "0")} 
-AND def.|QPDiscriminator.IsPage|=1 AND ai.|QPAbstractItem.VersionOf| is null 
-    AND (
-        ai.|QPAbstractItem.Parent| {parentExpression}
-        OR EXISTS (SELECT 1 FROM |QPAbstractItem| ai1 
-            WHERE ai.|QPAbstractItem.Parent| {parentExpression} AND ai1.content_item_id=ai.|QPAbstractItem.VersionOf|)
-    )
+{onlyPagesFilter} 
+    AND (ai.|QPAbstractItem.Parent| {parentExpression} OR ai.|QPAbstractItem.VersionOf| {parentExpression})
 ORDER BY ai.|QPAbstractItem.Parent|, ai.|QPAbstractItem.IndexOrder|, ai.content_item_id
 ";
             return _netNameQueryAnalyzer.PrepareQuery(query, siteId, false, true);
@@ -108,6 +107,7 @@ ORDER BY ai.|QPAbstractItem.Parent|, ai.|QPAbstractItem.IndexOrder|, ai.content_
 SELECT
     ai.content_item_id AS Id,
     ai.archive AS Archive,
+    ai.visible AS Visible,
     ai.|QPAbstractItem.Name| as Alias,
     ai.|QPAbstractItem.Title| as Title,
     ai.|QPAbstractItem.Parent| AS ParentId,
@@ -253,7 +253,7 @@ ORDER BY ai.content_item_id";
             string query;
             if (!parentIdsArr.Any())
             {
-                query = GetAbstractItemsQuery(siteId, isArchive, "IS NULL");
+                query = GetAbstractItemsQuery(siteId, isArchive, "IS NULL", !loadChildren);
                 items = _uow.Connection.Query<AbstractItemData>(query, transaction).ToList();
                 if (useRegion)
                 {
@@ -282,7 +282,7 @@ ORDER BY ai.content_item_id";
             }
 
             var idList = SqlQuerySyntaxHelper.IdList(_uow.DatabaseType, "@ParentIds", "parentIds");
-            query = GetAbstractItemsQuery(siteId, isArchive, $"IN (SELECT Id FROM {idList})");
+            query = GetAbstractItemsQuery(siteId, isArchive, $"IN (SELECT Id FROM {idList})", !loadChildren);
 
             if (_uow.DatabaseType == DatabaseType.SqlServer)
             {
