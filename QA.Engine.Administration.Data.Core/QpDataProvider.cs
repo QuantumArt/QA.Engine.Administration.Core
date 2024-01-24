@@ -30,7 +30,7 @@ namespace QA.Engine.Administration.Data.Core
         private ArticleService GetArticleService(int userId)
         {
             var info = new QpConnectionInfo(
-                _configuration.ConnectionString, 
+                _configuration.ConnectionString,
                 (DatabaseType)(int)_configuration.DbType
             );
             return new ArticleService(info, userId);
@@ -55,59 +55,62 @@ namespace QA.Engine.Administration.Data.Core
 
             var articleData = new[]
             {
-                new ArticleData { ContentId = contentId, Id = editData.ItemId, Fields = new List<FieldData>()
+                new ArticleData
                 {
-                    new() { Id = fields["Title"], Value = editData.Title },
-                    new() { Id = fields["IsInSiteMap"], Value = Convert.ToInt32(editData.IsInSiteMap).ToString() }
-                } }
+                    ContentId = contentId, Id = editData.ItemId, Fields = new List<FieldData>()
+                    {
+                        new() { Id = fields["Title"], Value = editData.Title },
+                        new() { Id = fields["IsInSiteMap"], Value = Convert.ToInt32(editData.IsInSiteMap).ToString() }
+                    }
+                }
             };
             GetArticleService(userId).BatchUpdate(articleData, true);
         }
 
         public void Publish(int siteId, int contentId, int userId, IEnumerable<AbstractItemData> items, int statusId)
         {
-            var itemIds = items.Select(x => new {x.Id, x.ExtensionId}).ToArray();
+            var itemIds = items.Select(x => new { x.Id, x.ExtensionId }).ToArray();
             Logger.ForDebugEvent()
                 .Message("Publish")
                 .Property("siteId", siteId)
                 .Property("contentId", contentId)
                 .Property("userId", userId)
                 .Property("itemIds", itemIds)
-                .Log();              
+                .Log();
 
             var result = GetArticleService(userId).Publish(contentId, itemIds.Select(n => n.Id).ToArray());
             if (result != null && result.Type == ActionMessageType.Error)
             {
                 throw new ApplicationException(result.Text);
-            }            
+            }
         }
 
         public void Reorder(int siteId, int contentId, int userId, IEnumerable<AbstractItemData> items)
         {
-            var data = items.Select(x => new {x.Id, x.IndexOrder}).ToArray();
+            var data = items.Select(x => new { x.Id, x.IndexOrder }).ToArray();
             Logger.ForDebugEvent()
                 .Message("Reorder")
                 .Property("siteId", siteId)
                 .Property("contentId", contentId)
                 .Property("userId", userId)
                 .Property("data", data)
-                .Log();               
-            
+                .Log();
+
             var fields = GetFields(siteId, contentId)
                 .ToDictionary(k => k.Name, v => v.Id);
             if (!fields.ContainsKey("IndexOrder"))
                 throw new Exception("NetName for field IndexOrder not found");
-            
+
             var articleData = data
                 .Where(x => x.IndexOrder.HasValue)
                 .Select(n => new ArticleData()
                 {
                     ContentId = contentId, Id = n.Id, Fields = new List<FieldData>()
                     {
-                        new() {Id = fields["IndexOrder"], Value = n.IndexOrder.Value.ToString()},
+                        new() { Id = fields["IndexOrder"], Value = n.IndexOrder.Value.ToString() },
                     }
                 }).ToArray();
-            
+
             GetArticleService(userId).BatchUpdate(articleData, true);
         }
 
@@ -120,7 +123,7 @@ namespace QA.Engine.Administration.Data.Core
                 .Property("userId", userId)
                 .Property("itemId", itemId)
                 .Property("newParentId", newParentId)
-                .Log();              
+                .Log();
 
             var fields = GetFields(siteId, contentId)
                 .ToDictionary(k => k.Name, v => v.Id);
@@ -129,17 +132,21 @@ namespace QA.Engine.Administration.Data.Core
 
             var articleData = new[]
             {
-                new ArticleData { ContentId = contentId, Id = itemId, Fields = new List<FieldData>()
+                new ArticleData
                 {
-                    new() { Id = fields["Parent"], ArticleIds = new[]{ newParentId } },
-                } }
+                    ContentId = contentId, Id = itemId, Fields = new List<FieldData>()
+                    {
+                        new() { Id = fields["Parent"], ArticleIds = new[] { newParentId } },
+                    }
+                }
             };
             GetArticleService(userId).BatchUpdate(articleData, true);
         }
 
-        public void Archive(int siteId, int contentId, int userId, IEnumerable<AbstractItemData> items, AbstractItemData moveContentVersion)
+        public void Archive(int siteId, int contentId, int userId, IEnumerable<AbstractItemData> items,
+            AbstractItemData moveContentVersion)
         {
-            var itemIds = items.Select(x => new {x.Id, x.ExtensionId}).ToArray();
+            var itemIds = items.Select(x => new { x.Id, x.ExtensionId }).ToArray();
             Logger.ForDebugEvent()
                 .Message("Archive")
                 .Property("siteId", siteId)
@@ -148,7 +155,7 @@ namespace QA.Engine.Administration.Data.Core
                 .Property("itemIds", itemIds)
                 .Property("moveContentVersion", moveContentVersion)
                 .Log();
-            
+
             var ids = itemIds.Select(n => n.Id).ToArray();
             var result = GetArticleService(userId).SetArchiveFlag(contentId, ids, true);
             if (result != null && result.Type == ActionMessageType.Error)
@@ -164,7 +171,7 @@ namespace QA.Engine.Administration.Data.Core
 
         public void Restore(int siteId, int contentId, int userId, IEnumerable<AbstractItemData> items)
         {
-            var itemIds = items.Select(x => new {x.Id, x.ExtensionId}).ToArray();
+            var itemIds = items.Select(x => new { x.Id, x.ExtensionId }).ToArray();
             Logger.ForDebugEvent()
                 .Message("Restore")
                 .Property("siteId", siteId)
@@ -172,7 +179,7 @@ namespace QA.Engine.Administration.Data.Core
                 .Property("userId", userId)
                 .Property("itemIds", itemIds)
                 .Log();
-            
+
             var ids = itemIds.Select(n => n.Id).ToArray();
             var result = GetArticleService(userId).SetArchiveFlag(contentId, ids, false);
             if (result != null && result.Type == ActionMessageType.Error)
@@ -191,14 +198,14 @@ namespace QA.Engine.Administration.Data.Core
                 .Property("userId", userId)
                 .Property("items", itemIds)
                 .Log();
-            
+
             var result = GetArticleService(userId).Delete(contentId, itemIds);
             if (result != null && result.Type == ActionMessageType.Error)
             {
                 throw new ApplicationException(result.Text);
             }
         }
-        
+
         public List<QpFieldData> GetFields(int siteId, int contentId)
         {
             var result = _qpMetadataManager.GetRealData(
@@ -237,7 +244,7 @@ namespace QA.Engine.Administration.Data.Core
                     .Log();
                 return;
             }
-            
+
             Logger.ForDebugEvent()
                 .Message("moveUpContentVersion")
                 .Property("siteId", siteId)
@@ -247,7 +254,7 @@ namespace QA.Engine.Administration.Data.Core
                 .Property("alias", item.Alias)
                 .Property("parentId", item.ParentId)
                 .Log();
-            
+
             var fields = GetFields(siteId, contentId)
                 .ToDictionary(k => k.Name, v => v.Id);
             if (!fields.ContainsKey("Name"))
@@ -259,18 +266,21 @@ namespace QA.Engine.Administration.Data.Core
             if (!fields.ContainsKey("IsPage"))
                 throw new Exception("NetName for field IsPage not found");
             if (!fields.ContainsKey("IndexOrder"))
-                throw new Exception("NetName for field IndexOrder not found");            
+                throw new Exception("NetName for field IndexOrder not found");
 
             var articleData = new[]
             {
-                new ArticleData { ContentId = contentId, Id = item.Id, Fields = new List<FieldData>
+                new ArticleData
                 {
-                    new() { Id = fields["Parent"], ArticleIds = new[]{ item.ParentId.Value } },
-                    new() { Id = fields["Name"], Value = item.Alias },
-                    new() { Id = fields["IndexOrder"], Value = item.IndexOrder?.ToString() },
-                    new() { Id = fields["VersionOf"] },
-                    new() { Id = fields["IsPage"], Value = "1" },
-                } }
+                    ContentId = contentId, Id = item.Id, Fields = new List<FieldData>
+                    {
+                        new() { Id = fields["Parent"], ArticleIds = new[] { item.ParentId.Value } },
+                        new() { Id = fields["Name"], Value = item.Alias },
+                        new() { Id = fields["IndexOrder"], Value = item.IndexOrder?.ToString() },
+                        new() { Id = fields["VersionOf"] },
+                        new() { Id = fields["IsPage"], Value = "1" },
+                    }
+                }
             };
             GetArticleService(userId).BatchUpdate(articleData, true);
         }

@@ -189,28 +189,30 @@ ORDER BY ai.content_item_id";
 
         #endregion
 
-        public List<AbstractItemData> GetAllItems(int siteId, bool isArchive, bool useRegion, IDbTransaction transaction = null)
+        public List<AbstractItemData> GetAllItems(int siteId, bool isArchive, bool useRegion,
+            IDbTransaction transaction = null)
         {
             _logger.ForDebugEvent().Message("GetAllItems")
                 .Property("siteId", siteId)
                 .Property("isArchive", isArchive)
                 .Property("useRegion", useRegion)
                 .Log();
-            
+
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            
+
             string query = GetAllAbstractItemsQuery(siteId, isArchive);
             var items = _uow.Connection.Query<AbstractItemData>(query, transaction).ToList();
-            
+
             _logger.ForDebugEvent().Message("GetAllItems")
                 .Property("count", items.Count)
                 .Property("elapsed", stopwatch.ElapsedMilliseconds)
                 .Log();
-            
+
             if (useRegion)
             {
-                var regions = _uow.Connection.Query<RegionData>(GetRegionsQuery(siteId, isArchive), transaction).ToList();
+                var regions = _uow.Connection.Query<RegionData>(GetRegionsQuery(siteId, isArchive), transaction)
+                    .ToList();
                 var regionLinkId = _uow.Connection.QueryFirst<int>(GetRegionLinkIdQuery(siteId), transaction);
                 var links = _uow.Connection.Query<LinkItem>(GetLinkItemIdQuery(regionLinkId), transaction)
                     .ToList()
@@ -230,15 +232,15 @@ ORDER BY ai.content_item_id";
             return items;
         }
 
-        public List<AbstractItemData> GetItems(int siteId, 
-            bool isArchive, 
-            IEnumerable<int> parentIds, 
+        public List<AbstractItemData> GetItems(int siteId,
+            bool isArchive,
+            IEnumerable<int> parentIds,
             bool useRegion,
             bool loadChildren = false,
             IDbTransaction transaction = null)
         {
             var parentIdsArr = parentIds?.ToArray() ?? Array.Empty<int>();
-            
+
             _logger.ForDebugEvent().Message("GetItems")
                 .Property("siteId", siteId)
                 .Property("isArchive", isArchive)
@@ -259,6 +261,7 @@ ORDER BY ai.content_item_id";
                 {
                     AddRegionInfo(siteId, isArchive, items);
                 }
+
                 _logger.ForDebugEvent().Message("GetItems").Property("count", items.Count).Log();
                 return items;
             }
@@ -271,7 +274,7 @@ ORDER BY ai.content_item_id";
                     .Log();
 
                 items = new List<AbstractItemData>();
-                for (var i = 0; i < (float) parentIdsArr.Length / maxParentIdsPerRequest; i++)
+                for (var i = 0; i < (float)parentIdsArr.Length / maxParentIdsPerRequest; i++)
                 {
                     int[] r = parentIdsArr.Skip(i * maxParentIdsPerRequest).Take(maxParentIdsPerRequest).ToArray();
                     items.AddRange(GetItems(siteId, isArchive, r, useRegion, loadChildren));
@@ -287,13 +290,17 @@ ORDER BY ai.content_item_id";
             if (_uow.DatabaseType == DatabaseType.SqlServer)
             {
                 items = _uow.Connection.Query<AbstractItemData>(query,
-                        new {ParentIds = SqlQuerySyntaxHelper.IdsToDataTable(parentIdsArr).AsTableValuedParameter("Ids")},
+                        new
+                        {
+                            ParentIds = SqlQuerySyntaxHelper.IdsToDataTable(parentIdsArr).AsTableValuedParameter("Ids")
+                        },
                         transaction)
                     .ToList();
             }
             else
             {
-                items = _uow.Connection.Query<AbstractItemData>(query, new {ParentIds = parentIdsArr}, transaction).ToList();
+                items = _uow.Connection.Query<AbstractItemData>(query, new { ParentIds = parentIdsArr }, transaction)
+                    .ToList();
             }
 
             if (useRegion)
@@ -311,7 +318,8 @@ ORDER BY ai.content_item_id";
             return items;
         }
 
-        private void AddRegionInfo(int siteId, bool isArchive, List<AbstractItemData> items, IDbTransaction transaction = null)
+        private void AddRegionInfo(int siteId, bool isArchive, List<AbstractItemData> items,
+            IDbTransaction transaction = null)
         {
             var regions = _uow.Connection.Query<RegionData>(GetRegionsQuery(siteId, isArchive), transaction).ToList();
             var regionLinkId = _uow.Connection.QueryFirst<int>(GetRegionLinkIdQuery(siteId), transaction);
@@ -329,11 +337,11 @@ ORDER BY ai.content_item_id";
         }
 
         public List<AbstractItemData> GetByIds(
-            int siteId, 
-            bool isArchive, 
+            int siteId,
+            bool isArchive,
             IEnumerable<int> itemIds,
-            bool useRegion = false, 
-            bool loadChildren = false, 
+            bool useRegion = false,
+            bool loadChildren = false,
             IDbTransaction transaction = null)
         {
             var itemIdsArr = itemIds?.ToArray() ?? Array.Empty<int>();
@@ -351,18 +359,20 @@ ORDER BY ai.content_item_id";
             var query = GetCmdGetAbstractItemByIds(siteId, isArchive, idList);
 
             List<AbstractItemData> result;
-            
+
             if (_uow.DatabaseType == DatabaseType.SqlServer)
             {
                 result = _uow.Connection.Query<AbstractItemData>(query,
-                        new {ItemIds = SqlQuerySyntaxHelper.IdsToDataTable(itemIdsArr).AsTableValuedParameter("Ids")},
+                        new { ItemIds = SqlQuerySyntaxHelper.IdsToDataTable(itemIdsArr).AsTableValuedParameter("Ids") },
                         transaction)
                     .ToList();
             }
             else
             {
-                result = _uow.Connection.Query<AbstractItemData>(query, new {ItemIds = itemIdsArr}, transaction).ToList();
+                result = _uow.Connection.Query<AbstractItemData>(query, new { ItemIds = itemIdsArr }, transaction)
+                    .ToList();
             }
+
             _logger.ForDebugEvent().Message("GetByIds")
                 .Property("count", result.Count)
                 .Property("result", result)
@@ -373,7 +383,7 @@ ORDER BY ai.content_item_id";
                 var children = GetItems(siteId, isArchive, itemIdsArr, useRegion, true);
                 result.AddRange(children);
             }
-            
+
             return result;
         }
 

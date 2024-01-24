@@ -15,10 +15,4 @@
     <ProjectReference Include="..\QA.Engine.Administration.Data.Interfaces.Core\QA.Engine.Administration.Data.Interfaces.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions">
-      <HintPath>C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\6.0.23\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
 </Project>
