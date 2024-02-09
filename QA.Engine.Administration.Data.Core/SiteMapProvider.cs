@@ -49,10 +49,13 @@ SELECT
     def.|QPDiscriminator.IsPage| as IsPage,
     def.|QPDiscriminator.Title| as DiscriminatorTitle,
     def.|QPDiscriminator.IconUrl| as IconUrl,
-    CASE WHEN ai.STATUS_TYPE_ID IN (SELECT st.STATUS_TYPE_ID FROM STATUS_TYPE st WHERE st.STATUS_TYPE_NAME=N'Published') THEN 1 ELSE 0 END AS Published
+    CASE WHEN ai.STATUS_TYPE_ID IN (
+        SELECT st.STATUS_TYPE_ID FROM STATUS_TYPE st WHERE st.STATUS_TYPE_NAME=N'Published'
+    ) THEN 1 ELSE 0 END AS Published
 FROM |QPAbstractItem| ai
 INNER JOIN |QPDiscriminator| def on ai.|QPAbstractItem.Discriminator| = def.content_item_id
-WHERE ai.archive={(isArchive ? "1" : "0")} 
+INNER JOIN content_item ci on ai.content_item_id = ci.content_item_id
+WHERE ci.archive={(isArchive ? "1" : "0")} 
 ORDER BY ai.|QPAbstractItem.Parent|, ai.|QPAbstractItem.IndexOrder|, ai.content_item_id
 ";
             return _netNameQueryAnalyzer.PrepareQuery(query, siteId, false, true);
@@ -86,10 +89,13 @@ SELECT
     def.|QPDiscriminator.IsPage| as IsPage,
     def.|QPDiscriminator.Title| as DiscriminatorTitle,
     def.|QPDiscriminator.IconUrl| as IconUrl,
-    CASE WHEN ai.STATUS_TYPE_ID IN (SELECT st.STATUS_TYPE_ID FROM STATUS_TYPE st WHERE st.STATUS_TYPE_NAME=N'Published') THEN 1 ELSE 0 END AS Published
+    CASE WHEN ai.STATUS_TYPE_ID IN (
+        SELECT st.STATUS_TYPE_ID FROM STATUS_TYPE st WHERE st.STATUS_TYPE_NAME=N'Published'
+    ) THEN 1 ELSE 0 END AS Published
 FROM |QPAbstractItem| ai
 INNER JOIN |QPDiscriminator| def on ai.|QPAbstractItem.Discriminator| = def.content_item_id
-WHERE ai.archive={(isArchive ? "1" : "0")} 
+INNER JOIN content_item ci on ai.content_item_id = ci.content_item_id
+WHERE ci.archive={(isArchive ? "1" : "0")} 
 {onlyPagesFilter} 
     AND (ai.|QPAbstractItem.Parent| {parentExpression} OR ai.|QPAbstractItem.VersionOf| {parentExpression})
 ORDER BY ai.|QPAbstractItem.Parent|, ai.|QPAbstractItem.IndexOrder|, ai.content_item_id
@@ -122,10 +128,13 @@ SELECT
     def.|QPDiscriminator.IsPage| as IsPage,
     def.|QPDiscriminator.Title| as DiscriminatorTitle,
     def.|QPDiscriminator.IconUrl| as IconUrl,
-    CASE WHEN ai.STATUS_TYPE_ID IN (SELECT st.STATUS_TYPE_ID FROM STATUS_TYPE st WHERE st.STATUS_TYPE_NAME=N'Published') THEN 1 ELSE 0 END AS Published
+    CASE WHEN ai.STATUS_TYPE_ID IN (
+        SELECT st.STATUS_TYPE_ID FROM STATUS_TYPE st WHERE st.STATUS_TYPE_NAME=N'Published'
+    ) THEN 1 ELSE 0 END AS Published
 FROM |QPAbstractItem| ai
 INNER JOIN |QPDiscriminator| def on ai.|QPAbstractItem.Discriminator| = def.content_item_id
-WHERE ai.archive={(isArchive ? "1" : "0")} AND ai.content_item_id IN (SELECT Id FROM {idsExpression})
+INNER JOIN content_item ci on ai.content_item_id = ci.content_item_id
+WHERE ci.archive={(isArchive ? "1" : "0")} AND ai.content_item_id IN (SELECT Id FROM {idsExpression})
 ";
             return _netNameQueryAnalyzer.PrepareQuery(query, siteId, false, true);
         }
@@ -153,10 +162,14 @@ SELECT
     def.|QPDiscriminator.IsPage| as IsPage,
     def.|QPDiscriminator.Title| as DiscriminatorTitle,
     def.|QPDiscriminator.IconUrl| as IconUrl,
-    CASE WHEN ai.STATUS_TYPE_ID IN (SELECT st.STATUS_TYPE_ID FROM STATUS_TYPE st WHERE st.STATUS_TYPE_NAME=N'Published') THEN 1 ELSE 0 END AS Published
+    CASE WHEN ai.STATUS_TYPE_ID IN (
+        SELECT st.STATUS_TYPE_ID FROM STATUS_TYPE st WHERE st.STATUS_TYPE_NAME=N'Published'
+    ) THEN 1 ELSE 0 END AS Published
 FROM |QPAbstractItem| ai
 INNER JOIN |QPDiscriminator| def on ai.|QPAbstractItem.Discriminator| = def.content_item_id
-WHERE ai.archive=0 AND ai.|QPAbstractItem.Parent| IS NULL AND ai.|QPAbstractItem.VersionOf| IS NULL AND def.|QPDiscriminator.IsPage|=1
+INNER JOIN content_item ci on ai.content_item_id = ci.content_item_id
+WHERE ci.archive=0 AND ai.|QPAbstractItem.Parent| IS NULL 
+    AND ai.|QPAbstractItem.VersionOf| IS NULL AND def.|QPDiscriminator.IsPage|=1
 ORDER BY ai.content_item_id";
 
         private string GetRegionsQuery(int siteId, bool isArchive = false)
@@ -174,9 +187,10 @@ ORDER BY ai.content_item_id";
 
         private string GetRegionLinkIdQuery(int siteId)
         {
-            string query =
-                $@"SELECT {SqlQuerySyntaxHelper.Top(_uow.DatabaseType, "1")} |QPAbstractItem.Regions| FROM |QPAbstractItem| WHERE |QPAbstractItem.Regions|
-                IS NOT NULL {SqlQuerySyntaxHelper.Limit(_uow.DatabaseType, "1")}";
+            string query = $@"
+SELECT {SqlQuerySyntaxHelper.Top(_uow.DatabaseType, "1")} |QPAbstractItem.Regions| FROM |QPAbstractItem| 
+WHERE |QPAbstractItem.Regions| IS NOT NULL {SqlQuerySyntaxHelper.Limit(_uow.DatabaseType, "1")}
+            ";
             return _netNameQueryAnalyzer.PrepareQuery(query, siteId, false, true);
         }
 

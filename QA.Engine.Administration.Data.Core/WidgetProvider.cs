@@ -42,10 +42,15 @@ SELECT
     def.content_item_id AS DiscriminatorId,
     def.|QPDiscriminator.Name| as Discriminator,
     def.|QPDiscriminator.IsPage| as IsPage,
-    CASE WHEN ai.STATUS_TYPE_ID IN (SELECT st.STATUS_TYPE_ID FROM STATUS_TYPE st WHERE st.STATUS_TYPE_NAME=N'Published') THEN 1 ELSE 0 END AS Published
+    CASE WHEN ai.STATUS_TYPE_ID IN (
+        SELECT st.STATUS_TYPE_ID FROM STATUS_TYPE st WHERE st.STATUS_TYPE_NAME=N'Published'
+    ) THEN 1 ELSE 0 END AS Published
 FROM |QPAbstractItem| ai
 INNER JOIN |QPDiscriminator| def on ai.|QPAbstractItem.Discriminator| = def.content_item_id
-WHERE ai.archive={SqlQuerySyntaxHelper.ToBoolSql(_uow.DatabaseType, false)} AND def.|QPDiscriminator.IsPage|={SqlQuerySyntaxHelper.ToBoolSql(_uow.DatabaseType, false)} AND ai.|QPAbstractItem.Parent| {parentExpression}
+INNER JOIN content_item ci on ai.content_item_id = ci.content_item_id
+WHERE ci.archive={SqlQuerySyntaxHelper.ToBoolSql(_uow.DatabaseType, false)} 
+    AND def.|QPDiscriminator.IsPage|={SqlQuerySyntaxHelper.ToBoolSql(_uow.DatabaseType, false)} 
+    AND ai.|QPAbstractItem.Parent| {parentExpression}
 ";
         }
 
