@@ -187,7 +187,7 @@ export default class SiteTree extends React.Component<Props, State> {
     private handleLastPage = () => {
         const { treeStore } = this.props;
         const tree = treeStore.getArchiveTreeStore();
-        tree.handlePagination(tree.pagesCount);
+        tree.handlePagination(tree.pagesCount - 1);
     };
 
     private handleFirstPage = () => {
@@ -460,7 +460,7 @@ export default class SiteTree extends React.Component<Props, State> {
                                     icon="arrow-left"
                                     minimal
                                     onClick={this.handlePrevPage}
-                                    disabled={tree.page === 1}
+                                    disabled={tree.page <= 1}
                                 />
                                 <Tag
                                     className="left"
@@ -470,7 +470,7 @@ export default class SiteTree extends React.Component<Props, State> {
                                     1
                                 </Tag>
                                 <NumericInput
-                                    max={tree.pagesCount + 1}
+                                    max={tree.pagesCount}
                                     min={1}
                                     buttonPosition="none"
                                     value={`${tree.page}`}
@@ -482,14 +482,14 @@ export default class SiteTree extends React.Component<Props, State> {
                                     interactive
                                     onClick={this.handleLastPage}
                                 >
-                                    {tree.pagesCount + 1}
+                                    {tree.pagesCount}
                                 </Tag>
                                 <Button
                                     icon="arrow-right"
                                     minimal
                                     onClick={this.handleNextPage}
                                     disabled={
-                                        tree.pageIndex === tree.pagesCount
+                                        tree.pageIndex >= tree.pagesCount - 1
                                     }
                                 />
                             </div>
