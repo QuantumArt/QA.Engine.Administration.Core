@@ -519,7 +519,7 @@ namespace QA.Engine.Administration.WebApp.Core.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Сортировать.
+        ///   Looks up a localized string similar to Изменить порядок.
         /// </summary>
         public static string Reorder {
             get {

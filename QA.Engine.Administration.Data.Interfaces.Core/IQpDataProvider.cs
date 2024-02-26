@@ -24,7 +24,7 @@ namespace QA.Engine.Administration.Data.Interfaces.Core
         /// <summary>
         /// Переместить элементы в архив
         /// </summary>
-        void Remove(int siteId, int contentId, int userId, IEnumerable<AbstractItemData> items, AbstractItemData moveContentVersion);
+        void Archive(int siteId, int contentId, int userId, IEnumerable<AbstractItemData> items, AbstractItemData moveContentVersion);
         /// <summary>
         /// Восстановить элементы из архива
         /// </summary>
@@ -33,5 +33,8 @@ namespace QA.Engine.Administration.Data.Interfaces.Core
         ///  Удалить элементы
         /// </summary>
         void Delete(int siteId, int contentId, int userId, IEnumerable<AbstractItemData> items);
+        
+        List<QpFieldData> GetFields(int siteId, int contentId);
+
     }
 }

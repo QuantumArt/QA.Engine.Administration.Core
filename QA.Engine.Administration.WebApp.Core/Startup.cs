@@ -5,9 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using QA.DotNetCore.Caching.Interfaces;
 using QA.DotNetCore.Engine.Persistent.Configuration;
-using QA.DotNetCore.Engine.Persistent.Interfaces;
 using QA.DotNetCore.Engine.QpData.Persistent.Dapper;
 using QA.Engine.Administration.Common.Core;
 using QA.Engine.Administration.Data.Core;
@@ -19,8 +17,9 @@ using QA.Engine.Administration.Services.Core.Mapper.Extensions;
 using QA.Engine.Administration.WebApp.Core.Auth;
 using QP.ConfigurationService.Models;
 using System;
-using System.Data;
 using System.Globalization;
+using QA.DotNetCore.Engine.Persistent.Interfaces;
+using DatabaseType = QP.ConfigurationService.Models.DatabaseType;
 
 namespace QA.Engine.Administration.WebApp.Core
 {
@@ -71,20 +70,33 @@ namespace QA.Engine.Administration.WebApp.Core
             _ = services.AddScoped<QPSecurityChecker>();
             _ = services.AddScoped<IWebAppQpHelper, WebAppQpHelper>();
 
-            _ = services.AddScoped<IUnitOfWork, UnitOfWork>(sp =>
+            _ = services.AddScoped(sp =>
             {
                 if (config.UseFake && config.FakeData != null)
                 {
-                    return new UnitOfWork(config.FakeData.ConnectionString, config.FakeData.DatabaseType);
+                    return new CustomerConfiguration
+                    {
+                        ConnectionString = config.FakeData.ConnectionString,
+                        DbType = Enum.Parse<DatabaseType>(config.FakeData.DatabaseType)
+                    };
                 }
 
                 IWebAppQpHelper qpHelper = sp.GetService<IWebAppQpHelper>();
                 if (!string.IsNullOrEmpty(qpHelper.SavedConnectionString) && string.IsNullOrEmpty(qpHelper.PassedCustomerCode))
                 {
-                    return new UnitOfWork(qpHelper.SavedConnectionString, qpHelper.SavedDbType.ToString());
+                    return new CustomerConfiguration
+                    {
+                        ConnectionString = qpHelper.SavedConnectionString,
+                        DbType = qpHelper.SavedDbType
+                    };
                 }
 
-                CustomerConfiguration dbConfig = qpHelper.GetCurrentCustomerConfiguration();
+                return qpHelper.GetCurrentCustomerConfiguration();
+            });
+
+            _ = services.AddScoped<IUnitOfWork, UnitOfWork>(sp =>
+            {
+                CustomerConfiguration dbConfig = sp.GetRequiredService<CustomerConfiguration>();
                 return dbConfig != null ? new UnitOfWork(dbConfig.ConnectionString, dbConfig.DbType.ToString()) : null;
             });
 
@@ -103,7 +115,6 @@ namespace QA.Engine.Administration.WebApp.Core
                 return new QpDbConnector(uow.Connection);
             });
             _ = services.AddScoped<IQpMetadataManager, QpMetadataManager>();
-            _ = services.AddScoped<IQpContentManager, QpContentManager>();
 
             _ = services.AddScoped<ISiteMapService, SiteMapService>();
             _ = services.AddScoped<ISiteMapModifyService, SiteMapModifyService>();

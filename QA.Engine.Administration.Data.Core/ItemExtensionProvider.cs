@@ -1,12 +1,12 @@
 ﻿using System;
 using Dapper;
-using Microsoft.Extensions.Logging;
 using QA.DotNetCore.Engine.Persistent.Interfaces;
 using QA.Engine.Administration.Data.Interfaces.Core;
 using QA.Engine.Administration.Data.Interfaces.Core.Models;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using NLog;
 using QA.DotNetCore.Engine.Persistent.Dapper;
 
 namespace QA.Engine.Administration.Data.Core
@@ -14,12 +14,11 @@ namespace QA.Engine.Administration.Data.Core
     public class ItemExtensionProvider: IItemExtensionProvider
     {
         private readonly IUnitOfWork _uow;
-        private readonly ILogger<ItemExtensionProvider> _logger;
+        private readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
-        public ItemExtensionProvider(IUnitOfWork uow, ILogger<ItemExtensionProvider> logger)
+        public ItemExtensionProvider(IUnitOfWork uow)
         {
             _uow = uow;
-            _logger = logger;
         }
 
         private const string CmdGetFieldNames = @"
@@ -32,7 +31,7 @@ FROM CONTENT_ATTRIBUTE ca JOIN ATTRIBUTE_TYPE a ON ca.ATTRIBUTE_TYPE_ID=a.ATTRIB
 WHERE ca.CONTENT_ID={0} AND ca.ATTRIBUTE_NAME <> 'ItemId' AND (ca.REQUIRED=1 OR ca.view_in_list={1})";
         
         private const string CmdGetContentRow = @"SELECT * FROM content_{0}_united WHERE ItemId={1}";
-        private const string CmdGetExtentionItems = @"
+        private const string CmdGetExtensionItems = @"
 SELECT b.ATTRIBUTE_NAME as FieldName, a.CONTENT_ID as ExtensionId
 FROM CONTENT_ATTRIBUTE a JOIN (
 	SELECT ATTRIBUTE_ID, ATTRIBUTE_NAME, RELATED_ATTRIBUTE_ID, BACK_RELATED_ATTRIBUTE_ID 
@@ -64,29 +63,40 @@ SELECT CONTENT_ITEM_ID AS ContentId, {1} AS Name FROM content_{0}_united WHERE {
 
         public List<FieldAttributeData> GetItemExtensionFields(int siteId, int value, int extensionId, IDbTransaction transaction = null)
         {
-            _logger.LogDebug($"getItemExtensionFields. siteId: {siteId}, value: {value}, extensionId: {extensionId}");
+            _logger.ForDebugEvent().Message("GetItemExtensionFields")
+                .Property("siteId", siteId)
+                .Property("value", value)
+                .Property("extensionId", extensionId)
+                .Log();
             var fieldNamesQuery = string.Format(CmdGetFieldNames, extensionId, SqlQuerySyntaxHelper.ToBoolSql(_uow.DatabaseType, true));
-            var fieldNames = _uow.Connection.Query<FieldAttributeData>(fieldNamesQuery, transaction);
+            var fieldNames = _uow.Connection.Query<FieldAttributeData>(fieldNamesQuery, transaction).ToArray();
             var contentRowsQuery = string.Format(CmdGetContentRow, extensionId, value);
             var contentRow = _uow.Connection.Query<object>(contentRowsQuery, transaction);
-            var relatedFieldsQuery = string.Format(CmdGetExtentionItems, extensionId, value);
-            var relatedFields = _uow.Connection.Query<RelationExtension>(relatedFieldsQuery, transaction);
+            var relatedFieldsQuery = string.Format(CmdGetExtensionItems, extensionId);
+            var relatedFields = _uow.Connection.Query<RelationExtension>(relatedFieldsQuery, transaction).ToArray();
             var dict = contentRow.FirstOrDefault() as IDictionary<string, object>;
 
             foreach (var field in fieldNames)
             {
-                field.Value = dict.FirstOrDefault(x => string.Equals(x.Key, field.FieldName, StringComparison.OrdinalIgnoreCase)).Value;
+                field.Value = dict?.FirstOrDefault(x => string.Equals(x.Key, field.FieldName, StringComparison.OrdinalIgnoreCase)).Value;
                 field.RelationExtensionId = relatedFields.FirstOrDefault(x => x.FieldName == field.FieldName)?.ExtensionId;
             }
 
-            _logger.LogDebug($"getItemExtensionFields. fieldNames: {SerializeData(fieldNames)}");
+            _logger.ForDebugEvent().Message("GetItemExtensionFields")
+                .Property("fieldNames", fieldNames)
+                .Log();
 
             return fieldNames.ToList();
         }
 
         public string GetRelatedItemName(int siteId, int id, int attributeId, IDbTransaction transaction = null)
         {
-            _logger.LogDebug($"GetRelatedItemName. siteId: {siteId}, id: {id}, attributeId: {attributeId}");
+            _logger.ForDebugEvent().Message("GetRelatedItemName")
+                .Property("siteId", siteId)
+                .Property("id", id)
+                .Property("attributeId", attributeId)
+                .Log();
+            
             var contentAttribute = GetContentAttribute(attributeId, transaction);
             while (contentAttribute.RelatedAttributeId.HasValue)
             {
@@ -96,13 +106,13 @@ SELECT CONTENT_ITEM_ID AS ContentId, {1} AS Name FROM content_{0}_united WHERE {
                     var fieldValue = GetContentFieldValue(id, contentAttribute.ContentId, contentAttribute.AttributeName, transaction);
                     if (!int.TryParse(fieldValue, out id))
                     {
-                        _logger.LogDebug($"GetRelatedItemName. result: {fieldValue}");
+                        _logger.ForDebugEvent().Message("GetRelatedItemName").Property("result", fieldValue).Log();                        
                         return fieldValue;
                     }
                 }
             }
             var result = GetContentFieldValue(id, contentAttribute.ContentId, contentAttribute.AttributeName, transaction);
-            _logger.LogDebug($"GetRelatedItemName. result: {result}");
+            _logger.ForDebugEvent().Message("GetRelatedItemName").Property("result", result).Log();
             return result;
         }
 
@@ -112,43 +122,56 @@ SELECT CONTENT_ITEM_ID AS ContentId, {1} AS Name FROM content_{0}_united WHERE {
             int attributeId, 
             IDbTransaction transaction = null)
         {
-            _logger.LogDebug($"GetManyToOneRelatedItemNames. siteId: {siteId}, id: {id}, value: {value}, attributeId: {attributeId}");
+            _logger.ForDebugEvent().Message("GetManyToOneRelatedItemNames")
+                .Property("siteId", siteId)
+                .Property("id", id)
+                .Property("attributeId", attributeId)
+                .Log();
+            
+            Dictionary<int, string> result;
             var contentAttribute = GetContentAttribute(attributeId, transaction);
             if (!contentAttribute.TreeOrderField.HasValue)
             {
-                _logger.LogDebug($"GetManyToOneRelatedItemNames. result: null");
-                return null;
+                result = null;
             }
-            var itemId = GetContentIdByItemId(value, contentAttribute.ContentId, transaction);
-            var nameAttribute = GetContentAttribute(contentAttribute.TreeOrderField.Value, transaction);
-            var relatedAttribute = GetContentAttribute(id, transaction);
-            var result = GetContentFieldValues(itemId, 
-                nameAttribute.ContentId, 
-                nameAttribute.AttributeName, 
-                relatedAttribute.AttributeName, 
-                transaction);
-            _logger.LogDebug($"GetManyToOneRelatedItemNames. result: {SerializeData(result)}");
+            else
+            {
+                var itemId = GetContentIdByItemId(value, contentAttribute.ContentId, transaction);
+                var nameAttribute = GetContentAttribute(contentAttribute.TreeOrderField.Value, transaction);
+                var relatedAttribute = GetContentAttribute(id, transaction);
+                result = GetContentFieldValues(itemId, 
+                    nameAttribute.ContentId, 
+                    nameAttribute.AttributeName, 
+                    relatedAttribute.AttributeName, 
+                    transaction);
+            }
+            _logger.ForDebugEvent().Message("GetRelatedItemName").Property("result", result).Log();                
             return result;
         }
 
         private ContentAttribute GetContentAttribute(int attributeId, 
             IDbTransaction transaction)
         {
-            _logger.LogDebug($"GetContentAttribute. attributeId: {attributeId}");
+            _logger.ForDebugEvent().Message("GetContentAttribute").Property("attributeId", attributeId).Log();
             var result = _uow.Connection.QuerySingleOrDefault<ContentAttribute>(CmdGetContentAttribute, 
                 new { attributeId }, 
                 transaction);
-            _logger.LogDebug($"GetContentAttribute. result: {SerializeData(result)}");
+            _logger.ForDebugEvent().Message("GetContentAttribute").Property("result", result).Log();
             return result;
         }
 
         private string GetContentFieldValue(int id, int contentId, string attributeName, IDbTransaction transaction)
         {
-            _logger.LogDebug($"GetContentFieldValue. id: {id}, contentId: {contentId}, attributeName: {attributeName}");
+            _logger.ForDebugEvent().Message("GetManyToOneRelatedItemNames")
+                .Property("contentId", contentId)
+                .Property("id", id)
+                .Property("attributeName", attributeName)
+                .Log();
+            
             var query = string.Format(CmdGetContentFieldValue, contentId, attributeName);
             var result = _uow.Connection.QuerySingleOrDefault<string>(query, new { id }, transaction);
-            _logger.LogDebug($"GetContentFieldValue. result: {result}");
-            return result?.ToString();
+            _logger.ForDebugEvent().Message("GetContentFieldValue").Property("result", result).Log();
+            return result;
         }
 
         private Dictionary<int, string> GetContentFieldValues(int itemId, 
@@ -157,24 +180,31 @@ SELECT CONTENT_ITEM_ID AS ContentId, {1} AS Name FROM content_{0}_united WHERE {
             string attributeName,
             IDbTransaction transaction)
         {
-            _logger.LogDebug($"GetContentFieldValue. contentId: {contentId}, titleAttributeName: {titleAttributeName}, attributeName: {attributeName}");
+            _logger.ForDebugEvent().Message("GetManyToOneRelatedItemNames")
+                .Property("contentId", contentId)
+                .Property("titleAttributeName", titleAttributeName)
+                .Property("attributeName", attributeName)
+                .Log();
+            
             var query = string.Format(CmdGetContentFieldValues, contentId, titleAttributeName, attributeName);
             var result = _uow.Connection.Query<RelatedItem>(query, new { itemId }, transaction).ToDictionary(k => k.ContentId, v => v.Name);
-            _logger.LogDebug($"GetContentFieldValue. result: {SerializeData(result)}");
+            _logger.ForDebugEvent().Message("GetContentFieldValues").Property("result", result).Log();
             return result;
         }
 
         private int GetContentIdByItemId(int id, int contentId,
             IDbTransaction transaction)
         {
-            _logger.LogDebug($"GetContentIdByItemId. id: {id}, contentId: {contentId}");
+            _logger.ForDebugEvent().Message("GetManyToOneRelatedItemNames")
+                .Property("contentId", contentId)
+                .Property("id", id)
+                .Log();
+            
             var query = string.Format(CmdGetContentIdByItemId, contentId);
             var result = _uow.Connection.QuerySingleOrDefault<int>(query, new { itemId = id }, transaction);
-            _logger.LogDebug($"GetContentIdByItemId. result: {result}");
+            _logger.ForDebugEvent().Message("GetContentIdByItemId").Property("result", result).Log();
             return result;
         }
-
-        private static string SerializeData(object data) => Newtonsoft.Json.JsonConvert.SerializeObject(data);
 
         class RelationExtension
         {

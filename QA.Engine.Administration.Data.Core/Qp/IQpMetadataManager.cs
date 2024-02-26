@@ -1,23 +1,12 @@
-﻿using Quantumart.QPublishing.Database;
-using Quantumart.QPublishing.Info;
-using System.Collections.Generic;
+﻿using System.Data;
 
 namespace QA.Engine.Administration.Data.Core.Qp
 {
+    /// <summary>
+    /// Контракт для работы с БД QP
+    /// </summary>
     public interface IQpMetadataManager
     {
-        List<ContentAttribute> GetContentAttributes(string siteName, string contentName);
-
-        List<ContentAttribute> GetContentAttributes(int contentId);
-
-        ContentAttribute GetContentAttribute(string siteName, string contentName, string fieldName);
-
-        int GetContentId(string siteName, string contentName);
-
-        string GetContentName(int contentId);
-
-        int GetSiteId(string siteName);
-
-        string GetSiteName(int siteId);
-    }
+        DataTable GetRealData(string tableName, string fields, string where);
+   }
 }

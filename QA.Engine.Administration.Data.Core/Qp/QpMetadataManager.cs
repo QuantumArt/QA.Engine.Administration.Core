@@ -1,158 +1,36 @@
-﻿using Quantumart.QPublishing.Database;
-using Quantumart.QPublishing.Info;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
+using System.Data;
 
 namespace QA.Engine.Administration.Data.Core.Qp
 {
-    /// <summary>
-    /// Менеджер метаданных QP
-    /// </summary>
     public class QpMetadataManager : IQpMetadataManager
     {
-        private readonly DBConnector _dbConnection;
+        private readonly IQpDbConnector _qpDbConnector;
 
         #region Constructors
 
-        /// <summary>
-        /// Конструирует объект
-        /// </summary>
-        /// <param name="connectionString">Строка подключения</param>
-        public QpMetadataManager(IQpDbConnector dbConnector)
+        public QpMetadataManager(IQpDbConnector qpDbConnector)
         {
-            _dbConnection = dbConnector.DbConnector;
+            _qpDbConnector = qpDbConnector;
         }
 
         #endregion
 
-        #region Methods
-
         /// <summary>
-        /// Возвращает список атрибутов контента
+        /// Возвращает результат запроса
         /// </summary>
-        /// <param name="siteName">Имя сайта</param>
-        /// <param name="contentName">Имя контента</param>
         /// <returns></returns>
-        public virtual List<ContentAttribute> GetContentAttributes(
-            string siteName,
-            string contentName)
+        public virtual DataTable GetRealData(string tableName, string fields, string where = null)
         {
-            if (string.IsNullOrEmpty(siteName))
-                throw new ArgumentNullException("siteName");
-            if (string.IsNullOrEmpty(contentName))
-                throw new ArgumentNullException("contentName");
+            if (string.IsNullOrWhiteSpace(tableName))
+                throw new ArgumentNullException(nameof(tableName));
+            if (string.IsNullOrWhiteSpace(fields))
+                throw new ArgumentNullException(nameof(fields));
 
-            return GetContentAttributes(GetContentId(
-                siteName, contentName));
+            var filterFields = string.Join(",", fields.Split(new[] {","}, StringSplitOptions.RemoveEmptyEntries));
+            var localWhere = string.IsNullOrWhiteSpace(where) ? "1 = 1" : where;
+            var command = _qpDbConnector.CreateCommand($"SELECT {filterFields} FROM {tableName} WHERE {localWhere}");
+            return _qpDbConnector.GetRealData(command);
         }
-
-        /// <summary>
-        /// Возвращает список атрибутов контента
-        /// </summary>
-        /// <param name="contentId">Идентификатор контента</param>
-        /// <returns></returns>
-        public virtual List<ContentAttribute> GetContentAttributes(
-            int contentId)
-        {
-            if (contentId <= 0)
-                throw new ArgumentException("contentId <= 0");
-
-            return _dbConnection.GetContentAttributeObjects(contentId).ToList();
-        }
-
-        /// <summary>
-        /// Возвращает атрибут контента
-        /// </summary>
-        /// <param name="siteName">Имя сайта</param>
-        /// <param name="contentName">Имя контента</param>
-        /// <param name="fieldName">Имя поля</param>
-        /// <returns></returns>
-        public virtual ContentAttribute GetContentAttribute(
-            string siteName,
-            string contentName,
-            string fieldName)
-        {
-            if (string.IsNullOrEmpty(siteName))
-                throw new ArgumentNullException("siteName");
-            if (string.IsNullOrEmpty(contentName))
-                throw new ArgumentNullException("contentName");
-            if (string.IsNullOrEmpty(fieldName))
-                throw new ArgumentNullException("fieldName");
-
-            int fieldId = _dbConnection.GetAttributeIdByNetName(
-                GetContentId(
-                    siteName,
-                    contentName), fieldName);
-
-            return _dbConnection.GetContentAttributeObject(fieldId);
-        }
-
-        /// <summary>
-        /// Возвращает идентификатор контента
-        /// </summary>
-        /// <param name="siteName">Имя сайта</param>
-        /// <param name="contentName">Имя контента</param>
-        /// <returns></returns>
-        public virtual int GetContentId(
-            string siteName,
-            string contentName)
-        {
-            if (string.IsNullOrEmpty(siteName))
-                throw new ArgumentNullException("siteName");
-            if (string.IsNullOrEmpty(contentName))
-                throw new ArgumentNullException("contentName");
-
-            int contentId = _dbConnection.GetContentId(
-                GetSiteId(siteName), contentName);
-
-            return contentId;
-        }
-
-        /// <summary>
-        /// Возвращает имя контента
-        /// </summary>
-        /// <param name="contentId">Идентификатор контента</param>
-        /// <returns></returns>
-        public virtual string GetContentName(
-            int contentId)
-        {
-            if (contentId <= 0)
-                throw new ArgumentException("contentId <= 0");
-
-            string contentName = _dbConnection.GetContentName(contentId);
-
-            return contentName;
-        }
-
-        /// <summary>
-        /// Возвращает идентификатор сайта
-        /// </summary>
-        /// <param name="siteName">Название сайта</param>
-        /// <returns></returns>
-        public virtual int GetSiteId(string siteName)
-        {
-            if (string.IsNullOrEmpty(siteName))
-                throw new ArgumentNullException("siteName");
-
-            int siteId = _dbConnection.GetSiteId(siteName);
-            return siteId;
-        }
-
-        /// <summary>
-        /// Возвращает имя сайта
-        /// </summary>
-        /// <param name="siteId">Ид. сайта</param>
-        /// <returns></returns>
-        public virtual string GetSiteName(int siteId)
-        {
-            if (siteId <= 0)
-                throw new ArgumentException("siteId <= 0");
-
-            string siteName = _dbConnection.GetSiteName(siteId);
-            return siteName;
-        }
-
-        #endregion
     }
 }

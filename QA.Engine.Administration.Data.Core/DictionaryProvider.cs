@@ -1,5 +1,4 @@
 ﻿using Dapper;
-using Microsoft.Extensions.Logging;
 using QA.DotNetCore.Engine.Persistent.Interfaces;
 using QA.Engine.Administration.Common.Core;
 using QA.Engine.Administration.Data.Interfaces.Core;
@@ -7,7 +6,7 @@ using QA.Engine.Administration.Data.Interfaces.Core.Models;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using QA.DotNetCore.Engine.Persistent.Dapper;
+using NLog;
 
 namespace QA.Engine.Administration.Data.Core
 {
@@ -15,13 +14,12 @@ namespace QA.Engine.Administration.Data.Core
     {
         private readonly IUnitOfWork _uow;
         private readonly INetNameQueryAnalyzer _netNameQueryAnalyzer;
-        private readonly ILogger<DictionaryProvider> _logger;
+        private readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
-        public DictionaryProvider(IUnitOfWork uow, INetNameQueryAnalyzer netNameQueryAnalyzer, ILogger<DictionaryProvider> logger)
+        public DictionaryProvider(IUnitOfWork uow, INetNameQueryAnalyzer netNameQueryAnalyzer)
         {
             _uow = uow;
             _netNameQueryAnalyzer = netNameQueryAnalyzer;
-            _logger = logger;
         }
 
         private string CmdGetAllItemDefinitions = @"
@@ -84,46 +82,55 @@ WHERE reg.ARCHIVE = 0
 
         public List<ItemDefinitionData> GetAllItemDefinitions(int siteId, IDbTransaction transaction = null)
         {
-            _logger.LogDebug($"getAllItemDefinitions. siteId: {siteId}");
+            _logger.ForDebugEvent().Message("GetAllItemDefinitions").Property("siteId", siteId).Log();
             var query = _netNameQueryAnalyzer.PrepareQuery(CmdGetAllItemDefinitions, siteId, false);
             var result = _uow.Connection.Query<ItemDefinitionData>(query, transaction).ToList();
-            _logger.LogDebug($"getAllItemDefinitions. total: {result.Count}");
+            _logger.ForDebugEvent().Message("GetAllItemDefinitions").Property("total", result.Count).Log();
             return result;
         }
 
         public List<StatusTypeData> GetAllStatusTypes(int siteId, IDbTransaction transaction = null)
         {
-            _logger.LogDebug($"getAllStatusTypes. siteId: {siteId}");
+            _logger.ForDebugEvent().Message("GetAllStatusTypes").Property("siteId", siteId).Log();
             var result = _uow.Connection.Query<StatusTypeData>(CmdGetAllStatusTypes, 
                 new { SiteId = siteId }, transaction).ToList();
-            _logger.LogDebug($"getAllStatusTypes. total: {result.Count}");
+            _logger.ForDebugEvent().Message("GetAllStatusTypes").Property("total", result.Count).Log();
             return result;
         }
 
         public StatusTypeData GetStatusType(int siteId, QpContentItemStatus status, IDbTransaction transaction = null)
         {
-            _logger.LogDebug($"getStatusType. siteId: {siteId}, status: {status}");
+            _logger.ForDebugEvent().Message("GetStatusType")
+                .Property("siteId", siteId)
+                .Property("status", status)
+                .Log();
+            
             var result = _uow.Connection.QueryFirst<StatusTypeData>(CmdGetStatusTypeById, 
                 new { SiteId = siteId, Status = status.GetDescription() }, transaction);
-            _logger.LogDebug($"getStatusType. statusId: {result.Id}, statusName: {result.Name}");
+
+            _logger.ForDebugEvent().Message("GetStatusType")
+                .Property("statusId", result.Id)
+                .Property("statusName", result.Name)
+                .Log();
+            
             return result;
         }
 
         public List<RegionData> GetAllRegions(int siteId, IDbTransaction transaction = null)
         {
-            _logger.LogDebug($"getAllRegions. siteId: {siteId}");
+            _logger.ForDebugEvent().Message("GetAllRegions").Property("siteId", siteId).Log();
             var query = _netNameQueryAnalyzer.PrepareQuery(GetAllRegionsQuery(), siteId, true, true);
             var result = _uow.Connection.Query<RegionData>(query, transaction).ToList();
-            _logger.LogDebug($"getAllRegions. total: {result.Count}");
+            _logger.ForDebugEvent().Message("GetAllRegions").Property("total", result.Count).Log();
             return result;
         }
 
         public List<CultureData> GetAllCultures(int siteId, IDbTransaction transaction = null)
         {
-            _logger.LogDebug($"GetAllCultures. siteId: {siteId}");
+            _logger.ForDebugEvent().Message("GetAllCultures").Property("siteId", siteId).Log();
             var query = _netNameQueryAnalyzer.PrepareQuery(CmdGetAllCultures(), siteId, true, true);
             var result = _uow.Connection.Query<CultureData>(query, transaction).ToList();
-            _logger.LogDebug($"GetAllCultures. total: {result.Count}");
+            _logger.ForDebugEvent().Message("GetAllCultures").Property("total", result.Count).Log();
             return result;
         }
     }

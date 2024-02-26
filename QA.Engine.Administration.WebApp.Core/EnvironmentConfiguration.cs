@@ -24,7 +24,7 @@ namespace QA.Engine.Administration.WebApp.Core
 
     public class FakeData
     {
-        public string DatabaseType { get; set; } = String.Empty;
+        public string DatabaseType { get; set; } = "SqlServer";
         public int UserId { get; set; }
         public string LangName { get; set; }
         public string ConnectionString { get; set; }
