@@ -36,7 +36,7 @@ export default class ArchiveTreeStore extends BaseTreeState<ArchiveModel> {
                 this.pagesCount = Math.ceil(this.origTreeInternal.length / this.MAX_SIZE);
             }
             if (number !== null) {
-                this.pageIndex = this.pageIndex < 0 ? -1 : number < 0 ? 0 : number;
+                this.pageIndex = this.pageIndex < 0 ? -1 : number > this.pagesCount - 1 ? this.pagesCount - 1 : number < 0 ? 0 : number;
             } else {
                 this.pageIndex += 1;
             }
@@ -44,7 +44,9 @@ export default class ArchiveTreeStore extends BaseTreeState<ArchiveModel> {
             if (maybePage) {
                 this.treeInternal = maybePage.mappedTree;
             } else {
-                const arr = this.origTreeInternal.splice(this.pageIndex, this.MAX_SIZE);
+                const firstElement = this.pageIndex * this.MAX_SIZE;
+                const lastElement = firstElement + this.MAX_SIZE < this.origTreeInternal.length ? firstElement + this.MAX_SIZE : this.origTreeInternal.length;
+                const arr = this.origTreeInternal.slice(firstElement, lastElement);
                 this.convertTree(arr, 'treeInternal');
                 this.pagesMap.set(this.pageIndex, {
                     originalTree: arr,
