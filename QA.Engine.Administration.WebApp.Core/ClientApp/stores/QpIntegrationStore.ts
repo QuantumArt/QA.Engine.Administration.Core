@@ -406,10 +406,8 @@ class QpIntegrationUtils {
         const result = [
             QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.parent),
             QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.discriminator),
-            // QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.zoneName),
             QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.extensionId),
             QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.versionOf),
-            QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.indexOrder),
         ];
         fields.forEach(x => result.push(QpIntegrationUtils.getField(qpfields, x)));
         return result;
@@ -417,8 +415,6 @@ class QpIntegrationUtils {
 
     static getDefaultHideFields = (qpfields: QpFieldModel[], fields: string[] = []): string[] => {
         const result = [
-            // QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.zoneName),
-            QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.indexOrder),
             QpIntegrationUtils.getField(qpfields, QpAbstractItemFields.isPage),
         ];
         fields.forEach(x => result.push(QpIntegrationUtils.getField(qpfields, x)));
