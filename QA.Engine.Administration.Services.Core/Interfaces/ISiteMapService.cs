@@ -14,7 +14,7 @@ namespace QA.Engine.Administration.Services.Core.Interfaces
         List<ArchiveModel> GetArchiveTree(int siteId);
         ArchiveModel GetArchiveSubTree(int siteId, int itemId);
 
-        List<ExtensionFieldModel> GetItemExtantionFields(int siteId, int id, int extensionId);
+        List<ExtensionFieldModel> GetItemExtensionFields(int siteId, int id, int extensionId);
         string GetRelatedItemName(int siteId, int id, int attributeId);
         Dictionary<int, string> GetManyToOneRelatedItemNames(int siteId, int id, int value, int attributeId);
     }

@@ -1,12 +1,11 @@
 ﻿using Dapper;
-using Microsoft.Extensions.Logging;
 using QA.DotNetCore.Engine.Persistent.Interfaces;
 using QA.Engine.Administration.Data.Core.Qp;
 using QA.Engine.Administration.Data.Interfaces.Core;
 using QA.Engine.Administration.Data.Interfaces.Core.Models;
-using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using NLog;
 
 namespace QA.Engine.Administration.Data.Core
 {
@@ -14,105 +13,80 @@ namespace QA.Engine.Administration.Data.Core
     {
         private readonly IMetaInfoRepository _metaInfoRepository;
         private readonly IQpMetadataManager _qpMetadataManager;
-        private readonly IQpContentManager _qpContentManager;
         private readonly IQpDbConnector _qpDbConnector;
         private readonly IUnitOfWork _uow;
-        private readonly ILogger<SettingsProvider> _logger;
+        private readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
         private string AbstractItemNetName => "QPAbstractItem";
         private string RegionNetName => "QPRegion";
 
         public SettingsProvider(
-            IMetaInfoRepository metaInfoRepository, IQpMetadataManager qpMetadataManager, IQpContentManager qpContentManager,
-            IUnitOfWork uow, IQpDbConnector qpDbConnector, ILogger<SettingsProvider> logger)
+            IMetaInfoRepository metaInfoRepository, IQpMetadataManager qpMetadataManager,
+            IUnitOfWork uow, IQpDbConnector qpDbConnector)
         {
             _metaInfoRepository = metaInfoRepository;
             _qpMetadataManager = qpMetadataManager;
-            _qpContentManager = qpContentManager;
             _qpDbConnector = qpDbConnector;
             _uow = uow;
-            _logger = logger;
         }
 
         public int GetContentId(int siteId, IDbTransaction transaction = null)
         {
-            _logger.LogDebug($"getContent. siteId: {siteId}");
+            _logger.ForDebugEvent().Message("GetContentId").Property("siteId", siteId).Log();
             var content = _metaInfoRepository.GetContent(AbstractItemNetName, siteId);
-            _logger.LogDebug($"getContent. contentId: {content.ContentId}");
+            _logger.ForDebugEvent().Message("GetContentId").Property("contentId", content.ContentId).Log();
             return content.ContentId;
         }
 
         public bool HasRegion(int siteId, IDbTransaction transaction = null)
         {
-            _logger.LogDebug($"hasRegion. siteId: {siteId}");
+            _logger.ForDebugEvent().Message("HasRegion").Property("siteId", siteId).Log();
             var content = _metaInfoRepository.GetContent(RegionNetName, siteId);
-            _logger.LogDebug($"hasRegion. hasregion: {content != null}");
-            return content != null;
+            var hasRegion = content != null;
+            _logger.ForDebugEvent().Message("HasRegion").Property("hasRegion", hasRegion).Log();
+            return hasRegion;
         }
 
         public QpContentData GetContent(int siteId, string contentName, IDbTransaction transaction = null)
         {
-            _logger.LogDebug($"getContent. siteId: {siteId}, contentName: {contentName}");
-            var siteName = _qpMetadataManager.GetSiteName(siteId);
-            var contents = _qpContentManager
-                      .Connect()
-                      .SiteName(siteName)
-                      .ContentName("CONTENT")
-                      .Fields("CONTENT_ID, CONTENT_NAME, NET_CONTENT_NAME")
-                      .Where($"NET_CONTENT_NAME = '{contentName}'")
-                      .GetRealData();
-
-            var result = contents.PrimaryContent.Select()
+            _logger.ForDebugEvent().Message("GetContent")
+                .Property("siteId", siteId)
+                .Property("contentName", contentName)
+                .Log();
+            var result = _qpMetadataManager.GetRealData(
+                    "CONTENT",
+                    "CONTENT_ID, CONTENT_NAME, NET_CONTENT_NAME",
+                        $"NET_CONTENT_NAME = '{contentName}'"
+                )
+                .AsEnumerable()
                 .Select(x => new QpContentData
                 {
-                    Id = int.Parse(x["CONTENT_ID"].ToString()),
+                    Id = int.Parse(x["CONTENT_ID"].ToString() ?? "0"),
                     Name = x["NET_CONTENT_NAME"].ToString()
-                }).ToList();
+                }).FirstOrDefault();
 
-            _logger.LogDebug($"getContent. contentId: {result.FirstOrDefault()?.Id}, contentName: {result.FirstOrDefault()?.Name }");
-
-            return result.FirstOrDefault();
-        }
-
-        public List<QpFieldData> GetFields(int siteId, int contentId, IDbTransaction transaction = null)
-        {
-            _logger.LogDebug($"getFields. siteId: {siteId}, contentId: {contentId}");
-            var siteName = _qpMetadataManager.GetSiteName(siteId);
-            var fields = _qpContentManager
-                .Connect()
-                .SiteName(siteName)
-                .ContentName("CONTENT_ATTRIBUTE")
-                .Fields("ATTRIBUTE_ID, CONTENT_ID, ATTRIBUTE_NAME, NET_ATTRIBUTE_NAME")
-                .Where($"NET_ATTRIBUTE_NAME is not null AND CONTENT_ID = {contentId}")
-                .GetRealData();
-
-            var result = fields.PrimaryContent.Select()
-                .Select(x => new QpFieldData
-                {
-                    Id = int.Parse(x["ATTRIBUTE_ID"].ToString()),
-                    Name = x["NET_ATTRIBUTE_NAME"].ToString()
-                }).ToList();
-
-            _logger.LogDebug($"getFields. fields: {Newtonsoft.Json.JsonConvert.SerializeObject(result)}");
+            _logger.ForDebugEvent().Message("GetContent")
+                .Property("contentId", result?.Id ?? 0)
+                .Property("contentName", result?.Name ?? "");
 
             return result;
         }
 
         public string GetIconUrl(int siteId, IDbTransaction transaction = null)
         {
-            _logger.LogDebug($"getIconUrl. siteId: {siteId}");
+            _logger.ForDebugEvent().Message("GetIconUrl").Property("siteId", siteId).Log();
             var fieldId = _qpDbConnector.DbConnector.GetAttributeIdByNetNames(siteId, "QPDiscriminator", "IconUrl");
             var url = _qpDbConnector.DbConnector.GetUrlForFileAttribute(fieldId, true, false);
-            _logger.LogDebug($"getIconUrl. url: {url}");
+            _logger.ForDebugEvent().Message("GetIconUrl").Property("url", url).Log();
             return url;
         }
 
         public CustomActionData GetCustomAction(string alias, IDbTransaction transaction = null)
         {
-            _logger.LogDebug($"getCustomActionCode. alias: {alias}");
+            _logger.ForDebugEvent().Message("GetCustomAction").Property("alias", alias).Log();
             var query = $"SELECT c.ID as Id, b.CODE as Code FROM CUSTOM_ACTION c JOIN BACKEND_ACTION b ON c.ACTION_ID=b.ID WHERE ALIAS='{alias.ToLower()}'";
             var result = _uow.Connection.QuerySingleOrDefault<CustomActionData>(query);
-            _logger.LogDebug($"getCustomActionCode. result: {Newtonsoft.Json.JsonConvert.SerializeObject(result)}");
+            _logger.ForDebugEvent().Message("GetCustomAction").Property("result", result).Log();            
             return result;
         }
     }

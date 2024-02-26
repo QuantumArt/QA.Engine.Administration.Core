@@ -7,8 +7,8 @@ using System.Linq;
 using QA.Engine.Administration.Data.Interfaces.Core.Models;
 using QA.Engine.Administration.Services.Core.Models;
 using QA.Engine.Administration.Services.Core.Filters;
-using Microsoft.Extensions.Logging;
 using System.Diagnostics;
+using NLog;
 
 namespace QA.Engine.Administration.Services.Core
 {
@@ -20,12 +20,12 @@ namespace QA.Engine.Administration.Services.Core
         private readonly ISettingsProvider _settingsProvider;
         private readonly IItemExtensionProvider _itemExtensionProvider;
         private readonly IMapper _mapper;
-        private readonly ILogger<SiteMapService> _logger;
+        private readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
         public SiteMapService(
-            ISiteMapProvider siteMapProvider, IWidgetProvider widgetProvider, 
+            ISiteMapProvider siteMapProvider, IWidgetProvider widgetProvider,
             IDictionaryProvider dictionaryProvider, ISettingsProvider settingsProvider,
-            IItemExtensionProvider itemExtensionProvider, IMapper mapper, ILogger<SiteMapService> logger)
+            IItemExtensionProvider itemExtensionProvider, IMapper mapper)
         {
             _siteMapProvider = siteMapProvider;
             _widgetProvider = widgetProvider;
@@ -33,34 +33,32 @@ namespace QA.Engine.Administration.Services.Core
             _settingsProvider = settingsProvider;
             _itemExtensionProvider = itemExtensionProvider;
             _mapper = mapper;
-            _logger = logger;
         }
 
-        public List<PageModel> GetSiteMapItems(int siteId, bool isArchive, int? parentId, int[] regionIds = null, bool? useHierarchyRegionFilter = null)
+        public List<PageModel> GetSiteMapItems(int siteId, bool isArchive, int? parentId, int[] regionIds = null,
+            bool? useHierarchyRegionFilter = null)
         {
-            Func<AbstractItemData, bool> regionFilter = x => true;
+            Func<AbstractItemData, bool> regionFilter = _ => true;
             var useRegion = _settingsProvider.HasRegion(siteId);
             if (useRegion)
             {
-                _logger.LogTrace("Use region filter");
                 var rootPage = _siteMapProvider.GetRootPage(siteId);
                 var regions = _dictionaryProvider.GetAllRegions(siteId);
                 var filter = RegionFilterFactory.Create(rootPage, regions, useHierarchyRegionFilter ?? false);
                 regionFilter = filter.GetFilter(regionIds);
             }
-            
-            var iconUrl = _settingsProvider.GetIconUrl(siteId);
 
-            var items = _siteMapProvider.GetItems(siteId, isArchive, parentId.HasValue ? new[] { parentId.Value } : null, useRegion)
+            var parentFilter = parentId.HasValue ? new[] { parentId.Value } : null;
+            var items = _siteMapProvider.GetItems(siteId, isArchive, parentFilter, useRegion)
                 .Where(regionFilter)
                 .Select(x => _mapper.Map<PageModel>(x))
                 .ToList();
-            // items.ForEach(x => x.IconUrl = $"{iconUrl}/{x.IconUrl}");
-            var children = _siteMapProvider.GetItems(siteId, isArchive, items.Select(x => x.Id), useRegion)
+
+            var childFilter = items.Select(x => x.Id).ToArray();
+            var children = _siteMapProvider.GetItems(siteId, isArchive, childFilter, useRegion)
                 .Where(regionFilter)
                 .Select(x => _mapper.Map<PageModel>(x))
                 .ToList();
-            // children.ForEach(x => x.IconUrl = $"{iconUrl}/{x.IconUrl}");
 
             foreach (var item in items)
                 item.Children = children.Where(x => x.ParentId == item.Id).ToList();
@@ -68,31 +66,30 @@ namespace QA.Engine.Administration.Services.Core
             return items;
         }
 
-        public List<WidgetModel> GetWidgetItems(int siteId, bool isArchive, int parentId, int[] regionIds = null, bool? useHierarchyRegionFilter = null)
+        public List<WidgetModel> GetWidgetItems(int siteId, bool isArchive, int parentId, int[] regionIds = null,
+            bool? useHierarchyRegionFilter = null)
         {
-            Func<AbstractItemData, bool> regionFilter = x => true;
+            Func<AbstractItemData, bool> regionFilter = _ => true;
             var useRegion = _settingsProvider.HasRegion(siteId);
             if (useRegion)
             {
-                _logger.LogTrace("Use region filter");
                 var rootPage = _siteMapProvider.GetRootPage(siteId);
                 var regions = _dictionaryProvider.GetAllRegions(siteId);
                 var filter = RegionFilterFactory.Create(rootPage, regions, useHierarchyRegionFilter ?? false);
                 regionFilter = filter.GetFilter(regionIds);
             }
 
-            var iconUrl = _settingsProvider.GetIconUrl(siteId);
+            var parentFilter = new[] { parentId };
+            var items = _widgetProvider.GetItems(siteId, isArchive, parentFilter)
+                .Where(regionFilter)
+                .Select(x => _mapper.Map<WidgetModel>(x))
+                .ToList();
 
-            var items = _widgetProvider.GetItems(siteId, isArchive, new[] { parentId })
+            var childFilter = items.Select(x => x.Id);
+            var children = _widgetProvider.GetItems(siteId, isArchive, childFilter)
                 .Where(regionFilter)
                 .Select(x => _mapper.Map<WidgetModel>(x))
                 .ToList();
-            // items.ForEach(x => x.IconUrl = $"{iconUrl}/{x.IconUrl}");
-            var children = _widgetProvider.GetItems(siteId, isArchive, items.Select(x => x.Id))
-                .Where(regionFilter)
-                .Select(x => _mapper.Map<WidgetModel>(x))
-                .ToList();
-            // children.ForEach(x => x.IconUrl = $"{iconUrl}/{x.IconUrl}");
 
             foreach (var item in items)
                 item.Children = children.Where(x => x.ParentId == item.Id).ToList();
@@ -102,92 +99,116 @@ namespace QA.Engine.Administration.Services.Core
 
         public List<PageModel> GetSiteMapTree(int siteId, int[] regionIds = null, bool? useHierarchyRegionFilter = null)
         {
-            _logger.LogTrace($"GetSiteMapStructure siteId={siteId}, regionIds={string.Join(", ", regionIds)}, useHierarchyRegionFilter={useHierarchyRegionFilter}");
-            Func<AbstractItemData, bool> regionFilter = x => true;
             var useRegion = _settingsProvider.HasRegion(siteId);
+            _logger.ForDebugEvent().Message("GetSiteMapSubStructure")
+                .Property("siteId", siteId)
+                .Property("regionIds", regionIds != null ? string.Join(", ", regionIds) : "")
+                .Property("useRegion", useRegion)
+                .Property("useHierarchyRegionFilter", useHierarchyRegionFilter)
+                .Log();
+
+            Func<AbstractItemData, bool> regionFilter = _ => true;
             if (useRegion)
             {
-                _logger.LogTrace("Use region filter");
                 var rootPage = _siteMapProvider.GetRootPage(siteId);
                 var regions = _dictionaryProvider.GetAllRegions(siteId);
                 var filter = RegionFilterFactory.Create(rootPage, regions, useHierarchyRegionFilter ?? false);
                 regionFilter = filter.GetFilter(regionIds);
             }
 
-            var iconUrl = _settingsProvider.GetIconUrl(siteId);
-
             var stopwatch = new Stopwatch();
             stopwatch.Start();
             var abstractItems = _siteMapProvider.GetAllItems(siteId, false, useRegion)
                 .Where(regionFilter)
                 .ToList();
-            // abstractItems.ForEach(x => x.IconUrl = $"{iconUrl}/{x.IconUrl}");
             stopwatch.Stop();
-            _logger.LogTrace($"get all abstract items {stopwatch.ElapsedMilliseconds}ms");
+            _logger.ForDebugEvent().Message("GetSiteMapTree: loading all abstract items")
+                .Property("elapsed", stopwatch.ElapsedMilliseconds)
+                .Log();
 
             stopwatch.Reset();
             stopwatch.Start();
 
-            var pages = abstractItems.Where(x => x.IsPage).Select(x => _mapper.Map<PageModel>(x)).OrderBy(x => x.IndexOrder).ToList();
-            var widgets = abstractItems.Where(x => !x.IsPage).Select(x => _mapper.Map<WidgetModel>(x)).OrderBy(x => x.IndexOrder).ToList();
+            var pages = abstractItems.Where(x => x.IsPage).Select(x => _mapper.Map<PageModel>(x))
+                .OrderBy(x => x.IndexOrder).ToList();
+            var widgets = abstractItems.Where(x => !x.IsPage).Select(x => _mapper.Map<WidgetModel>(x))
+                .OrderBy(x => x.IndexOrder).ToList();
 
             var result = SiteMapStructureBuilder.GetPageTree(pages, widgets);
+
             stopwatch.Stop();
-            _logger.LogTrace($"convert abstract items to tree {stopwatch.ElapsedMilliseconds}ms");
+            _logger.ForDebugEvent().Message("GetSiteMapTree: convert abstract items to tree")
+                .Property("elapsed", stopwatch.ElapsedMilliseconds)
+                .Log();
 
             return result;
         }
 
-        public PageModel GetSiteMapSubTree(int siteId, int itemId, int[] regionIds = null, bool? useHierarchyRegionFilter = null)
+        public PageModel GetSiteMapSubTree(int siteId, int itemId, int[] regionIds = null,
+            bool? useHierarchyRegionFilter = null)
         {
-            _logger.LogTrace($"GetSiteMapSubStructure siteId={siteId}, regionIds={string.Join(", ", regionIds)}, useHierarchyRegionFilter={useHierarchyRegionFilter}");
-            Func<AbstractItemData, bool> regionFilter = x => true;
             var useRegion = _settingsProvider.HasRegion(siteId);
+            _logger.ForDebugEvent().Message("GetSiteMapSubTree")
+                .Property("siteId", siteId)
+                .Property("regionIds", regionIds != null ? string.Join(", ", regionIds) : "")
+                .Property("useRegion", useRegion)
+                .Property("useHierarchyRegionFilter", useHierarchyRegionFilter)
+                .Log();
+            Func<AbstractItemData, bool> regionFilter = _ => true;
             if (useRegion)
             {
-                _logger.LogTrace("Use region filter");
                 var rootPage = _siteMapProvider.GetRootPage(siteId);
                 var regions = _dictionaryProvider.GetAllRegions(siteId);
                 var filter = RegionFilterFactory.Create(rootPage, regions, useHierarchyRegionFilter ?? false);
                 regionFilter = filter.GetFilter(regionIds);
             }
 
-            var iconUrl = _settingsProvider.GetIconUrl(siteId);
-
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            var abstractItems = _siteMapProvider.GetAllItems(siteId, false, useRegion)
+
+            var ids = new[] { itemId };
+            var abstractItems = _siteMapProvider.GetByIds(siteId, false, ids, useRegion, true)
                 .Where(regionFilter)
                 .ToList();
-            // abstractItems.ForEach(x => x.IconUrl = $"{iconUrl}/{x.IconUrl}");
+
             stopwatch.Stop();
-            _logger.LogTrace($"get all abstract items {stopwatch.ElapsedMilliseconds}ms");
+            _logger.ForDebugEvent().Message("GetSiteMapSubTree: loading abstract items")
+                .Property("elapsed", stopwatch.ElapsedMilliseconds)
+                .Log();
 
             stopwatch.Reset();
             stopwatch.Start();
 
-            var pages = abstractItems.Where(x => x.IsPage).Select(x => _mapper.Map<PageModel>(x)).OrderBy(x => x.IndexOrder).ToList();
-            var widgets = abstractItems.Where(x => !x.IsPage).Select(x => _mapper.Map<WidgetModel>(x)).OrderBy(x => x.IndexOrder).ToList();
+            var pages = abstractItems.Where(x => x.IsPage).Select(x => _mapper.Map<PageModel>(x))
+                .OrderBy(x => x.IndexOrder).ToList();
+            var widgets = abstractItems.Where(x => !x.IsPage).Select(x => _mapper.Map<WidgetModel>(x))
+                .OrderBy(x => x.IndexOrder).ToList();
 
             var result = SiteMapStructureBuilder.GetPageSubTree(itemId, pages, widgets);
             stopwatch.Stop();
-            _logger.LogTrace($"convert abstract items to tree {stopwatch.ElapsedMilliseconds}ms");
+            _logger.ForDebugEvent().Message("GetSiteMapSubTree: converting abstract items to tree")
+                .Property("elapsed", stopwatch.ElapsedMilliseconds)
+                .Log();
 
             return result.FirstOrDefault();
         }
 
         public List<ArchiveModel> GetArchiveTree(int siteId)
         {
-            _logger.LogTrace($"GetArchiveStructure siteId={siteId}");
             var useRegion = _settingsProvider.HasRegion(siteId);
-            var iconUrl = _settingsProvider.GetIconUrl(siteId);
+            _logger.ForDebugEvent().Message("GetArchiveTree")
+                .Property("siteId", siteId)
+                .Property("useRegion", useRegion)
+                .Log();
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
             var abstractItems = _siteMapProvider.GetAllItems(siteId, true, useRegion);
-            // abstractItems.ForEach(x => x.IconUrl = $"{iconUrl}/{x.IconUrl}");
             stopwatch.Stop();
-            _logger.LogTrace($"get all archive abstract items {stopwatch.ElapsedMilliseconds}ms");
+
+            _logger.ForDebugEvent().Message("GetArchiveTree: loading all abstract items")
+                .Property("elapsed", stopwatch.ElapsedMilliseconds)
+                .Log();
 
             stopwatch.Reset();
             stopwatch.Start();
@@ -196,23 +217,33 @@ namespace QA.Engine.Administration.Services.Core
 
             var result = SiteMapStructureBuilder.GetArchiveTree(archives);
             stopwatch.Stop();
-            _logger.LogTrace($"convert abstract items to tree {stopwatch.ElapsedMilliseconds}ms");
+
+            _logger.ForDebugEvent().Message("GetArchiveTree: converting archive abstract items to tree")
+                .Property("elapsed", stopwatch.ElapsedMilliseconds)
+                .Log();
 
             return result;
         }
 
         public ArchiveModel GetArchiveSubTree(int siteId, int itemId)
         {
-            _logger.LogTrace($"GetArchiveSubStructure siteId={siteId}, itemId={itemId}");
             var useRegion = _settingsProvider.HasRegion(siteId);
-            var iconUrl = _settingsProvider.GetIconUrl(siteId);
+
+            _logger.ForDebugEvent().Message("GetArchiveSubTree")
+                .Property("siteId", siteId)
+                .Property("itemId", itemId)
+                .Property("useRegion", useRegion)
+                .Log();
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            var abstractItems = _siteMapProvider.GetAllItems(siteId, true, useRegion);
-            // abstractItems.ForEach(x => x.IconUrl = $"{iconUrl}/{x.IconUrl}");
+            var itemIds = new[] { itemId };
+            var abstractItems = _siteMapProvider.GetByIds(siteId, true, itemIds, useRegion, true);
             stopwatch.Stop();
-            _logger.LogTrace($"get all archive abstract items {stopwatch.ElapsedMilliseconds}ms");
+
+            _logger.ForDebugEvent().Message("GetArchiveSubTree: loading archive abstract items")
+                .Property("elapsed", stopwatch.ElapsedMilliseconds)
+                .Log();
 
             stopwatch.Reset();
             stopwatch.Start();
@@ -221,12 +252,15 @@ namespace QA.Engine.Administration.Services.Core
 
             var result = SiteMapStructureBuilder.GetArchiveSubTree(itemId, archives);
             stopwatch.Stop();
-            _logger.LogTrace($"convert archive abstract items to tree {stopwatch.ElapsedMilliseconds}ms");
+
+            _logger.ForDebugEvent().Message("GetArchiveSubTree: converting archive abstract items to tree")
+                .Property("elapsed", stopwatch.ElapsedMilliseconds)
+                .Log();
 
             return result.FirstOrDefault();
         }
 
-        public List<ExtensionFieldModel> GetItemExtantionFields(int siteId, int id, int extensionId)
+        public List<ExtensionFieldModel> GetItemExtensionFields(int siteId, int id, int extensionId)
         {
             var fields = _itemExtensionProvider.GetItemExtensionFields(siteId, id, extensionId);
             var result = _mapper.Map<List<ExtensionFieldModel>>(fields);

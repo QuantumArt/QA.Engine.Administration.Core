@@ -1,7 +1,5 @@
 ﻿using Dapper;
-using Microsoft.Extensions.Logging;
 using QA.DotNetCore.Engine.Persistent.Interfaces;
-using QA.Engine.Administration.Data.Core.Qp;
 using QA.Engine.Administration.Data.Interfaces.Core;
 using QA.Engine.Administration.Data.Interfaces.Core.Models;
 using System;
@@ -9,7 +7,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
-using Microsoft.SqlServer.Server;
+using NLog;
 using QA.DotNetCore.Engine.Persistent.Dapper;
 
 namespace QA.Engine.Administration.Data.Core
@@ -18,14 +16,12 @@ namespace QA.Engine.Administration.Data.Core
     {
         private readonly IUnitOfWork _uow;
         private readonly INetNameQueryAnalyzer _netNameQueryAnalyzer;
-        private readonly ILogger<SiteMapProvider> _logger;
+        private readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
-        public SiteMapProvider(IUnitOfWork uow, INetNameQueryAnalyzer netNameQueryAnalyzer,
-            ILogger<SiteMapProvider> logger)
+        public SiteMapProvider(IUnitOfWork uow, INetNameQueryAnalyzer netNameQueryAnalyzer)
         {
             _netNameQueryAnalyzer = netNameQueryAnalyzer;
             _uow = uow;
-            _logger = logger;
         }
 
         #region запросы с использованием NetName таблиц и столбцов
@@ -53,10 +49,13 @@ SELECT
     def.|QPDiscriminator.IsPage| as IsPage,
     def.|QPDiscriminator.Title| as DiscriminatorTitle,
     def.|QPDiscriminator.IconUrl| as IconUrl,
-    CASE WHEN ai.STATUS_TYPE_ID IN (SELECT st.STATUS_TYPE_ID FROM STATUS_TYPE st WHERE st.STATUS_TYPE_NAME=N'Published') THEN 1 ELSE 0 END AS Published
+    CASE WHEN ai.STATUS_TYPE_ID IN (
+        SELECT st.STATUS_TYPE_ID FROM STATUS_TYPE st WHERE st.STATUS_TYPE_NAME=N'Published'
+    ) THEN 1 ELSE 0 END AS Published
 FROM |QPAbstractItem| ai
 INNER JOIN |QPDiscriminator| def on ai.|QPAbstractItem.Discriminator| = def.content_item_id
-WHERE ai.archive={(isArchive ? "1" : "0")} 
+INNER JOIN content_item ci on ai.content_item_id = ci.content_item_id
+WHERE ci.archive={(isArchive ? "1" : "0")} 
 ORDER BY ai.|QPAbstractItem.Parent|, ai.|QPAbstractItem.IndexOrder|, ai.content_item_id
 ";
             return _netNameQueryAnalyzer.PrepareQuery(query, siteId, false, true);
@@ -66,8 +65,11 @@ ORDER BY ai.|QPAbstractItem.Parent|, ai.|QPAbstractItem.IndexOrder|, ai.content_
 
         #region get abstract items with parent
 
-        private string GetAbstractItemsQuery(int siteId, bool isArchive, string parentExpression)
+        private string GetAbstractItemsQuery(int siteId, bool isArchive, string parentExpression, bool onlyPages)
         {
+            var onlyPagesFilter = onlyPages
+                ? "AND def.|QPDiscriminator.IsPage|=1 AND ai.|QPAbstractItem.VersionOf| is null"
+                : "";
             var query = $@"
 SELECT
     ai.content_item_id AS Id,
@@ -87,16 +89,15 @@ SELECT
     def.|QPDiscriminator.IsPage| as IsPage,
     def.|QPDiscriminator.Title| as DiscriminatorTitle,
     def.|QPDiscriminator.IconUrl| as IconUrl,
-    CASE WHEN ai.STATUS_TYPE_ID IN (SELECT st.STATUS_TYPE_ID FROM STATUS_TYPE st WHERE st.STATUS_TYPE_NAME=N'Published') THEN 1 ELSE 0 END AS Published
+    CASE WHEN ai.STATUS_TYPE_ID IN (
+        SELECT st.STATUS_TYPE_ID FROM STATUS_TYPE st WHERE st.STATUS_TYPE_NAME=N'Published'
+    ) THEN 1 ELSE 0 END AS Published
 FROM |QPAbstractItem| ai
 INNER JOIN |QPDiscriminator| def on ai.|QPAbstractItem.Discriminator| = def.content_item_id
-WHERE ai.archive={(isArchive ? "1" : "0")} 
-AND def.|QPDiscriminator.IsPage|=1 AND ai.|QPAbstractItem.VersionOf| is null 
-    AND (
-        ai.|QPAbstractItem.Parent| {parentExpression}
-        OR EXISTS (SELECT 1 FROM |QPAbstractItem| ai1 
-            WHERE ai.|QPAbstractItem.Parent| {parentExpression} AND ai1.content_item_id=ai.|QPAbstractItem.VersionOf|)
-    )
+INNER JOIN content_item ci on ai.content_item_id = ci.content_item_id
+WHERE ci.archive={(isArchive ? "1" : "0")} 
+{onlyPagesFilter} 
+    AND (ai.|QPAbstractItem.Parent| {parentExpression} OR ai.|QPAbstractItem.VersionOf| {parentExpression})
 ORDER BY ai.|QPAbstractItem.Parent|, ai.|QPAbstractItem.IndexOrder|, ai.content_item_id
 ";
             return _netNameQueryAnalyzer.PrepareQuery(query, siteId, false, true);
@@ -112,6 +113,7 @@ ORDER BY ai.|QPAbstractItem.Parent|, ai.|QPAbstractItem.IndexOrder|, ai.content_
 SELECT
     ai.content_item_id AS Id,
     ai.archive AS Archive,
+    ai.visible AS Visible,
     ai.|QPAbstractItem.Name| as Alias,
     ai.|QPAbstractItem.Title| as Title,
     ai.|QPAbstractItem.Parent| AS ParentId,
@@ -126,10 +128,13 @@ SELECT
     def.|QPDiscriminator.IsPage| as IsPage,
     def.|QPDiscriminator.Title| as DiscriminatorTitle,
     def.|QPDiscriminator.IconUrl| as IconUrl,
-    CASE WHEN ai.STATUS_TYPE_ID IN (SELECT st.STATUS_TYPE_ID FROM STATUS_TYPE st WHERE st.STATUS_TYPE_NAME=N'Published') THEN 1 ELSE 0 END AS Published
+    CASE WHEN ai.STATUS_TYPE_ID IN (
+        SELECT st.STATUS_TYPE_ID FROM STATUS_TYPE st WHERE st.STATUS_TYPE_NAME=N'Published'
+    ) THEN 1 ELSE 0 END AS Published
 FROM |QPAbstractItem| ai
 INNER JOIN |QPDiscriminator| def on ai.|QPAbstractItem.Discriminator| = def.content_item_id
-WHERE ai.archive={(isArchive ? "1" : "0")} AND ai.content_item_id IN (SELECT Id FROM {idsExpression})
+INNER JOIN content_item ci on ai.content_item_id = ci.content_item_id
+WHERE ci.archive={(isArchive ? "1" : "0")} AND ai.content_item_id IN (SELECT Id FROM {idsExpression})
 ";
             return _netNameQueryAnalyzer.PrepareQuery(query, siteId, false, true);
         }
@@ -157,10 +162,14 @@ SELECT
     def.|QPDiscriminator.IsPage| as IsPage,
     def.|QPDiscriminator.Title| as DiscriminatorTitle,
     def.|QPDiscriminator.IconUrl| as IconUrl,
-    CASE WHEN ai.STATUS_TYPE_ID IN (SELECT st.STATUS_TYPE_ID FROM STATUS_TYPE st WHERE st.STATUS_TYPE_NAME=N'Published') THEN 1 ELSE 0 END AS Published
+    CASE WHEN ai.STATUS_TYPE_ID IN (
+        SELECT st.STATUS_TYPE_ID FROM STATUS_TYPE st WHERE st.STATUS_TYPE_NAME=N'Published'
+    ) THEN 1 ELSE 0 END AS Published
 FROM |QPAbstractItem| ai
 INNER JOIN |QPDiscriminator| def on ai.|QPAbstractItem.Discriminator| = def.content_item_id
-WHERE ai.archive=0 AND ai.|QPAbstractItem.Parent| IS NULL AND ai.|QPAbstractItem.VersionOf| IS NULL AND def.|QPDiscriminator.IsPage|=1
+INNER JOIN content_item ci on ai.content_item_id = ci.content_item_id
+WHERE ci.archive=0 AND ai.|QPAbstractItem.Parent| IS NULL 
+    AND ai.|QPAbstractItem.VersionOf| IS NULL AND def.|QPDiscriminator.IsPage|=1
 ORDER BY ai.content_item_id";
 
         private string GetRegionsQuery(int siteId, bool isArchive = false)
@@ -178,9 +187,10 @@ ORDER BY ai.content_item_id";
 
         private string GetRegionLinkIdQuery(int siteId)
         {
-            string query =
-                $@"SELECT {SqlQuerySyntaxHelper.Top(_uow.DatabaseType, "1")} |QPAbstractItem.Regions| FROM |QPAbstractItem| WHERE |QPAbstractItem.Regions|
-                IS NOT NULL {SqlQuerySyntaxHelper.Limit(_uow.DatabaseType, "1")}";
+            string query = $@"
+SELECT {SqlQuerySyntaxHelper.Top(_uow.DatabaseType, "1")} |QPAbstractItem.Regions| FROM |QPAbstractItem| 
+WHERE |QPAbstractItem.Regions| IS NOT NULL {SqlQuerySyntaxHelper.Limit(_uow.DatabaseType, "1")}
+            ";
             return _netNameQueryAnalyzer.PrepareQuery(query, siteId, false, true);
         }
 
@@ -193,17 +203,30 @@ ORDER BY ai.content_item_id";
 
         #endregion
 
-        public List<AbstractItemData> GetAllItems(int siteId, bool isArchive, bool useRegion, IDbTransaction transaction = null)
+        public List<AbstractItemData> GetAllItems(int siteId, bool isArchive, bool useRegion,
+            IDbTransaction transaction = null)
         {
-            _logger.LogDebug($"getAllItems. siteId: {siteId}, isArchive: {isArchive}, useRegion: {useRegion}");
+            _logger.ForDebugEvent().Message("GetAllItems")
+                .Property("siteId", siteId)
+                .Property("isArchive", isArchive)
+                .Property("useRegion", useRegion)
+                .Log();
+
             var stopwatch = new Stopwatch();
             stopwatch.Start();
+
             string query = GetAllAbstractItemsQuery(siteId, isArchive);
             var items = _uow.Connection.Query<AbstractItemData>(query, transaction).ToList();
-            _logger.LogDebug($"getAllItems. count: {items.Count}. {stopwatch.ElapsedMilliseconds}ms");
+
+            _logger.ForDebugEvent().Message("GetAllItems")
+                .Property("count", items.Count)
+                .Property("elapsed", stopwatch.ElapsedMilliseconds)
+                .Log();
+
             if (useRegion)
             {
-                var regions = _uow.Connection.Query<RegionData>(GetRegionsQuery(siteId, isArchive), transaction).ToList();
+                var regions = _uow.Connection.Query<RegionData>(GetRegionsQuery(siteId, isArchive), transaction)
+                    .ToList();
                 var regionLinkId = _uow.Connection.QueryFirst<int>(GetRegionLinkIdQuery(siteId), transaction);
                 var links = _uow.Connection.Query<LinkItem>(GetLinkItemIdQuery(regionLinkId), transaction)
                     .ToList()
@@ -223,58 +246,75 @@ ORDER BY ai.content_item_id";
             return items;
         }
 
-        public List<AbstractItemData> GetItems(int siteId, 
-            bool isArchive, 
-            IEnumerable<int> parentIds, 
-            bool useRegion, 
+        public List<AbstractItemData> GetItems(int siteId,
+            bool isArchive,
+            IEnumerable<int> parentIds,
+            bool useRegion,
+            bool loadChildren = false,
             IDbTransaction transaction = null)
         {
-            _logger.LogDebug(
-                $"getItems. siteId: {siteId}, isArchive: {isArchive}, useRegion: {useRegion}, parentIds: {SerializeData(parentIds)}");
+            var parentIdsArr = parentIds?.ToArray() ?? Array.Empty<int>();
+
+            _logger.ForDebugEvent().Message("GetItems")
+                .Property("siteId", siteId)
+                .Property("isArchive", isArchive)
+                .Property("useRegion", useRegion)
+                .Property("loadChildren", loadChildren)
+                .Property("parentIds", parentIdsArr)
+                .Log();
 
             const int maxParentIdsPerRequest = 500;
 
             List<AbstractItemData> items;
             string query;
-            if (parentIds == null || !parentIds.Any())
+            if (!parentIdsArr.Any())
             {
-                query = GetAbstractItemsQuery(siteId, isArchive, "IS NULL");
+                query = GetAbstractItemsQuery(siteId, isArchive, "IS NULL", !loadChildren);
                 items = _uow.Connection.Query<AbstractItemData>(query, transaction).ToList();
                 if (useRegion)
                 {
                     AddRegionInfo(siteId, isArchive, items);
                 }
 
-                _logger.LogDebug($"getItems. count: {items.Count}");
+                _logger.ForDebugEvent().Message("GetItems").Property("count", items.Count).Log();
                 return items;
             }
 
-            if (parentIds.Count() > maxParentIdsPerRequest)
+            if (parentIdsArr.Length > maxParentIdsPerRequest)
             {
+                _logger.ForDebugEvent().Message("GetItems: limit exceeded")
+                    .Property("limit", parentIdsArr.Length)
+                    .Property("Length", maxParentIdsPerRequest)
+                    .Log();
+
                 items = new List<AbstractItemData>();
-                for (var i = 0; i < (float) parentIds.Count() / maxParentIdsPerRequest; i++)
+                for (var i = 0; i < (float)parentIdsArr.Length / maxParentIdsPerRequest; i++)
                 {
-                    int[] r = parentIds.Skip(i * maxParentIdsPerRequest).Take(maxParentIdsPerRequest).ToArray();
-                    items.AddRange(GetItems(siteId, isArchive, r, useRegion));
+                    int[] r = parentIdsArr.Skip(i * maxParentIdsPerRequest).Take(maxParentIdsPerRequest).ToArray();
+                    items.AddRange(GetItems(siteId, isArchive, r, useRegion, loadChildren));
                 }
 
-                _logger.LogDebug($"getItems. count: {items.Count}");
+                _logger.ForDebugEvent().Message("GetItems").Property("count", items.Count).Log();
                 return items;
             }
 
             var idList = SqlQuerySyntaxHelper.IdList(_uow.DatabaseType, "@ParentIds", "parentIds");
-            query = GetAbstractItemsQuery(siteId, isArchive, $"IN (SELECT Id FROM {idList})");
+            query = GetAbstractItemsQuery(siteId, isArchive, $"IN (SELECT Id FROM {idList})", !loadChildren);
 
             if (_uow.DatabaseType == DatabaseType.SqlServer)
             {
                 items = _uow.Connection.Query<AbstractItemData>(query,
-                        new {ParentIds = SqlQuerySyntaxHelper.IdsToDataTable(parentIds).AsTableValuedParameter("Ids")},
+                        new
+                        {
+                            ParentIds = SqlQuerySyntaxHelper.IdsToDataTable(parentIdsArr).AsTableValuedParameter("Ids")
+                        },
                         transaction)
                     .ToList();
             }
             else
             {
-                items = _uow.Connection.Query<AbstractItemData>(query, new {ParentIds = parentIds}, transaction).ToList();
+                items = _uow.Connection.Query<AbstractItemData>(query, new { ParentIds = parentIdsArr }, transaction)
+                    .ToList();
             }
 
             if (useRegion)
@@ -282,10 +322,18 @@ ORDER BY ai.content_item_id";
                 AddRegionInfo(siteId, isArchive, items);
             }
 
+            if (items.Any() && loadChildren)
+            {
+                var ids = items.Select(n => n.Id).ToArray();
+                var children = GetItems(siteId, isArchive, ids, useRegion, true);
+                items.AddRange(children);
+            }
+
             return items;
         }
 
-        private void AddRegionInfo(int siteId, bool isArchive, List<AbstractItemData> items, IDbTransaction transaction = null)
+        private void AddRegionInfo(int siteId, bool isArchive, List<AbstractItemData> items,
+            IDbTransaction transaction = null)
         {
             var regions = _uow.Connection.Query<RegionData>(GetRegionsQuery(siteId, isArchive), transaction).ToList();
             var regionLinkId = _uow.Connection.QueryFirst<int>(GetRegionLinkIdQuery(siteId), transaction);
@@ -302,43 +350,68 @@ ORDER BY ai.content_item_id";
             }
         }
 
-        public List<AbstractItemData> GetByIds(int siteId, bool isArchive, IEnumerable<int> itemIds, IDbTransaction transaction = null)
+        public List<AbstractItemData> GetByIds(
+            int siteId,
+            bool isArchive,
+            IEnumerable<int> itemIds,
+            bool useRegion = false,
+            bool loadChildren = false,
+            IDbTransaction transaction = null)
         {
-            _logger.LogDebug($"getByIds. siteId: {siteId}, isArchive: {isArchive}, itemIds: {SerializeData(itemIds)}");
+            var itemIdsArr = itemIds?.ToArray() ?? Array.Empty<int>();
+            if (!itemIdsArr.Any()) throw new ArgumentNullException(nameof(itemIds));
+            if (itemIdsArr.Any(x => x <= 0)) throw new ArgumentException("itemId <= 0");
 
-            if (itemIds == null || !itemIds.Any()) throw new ArgumentNullException("itemIds");
-            if (itemIds.Any(x => x <= 0)) throw new ArgumentException("itemId <= 0");
+            _logger.ForDebugEvent().Message("GetByIds")
+                .Property("siteId", siteId)
+                .Property("isArchive", isArchive)
+                .Property("loadChildren", loadChildren)
+                .Property("itemIds", itemIdsArr)
+                .Log();
 
             var idList = SqlQuerySyntaxHelper.IdList(_uow.DatabaseType, "@ItemIds", "itemIds");
             var query = GetCmdGetAbstractItemByIds(siteId, isArchive, idList);
 
             List<AbstractItemData> result;
-            
+
             if (_uow.DatabaseType == DatabaseType.SqlServer)
             {
                 result = _uow.Connection.Query<AbstractItemData>(query,
-                        new {ItemIds = SqlQuerySyntaxHelper.IdsToDataTable(itemIds).AsTableValuedParameter("Ids")},
+                        new { ItemIds = SqlQuerySyntaxHelper.IdsToDataTable(itemIdsArr).AsTableValuedParameter("Ids") },
                         transaction)
                     .ToList();
             }
             else
             {
-                result = _uow.Connection.Query<AbstractItemData>(query, new {ItemIds = itemIds}, transaction).ToList();
+                result = _uow.Connection.Query<AbstractItemData>(query, new { ItemIds = itemIdsArr }, transaction)
+                    .ToList();
             }
-            
-            _logger.LogDebug($"getByIds. count: {result.Count}, result: {SerializeData(result)}");
+
+            _logger.ForDebugEvent().Message("GetByIds")
+                .Property("count", result.Count)
+                .Property("result", result)
+                .Log();
+
+            if (result.Any() && loadChildren)
+            {
+                var children = GetItems(siteId, isArchive, itemIdsArr, useRegion, true);
+                result.AddRange(children);
+            }
+
             return result;
         }
 
         public AbstractItemData GetRootPage(int siteId, IDbTransaction transaction = null)
         {
-            _logger.LogDebug($"getRootPage. siteId: {siteId}");
+            _logger.ForDebugEvent().Message("GetRootPage")
+                .Property("siteId", siteId)
+                .Log();
             var query = _netNameQueryAnalyzer.PrepareQuery(CmdGetRootPage, siteId, false, true);
             var result = _uow.Connection.Query<AbstractItemData>(query, transaction).FirstOrDefault();
-            _logger.LogDebug($"getRootPage. result: {SerializeData(result)}");
+            _logger.ForDebugEvent().Message("GetRootPage")
+                .Property("result", result)
+                .Log();
             return result;
         }
-
-        private static string SerializeData(object data) => Newtonsoft.Json.JsonConvert.SerializeObject(data);
     }
 }
