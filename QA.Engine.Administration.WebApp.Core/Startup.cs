@@ -108,6 +108,7 @@ namespace QA.Engine.Administration.WebApp.Core
             _ = services.AddScoped<IQpDataProvider, QpDataProvider>();
             _ = services.AddScoped<ISettingsProvider, SettingsProvider>();
             _ = services.AddScoped<IItemExtensionProvider, ItemExtensionProvider>();
+            _ = services.AddScoped<SqlHelper>();
 
             _ = services.AddScoped<IQpDbConnector, QpDbConnector>(sp =>
             {

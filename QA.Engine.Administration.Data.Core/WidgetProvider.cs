@@ -16,16 +16,13 @@ namespace QA.Engine.Administration.Data.Core
         private readonly IUnitOfWork _uow;
         private readonly INetNameQueryAnalyzer _netNameQueryAnalyzer;
         private readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+        private readonly SqlHelper _sql;
 
-        public WidgetProvider(IUnitOfWork uow, INetNameQueryAnalyzer netNameQueryAnalyzer)
+        public WidgetProvider(IUnitOfWork uow, INetNameQueryAnalyzer netNameQueryAnalyzer, SqlHelper sql)
         {
             _uow = uow;
             _netNameQueryAnalyzer = netNameQueryAnalyzer;
-        }
-        
-        private string GetBoolSql(bool value)
-        {
-            return SqlQuerySyntaxHelper.ToBoolSql(_uow.DatabaseType, value);
+            _sql = sql;
         }
 
         //запрос с использованием NetName таблиц и столбцов
@@ -52,8 +49,8 @@ SELECT
     ) THEN 1 ELSE 0 END AS Published
 FROM |QPAbstractItem| ai
 INNER JOIN |QPDiscriminator| def on ai.|QPAbstractItem.Discriminator| = def.content_item_id
-WHERE ai.archive = {GetBoolSql(false)}
-    AND def.|QPDiscriminator.IsPage| = {GetBoolSql(false)}
+WHERE ai.archive = {_sql.GetBool(false)}
+    AND def.|QPDiscriminator.IsPage| = {_sql.GetBool(false)}
     AND ai.|QPAbstractItem.Parent| {parentExpression}
 ";
         }
