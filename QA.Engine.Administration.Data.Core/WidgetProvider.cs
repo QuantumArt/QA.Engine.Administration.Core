@@ -22,6 +22,11 @@ namespace QA.Engine.Administration.Data.Core
             _uow = uow;
             _netNameQueryAnalyzer = netNameQueryAnalyzer;
         }
+        
+        private string GetBoolSql(bool value)
+        {
+            return SqlQuerySyntaxHelper.ToBoolSql(_uow.DatabaseType, value);
+        }
 
         //запрос с использованием NetName таблиц и столбцов
         private string CmdGetAbstractWidgetItem(string parentExpression)
@@ -47,9 +52,8 @@ SELECT
     ) THEN 1 ELSE 0 END AS Published
 FROM |QPAbstractItem| ai
 INNER JOIN |QPDiscriminator| def on ai.|QPAbstractItem.Discriminator| = def.content_item_id
-INNER JOIN content_item ci on ai.content_item_id = ci.content_item_id
-WHERE ci.archive={SqlQuerySyntaxHelper.ToBoolSql(_uow.DatabaseType, false)} 
-    AND def.|QPDiscriminator.IsPage|={SqlQuerySyntaxHelper.ToBoolSql(_uow.DatabaseType, false)} 
+WHERE ai.archive = {GetBoolSql(false)}
+    AND def.|QPDiscriminator.IsPage| = {GetBoolSql(false)}
     AND ai.|QPAbstractItem.Parent| {parentExpression}
 ";
         }

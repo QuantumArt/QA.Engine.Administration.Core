@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using NLog;
+using QA.DotNetCore.Engine.Persistent.Dapper;
 
 namespace QA.Engine.Administration.Data.Core
 {
@@ -20,6 +21,11 @@ namespace QA.Engine.Administration.Data.Core
         {
             _uow = uow;
             _netNameQueryAnalyzer = netNameQueryAnalyzer;
+        }
+        
+        private string GetBoolSql(bool value)
+        {
+            return SqlQuerySyntaxHelper.ToBoolSql(_uow.DatabaseType, value);
         }
 
         private string CmdGetAllItemDefinitions = @"
@@ -57,26 +63,26 @@ WHERE SITE_ID=@SiteId AND STATUS_TYPE_NAME=@Status
 
         private string GetAllRegionsQuery()
         {
-            return @"
+            return $@"
 SELECT 
     reg.CONTENT_ITEM_ID AS Id, 
     reg.|QPRegion.Alias| AS Alias, 
     reg.|QPRegion.ParentId| AS ParentId, 
     reg.|QPRegion.Title| AS Title
 FROM |QPRegion| reg
-WHERE reg.ARCHIVE = 0
+WHERE reg.ARCHIVE = {GetBoolSql(false)}
 ";
         }
 
         private string CmdGetAllCultures()
         {
-            return @"
+            return $@"
 SELECT 
     reg.CONTENT_ITEM_ID AS Id, 
     reg.|QPCulture.Title| AS Title, 
     reg.|QPCulture.Name| AS Name
 FROM |QPCulture| reg
-WHERE reg.ARCHIVE = 0
+WHERE reg.ARCHIVE = {GetBoolSql(false)}
 ";
         }
 
