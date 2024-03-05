@@ -16,18 +16,15 @@ namespace QA.Engine.Administration.Data.Core
         private readonly IUnitOfWork _uow;
         private readonly INetNameQueryAnalyzer _netNameQueryAnalyzer;
         private readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+        private readonly SqlHelper _sql;
 
-        public DictionaryProvider(IUnitOfWork uow, INetNameQueryAnalyzer netNameQueryAnalyzer)
+        public DictionaryProvider(IUnitOfWork uow, INetNameQueryAnalyzer netNameQueryAnalyzer, SqlHelper sql)
         {
             _uow = uow;
             _netNameQueryAnalyzer = netNameQueryAnalyzer;
+            _sql = sql;
         }
         
-        private string GetBoolSql(bool value)
-        {
-            return SqlQuerySyntaxHelper.ToBoolSql(_uow.DatabaseType, value);
-        }
-
         private string CmdGetAllItemDefinitions = @"
 SELECT
     CONTENT_ITEM_ID as Id,
@@ -70,7 +67,7 @@ SELECT
     reg.|QPRegion.ParentId| AS ParentId, 
     reg.|QPRegion.Title| AS Title
 FROM |QPRegion| reg
-WHERE reg.ARCHIVE = {GetBoolSql(false)}
+WHERE reg.ARCHIVE = {_sql.GetBool(false)}
 ";
         }
 
@@ -82,7 +79,7 @@ SELECT
     reg.|QPCulture.Title| AS Title, 
     reg.|QPCulture.Name| AS Name
 FROM |QPCulture| reg
-WHERE reg.ARCHIVE = {GetBoolSql(false)}
+WHERE reg.ARCHIVE = {_sql.GetBool(false)}
 ";
         }
 

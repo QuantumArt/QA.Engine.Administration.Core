@@ -17,11 +17,13 @@ namespace QA.Engine.Administration.Data.Core
         private readonly IUnitOfWork _uow;
         private readonly INetNameQueryAnalyzer _netNameQueryAnalyzer;
         private readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+        private readonly SqlHelper _sql;
 
-        public SiteMapProvider(IUnitOfWork uow, INetNameQueryAnalyzer netNameQueryAnalyzer)
+        public SiteMapProvider(IUnitOfWork uow, INetNameQueryAnalyzer netNameQueryAnalyzer, SqlHelper sql)
         {
             _netNameQueryAnalyzer = netNameQueryAnalyzer;
             _uow = uow;
+            _sql = sql;
         }
 
         #region запросы с использованием NetName таблиц и столбцов
@@ -54,7 +56,7 @@ SELECT
     ) THEN 1 ELSE 0 END AS Published
 FROM |QPAbstractItem| ai
 INNER JOIN |QPDiscriminator| def on ai.|QPAbstractItem.Discriminator| = def.content_item_id
-WHERE ai.archive = {GetBoolSql(isArchive)}
+WHERE ai.archive = {_sql.GetBool(isArchive)}
 ORDER BY ai.|QPAbstractItem.Parent|, ai.|QPAbstractItem.IndexOrder|, ai.content_item_id
 ";
             return _netNameQueryAnalyzer.PrepareQuery(query, siteId, false, true);
@@ -67,7 +69,7 @@ ORDER BY ai.|QPAbstractItem.Parent|, ai.|QPAbstractItem.IndexOrder|, ai.content_
         private string GetAbstractItemsQuery(int siteId, bool isArchive, string parentExpression, bool onlyPages)
         {
             var onlyPagesFilter = onlyPages
-                ? $"AND def.|QPDiscriminator.IsPage|={GetBoolSql(true)} AND ai.|QPAbstractItem.VersionOf| is null"
+                ? $"AND def.|QPDiscriminator.IsPage|={_sql.GetBool(true)} AND ai.|QPAbstractItem.VersionOf| is null"
                 : "";
             var query = $@"
 SELECT
@@ -93,7 +95,7 @@ SELECT
     ) THEN 1 ELSE 0 END AS Published
 FROM |QPAbstractItem| ai
 INNER JOIN |QPDiscriminator| def on ai.|QPAbstractItem.Discriminator| = def.content_item_id
-WHERE ai.archive = {GetBoolSql(isArchive)}
+WHERE ai.archive = {_sql.GetBool(isArchive)}
 {onlyPagesFilter} 
     AND (ai.|QPAbstractItem.Parent| {parentExpression} OR ai.|QPAbstractItem.VersionOf| {parentExpression})
 ORDER BY ai.|QPAbstractItem.Parent|, ai.|QPAbstractItem.IndexOrder|, ai.content_item_id
@@ -131,7 +133,7 @@ SELECT
     ) THEN 1 ELSE 0 END AS Published
 FROM |QPAbstractItem| ai
 INNER JOIN |QPDiscriminator| def on ai.|QPAbstractItem.Discriminator| = def.content_item_id
-WHERE ai.archive = {GetBoolSql(isArchive)}
+WHERE ai.archive = {_sql.GetBool(isArchive)}
 AND ai.content_item_id IN (SELECT Id FROM {idsExpression})
 ";
             return _netNameQueryAnalyzer.PrepareQuery(query, siteId, false, true);
@@ -140,11 +142,6 @@ AND ai.content_item_id IN (SELECT Id FROM {idsExpression})
         #endregion
 
         #region get root page
-
-        private string GetBoolSql(bool value)
-        {
-            return SqlQuerySyntaxHelper.ToBoolSql(_uow.DatabaseType, value);
-        }
 
         private string CmdGetRootPage()
         {
@@ -172,9 +169,9 @@ SELECT
     ) THEN 1 ELSE 0 END AS Published
 FROM |QPAbstractItem| ai
 INNER JOIN |QPDiscriminator| def on ai.|QPAbstractItem.Discriminator| = def.content_item_id
-WHERE ai.archive = {GetBoolSql(false)}
+WHERE ai.archive = {_sql.GetBool(false)}
     AND ai.|QPAbstractItem.Parent| IS NULL 
-    AND ai.|QPAbstractItem.VersionOf| IS NULL AND def.|QPDiscriminator.IsPage| = {GetBoolSql(true)}
+    AND ai.|QPAbstractItem.VersionOf| IS NULL AND def.|QPDiscriminator.IsPage| = {_sql.GetBool(true)}
 ORDER BY ai.content_item_id";
         }
 
