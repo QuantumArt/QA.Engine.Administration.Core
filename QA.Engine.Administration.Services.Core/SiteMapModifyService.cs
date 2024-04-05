@@ -93,17 +93,31 @@ namespace QA.Engine.Administration.Services.Core
             }
 
             var item = items.First(x => x.Id == itemId);
+            List<AbstractItemData> list;
 
-            var parentId = item.ParentId.HasValue ? new[] {item.ParentId.Value} : Array.Empty<int>();
-            var list = _siteMapProvider.GetItems(siteId, false, parentId , false);
+            if (item.IsPage)
+            {
+                var parentId = item.ParentId.HasValue ? new[] {item.ParentId.Value} : Array.Empty<int>();
+                list = _siteMapProvider.GetItems(siteId, false, parentId , false);
+            }
+            else
+            {
+                if (!item.ParentId.HasValue)
+                {
+                    var message = $"Item with id {itemId} has no parent";
+                    throw new InvalidOperationException(message);
+                }
 
-            var result = list.Select(x => _mapper.Map<PageModel>(x)).ToList();
+                list = _siteMapProvider.GetWidgetItems(siteId, item.ParentId.Value, item.ZoneName);
+            }
+
+            var result = list;
             result.Remove(result.SingleOrDefault(x => x.Id == itemId));
             var relatedIndex = result.IndexOf(result.SingleOrDefault(x => x.Id == relatedItemId));
             var newIndex = isInsertBefore
                 ? relatedIndex
                 : relatedIndex + 1 >= result.Count ? result.Count : relatedIndex + 1;
-            result.Insert(newIndex, _mapper.Map<PageModel>(item));
+            result.Insert(newIndex, item);
 
             for (var i = 0; i < result.Count; i++)
             {
@@ -140,7 +154,7 @@ namespace QA.Engine.Administration.Services.Core
                 throw new InvalidOperationException(message);
             }
             var contentId = _settingsProvider.GetContentId(siteId);
-            
+
             _qpDataProvider.Move(siteId, contentId, userId, itemId, newParentId);
         }
 

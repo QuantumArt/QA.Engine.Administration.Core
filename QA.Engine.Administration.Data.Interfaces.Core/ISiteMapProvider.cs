@@ -6,17 +6,21 @@ namespace QA.Engine.Administration.Data.Interfaces.Core
 {
     public interface ISiteMapProvider
     {
-        List<AbstractItemData> GetAllItems(int siteId, 
-            bool isArchive, 
-            bool useRegion, 
+        List<AbstractItemData> GetAllItems(int siteId,
+            bool isArchive,
+            bool useRegion,
             IDbTransaction transaction = null);
-        List<AbstractItemData> GetItems(int siteId, 
-            bool isArchive, 
-            IEnumerable<int> parentId, 
+        List<AbstractItemData> GetItems(int siteId,
+            bool isArchive,
+            IEnumerable<int> parentId,
             bool useRegion,
             bool loadChildren = false,
             IDbTransaction transaction = null);
-        List<AbstractItemData> GetByIds(int siteId, 
+        List<AbstractItemData> GetWidgetItems(int siteId,
+            int parentId,
+            string zoneName,
+            IDbTransaction transaction = null);
+        List<AbstractItemData> GetByIds(int siteId,
             bool isArchive,
             IEnumerable<int> itemIds,
             bool useRegion = false,

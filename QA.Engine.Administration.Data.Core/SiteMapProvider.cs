@@ -64,6 +64,45 @@ ORDER BY ai.|QPAbstractItem.Parent|, ai.|QPAbstractItem.IndexOrder|, ai.content_
 
         #endregion
 
+        #region get widgets by parent and zone
+
+        private string GetWidgetItemsQuery(int siteId, int parent, string zoneName)
+        {
+            string query = $@"
+SELECT
+    ai.content_item_id AS Id,
+    ai.archive AS Archive,
+    ai.visible As Visible,
+    ai.|QPAbstractItem.Name| as Alias,
+    ai.|QPAbstractItem.Title| as Title,
+    ai.|QPAbstractItem.Parent| AS ParentId,
+    ai.|QPAbstractItem.IsVisible| AS IsVisible,
+    ai.|QPAbstractItem.ZoneName| AS ZoneName,
+    ai.|QPAbstractItem.IndexOrder| AS IndexOrder,
+    ai.|QPAbstractItem.ExtensionId| AS ExtensionId,
+    ai.|QPAbstractItem.VersionOf| AS VersionOfId,
+    ai.|QPAbstractItem.IsInSiteMap| AS IsInSiteMap,
+    def.content_item_id AS DiscriminatorId,
+    def.|QPDiscriminator.Name| as Discriminator,
+    def.|QPDiscriminator.IsPage| as IsPage,
+    def.|QPDiscriminator.Title| as DiscriminatorTitle,
+    def.|QPDiscriminator.IconUrl| as IconUrl,
+    CASE WHEN ai.STATUS_TYPE_ID IN (
+        SELECT st.STATUS_TYPE_ID FROM STATUS_TYPE st WHERE st.STATUS_TYPE_NAME=N'Published'
+    ) THEN 1 ELSE 0 END AS Published
+FROM |QPAbstractItem| ai
+INNER JOIN |QPDiscriminator| def on ai.|QPAbstractItem.Discriminator| = def.content_item_id
+WHERE ai.archive = {_sql.GetBool(false)}
+    AND ai.|QPAbstractItem.ZoneName| = '{zoneName}'
+    AND ai.|QPAbstractItem.Parent| = {parent}
+ORDER BY ai.|QPAbstractItem.IndexOrder|, ai.content_item_id
+";
+
+            return _netNameQueryAnalyzer.PrepareQuery(query, siteId, false, true);
+        }
+
+        #endregion
+
         #region get abstract items with parent
 
         private string GetAbstractItemsQuery(int siteId, bool isArchive, string parentExpression, bool onlyPages)
@@ -245,6 +284,25 @@ WHERE |QPAbstractItem.Regions| IS NOT NULL {SqlQuerySyntaxHelper.Limit(_uow.Data
                         abstractItem.RegionIds = new List<int>();
                 }
             }
+
+            return items;
+        }
+
+        public List<AbstractItemData> GetWidgetItems(int siteId,
+            int parentId,
+            string zoneName,
+            IDbTransaction transaction = null)
+        {
+            _logger.ForDebugEvent().Message("GetWidgetItems")
+                .Property(nameof(siteId), siteId)
+                .Property(nameof(parentId), parentId)
+                .Property(nameof(zoneName), zoneName)
+                .Log();
+
+            string query = GetWidgetItemsQuery(siteId, parentId, zoneName);
+            List<AbstractItemData> items = _uow.Connection.Query<AbstractItemData>(query, transaction).ToList();
+
+            _logger.ForDebugEvent().Message("GetItems").Property("count", items.Count).Log();
 
             return items;
         }
