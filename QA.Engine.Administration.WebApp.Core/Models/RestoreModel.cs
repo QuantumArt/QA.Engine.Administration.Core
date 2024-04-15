@@ -21,7 +21,7 @@ namespace QA.Engine.Administration.WebApp.Core.Models
         /// </summary>
         public bool? IsRestoreWidgets { get; set; }
         /// <summary>
-        /// Восстанавливать контентные верисс
+        /// Восстанавливать контентные версии
         /// </summary>
         public bool? IsRestoreContentVersions { get; set; }
         /// <summary>

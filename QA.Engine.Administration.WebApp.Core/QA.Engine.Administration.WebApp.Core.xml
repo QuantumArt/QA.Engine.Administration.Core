@@ -397,7 +397,7 @@
         </member>
         <member name="P:QA.Engine.Administration.WebApp.Core.Models.RestoreModel.IsRestoreContentVersions">
             <summary>
-            Восстанавливать контентные верисс
+            Восстанавливать контентные версии
             </summary>
         </member>
         <member name="P:QA.Engine.Administration.WebApp.Core.Models.RestoreModel.IsRestoreChildren">
