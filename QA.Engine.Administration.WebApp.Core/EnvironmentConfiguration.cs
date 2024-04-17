@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace QA.Engine.Administration.WebApp.Core
 {
@@ -20,6 +21,7 @@ namespace QA.Engine.Administration.WebApp.Core
 
         public string ConfigurationServiceUrl { get; set; }
         public string ConfigurationServiceToken { get; set; }
+        public Dictionary<string, CustomerOptions> CustomerSettings { get; set; }
     }
 
     public class FakeData
@@ -37,5 +39,15 @@ namespace QA.Engine.Administration.WebApp.Core
         public string ItemIdParamName { get; set; }
         public string CultureParamName { get; set; }
         public string RegionParamName { get; set; }
+    }
+
+    public class CustomerOptions
+    {
+        public bool HidePreviewInSiteTreeContextMenu { get; set; }
+
+        public CustomerOptions()
+        {
+            HidePreviewInSiteTreeContextMenu = false;
+        }
     }
 }

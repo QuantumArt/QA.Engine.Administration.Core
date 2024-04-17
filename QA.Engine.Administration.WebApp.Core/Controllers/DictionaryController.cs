@@ -30,6 +30,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
         private readonly IStringLocalizerFactory _stringLocalizerFactory;
         private readonly CustomAction _customActionConfig;
         private readonly string _rootPageDiscriminator;
+        private readonly CustomerOptions _customerOptions;
         private readonly int _siteId;
         private readonly int _userId;
 
@@ -46,6 +47,10 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
 
             _customActionConfig = options.Value?.CustomAction;
             _rootPageDiscriminator = options.Value?.StartPageDiscriminator;
+
+            _customerOptions = options.Value?.CustomerSettings != null
+                ? options.Value.CustomerSettings.GetValueOrDefault(webAppQpHelper.CustomerCode, new())
+                : new CustomerOptions();
 
             _siteId = webAppQpHelper.SavedSiteId;
             _userId = webAppQpHelper.UserId;
@@ -154,6 +159,18 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
             customAction.CultureParamName = _customActionConfig?.CultureParamName;
             customAction.RegionParamName = _customActionConfig?.RegionParamName;
             return ApiResult<CustomActionModel>.Success(customAction);
+        }
+
+        /// <summary>
+        /// Возвращает настройки клиента
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("getCustomerOptions")]
+        public ApiResult<CustomerOptionsModel> GetCustomerOptions()
+        {
+            _logger.ForDebugEvent().Message("GET /getCustomerOptions").Log();
+            CustomerOptionsModel customerOptions = new() { HidePreviewInSiteTreeContextMenu = _customerOptions.HidePreviewInSiteTreeContextMenu };
+            return ApiResult<CustomerOptionsModel>.Success(customerOptions);
         }
     }
 }

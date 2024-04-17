@@ -7,8 +7,14 @@ import { action, computed, observable } from "mobx";
 
 export default class SiteTreeStore extends BaseTreeState<PageModel> {
     public type = TreeStoreType.SITE;
+    public customerOptions: CustomerOptionsModel = null;
 
     private regionIds: number[] = [];
+
+    constructor() {
+        super();
+        this.getCustomerOptions();
+    }
 
     public get parentNode(): PageModel {
         return this.nodesMap.get(this.selectedNode.parentId).original;
@@ -159,4 +165,17 @@ export default class SiteTreeStore extends BaseTreeState<PageModel> {
     public getNode = (id: number) => {
         return this.nodesMap.get(id).original;
     };
+
+    private async getCustomerOptions() {
+        try {
+            const response: ApiResult<CustomerOptionsModel> = await DictionaryService.getCustomerOptions();
+            if (response.isSuccess) {
+                this.customerOptions = response.data;
+            } else {
+                this.customerOptions = null;
+            }
+        } catch (e) {
+            this.customerOptions = null;
+        }
+    }
 }
