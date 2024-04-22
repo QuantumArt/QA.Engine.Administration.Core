@@ -11,11 +11,6 @@ export default class SiteTreeStore extends BaseTreeState<PageModel> {
 
     private regionIds: number[] = [];
 
-    constructor() {
-        super();
-        this.getCustomerOptions();
-    }
-
     public get parentNode(): PageModel {
         return this.nodesMap.get(this.selectedNode.parentId).original;
     }
@@ -40,6 +35,7 @@ export default class SiteTreeStore extends BaseTreeState<PageModel> {
     protected contextMenuType: ContextMenuType = ContextMenuType.SITEMAP;
 
     protected async getTree(): Promise<ApiResult<PageModel[]>> {
+        await this.getCustomerOptions();
         if (this.regionIds.length === 0) {
             return await SiteMapService.getSiteMapTree();
         }
