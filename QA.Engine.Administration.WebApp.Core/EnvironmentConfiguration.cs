@@ -45,10 +45,5 @@ namespace QA.Engine.Administration.WebApp.Core
     public class CustomerOptions
     {
         public bool HidePreviewInSiteTreeContextMenu { get; set; }
-
-        public CustomerOptions()
-        {
-            HidePreviewInSiteTreeContextMenu = false;
-        }
     }
 }

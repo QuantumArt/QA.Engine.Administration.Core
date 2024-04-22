@@ -302,8 +302,7 @@ export default class QpIntegrationStore extends ErrorHandler {
 
         executeOptions.options.additionalOptions = {};
         if (this.customAction.previewPagePathName != null) {
-            const pagePath = await this.treeStore.getSiteTreeStore().getPathToElement(id);
-            executeOptions.options.additionalOptions[this.customAction.previewPagePathName] = pagePath;
+            executeOptions.options.additionalOptions[this.customAction.previewPagePathName] = await this.treeStore.getSiteTreeStore().getPathToElement(id);
         }
 
         this.executeTab(executeOptions);
