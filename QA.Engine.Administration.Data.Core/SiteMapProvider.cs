@@ -204,6 +204,24 @@ WHERE |QPAbstractItem.Regions| IS NOT NULL {SqlQuerySyntaxHelper.Limit(_uow.Data
 
         #endregion
 
+        #region get page data by id
+
+        private string GetPageByIdQuery(int siteId, int pageId)
+        {
+            var query = $@"
+SELECT
+    ai.content_item_id AS Id,
+    ai.|QPAbstractItem.Name| as Alias,
+    ai.|QPAbstractItem.Parent| AS ParentId,
+    ai.|QPAbstractItem.ExtensionId| AS ExtensionId
+FROM |QPAbstractItem| ai
+WHERE ai.content_item_id = {pageId}";
+
+            return _netNameQueryAnalyzer.PrepareQuery(query, siteId, false, true);
+        }
+
+        #endregion
+
         #endregion
 
         public List<AbstractItemData> GetAllItems(int siteId, bool isArchive, bool useRegion,
@@ -416,5 +434,28 @@ WHERE |QPAbstractItem.Regions| IS NOT NULL {SqlQuerySyntaxHelper.Limit(_uow.Data
                 .Log();
             return result;
         }
+
+        public PageData GetPageById(int siteId, int pageId, IDbTransaction transaction = null)
+        {
+            if (pageId <= 0)
+            {
+                throw new ArgumentException("pageId <= 0");
+            }
+
+            _logger.ForDebugEvent().Message("GetPageById")
+                .Property("siteId", siteId)
+                .Property("pageId", pageId)
+                .Log();
+
+            var query = GetPageByIdQuery(siteId, pageId);
+            var result = _uow.Connection.Query<PageData>(query, transaction).FirstOrDefault();
+
+            _logger.ForDebugEvent().Message("GetPageById")
+                .Property("result", result)
+                .Log();
+
+            return result;
+        }
+
     }
 }

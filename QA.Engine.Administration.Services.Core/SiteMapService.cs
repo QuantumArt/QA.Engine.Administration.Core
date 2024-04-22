@@ -22,6 +22,8 @@ namespace QA.Engine.Administration.Services.Core
         private readonly IMapper _mapper;
         private readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
+        private const int START_PAGE_EXTENSION_ID = 547;
+
         public SiteMapService(
             ISiteMapProvider siteMapProvider, IWidgetProvider widgetProvider,
             IDictionaryProvider dictionaryProvider, ISettingsProvider settingsProvider,
@@ -277,6 +279,37 @@ namespace QA.Engine.Administration.Services.Core
         {
             var result = _itemExtensionProvider.GetManyToOneRelatedItemNames(siteId, id, value, attributeId);
             return result;
+        }
+
+        public string GetPathToPage(int siteId, int pageId)
+        {
+            _logger.ForDebugEvent().Message("GetPathToPage")
+                .Property("siteId", siteId)
+                .Property("pageId", pageId)
+                .Log();
+
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            Stack<string> result = new();
+            PageData pageData = _siteMapProvider.GetPageById(siteId, pageId);
+
+            while (pageData is not null && pageData.ExtensionId != START_PAGE_EXTENSION_ID && pageData.ParentId is not null)
+            {
+                if (!string.IsNullOrEmpty(pageData.Alias))
+                {
+                    result.Push(pageData.Alias);
+                }
+
+                pageData = _siteMapProvider.GetPageById(siteId, pageData.ParentId.Value);
+            }
+
+            stopwatch.Stop();
+            _logger.ForDebugEvent().Message("GetPathToPage: calculating page path")
+                .Property("elapsed", stopwatch.ElapsedMilliseconds)
+                .Log();
+
+            return string.Join("/", result);
         }
     }
 }
