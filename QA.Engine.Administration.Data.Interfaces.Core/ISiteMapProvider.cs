@@ -23,6 +23,5 @@ namespace QA.Engine.Administration.Data.Interfaces.Core
             bool loadChildren = false,
             IDbTransaction transaction = null);
         AbstractItemData GetRootPage(int siteId, IDbTransaction transaction = null);
-        PageData GetPageById(int siteId, int pageId, IDbTransaction transaction = null);
     }
 }

@@ -344,22 +344,6 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
             return ApiResult.Success();
         }
 
-        /// <summary>
-        /// Возвращает путь до страницы
-        /// </summary>
-        /// <param name="pageId">Id страницы</param>
-        /// <returns></returns>
-        [HttpGet("getPathToPage")]
-        public ApiResult<string> GetPathToPage(int pageId)
-        {
-            _logger.ForDebugEvent().Message("GET /getPathToPage")
-                .Property("pageId", pageId)
-                .Property("userId", _userId)
-                .Log();
-
-            var path = _siteMapService.GetPathToPage(_siteId, pageId);
-            return ApiResult<string>.Success(path);
-        }
     }
 
 
