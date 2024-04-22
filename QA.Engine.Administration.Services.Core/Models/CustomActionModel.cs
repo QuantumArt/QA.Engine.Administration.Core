@@ -10,5 +10,6 @@ namespace QA.Engine.Administration.Services.Core.Models
         public string ItemIdParamName { get; set; }
         public string CultureParamName { get; set; }
         public string RegionParamName { get; set; }
+        public string PreviewPagePathName { get; set; }
     }
 }

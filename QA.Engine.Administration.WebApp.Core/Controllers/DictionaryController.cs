@@ -158,6 +158,7 @@ namespace QA.Engine.Administration.WebApp.Core.Controllers
             customAction.ItemIdParamName = _customActionConfig?.ItemIdParamName;
             customAction.CultureParamName = _customActionConfig?.CultureParamName;
             customAction.RegionParamName = _customActionConfig?.RegionParamName;
+            customAction.PreviewPagePathName = _customActionConfig?.PreviewPagePathName;
             return ApiResult<CustomActionModel>.Success(customAction);
         }
 

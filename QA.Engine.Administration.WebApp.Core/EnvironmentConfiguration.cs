@@ -39,6 +39,7 @@ namespace QA.Engine.Administration.WebApp.Core
         public string ItemIdParamName { get; set; }
         public string CultureParamName { get; set; }
         public string RegionParamName { get; set; }
+        public string PreviewPagePathName { get; set; }
     }
 
     public class CustomerOptions

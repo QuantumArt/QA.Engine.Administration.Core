@@ -299,6 +299,13 @@ export default class QpIntegrationStore extends ErrorHandler {
         if (regionIds != null && this.customAction.regionParamName != null) {
             executeOptions.options.additionalParams[this.customAction.regionParamName] = regionIds[0];
         }
+
+        executeOptions.options.additionalOptions = {};
+        if (this.customAction.previewPagePathName != null) {
+            const pagePath = await this.treeStore.getSiteTreeStore().getPathToElement(id);
+            executeOptions.options.additionalOptions[this.customAction.previewPagePathName] = pagePath;
+        }
+
         this.executeTab(executeOptions);
     }
 
