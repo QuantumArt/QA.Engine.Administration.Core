@@ -4,7 +4,6 @@ import QpAbstractItemFields from 'constants/QpAbstractItemFields';
 import QpActionCodes from 'constants/QpActionCodes';
 import QpCallbackProcNames from 'constants/QpCallbackProcNames';
 import QpEntityCodes from 'constants/QpEntityCodes';
-// import { BackendEventObserver, executeBackendAction, ArticleFormState, ExecuteActionOptions, InitFieldValue, OpenSelectWindowOptions, openSelectWindow, EntitiesSelectedArgs } from 'qp/QP8BackendApi.Interaction';
 import {
     BackendEventObserver,
     executeBackendAction,
@@ -400,7 +399,7 @@ class QpIntegrationUtils {
         const executeOptions = new OpenSelectWindowOptions();
         executeOptions.selectActionCode = isMultiple ? QpActionCodes.multiple_select_article : QpActionCodes.select_article;
         executeOptions.entityTypeCode = QpEntityCodes.article;
-        executeOptions.isMultiple = isMultiple,
+        executeOptions.isMultiple = isMultiple;
         executeOptions.parentEntityId = entityId;
         executeOptions.selectWindowUID = QpIntegrationUtils.newGuid();
         executeOptions.callerCallback = callback;
