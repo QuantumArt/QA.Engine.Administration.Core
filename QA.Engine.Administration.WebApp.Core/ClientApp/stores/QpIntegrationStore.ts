@@ -13,7 +13,7 @@ import {
     OpenSelectWindowOptions,
     openSelectWindow,
     EntitiesSelectedArgs,
-} from 'qp8backendapi-interaction';
+} from '@quantumart/qp8backendapi-interaction';
 import TreeStore from 'stores/TreeStore';
 import ErrorHandler from 'stores/ErrorHandler';
 import ErrorsTypes from 'constants/ErrorsTypes';
