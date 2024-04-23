@@ -16,7 +16,7 @@
     "lodash.throttle": "^4.1.1",
     "mobx": "^5.15.7",
     "mobx-react": "^5.4.3",
-    "qp8backendapi-interaction": "^1.0.0",
+    "@quantumart/qp8backendapi-interaction": "^1.1.4",
     "qs": "^6.6.0",
     "react": "^16.7.0",
     "react-custom-scrollbars-2": "^4.5.0",

@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
 namespace QA.Engine.Administration.WebApp.Core.Auth
 {
     /// <summary>
-    /// Методы для взаимойствия c Qp
+    /// Методы для взаимодействия c Qp
     /// </summary>
     public class QpHelper
     {
