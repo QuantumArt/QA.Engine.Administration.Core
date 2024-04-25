@@ -62,10 +62,10 @@ export default class RestorePopup extends React.Component<Props, State> {
     render() {
         const { popupStore, textStore, treeStore } = this.props;
         const { restoreAllVersions, restoreChildren, restoreContentVersions, restoreWidgets } = this.state;
-        const isPage = treeStore.getArchiveTreeStore().IsPage(popupStore.itemId);
         if (popupStore.type !== PopupType.RESTORE) {
             return null;
         }
+        const isPage = treeStore.getArchiveTreeStore().IsPage(popupStore.itemId);
 
         return (
             <Card>
