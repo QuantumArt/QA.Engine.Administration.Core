@@ -101,7 +101,7 @@ export default class ArchiveTreeStore extends BaseTreeState<ArchiveModel> {
 
     public IsPage(id: number): boolean {
         const node = this.nodesMap.get(id);
-        return node.original.isPage;
+        return node?.original?.isPage ?? false;
     }
 
     protected contextMenuType: ContextMenuType = ContextMenuType.ARCHIVE;
