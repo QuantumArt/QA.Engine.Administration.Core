@@ -206,6 +206,7 @@ export class CustomTree<T = {}> extends React.Component<Props<T>, {}> {
         node: TreeNode<T>,
         e: React.MouseEvent<HTMLElement>
     ) => {
+        this.handlerHelper(this.props.onNodeClick, node, e);
         this.handlerHelper(this.props.onNodeContextMenu, node, e);
     };
 
