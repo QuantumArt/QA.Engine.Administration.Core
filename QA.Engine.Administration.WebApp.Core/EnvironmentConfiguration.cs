@@ -22,6 +22,7 @@ namespace QA.Engine.Administration.WebApp.Core
         public string ConfigurationServiceUrl { get; set; }
         public string ConfigurationServiceToken { get; set; }
         public Dictionary<string, CustomerOptions> CustomerSettings { get; set; }
+        public TimeSpan SessionTimeout { get; set; } = TimeSpan.FromDays(1);
     }
 
     public class FakeData
