@@ -6,7 +6,7 @@
     <members>
         <member name="T:QA.Engine.Administration.WebApp.Core.Auth.QpHelper">
             <summary>
-            Методы для взаимойствия c Qp
+                Методы для взаимодействия c Qp
             </summary>
         </member>
         <member name="P:QA.Engine.Administration.WebApp.Core.Auth.QpHelper.CustomerCode">
@@ -331,7 +331,7 @@
         </member>
         <member name="T:QA.Engine.Administration.WebApp.Core.Models.RemoveModel">
             <summary>
-            Модель для перемещения элемена в архив
+            Модель для перемещения элемента в архив
             </summary>
         </member>
         <member name="P:QA.Engine.Administration.WebApp.Core.Models.RemoveModel.ItemId">
@@ -397,12 +397,12 @@
         </member>
         <member name="P:QA.Engine.Administration.WebApp.Core.Models.RestoreModel.IsRestoreContentVersions">
             <summary>
-            Восстанавливать контентные верисс
+            Восстанавливать контентные версии
             </summary>
         </member>
         <member name="P:QA.Engine.Administration.WebApp.Core.Models.RestoreModel.IsRestoreChildren">
             <summary>
-            Восстанавлявать дочерние элементы
+            Восстанавливать дочерние элементы
             </summary>
         </member>
     </members>

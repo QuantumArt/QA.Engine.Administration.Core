@@ -60,11 +60,12 @@ export default class RestorePopup extends React.Component<Props, State> {
         this.setState({ restoreContentVersions: version.target.checked })
 
     render() {
-        const { popupStore, textStore } = this.props;
+        const { popupStore, textStore, treeStore } = this.props;
         const { restoreAllVersions, restoreChildren, restoreContentVersions, restoreWidgets } = this.state;
         if (popupStore.type !== PopupType.RESTORE) {
             return null;
         }
+        const isPage = treeStore.getArchiveTreeStore().IsPage(popupStore.itemId);
 
         return (
             <Card>
@@ -72,9 +73,11 @@ export default class RestorePopup extends React.Component<Props, State> {
                     <Checkbox checked={restoreAllVersions} onChange={this.changeRestoreAllVersions}>
                         {textStore.texts[Texts.popupRestoreAllVersion]}
                     </Checkbox>
-                    <Checkbox checked={restoreChildren} onChange={this.changeRestoreChildren}>
-                        {textStore.texts[Texts.popupRestoreChildren]}
-                    </Checkbox>
+                    {isPage &&
+                        <Checkbox checked={restoreChildren} onChange={this.changeRestoreChildren}>
+                            {textStore.texts[Texts.popupRestoreChildren]}
+                        </Checkbox>
+                    }
                     <Checkbox checked={restoreWidgets} onChange={this.changeRestoreWidgets}>
                         {textStore.texts[Texts.popupRestoreWidget]}
                     </Checkbox>

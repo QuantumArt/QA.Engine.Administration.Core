@@ -138,7 +138,7 @@ namespace QA.Engine.Administration.WebApp.Core
             _ = services.AddSession(options =>
             {
                 // Set a short timeout for easy testing.
-                options.IdleTimeout = TimeSpan.FromMinutes(20);
+                options.IdleTimeout = config.SessionTimeout;
                 options.Cookie.SameSite = config.UseSameSiteNone ? SameSiteMode.None : SameSiteMode.Lax;
                 options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
                 options.Cookie.IsEssential = true;

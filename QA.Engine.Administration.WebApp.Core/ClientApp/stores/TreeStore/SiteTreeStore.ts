@@ -7,6 +7,7 @@ import { action, computed, observable } from "mobx";
 
 export default class SiteTreeStore extends BaseTreeState<PageModel> {
     public type = TreeStoreType.SITE;
+    public customerOptions: CustomerOptionsModel = null;
 
     private regionIds: number[] = [];
 
@@ -34,6 +35,7 @@ export default class SiteTreeStore extends BaseTreeState<PageModel> {
     protected contextMenuType: ContextMenuType = ContextMenuType.SITEMAP;
 
     protected async getTree(): Promise<ApiResult<PageModel[]>> {
+        await this.getCustomerOptions();
         if (this.regionIds.length === 0) {
             return await SiteMapService.getSiteMapTree();
         }
@@ -159,4 +161,33 @@ export default class SiteTreeStore extends BaseTreeState<PageModel> {
     public getNode = (id: number) => {
         return this.nodesMap.get(id).original;
     };
+
+    public async getPathToElement(id: number): Promise<string> {
+        const path: string[] = [];
+        await this.getRootPageDiscriminator();
+
+        let node = this.nodesMap.get(id).original;
+
+        while (
+            node.parentId != null &&
+            node.discriminator !== this.rootPageDiscriminator
+        ) {
+            path.push(node.alias);
+            node = this.nodesMap.get(node.parentId).original;
+        }
+        return path.reverse().join('/');
+    }
+
+    private async getCustomerOptions() {
+        try {
+            const response: ApiResult<CustomerOptionsModel> = await DictionaryService.getCustomerOptions();
+            if (response.isSuccess) {
+                this.customerOptions = response.data;
+            } else {
+                this.customerOptions = null;
+            }
+        } catch (e) {
+            this.customerOptions = null;
+        }
+    }
 }

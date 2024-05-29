@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Intent, Menu, MenuDivider, MenuItem } from '@blueprintjs/core';
+import { ContextMenu, Intent, Menu, MenuDivider, MenuItem } from '@blueprintjs/core';
 import { observer, inject } from 'mobx-react';
 import PopupStore from 'stores/PopupStore';
 import PopupType from 'enums/PopupType';
@@ -13,7 +13,7 @@ interface Props {
     treeStore?: TreeStore;
     textStore?: TextStore;
     itemId: number;
-    node: ITreeElement;
+    node?: ITreeElement;
 }
 
 @inject('popupStore', 'treeStore', 'textStore')
@@ -36,7 +36,11 @@ export default class ArchiveTreeMenu extends React.Component<Props> {
 
     private handleClick = (e: React.MouseEvent<HTMLElement>, cb: () => void) => {
         e.stopPropagation();
-        this.props.node.isContextMenuActive = false;
+        if (this.props.node) {
+            this.props.node.isContextMenuActive = false;
+        } else {
+            ContextMenu.hide();
+        }
         cb();
     }
 
