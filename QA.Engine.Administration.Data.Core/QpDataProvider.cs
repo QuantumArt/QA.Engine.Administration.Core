@@ -20,11 +20,13 @@ namespace QA.Engine.Administration.Data.Core
         private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
         private readonly IQpMetadataManager _qpMetadataManager;
         private readonly CustomerConfiguration _configuration;
+        private readonly S3Options _s3Options;
 
-        public QpDataProvider(IQpMetadataManager qpMetadataManager, CustomerConfiguration configuration)
+        public QpDataProvider(IQpMetadataManager qpMetadataManager, CustomerConfiguration configuration, S3Options s3Options)
         {
             _qpMetadataManager = qpMetadataManager;
             _configuration = configuration;
+            _s3Options = s3Options;
         }
 
         private ArticleService GetArticleService(int userId)
@@ -33,7 +35,7 @@ namespace QA.Engine.Administration.Data.Core
                 _configuration.ConnectionString,
                 (DatabaseType)(int)_configuration.DbType
             );
-            return new ArticleService(info, userId);
+            return new ArticleService(info, userId) { S3Options = _s3Options };
         }
 
         public void Edit(int siteId, int contentId, int userId, EditData editData)

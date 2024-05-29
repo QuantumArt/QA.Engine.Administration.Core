@@ -43,7 +43,6 @@ namespace QA.Engine.Administration.WebApp.Core
                     }
                 })
                 .UseNLog()
-                .UseStartup<Startup>()
-                .SuppressStatusMessages(true);
+                .UseStartup<Startup>();
     }
 }
