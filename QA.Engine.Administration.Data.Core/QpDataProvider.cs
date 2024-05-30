@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Microsoft.Extensions.Options;
 using NLog;
 using QP.ConfigurationService.Models;
 using Quantumart.QP8.BLL.Services.API.Models;
@@ -22,11 +23,11 @@ namespace QA.Engine.Administration.Data.Core
         private readonly CustomerConfiguration _configuration;
         private readonly S3Options _s3Options;
 
-        public QpDataProvider(IQpMetadataManager qpMetadataManager, CustomerConfiguration configuration, S3Options s3Options)
+        public QpDataProvider(IQpMetadataManager qpMetadataManager, CustomerConfiguration configuration, IOptions<S3Options> s3Options)
         {
             _qpMetadataManager = qpMetadataManager;
             _configuration = configuration;
-            _s3Options = s3Options;
+            _s3Options = s3Options.Value;
         }
 
         private ArticleService GetArticleService(int userId)
