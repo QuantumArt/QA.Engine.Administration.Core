@@ -67,7 +67,13 @@ namespace QA.Engine.Administration.Data.Core
                     }
                 }
             };
-            GetArticleService(userId).BatchUpdate(articleData, true);
+
+            var model = new BatchUpdateModel { Articles = articleData, CreateVersions = true };
+            var result = GetArticleService(userId).BatchUpdate(model);
+            if (result != null && result.Type == ActionMessageType.Error)
+            {
+                throw new ApplicationException(result.Text);
+            }
         }
 
         public void Publish(int siteId, int contentId, int userId, IEnumerable<AbstractItemData> items, int statusId)
@@ -114,7 +120,12 @@ namespace QA.Engine.Administration.Data.Core
                     }
                 }).ToArray();
 
-            GetArticleService(userId).BatchUpdate(articleData, true);
+            var model = new BatchUpdateModel { Articles = articleData, CreateVersions = true };
+            var result = GetArticleService(userId).BatchUpdate(model);
+            if (result != null && result.Type == ActionMessageType.Error)
+            {
+                throw new ApplicationException(result.Text);
+            }
         }
 
         public void Move(int siteId, int contentId, int userId, int itemId, int newParentId)
@@ -143,7 +154,12 @@ namespace QA.Engine.Administration.Data.Core
                     }
                 }
             };
-            GetArticleService(userId).BatchUpdate(articleData, true);
+            var model = new BatchUpdateModel { Articles = articleData, CreateVersions = true };
+            var result = GetArticleService(userId).BatchUpdate(model);
+            if (result != null && result.Type == ActionMessageType.Error)
+            {
+                throw new ApplicationException(result.Text);
+            }
         }
 
         public void Archive(int siteId, int contentId, int userId, IEnumerable<AbstractItemData> items,
@@ -285,7 +301,12 @@ namespace QA.Engine.Administration.Data.Core
                     }
                 }
             };
-            GetArticleService(userId).BatchUpdate(articleData, true);
+            var model = new BatchUpdateModel { Articles = articleData, CreateVersions = true };
+            var result = GetArticleService(userId).BatchUpdate(model);
+            if (result != null && result.Type == ActionMessageType.Error)
+            {
+                throw new ApplicationException(result.Text);
+            }
         }
     }
 }
