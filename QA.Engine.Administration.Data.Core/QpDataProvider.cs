@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Microsoft.Extensions.Options;
 using NLog;
 using QP.ConfigurationService.Models;
 using Quantumart.QP8.BLL.Services.API.Models;
@@ -20,11 +21,13 @@ namespace QA.Engine.Administration.Data.Core
         private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
         private readonly IQpMetadataManager _qpMetadataManager;
         private readonly CustomerConfiguration _configuration;
+        private readonly S3Options _s3Options;
 
-        public QpDataProvider(IQpMetadataManager qpMetadataManager, CustomerConfiguration configuration)
+        public QpDataProvider(IQpMetadataManager qpMetadataManager, CustomerConfiguration configuration, IOptions<S3Options> s3Options)
         {
             _qpMetadataManager = qpMetadataManager;
             _configuration = configuration;
+            _s3Options = s3Options.Value;
         }
 
         private ArticleService GetArticleService(int userId)
@@ -33,7 +36,7 @@ namespace QA.Engine.Administration.Data.Core
                 _configuration.ConnectionString,
                 (DatabaseType)(int)_configuration.DbType
             );
-            return new ArticleService(info, userId);
+            return new ArticleService(info, userId) { S3Options = _s3Options };
         }
 
         public void Edit(int siteId, int contentId, int userId, EditData editData)
@@ -64,7 +67,13 @@ namespace QA.Engine.Administration.Data.Core
                     }
                 }
             };
-            GetArticleService(userId).BatchUpdate(articleData, true);
+
+            var model = new BatchUpdateModel { Articles = articleData, CreateVersions = true };
+            var result = GetArticleService(userId).BatchUpdate(model);
+            if (result != null && result.Type == ActionMessageType.Error)
+            {
+                throw new ApplicationException(result.Text);
+            }
         }
 
         public void Publish(int siteId, int contentId, int userId, IEnumerable<AbstractItemData> items, int statusId)
@@ -111,7 +120,12 @@ namespace QA.Engine.Administration.Data.Core
                     }
                 }).ToArray();
 
-            GetArticleService(userId).BatchUpdate(articleData, true);
+            var model = new BatchUpdateModel { Articles = articleData, CreateVersions = true };
+            var result = GetArticleService(userId).BatchUpdate(model);
+            if (result != null && result.Type == ActionMessageType.Error)
+            {
+                throw new ApplicationException(result.Text);
+            }
         }
 
         public void Move(int siteId, int contentId, int userId, int itemId, int newParentId)
@@ -140,7 +154,12 @@ namespace QA.Engine.Administration.Data.Core
                     }
                 }
             };
-            GetArticleService(userId).BatchUpdate(articleData, true);
+            var model = new BatchUpdateModel { Articles = articleData, CreateVersions = true };
+            var result = GetArticleService(userId).BatchUpdate(model);
+            if (result != null && result.Type == ActionMessageType.Error)
+            {
+                throw new ApplicationException(result.Text);
+            }
         }
 
         public void Archive(int siteId, int contentId, int userId, IEnumerable<AbstractItemData> items,
@@ -282,7 +301,12 @@ namespace QA.Engine.Administration.Data.Core
                     }
                 }
             };
-            GetArticleService(userId).BatchUpdate(articleData, true);
+            var model = new BatchUpdateModel { Articles = articleData, CreateVersions = true };
+            var result = GetArticleService(userId).BatchUpdate(model);
+            if (result != null && result.Type == ActionMessageType.Error)
+            {
+                throw new ApplicationException(result.Text);
+            }
         }
     }
 }
