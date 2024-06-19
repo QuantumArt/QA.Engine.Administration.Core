@@ -18,6 +18,7 @@ import QpIntegrationStore from "stores/QpIntegrationStore";
 import PopupStore from "stores/PopupStore";
 import TextStore from "stores/TextStore";
 import SiteTreeMenu from "./InteractiveZone/SiteTreeMenu";
+import ArchiveTreeMenu from "./InteractiveZone/ArchiveTreeMenu";
 
 const DISPLAYNAME_PREFIX = "Blueprint3";
 class Classes {
@@ -123,6 +124,8 @@ export class CustomTree<T = {}> extends React.Component<Props<T>, {}> {
                                     <WidgetTreeMenu itemId={+node.id} />
                                 ) : tree.type === TreeStoreType.SITE ? (
                                     <SiteTreeMenu itemId={+node.id} />
+                                ) : tree.type === TreeStoreType.ARCHIVE ? (
+                                    <ArchiveTreeMenu itemId={+node.id} />
                                 ) : null}
                             </Provider>
                         }
@@ -206,6 +209,7 @@ export class CustomTree<T = {}> extends React.Component<Props<T>, {}> {
         node: TreeNode<T>,
         e: React.MouseEvent<HTMLElement>
     ) => {
+        this.handlerHelper(this.props.onNodeClick, node, e);
         this.handlerHelper(this.props.onNodeContextMenu, node, e);
     };
 

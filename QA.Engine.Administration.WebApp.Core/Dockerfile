@@ -1,8 +1,20 @@
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build-env
-LABEL stage=intermediate
+FROM node:16-bullseye as front-builder
+LABEL stage=intermediate-front
 
-RUN curl -sL https://deb.nodesource.com/setup_16.x |  bash - && \
-    apt-get install -y nodejs
+WORKDIR /src/QA.Engine.Administration.WebApp.Core
+COPY QA.Engine.Administration.WebApp.Core/package.json .
+COPY QA.Engine.Administration.WebApp.Core/package-lock.json .
+RUN npm ci
+
+COPY QA.Engine.Administration.WebApp.Core/ClientApp ClientApp
+COPY QA.Engine.Administration.WebApp.Core/webpack.common.js .
+COPY QA.Engine.Administration.WebApp.Core/webpack.prod.js .
+COPY QA.Engine.Administration.WebApp.Core/tsconfig.json .
+COPY QA.Engine.Administration.WebApp.Core/.babelrc .
+RUN npm run build
+
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build-env
+LABEL stage=intermediate-back
 
 WORKDIR /src
 COPY ["QA.Engine.Administration.WebApp.Core/QA.Engine.Administration.WebApp.Core.csproj", "QA.Engine.Administration.WebApp.Core/"]
@@ -13,22 +25,16 @@ COPY ["QA.Engine.Administration.Services.Core/QA.Engine.Administration.Services.
 COPY .nuget .
 RUN dotnet restore "QA.Engine.Administration.WebApp.Core/QA.Engine.Administration.WebApp.Core.csproj"
 
-WORKDIR /src/QA.Engine.Administration.WebApp.Core
-COPY QA.Engine.Administration.WebApp.Core/package.json .
-COPY QA.Engine.Administration.WebApp.Core/package-lock.json .
-RUN npm ci
-
-WORKDIR /src
 COPY . .
 
-WORKDIR /src/QA.Engine.Administration.WebApp.Core
-RUN npm run build
-RUN dotnet publish "QA.Engine.Administration.WebApp.Core.csproj" -c Release -o /app/out
+WORKDIR /src
+RUN dotnet publish "QA.Engine.Administration.WebApp.Core/QA.Engine.Administration.WebApp.Core.csproj" -c Release -o /app/out --no-restore
 
 FROM mcr.microsoft.com/dotnet/aspnet:6.0
 ARG SERVICE_VERSION=0.0.0
 ENV ServiceVersion=${SERVICE_VERSION}
 WORKDIR /app
+COPY --from=front-builder /src/QA.Engine.Administration.WebApp.Core/wwwroot ./wwwroot
 COPY --from=build-env /app/out .
 EXPOSE 80
 ENTRYPOINT ["dotnet", "QA.Engine.Administration.WebApp.Core.dll"]

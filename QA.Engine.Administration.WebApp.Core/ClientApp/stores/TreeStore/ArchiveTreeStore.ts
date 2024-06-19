@@ -99,6 +99,11 @@ export default class ArchiveTreeStore extends BaseTreeState<ArchiveModel> {
         this.pageIndex = -1;
     }
 
+    public IsPage(id: number): boolean {
+        const node = this.nodesMap.get(id);
+        return node?.original?.isPage ?? false;
+    }
+
     protected contextMenuType: ContextMenuType = ContextMenuType.ARCHIVE;
 
     protected async getTree(): Promise<ApiResult<ArchiveModel[]>> {

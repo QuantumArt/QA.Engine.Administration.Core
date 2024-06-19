@@ -88,13 +88,6 @@ export default class WidgetTreeMenu extends React.Component<Props> {
             <Menu>
                 <MenuItem
                     onClick={(e: React.MouseEvent<HTMLElement>) =>
-                        this.handleClick(e, this.handlerExample)
-                    }
-                    icon="eye-open"
-                    text={textStore.texts[Texts.view]}
-                />
-                <MenuItem
-                    onClick={(e: React.MouseEvent<HTMLElement>) =>
                         this.handleClick(e, this.historyClick)
                     }
                     icon="history"

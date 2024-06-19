@@ -19,6 +19,7 @@ using QP.ConfigurationService.Models;
 using System;
 using System.Globalization;
 using QA.DotNetCore.Engine.Persistent.Interfaces;
+using Quantumart.QP8.Configuration;
 using DatabaseType = QP.ConfigurationService.Models.DatabaseType;
 
 namespace QA.Engine.Administration.WebApp.Core
@@ -127,6 +128,7 @@ namespace QA.Engine.Administration.WebApp.Core
 
             _ = services.AddDistributedMemoryCache();
 
+            _ = services.Configure<S3Options>(Configuration.GetSection("S3"));
             _ = services.Configure<CookiePolicyOptions>(options =>
             {
                 options.Secure = CookieSecurePolicy.SameAsRequest;
@@ -136,7 +138,7 @@ namespace QA.Engine.Administration.WebApp.Core
             _ = services.AddSession(options =>
             {
                 // Set a short timeout for easy testing.
-                options.IdleTimeout = TimeSpan.FromMinutes(20);
+                options.IdleTimeout = config.SessionTimeout;
                 options.Cookie.SameSite = config.UseSameSiteNone ? SameSiteMode.None : SameSiteMode.Lax;
                 options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
                 options.Cookie.IsEssential = true;

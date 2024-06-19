@@ -894,6 +894,11 @@
     "reflect-metadata" "^0.1.12"
     "tslib" "^1.8.1"
 
+"@quantumart/qp8backendapi-interaction@^1.1.4":
+  "integrity" "sha512-l49iCwT5a56Qah+2Wqmw6KSGCoYbmm+sHz7hvE1VlKmzR4dJzwXEiTBAxlzD8kqlHQWiwm0thYACyEawYnrDBA=="
+  "resolved" "https://registry.npmjs.org/@quantumart/qp8backendapi-interaction/-/qp8backendapi-interaction-1.1.4.tgz"
+  "version" "1.1.4"
+
 "@types/classnames@^2.2.7":
   "integrity" "sha512-MNl+rT5UmZeilaPxAVs6YaPC2m6aA8rofviZbhbxpPpl61uKodfdQVsBtgJGTqGizEf02oW3tsVe7FYB8kK14A=="
   "resolved" "https://registry.npmjs.org/@types/classnames/-/classnames-2.2.9.tgz"
@@ -5358,11 +5363,6 @@
   "integrity" "sha1-fjL3W0E4EpHQRhHxvxQQmsAGUdc="
   "resolved" "https://registry.npmjs.org/q/-/q-1.5.1.tgz"
   "version" "1.5.1"
-
-"qp8backendapi-interaction@^1.0.0":
-  "integrity" "sha512-WEy4LOBRazu3vK+pQnLjqk9yO8cxpBn9hBmoiJN0nv3a8iJsZhBDOKMj8HX6hNMC+jsYleA3hMrP8+aderURjA=="
-  "resolved" "https://registry.npmjs.org/qp8backendapi-interaction/-/qp8backendapi-interaction-1.0.0.tgz"
-  "version" "1.0.0"
 
 "qs@^6.6.0":
   "integrity" "sha512-Cxm7/SS/y/Z3MHWSxXb8lIFqgqBowP5JMlTUFyJN88y0SGQhVmZnqFK/PeuMX9LzUyWsqqhNxIyg0jlzq946yA=="

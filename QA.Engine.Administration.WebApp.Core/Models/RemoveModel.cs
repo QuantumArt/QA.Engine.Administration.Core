@@ -3,7 +3,7 @@ using QA.Engine.Administration.Common.Core;
 namespace QA.Engine.Administration.WebApp.Core.Models
 {
     /// <summary>
-    /// Модель для перемещения элемена в архив
+    /// Модель для перемещения элемента в архив
     /// </summary>
     [TypeScriptType]
     public class RemoveModel

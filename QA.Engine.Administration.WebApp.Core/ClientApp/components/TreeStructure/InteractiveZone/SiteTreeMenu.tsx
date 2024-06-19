@@ -86,7 +86,9 @@ export default class SiteTreeMenu extends React.Component<Props> {
     }
 
     render() {
-        const { textStore } = this.props;
+        const { textStore, treeStore } = this.props;
+        const tree = treeStore.getSiteTreeStore();
+        const isHidePreviewOption = tree.customerOptions.hidePreviewInSiteTreeContextMenu;
         return (
             <Menu>
                 <MenuItem
@@ -94,39 +96,41 @@ export default class SiteTreeMenu extends React.Component<Props> {
                     icon="refresh"
                     text={textStore.texts[Texts.refresh]}
                 />
-                <MenuItem
-                    onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.previewClick)}
-                    icon="eye-open"
-                    text={textStore.texts[Texts.view]}
-                />
+                {isHidePreviewOption
+                    ? null
+                    : (<MenuItem
+                        onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.previewClick)}
+                        icon="eye-open"
+                        text={textStore.texts[Texts.view]} />)
+                }
                 <MenuItem
                     onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.historyClick)}
                     icon="history"
                     text={textStore.texts[Texts.history]}
                 />
-                <MenuDivider/>
+                <MenuDivider />
                 <MenuItem
                     onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.publishClick)}
                     icon="confirm"
                     text={textStore.texts[Texts.publish]}
                     intent={Intent.SUCCESS}
                 />
-                <MenuDivider/>
+                <MenuDivider />
                 <MenuItem
                     onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.addClick)}
                     icon="new-object"
                     text={textStore.texts[Texts.addItem]}
-                    intent={Intent.PRIMARY}/>
+                    intent={Intent.PRIMARY} />
                 <MenuItem
                     onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.addVersionClick)}
                     icon="add"
                     text={textStore.texts[Texts.addVersionItem]}
-                    intent={Intent.PRIMARY}/>
+                    intent={Intent.PRIMARY} />
                 <MenuItem
                     onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.editClick)}
                     icon="edit"
                     text={textStore.texts[Texts.edit]}
-                    intent={Intent.PRIMARY}/>
+                    intent={Intent.PRIMARY} />
                 <MenuItem
                     onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.reorderClick)}
                     icon="sort"
@@ -139,12 +143,12 @@ export default class SiteTreeMenu extends React.Component<Props> {
                     text={textStore.texts[Texts.move]}
                     intent={Intent.PRIMARY}
                 />
-                <MenuDivider/>
+                <MenuDivider />
                 <MenuItem
                     onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.archiveClick)}
                     icon="box"
                     text={textStore.texts[Texts.archive]}
-                    intent={Intent.DANGER}/>
+                    intent={Intent.DANGER} />
             </Menu>
         );
     }

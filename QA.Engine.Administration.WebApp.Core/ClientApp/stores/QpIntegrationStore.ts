@@ -4,7 +4,6 @@ import QpAbstractItemFields from 'constants/QpAbstractItemFields';
 import QpActionCodes from 'constants/QpActionCodes';
 import QpCallbackProcNames from 'constants/QpCallbackProcNames';
 import QpEntityCodes from 'constants/QpEntityCodes';
-// import { BackendEventObserver, executeBackendAction, ArticleFormState, ExecuteActionOptions, InitFieldValue, OpenSelectWindowOptions, openSelectWindow, EntitiesSelectedArgs } from 'qp/QP8BackendApi.Interaction';
 import {
     BackendEventObserver,
     executeBackendAction,
@@ -14,7 +13,7 @@ import {
     OpenSelectWindowOptions,
     openSelectWindow,
     EntitiesSelectedArgs,
-} from 'qp8backendapi-interaction';
+} from '@quantumart/qp8backendapi-interaction';
 import TreeStore from 'stores/TreeStore';
 import ErrorHandler from 'stores/ErrorHandler';
 import ErrorsTypes from 'constants/ErrorsTypes';
@@ -299,6 +298,12 @@ export default class QpIntegrationStore extends ErrorHandler {
         if (regionIds != null && this.customAction.regionParamName != null) {
             executeOptions.options.additionalParams[this.customAction.regionParamName] = regionIds[0];
         }
+
+        executeOptions.options.additionalOptions = {};
+        if (this.customAction.previewPagePathName != null) {
+            executeOptions.options.additionalOptions[this.customAction.previewPagePathName] = await this.treeStore.getSiteTreeStore().getPathToElement(id);
+        }
+
         this.executeTab(executeOptions);
     }
 
@@ -394,7 +399,7 @@ class QpIntegrationUtils {
         const executeOptions = new OpenSelectWindowOptions();
         executeOptions.selectActionCode = isMultiple ? QpActionCodes.multiple_select_article : QpActionCodes.select_article;
         executeOptions.entityTypeCode = QpEntityCodes.article;
-        executeOptions.isMultiple = isMultiple,
+        executeOptions.isMultiple = isMultiple;
         executeOptions.parentEntityId = entityId;
         executeOptions.selectWindowUID = QpIntegrationUtils.newGuid();
         executeOptions.callerCallback = callback;
