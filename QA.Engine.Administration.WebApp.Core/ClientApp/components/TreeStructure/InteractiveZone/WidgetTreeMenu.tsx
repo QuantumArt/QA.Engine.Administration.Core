@@ -60,6 +60,11 @@ export default class WidgetTreeMenu extends React.Component<Props> {
         );
     };
 
+    private reorderClick = () => {
+        const { popupStore, itemId, textStore } = this.props;
+        popupStore.show(itemId, PopupType.REORDERWIDGET, textStore.texts[Texts.popupReorderTitle]);
+    }
+
     private handleClick = (
         e: React.MouseEvent<HTMLElement>,
         cb: () => void
@@ -112,6 +117,12 @@ export default class WidgetTreeMenu extends React.Component<Props> {
                     }
                     icon="edit"
                     text={textStore.texts[Texts.edit]}
+                    intent={Intent.PRIMARY}
+                />
+                <MenuItem
+                    onClick={(e: React.MouseEvent<HTMLElement>) => this.handleClick(e, this.reorderClick)}
+                    icon="sort"
+                    text={textStore.texts[Texts.reorder]}
                     intent={Intent.PRIMARY}
                 />
                 <MenuDivider />

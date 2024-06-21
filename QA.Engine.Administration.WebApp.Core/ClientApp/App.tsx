@@ -26,6 +26,7 @@ import ErrorToast from 'components/ErrorToast';
 import TextStore from 'stores/TextStore';
 import ReorderPopup from 'components/Popup/ReorderPopup';
 import RegionStore from 'stores/RegionStore';
+import ReorderWidgetPopup from "components/Popup/ReorderWidgetPopup";
 
 const app = hot(module)(() => {
     const navigationStoreInstance = new NavigationStore();
@@ -58,6 +59,7 @@ const app = hot(module)(() => {
                 <DeletePopup/>
                 <RestorePopup/>
                 <ReorderPopup/>
+                <ReorderWidgetPopup/>
             </Popup>
             <ErrorToast/>
         </div>

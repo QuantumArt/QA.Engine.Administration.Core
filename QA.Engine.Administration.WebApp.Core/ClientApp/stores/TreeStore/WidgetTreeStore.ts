@@ -1,5 +1,5 @@
 import SiteMapService from "services/SiteMapService";
-import { BaseTreeState, ITreeElement } from "stores/TreeStore/BaseTreeStore";
+import {BaseTreeState, ITreeElement, MapEntity} from "stores/TreeStore/BaseTreeStore";
 import ContextMenuType from "enums/ContextMenuType";
 import { action, observable } from "mobx";
 import TreeStoreType from "enums/TreeStoreType";
@@ -11,6 +11,16 @@ export default class WidgetTreeStore extends BaseTreeState<WidgetModel> {
     public type = TreeStoreType.WIDGET;
 
     @observable public selectedSiteTreeNode: PageModel;
+
+    public get widgetsInZone(): WidgetModel[] {
+        const widgets: WidgetModel[] = [];
+        const widgetMaps = Array.from(this.nodesMap.values()).filter((item: MapEntity<WidgetModel>) => item.original.zoneName === this.selectedNode.zoneName);
+        widgetMaps.forEach((x) => {
+            widgets.push(x.original);
+        });
+
+        return widgets.filter((value, index, array) => array.indexOf(value) === index);
+    }
 
     @action
     public handleNodeExpand = (nodeData: ITreeElement) => {
