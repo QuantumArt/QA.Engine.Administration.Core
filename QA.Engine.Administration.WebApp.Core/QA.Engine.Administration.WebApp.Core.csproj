@@ -59,6 +59,11 @@
           <Generator>PublicResXFileCodeGenerator</Generator>
           <LastGenOutput>Texts.Designer.cs</LastGenOutput>
       </EmbeddedResource>
+      <Compile Update="Resources\Texts.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>Texts.resx</DependentUpon>
+      </Compile>
       <Compile Update="Texts.Designer.cs">
           <DesignTime>True</DesignTime>
           <AutoGen>True</AutoGen>
