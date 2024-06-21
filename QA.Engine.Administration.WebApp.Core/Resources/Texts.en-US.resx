@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!--
     Microsoft ResX Schema
@@ -204,8 +204,11 @@
   <data name="PopupFieldAliasPlaceholder" xml:space="preserve">
     <value>alias</value>
   </data>
-  <data name="PopupFieldContentType" xml:space="preserve">
-    <value>Content type</value>
+  <data name="PopupFieldPageType" xml:space="preserve">
+    <value>Page type</value>
+  </data>
+  <data name="PopupFieldWidgetType" xml:space="preserve">
+    <value>Widget type</value>
   </data>
   <data name="PopupFieldTitle" xml:space="preserve">
     <value>Title</value>

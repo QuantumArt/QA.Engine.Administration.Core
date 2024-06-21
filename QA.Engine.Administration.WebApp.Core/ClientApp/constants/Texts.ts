@@ -47,7 +47,8 @@ export default class Texts {
     static readonly popupFieldTitlePlaceholder: string = 'PopupFieldTitlePlaceholder';
     static readonly popupFieldAlias: string = 'PopupFieldAlias';
     static readonly popupFieldAliasPlaceholder: string = 'PopupFieldAliasPlaceholder';
-    static readonly popupFieldContentType: string = 'PopupFieldContentType';
+    static readonly popupFieldPageType: string = 'PopupFieldPageType';
+    static readonly popupFieldWidgetType: string = 'PopupFieldWidgetType';
     static readonly popupFieldVersion: string = 'PopupFieldVersion';
     static readonly popupVersionContent: string = 'PopupVersionContent';
     static readonly popupVersionStructural: string = 'PopupVersionStructural';

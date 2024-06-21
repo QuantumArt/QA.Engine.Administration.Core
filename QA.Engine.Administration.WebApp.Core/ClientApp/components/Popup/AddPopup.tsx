@@ -82,6 +82,7 @@ export default class AddPopup extends React.Component<Props, State> {
         if (popupStore.type !== PopupType.ADD && popupStore.type !== PopupType.ADDWIDGET) {
             return null;
         }
+        const isWidget = popupStore.type === PopupType.ADDWIDGET;
 
         return (
             <Card>
@@ -91,7 +92,7 @@ export default class AddPopup extends React.Component<Props, State> {
                 <FormGroup label={textStore.texts[Texts.popupFieldAlias]}>
                     <InputGroup placeholder={textStore.texts[Texts.popupFieldAliasPlaceholder]} value={name} onChange={this.changeName} intent={nameIntent} />
                 </FormGroup>
-                <FormGroup label={textStore.texts[Texts.popupFieldContentType]}>
+                <FormGroup label={textStore.texts[isWidget ? Texts.popupFieldWidgetType : Texts.popupFieldPageType]}>
                     <DiscriminatorSelect filterable items={popupStore.discriminators} onChange={this.changeDiscriminator} intent={discriminatorIntent} />
                 </FormGroup>
                 <ButtonGroup className="dialog-button-group">
