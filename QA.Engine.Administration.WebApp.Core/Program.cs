@@ -3,8 +3,8 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using NLog.Web;
 using NLog;
+using NLog.Web;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace QA.Engine.Administration.WebApp.Core
@@ -16,6 +16,7 @@ namespace QA.Engine.Administration.WebApp.Core
             var logger = LogManager.Setup().LoadConfigurationFromFile("NLogClient.config").GetCurrentClassLogger();
             try
             {
+                AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
                 CreateWebHostBuilder(args).Build().Run();
             }
             catch (Exception exception)
