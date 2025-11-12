@@ -98,7 +98,12 @@ namespace QA.Engine.Administration.WebApp.Core
             _ = services.AddScoped<IUnitOfWork, UnitOfWork>(sp =>
             {
                 CustomerConfiguration dbConfig = sp.GetRequiredService<CustomerConfiguration>();
-                return dbConfig != null ? new UnitOfWork(dbConfig.ConnectionString, dbConfig.DbType.ToString()) : null;
+                return dbConfig != null
+                    ? new UnitOfWork(
+                        dbConfig.ConnectionString,
+                        dbConfig.DbType.ToString(),
+                        sp.GetRequiredService<ILogger<UnitOfWork>>())
+                    : null;
             });
 
             services.TryAddSiteStructureRepositories();
