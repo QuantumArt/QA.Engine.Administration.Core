@@ -13,7 +13,7 @@ COPY QA.Engine.Administration.WebApp.Core/tsconfig.json .
 COPY QA.Engine.Administration.WebApp.Core/.babelrc .
 RUN npm run build
 
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build-env
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
 LABEL stage=intermediate-back
 
 WORKDIR /src
@@ -30,7 +30,7 @@ COPY . .
 WORKDIR /src
 RUN dotnet publish "QA.Engine.Administration.WebApp.Core/QA.Engine.Administration.WebApp.Core.csproj" -c Release -o /app/out --no-restore
 
-FROM mcr.microsoft.com/dotnet/aspnet:6.0
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
 ARG SERVICE_VERSION=0.0.0
 ENV ServiceVersion=${SERVICE_VERSION}
 WORKDIR /app
