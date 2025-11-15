@@ -19,7 +19,7 @@ namespace QA.Engine.Administration.WebApp.Core.Auth
             if (!isAuthorized)
             {
                 context.Response.StatusCode = 403;
-                context.Response.Headers.Add("Content-Type", "text/plain; charset=utf-8");
+                context.Response.Headers.Append("Content-Type", "text/plain; charset=utf-8");
                 await context.Response.WriteAsync("Unauthorized");
             }
             else
