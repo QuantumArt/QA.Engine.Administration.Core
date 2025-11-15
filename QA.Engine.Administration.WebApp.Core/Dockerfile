@@ -37,4 +37,4 @@ WORKDIR /app
 COPY --from=front-builder /src/QA.Engine.Administration.WebApp.Core/wwwroot ./wwwroot
 COPY --from=build-env /app/out .
 EXPOSE 80
-ENTRYPOINT ["dotnet", "QA.Engine.Administration.WebApp.Core.dll"]
+ENTRYPOINT ["dotnet", "QA.Engine.Administration.WebApp.Core.dll", "--urls", "http://*:80"]

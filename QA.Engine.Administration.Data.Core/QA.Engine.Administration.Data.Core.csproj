@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="NLog" Version="6.0.4" />
-    <PackageReference Include="QA.DotNetCore.Engine.Persistent.Configuration" Version="3.4.1" />
+    <PackageReference Include="QA.DotNetCore.Engine.Persistent.Configuration" Version="3.5.0" />
     <PackageReference Include="Quantumart.QP8.BLL" Version="3.6.1" />
   </ItemGroup>
 
