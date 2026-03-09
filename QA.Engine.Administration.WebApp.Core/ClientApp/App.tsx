@@ -1,7 +1,5 @@
 import * as React from 'react';
 import { Provider } from 'mobx-react';
-// import DevTools from 'mobx-react-devtools'; // tslint:disable-line
-import { hot } from 'react-hot-loader';
 import '@blueprintjs/core/lib/css/blueprint.css';
 import '@blueprintjs/icons/lib/css/blueprint-icons.css';
 import '@blueprintjs/select/lib/css/blueprint-select.css';
@@ -26,24 +24,23 @@ import ErrorToast from 'components/ErrorToast';
 import TextStore from 'stores/TextStore';
 import ReorderPopup from 'components/Popup/ReorderPopup';
 import RegionStore from 'stores/RegionStore';
-import ReorderWidgetPopup from "components/Popup/ReorderWidgetPopup";
+import ReorderWidgetPopup from 'components/Popup/ReorderWidgetPopup';
 
-const app = hot(module)(() => {
-    const navigationStoreInstance = new NavigationStore();
-    const textStore = new TextStore();
-    const regionStore = new RegionStore();
-    const treeStoreInstance = new TreeStore(navigationStoreInstance, textStore);
+const navigationStoreInstance = new NavigationStore();
+const textStore = new TextStore();
+const regionStore = new RegionStore();
+const treeStoreInstance = new TreeStore(navigationStoreInstance, textStore);
 
-    return (
-        <Provider
-            treeStore={treeStoreInstance}
-            qpIntegrationStore={new QpIntegrationStore(treeStoreInstance)}
-            navigationStore={navigationStoreInstance}
-            popupStore={new PopupStore()}
-            editArticleStore={new EditArticleStore()}
-            textStore={textStore}
-            regionStore={regionStore}
-        >
+const App: React.FC = () => (
+    <Provider
+        treeStore={treeStoreInstance}
+        qpIntegrationStore={new QpIntegrationStore(treeStoreInstance)}
+        navigationStore={navigationStoreInstance}
+        popupStore={new PopupStore()}
+        editArticleStore={new EditArticleStore()}
+        textStore={textStore}
+        regionStore={regionStore}
+    >
         <div className="layout">
             <NavigationBar/>
             <TreeStructure
@@ -64,7 +61,6 @@ const app = hot(module)(() => {
             <ErrorToast/>
         </div>
     </Provider>
-    );
-});
+);
 
-export default app;
+export default App;
