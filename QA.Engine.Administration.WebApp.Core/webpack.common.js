@@ -1,11 +1,10 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 module.exports = {
     entry: {
-        polyfill: '@babel/polyfill',
         main: './ClientApp/index.tsx'
     },
     output: {
@@ -31,24 +30,14 @@ module.exports = {
             {
                 test: /\.(jpg|jpeg|png|gif|svg)?$/,
                 exclude: /fonts/,
-                use: {
-                    loader: 'url-loader',
-                    options: {
-                        name: 'img/[name].[ext]',
-                        limit: 10000
-                    }
-                }
+                type: 'asset',
+                generator: { filename: 'img/[name][ext]' }
             },
             {
                 test: /\.(woff|woff2|eot|ttf|otf|svg)?$/,
                 exclude: /img/,
-                use: {
-                    loader: 'url-loader',
-                    options: {
-                        name: 'fonts/[name].[ext]',
-                        limit: 10000
-                    }
-                }
+                type: 'asset',
+                generator: { filename: 'fonts/[name][ext]' }
             },
         ]
     },
@@ -58,9 +47,11 @@ module.exports = {
             title: 'Manage Site',
             template: 'ClientApp/assets/index.html'
         }),
-        CopyWebpackPlugin([{
-            from: './ClientApp/assets/pmrpc.js',
-            to: './scripts'
-        }])
+        new CopyPlugin({
+            patterns: [{
+                from: './ClientApp/assets/pmrpc.js',
+                to: './scripts'
+            }]
+        })
     ],
 };

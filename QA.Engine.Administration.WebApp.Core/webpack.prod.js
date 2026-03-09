@@ -1,7 +1,7 @@
-const merge = require('webpack-merge');
+const { merge } = require('webpack-merge');
 const common = require('./webpack.common');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = merge(common, {
@@ -9,6 +9,10 @@ module.exports = merge(common, {
     devtool: 'cheap-source-map',
     optimization: {
         minimize: true,
+        minimizer: [
+            `...`,
+            new CssMinimizerPlugin(),
+        ],
         splitChunks: {
             cacheGroups: {
                 vendors: {
@@ -26,7 +30,10 @@ module.exports = merge(common, {
                 test: /\.tsx?$/,
                 exclude: /node_modules/,
                 use: {
-                    loader: 'awesome-typescript-loader'
+                    loader: 'ts-loader',
+                    options: {
+                        transpileOnly: true,
+                    }
                 }
             },
             {
@@ -43,7 +50,6 @@ module.exports = merge(common, {
             filename: 'style/[name].css',
             chunkFilename: '[id].css'
         }),
-        new OptimizeCssAssetsPlugin({}),
         new BundleAnalyzerPlugin({
             analyzerMode: 'static'
         }),
