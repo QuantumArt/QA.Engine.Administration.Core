@@ -19,6 +19,7 @@ module.exports = merge(common, {
                     test: /[\\/]node_modules[\\/].*\.js$/,
                     chunks: 'all',
                     reuseExistingChunk: true,
+                    name: 'vendors',
                     filename: '[name].bundle.js'
                 },
             },
