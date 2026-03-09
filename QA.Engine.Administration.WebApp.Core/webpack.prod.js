@@ -31,10 +31,7 @@ module.exports = merge(common, {
                 test: /\.tsx?$/,
                 exclude: /node_modules/,
                 use: {
-                    loader: 'ts-loader',
-                    options: {
-                        transpileOnly: true,
-                    }
+                    loader: 'babel-loader'
                 }
             },
             {
