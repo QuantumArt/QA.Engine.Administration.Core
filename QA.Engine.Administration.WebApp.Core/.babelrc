@@ -3,9 +3,7 @@
     [
       "@babel/preset-env",
       {
-        "targets": {
-          "browsers": "last 2 versions"
-        },
+        "targets": "last 2 versions",
         "modules": false
       }
     ],
@@ -14,6 +12,8 @@
   ],
   "plugins": [
     ["@babel/plugin-proposal-decorators", { "legacy": true }],
-    ["@babel/plugin-proposal-class-properties", { "loose": true }]
+    ["@babel/plugin-proposal-class-properties", { "loose": true }],
+    ["@babel/plugin-transform-private-methods", { "loose": true }],
+    ["@babel/plugin-transform-private-property-in-object", { "loose": true }]
   ]
 }

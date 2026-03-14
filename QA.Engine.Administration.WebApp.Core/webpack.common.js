@@ -1,7 +1,7 @@
 const path = require('path');
+const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
-const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 module.exports = {
     entry: {
@@ -42,7 +42,11 @@ module.exports = {
         ]
     },
     plugins: [
-        new ForkTsCheckerWebpackPlugin(),
+        new webpack.DefinePlugin({
+            'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production'),
+            'process.env': JSON.stringify({}),
+            'process': JSON.stringify({ env: { NODE_ENV: process.env.NODE_ENV || 'production' } }),
+        }),
         new HtmlWebpackPlugin({
             title: 'Manage Site',
             template: 'ClientApp/assets/index.html'

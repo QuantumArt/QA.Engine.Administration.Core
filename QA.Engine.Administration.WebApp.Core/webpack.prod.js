@@ -49,7 +49,8 @@ module.exports = merge(common, {
             chunkFilename: '[id].css'
         }),
         new BundleAnalyzerPlugin({
-            analyzerMode: 'static'
+            analyzerMode: 'static',
+            openAnalyzer: false
         }),
     ],
 });
