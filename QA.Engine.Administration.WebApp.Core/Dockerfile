@@ -1,4 +1,4 @@
-FROM node:16-bullseye as front-builder
+FROM node:24-bookworm-slim AS front-builder
 LABEL stage=intermediate-front
 
 WORKDIR /src/QA.Engine.Administration.WebApp.Core

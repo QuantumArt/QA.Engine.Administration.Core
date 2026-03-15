@@ -9,7 +9,6 @@ import {
     ITreeProps,
     TreeEventHandler,
 } from "@blueprintjs/core";
-import { isFunction } from "util";
 import TreeStore, { TreeType } from "stores/TreeStore";
 import TreeStoreType from "enums/TreeStoreType";
 import RightClickMenu from "components/RightClickContextMenu";
@@ -99,7 +98,7 @@ export class CustomTree<T = {}> extends React.Component<Props<T>, {}> {
             const { tree } = this.props;
             const elementPath = currentPath.concat(i);
             if (
-                node.id < 0 &&
+                (node.id as number) < 0 &&
                 tree.type === TreeStoreType.WIDGET &&
                 (tree.searchActive || tree.selectedDiscriminatorsActive)
             ) {
@@ -247,7 +246,7 @@ export class CustomTree<T = {}> extends React.Component<Props<T>, {}> {
         node: TreeNode<T>,
         e: React.MouseEvent<HTMLElement>
     ) {
-        if (isFunction(handlerFromProps)) {
+        if (typeof handlerFromProps === 'function') {
             const nodeData = CustomTree.nodeFromPath(
                 node.props.path,
                 this.props.contents

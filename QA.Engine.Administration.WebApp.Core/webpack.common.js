@@ -1,17 +1,16 @@
 const path = require('path');
+const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
-const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
     entry: {
-        polyfill: '@babel/polyfill',
         main: './ClientApp/index.tsx'
     },
     output: {
         filename: '[name].bundle.js',
         path: path.join(__dirname, 'wwwroot/dist'),
-        publicPath: '/'
+        publicPath: '/dist/'
     },
     resolve: {
         extensions: ['.ts', '.tsx', '.js', '.json'],
@@ -31,36 +30,32 @@ module.exports = {
             {
                 test: /\.(jpg|jpeg|png|gif|svg)?$/,
                 exclude: /fonts/,
-                use: {
-                    loader: 'url-loader',
-                    options: {
-                        name: 'img/[name].[ext]',
-                        limit: 10000
-                    }
-                }
+                type: 'asset',
+                generator: { filename: 'img/[name][ext]' }
             },
             {
                 test: /\.(woff|woff2|eot|ttf|otf|svg)?$/,
                 exclude: /img/,
-                use: {
-                    loader: 'url-loader',
-                    options: {
-                        name: 'fonts/[name].[ext]',
-                        limit: 10000
-                    }
-                }
+                type: 'asset',
+                generator: { filename: 'fonts/[name][ext]' }
             },
         ]
     },
     plugins: [
-        new ForkTsCheckerWebpackPlugin(),
+        new webpack.DefinePlugin({
+            'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production'),
+            'process.env': JSON.stringify({}),
+            'process': JSON.stringify({ env: { NODE_ENV: process.env.NODE_ENV || 'production' } }),
+        }),
         new HtmlWebpackPlugin({
             title: 'Manage Site',
             template: 'ClientApp/assets/index.html'
         }),
-        CopyWebpackPlugin([{
-            from: './ClientApp/assets/pmrpc.js',
-            to: './scripts'
-        }])
+        new CopyPlugin({
+            patterns: [{
+                from: './ClientApp/assets/pmrpc.js',
+                to: './scripts'
+            }]
+        })
     ],
 };

@@ -459,9 +459,9 @@ export abstract class BaseTreeState<T extends {
         }
     }
 
-    protected abstract async getTree(): Promise<ApiResult<T[]>>;
+    protected abstract getTree(): Promise<ApiResult<T[]>>;
 
-    protected abstract async getSubTree(id: number): Promise<ApiResult<T>>;
+    protected abstract getSubTree(id: number): Promise<ApiResult<T>>;
 
     protected abstract contextMenuType: ContextMenuType;
 
