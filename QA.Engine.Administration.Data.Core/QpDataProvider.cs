@@ -88,7 +88,7 @@ namespace QA.Engine.Administration.Data.Core
                 .Log();
 
             var result = GetArticleService(userId).Publish(contentId, itemIds.Select(n => n.Id).ToArray());
-            if (result != null && result.Type == ActionMessageType.Error)
+            if (result != null && (result.Type == ActionMessageType.Error || result.Type == ActionMessageType.Info))
             {
                 throw new ApplicationException(result.Text);
             }
@@ -177,7 +177,7 @@ namespace QA.Engine.Administration.Data.Core
 
             var ids = itemIds.Select(n => n.Id).ToArray();
             var result = GetArticleService(userId).SetArchiveFlag(contentId, ids, true);
-            if (result != null && result.Type == ActionMessageType.Error)
+            if (result != null && (result.Type == ActionMessageType.Error || result.Type == ActionMessageType.Info))
             {
                 throw new ApplicationException(result.Text);
             }
@@ -201,7 +201,7 @@ namespace QA.Engine.Administration.Data.Core
 
             var ids = itemIds.Select(n => n.Id).ToArray();
             var result = GetArticleService(userId).SetArchiveFlag(contentId, ids, false);
-            if (result != null && result.Type == ActionMessageType.Error)
+            if (result != null && (result.Type == ActionMessageType.Error || result.Type == ActionMessageType.Info))
             {
                 throw new ApplicationException(result.Text);
             }
@@ -219,7 +219,7 @@ namespace QA.Engine.Administration.Data.Core
                 .Log();
 
             var result = GetArticleService(userId).Delete(contentId, itemIds);
-            if (result != null && result.Type == ActionMessageType.Error)
+            if (result != null && (result.Type == ActionMessageType.Error || result.Type == ActionMessageType.Info))
             {
                 throw new ApplicationException(result.Text);
             }
